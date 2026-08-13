@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Ticket, ShieldCheck, Info } from "lucide-react";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY } from "@/lib/sanity/queries";
+import { ACTIVE_DRAW_QUERY, type ActiveDraw } from "@/lib/sanity/queries";
 import { getActiveDraw } from "@/lib/api";
 import { PrizeTable } from "@/components/PrizeTable";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -20,7 +20,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   // Fetch from both Sanity (content) and Go API (live state) in parallel
   const [cmsData, apiDraw] = await Promise.allSettled([
-    sanityClient.fetch(ACTIVE_DRAW_QUERY),
+    sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
   ]);
 
