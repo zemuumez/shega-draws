@@ -1,0 +1,32 @@
+# ══════════════════════════════════════════════
+# Shega Draws — .gitignore
+# ══════════════════════════════════════════════
+
+# ── Go ──────────────────────────────────────
+backend/bin/
+backend/tmp/
+*.test
+
+# ── JWT Keys (NEVER commit) ──────────────────
+backend/keys/
+
+# ── Node / Next.js ──────────────────────────
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# ── Environment files ────────────────────────
+.env
+.env.local
+
+# ── OS / Editor ──────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# ── Docker volumes (if local) ────────────────
+pgdata/
+redisdata/
+miniodata/
