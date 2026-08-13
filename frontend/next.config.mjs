@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-import { createClient } from "next-sanity";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // ─── Security Headers ───────────────────────────────────────────────
   async headers() {
     return [
@@ -12,11 +10,11 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // unsafe-inline needed for Next.js inline scripts
+              "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://cdn.sanity.io",
-              "connect-src 'self' " + process.env.NEXT_PUBLIC_API_URL + " https://api.sanity.io",
+              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"} https://api.sanity.io`,
               "frame-ancestors 'none'",
             ].join("; "),
           },
