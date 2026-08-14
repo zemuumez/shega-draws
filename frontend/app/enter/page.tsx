@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -9,7 +9,6 @@ import { Card } from "@/components/ui/Card";
 import { NumberPicker } from "@/components/NumberPicker";
 import { PaymentProofUploader } from "@/components/PaymentProofUploader";
 import { registerPlayer, submitEntry, getActiveDraw } from "@/lib/api";
-import { useEffect } from "react";
 
 const AMOUNT_PRESETS = [50, 100, 250, 500];
 const STEPS = ["Sign up", "Pick a number", "Choose amount", "Pay & confirm"];
@@ -18,6 +17,8 @@ interface PayMethod { id: string; name: string; accountDetail: string; }
 
 export default function EnterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialNum = searchParams.get("num") || "07";
 
   // Draw state
   const [drawID, setDrawID]     = useState<string>("");
@@ -33,7 +34,7 @@ export default function EnterPage() {
   // Form fields
   const [name, setName]           = useState("");
   const [phone, setPhone]         = useState("");
-  const [number, setNumber]       = useState("07");
+  const [number, setNumber]       = useState(initialNum);
   const [amount, setAmount]       = useState(100);
   const [customAmount, setCustom] = useState("");
   const [method, setMethod]       = useState("");
@@ -224,9 +225,9 @@ export default function EnterPage() {
             {(methods.length > 0
               ? methods
               : [
-                  { id: "telebirr", name: "Telebirr",      accountDetail: "0911 22 33 44 (Shega Draws PLC)" },
-                  { id: "cbebirr",  name: "CBE Birr",      accountDetail: "0911 22 33 44 (Shega Draws PLC)" },
-                  { id: "bank",     name: "Bank transfer",  accountDetail: "CBE — 1000456789012 (Shega Draws PLC)" },
+                  { id: "telebirr", name: "Telebirr",      accountDetail: "0911 22 33 44 (Prime Draws PLC)" },
+                  { id: "cbebirr",  name: "CBE Birr",      accountDetail: "0911 22 33 44 (Prime Draws PLC)" },
+                  { id: "bank",     name: "Bank transfer",  accountDetail: "CBE — 1000456789012 (Prime Draws PLC)" },
                 ]
             ).map((m) => (
               <button
@@ -261,9 +262,9 @@ export default function EnterPage() {
               </p>
               <p style={{ color: "var(--paper)", fontSize: "0.9375rem" }}>
                 {(methods.find((m2) => m2.id === method) ?? { accountDetail: "" }).accountDetail ||
-                  (method === "telebirr" ? "0911 22 33 44 (Shega Draws PLC)" :
-                   method === "cbebirr"  ? "0911 22 33 44 (Shega Draws PLC)" :
-                                           "CBE — 1000456789012 (Shega Draws PLC)")}
+                  (method === "telebirr" ? "0911 22 33 44 (Prime Draws PLC)" :
+                   method === "cbebirr"  ? "0911 22 33 44 (Prime Draws PLC)" :
+                                           "CBE — 1000456789012 (Prime Draws PLC)")}
               </p>
             </div>
           )}
