@@ -82,7 +82,8 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 		// Draws
 		r.Route("/draws", func(r chi.Router) {
-			r.Get("/active", drawH.GetActiveDraw) // Public
+			r.Get("/", drawH.ListDraws)          // Public — list all draws
+			r.Get("/active", drawH.GetActiveDraw) // Public — current active draw
 
 			r.Group(func(r chi.Router) {
 				r.Use(authenticate)

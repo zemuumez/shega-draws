@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/shega-draws/backend/internal/delivery/http/middleware"
+	"github.com/shega-draws/backend/internal/domain"
 	"github.com/shega-draws/backend/internal/usecase"
 )
 
@@ -27,6 +28,25 @@ func (h *DrawHandler) GetActiveDraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, http.StatusOK, draw)
+}
+
+// ListDraws handles GET /api/v1/draws — public
+func (h *DrawHandler) ListDraws(w http.ResponseWriter, r *http.Request) {
+	var statusPtr *domain.DrawStatus
+	if s := r.URL.Query().Get("status"); s != "" {
+		st := domain.DrawStatus(s)
+		statusPtr = &st
+	}
+
+	draws, err := h.drawUC.ListDraws(r.Context(), statusPtr)
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	if draws == nil {
+		draws = []*domain.Draw{}
+	}
+	respond(w, http.StatusOK, draws)
 }
 
 // CreateDraw handles POST /api/v1/draws — superadmin only

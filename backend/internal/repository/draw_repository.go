@@ -15,6 +15,8 @@ type DrawRepository interface {
 	FindByID(ctx context.Context, id uuid.UUID) (*domain.Draw, error)
 	// FindActive returns the single currently open draw, or ErrDrawNotFound.
 	FindActive(ctx context.Context) (*domain.Draw, error)
+	// List retrieves draws optionally filtered by status.
+	List(ctx context.Context, status *domain.DrawStatus) ([]*domain.Draw, error)
 	// UpdateStatus changes the draw status (open→closed→revealed).
 	UpdateStatus(ctx context.Context, id uuid.UUID, status domain.DrawStatus, actorID uuid.UUID) error
 	// SetWinningNumbers persists the revealed winning numbers and seed.

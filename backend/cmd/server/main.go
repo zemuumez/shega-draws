@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"github.com/shega-draws/backend/config"
 	"github.com/shega-draws/backend/internal/infrastructure/postgres"
@@ -22,6 +23,11 @@ import (
 )
 
 func main() {
+	// ── Load .env file (dev convenience — ignored if file is absent) ──
+	if err := godotenv.Load(); err == nil {
+		fmt.Fprintln(os.Stderr, "Loaded .env file")
+	}
+
 	// ── Load config ──
 	cfg, err := config.Load()
 	if err != nil {

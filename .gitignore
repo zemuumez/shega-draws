@@ -30,3 +30,7 @@ Thumbs.db
 pgdata/
 redisdata/
 miniodata/
+
+# ── Local run guide ──────────────────────────
+RUN_GUIDE.md
+

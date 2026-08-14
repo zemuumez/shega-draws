@@ -49,6 +49,47 @@ func (r *drawRepo) FindByID(ctx context.Context, id uuid.UUID) (*domain.Draw, er
 	return r.scanDraw(r.pool.QueryRow(ctx, query, id))
 }
 
+func (r *drawRepo) List(ctx context.Context, status *domain.DrawStatus) ([]*domain.Draw, error) {
+	var query string
+	var args []interface{}
+	if status != nil {
+		query = `
+			SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,
+			       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by
+			FROM draws WHERE status = $1 ORDER BY created_at DESC`
+		args = append(args, string(*status))
+	} else {
+		query = `
+			SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,
+			       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by
+			FROM draws ORDER BY created_at DESC`
+	}
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("listing draws: %w", err)
+	}
+	defer rows.Close()
+
+	var draws []*domain.Draw
+	for rows.Next() {
+		var d domain.Draw
+		var winningNumbersJSON []byte
+		err := rows.Scan(
+			&d.ID, &d.DrawID, &d.SanityID, &d.Seed, &d.Commitment, &d.Status, &d.Deadline,
+			&winningNumbersJSON, &d.CreatedAt, &d.ClosedAt, &d.RevealedAt, &d.ClosedBy, &d.RevealedBy,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scanning draw in list: %w", err)
+		}
+		if winningNumbersJSON != nil {
+			_ = json.Unmarshal(winningNumbersJSON, &d.WinningNumbers)
+		}
+		draws = append(draws, &d)
+	}
+	return draws, nil
+}
+
 func (r *drawRepo) FindActive(ctx context.Context) (*domain.Draw, error) {
 	query := `
 		SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,

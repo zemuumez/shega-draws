@@ -79,6 +79,20 @@ func (uc *DrawUseCase) GetActiveDraw(ctx context.Context) (*domain.Draw, error) 
 	return draw, nil
 }
 
+// ListDraws returns draws optionally filtered by status (seeds are only included for revealed draws).
+func (uc *DrawUseCase) ListDraws(ctx context.Context, status *domain.DrawStatus) ([]*domain.Draw, error) {
+	draws, err := uc.drawRepo.List(ctx, status)
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range draws {
+		if d.Status != domain.DrawStatusRevealed {
+			d.Seed = nil
+		}
+	}
+	return draws, nil
+}
+
 // CloseEntries transitions an open draw to closed, preventing new entries.
 // The seed remains secret.
 func (uc *DrawUseCase) CloseEntries(ctx context.Context, drawID uuid.UUID, actorID uuid.UUID) (*domain.Draw, error) {
