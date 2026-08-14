@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EntryTicket } from "@/components/EntryTicket";
-import { Check, X, Lock, Unlock, LogOut, ExternalLink } from "lucide-react";
+import { Check, X, Lock, Unlock, LogOut, ExternalLink, Sparkles, SlidersHorizontal, Layers } from "lucide-react";
+import Link from "next/link";
 
 const STATUS_OPTIONS = ["all", "pending", "confirmed", "rejected"] as const;
 
@@ -48,7 +49,7 @@ export default function AdminDashboard() {
   const pendingCount   = entries.filter((e) => e.status === "pending").length;
   const confirmedCount = entries.filter((e) => e.status === "confirmed").length;
 
-  async function act(fn: () => Promise<void>, entryID?: string) {
+  async function act(fn: () => Promise<unknown>, entryID?: string) {
     setActing(entryID ?? "draw");
     try { await fn(); await loadData(); }
     catch (e: any) { alert(e.message); }
@@ -69,14 +70,50 @@ export default function AdminDashboard() {
             {user.name} · <span style={{ textTransform: "capitalize" }}>{user.role}</span>
           </p>
         </div>
-        <Button
-          variant="ghost"
-          icon={LogOut}
-          onClick={() => logout().then(() => router.push("/admin/login"))}
-        >
-          Log out
-        </Button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <Link
+            href="/studio"
+            className="btn-base btn-secondary"
+            style={{ padding: "8px 16px", fontSize: "0.8125rem", display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none" }}
+          >
+            <Sparkles size={14} color="var(--gold)" />
+            Open CMS Studio
+          </Link>
+          <Button
+            variant="ghost"
+            icon={LogOut}
+            onClick={() => logout().then(() => router.push("/admin/login"))}
+          >
+            Log out
+          </Button>
+        </div>
       </div>
+
+      {/* CMS & Content Management Card */}
+      <Card style={{ marginBottom: 20, background: "linear-gradient(135deg, rgba(212, 175, 55, 0.06) 0%, rgba(20, 26, 36, 0.7) 100%)", borderColor: "rgba(212, 175, 55, 0.25)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+          <div style={{ maxWidth: 520 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <span className="badge badge-gold" style={{ fontSize: "0.6875rem" }}>
+                <Layers size={11} /> Headless CMS
+              </span>
+              <span style={{ color: "var(--paper)", fontWeight: 700, fontSize: "0.9375rem" }}>
+                Sanity Content Management Studio
+              </span>
+            </div>
+            <p style={{ color: "var(--paper-muted)", fontSize: "0.8125rem", lineHeight: 1.5, margin: 0 }}>
+              Edit jackpots, prize showcases, multilingual translations (English / Amharic / Afaan Oromoo), sponsor promos, and platform bank accounts live.
+            </p>
+          </div>
+          <Link
+            href="/studio"
+            className="btn-base btn-primary"
+            style={{ padding: "9px 18px", fontSize: "0.84375rem", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}
+          >
+            <SlidersHorizontal size={14} /> Launch Studio Editor
+          </Link>
+        </div>
+      </Card>
 
       {/* Draw state card */}
       {draw && (

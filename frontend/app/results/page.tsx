@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getActiveDraw } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY } from "@/lib/sanity/queries";
+import { ACTIVE_DRAW_QUERY, type ActiveDraw } from "@/lib/sanity/queries";
 import { ResultsVerifier } from "@/components/ResultsVerifier";
 import { PrizeTable } from "@/components/PrizeTable";
 import { Card } from "@/components/ui/Card";
@@ -16,7 +16,7 @@ export const revalidate = 30;
 
 export default async function ResultsPage() {
   const [cms, draw] = await Promise.allSettled([
-    sanityClient.fetch(ACTIVE_DRAW_QUERY),
+    sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
   ]);
 

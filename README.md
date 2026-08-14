@@ -447,26 +447,36 @@ audit_log (id, actor_id, action, target_type, target_id, metadata, created_at)
 | `EntryTicket` | Perforated ticket design, status badge, winner highlight |
 | `ResultsVerifier` | Client-side SHA-256 using Web Crypto API — fully trustless |
 
-### Content Management (Sanity)
+### Content Management (Sanity CMS)
 
-Sanity CMS powers the **editable content** — things non-engineers need to update:
+Shega Draws features an **embedded Sanity Studio** accessible directly at [`/studio`](http://localhost:3000/studio) or through the Admin Dashboard:
 
-- Draw title and description
-- Prize list (rank, label, prize title)
-- Payment account details (Telebirr, CBE Birr, bank)
-- Entry deadline
+- **Jackpots & Draws (`draw`)**: Draw ID, multilingual titles/descriptions (English, Amharic, Afaan Oromoo), ticket price, deadline datetime, hero image, prize tiers, payment accounts, and cryptographic verification parameters (seed, commitment, winning numbers).
+- **Prize Tiers (`prize`)**: Rank, translated badge labels, monetary valuation, and photos/specifications.
+- **Promotions & Deals (`promotion`)**: Multilingual banners, sponsor branding & logos, countdowns, highlight colors, and priority ordering.
+- **Payment Methods (`paymentMethod`)**: Telebirr, CBE Birr, and bank account instructions.
+- **Global Settings (`siteSettings`)**: Platform branding, contact phone, support email, Telegram channel, and WhatsApp hotline.
+- **Help & FAQs (`faq`)**: Categorized questions and answers with English, Amharic, and Afaan Oromoo translations.
 
-**To set up Sanity:**
+**To connect Sanity CMS:**
 
 1. Create a free project at [sanity.io](https://sanity.io)
 2. Copy your **Project ID** from the dashboard
 3. Set it in `frontend/.env.local`:
    ```bash
    NEXT_PUBLIC_SANITY_PROJECT_ID=your-actual-project-id
+   NEXT_PUBLIC_SANITY_DATASET=production
    ```
-4. Restart the dev server
+4. Access the embedded studio at [`http://localhost:3000/studio`](http://localhost:3000/studio).
 
-> **Without Sanity configured**, the app runs fully — pages display fallback text for CMS-managed content. Nothing crashes.
+**To pre-populate demo/seed data:**
+```bash
+cd frontend
+# (Optional) Generate an API token with write permissions at sanity.io/manage
+SANITY_API_TOKEN=your_token npm run seed:cms
+```
+
+> **Without Sanity configured**, the app runs fully in fallback mode — pages display rich localized placeholder content without crashing.
 
 ---
 

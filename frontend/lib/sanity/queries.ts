@@ -111,9 +111,44 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
   }
 `);
 
-export type ActiveDraw = NonNullable<Awaited<ReturnType<typeof import("./client").sanityClient.fetch<typeof ACTIVE_DRAW_QUERY>>>>;
-export type Prize = NonNullable<ActiveDraw["prizes"]>[number];
-export type PaymentMethod = NonNullable<ActiveDraw["paymentMethods"]>[number];
+export interface Prize {
+  rank: number;
+  label: string;
+  labelAm?: string;
+  labelOm?: string;
+  prizeTitle: string;
+  prizeTitleAm?: string;
+  prizeTitleOm?: string;
+  valueAmount?: string;
+  description?: string;
+  image?: string;
+}
+
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  accountDetail: string;
+}
+
+export interface ActiveDraw {
+  _id: string;
+  title: string;
+  titleAm?: string;
+  titleOm?: string;
+  drawId: string;
+  slug?: string;
+  deadline?: string;
+  description?: string;
+  descriptionAm?: string;
+  descriptionOm?: string;
+  maxNumber?: number;
+  ticketPrice?: number;
+  totalPrizeValue?: string;
+  entryAmounts?: number[];
+  heroImage?: string;
+  prizes?: Prize[];
+  paymentMethods?: PaymentMethod[];
+}
 
 export interface CMSPromotion {
   _id: string;

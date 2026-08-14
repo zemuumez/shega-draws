@@ -9,6 +9,10 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
   const pathname = usePathname();
   const { t } = useLanguage();
 
+  if (pathname?.startsWith("/studio")) {
+    return null;
+  }
+
   const navItems = [
     { href: "/",        label: t.nav.draws,       short: t.nav.draws,     icon: Home },
     { href: "/enter",   label: t.nav.enter,       short: t.nav.enter,     icon: Ticket },

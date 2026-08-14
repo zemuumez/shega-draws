@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import Link from "next/link";
 
-export const metadata = { title: "My Entries" };
-
 export default function EntriesPage() {
   const [drawID, setDrawID]   = useState<string>("");
   const [entries, setEntries] = useState<Entry[]>([]);

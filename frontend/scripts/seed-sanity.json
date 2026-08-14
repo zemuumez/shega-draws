@@ -1,0 +1,121 @@
+[
+  {
+    "_id": "draw-active-001",
+    "_type": "draw",
+    "drawId": "PD-2026-08A",
+    "title": "Grand Meskel & Holiday Jackpot",
+    "titleAm": "ታላቁ የመስቀል እና የበዓል ጃክፖት",
+    "titleOm": "Badhaasa Guddaa Ayyaana Masqalaa",
+    "slug": { "_type": "slug", "current": "grand-meskel-holiday-jackpot" },
+    "status": "open",
+    "deadline": "2026-09-27T18:00:00.000Z",
+    "description": "Pick your lucky number (00–99), pay conveniently via Telebirr or CBE Birr, and verify the cryptographic seed on draw day. 100% transparent and provably fair.",
+    "descriptionAm": "ከ 00 እስከ 99 የሚወዱትን ቁጥር ይምረጡ፣ በቴሌብር ወይም በንግድ ባንክ ይክፈሉ፣ በእጣው ቀን የማረጋገጫ ኮዱን ያረጋግጡ። 100% ግልጽ እና ታማኝ።",
+    "descriptionOm": "Lakkoofsa 00 hanga 99 filadhaa, Telebirr ykn Baankii Daldalaan kaffalaa, guyyaa carraatti koodii qulqullummaa mirkaneeffadhaa.",
+    "ticketPrice": 100,
+    "totalPrizeValue": "ETB 25,000,000+",
+    "maxNumber": 99,
+    "entryAmounts": [50, 100, 250, 500, 1000],
+    "prizes": [
+      {
+        "_key": "prize-1",
+        "rank": 1,
+        "label": "1st Prize · Grand Jackpot",
+        "labelAm": "1ኛ ዕጣ · ዋና ጃክፖት",
+        "labelOm": "Carraa 1ffaa · Badhaasa Guddaa",
+        "prizeTitle": "Luxury 4-Bedroom Villa in Bole Bulbula",
+        "prizeTitleAm": "ዘመናዊ ባለ 4 መኝታ ቪላ ቤት በቦሌ ቡልቡላ",
+        "prizeTitleOm": "Manna Viillaa Ammayyaa Boolee Bulbulaa",
+        "valueAmount": "ETB 15,000,000",
+        "description": "G+2 fully finished smart home with solar backup, private compound and security."
+      },
+      {
+        "_key": "prize-2",
+        "rank": 2,
+        "label": "2nd Prize · Luxury EV",
+        "labelAm": "2ኛ ዕጣ · ዘመናዊ መኪና",
+        "labelOm": "Carraa 2ffaa · Konkolaataa Ammayyaa",
+        "prizeTitle": "2026 Toyota bZ4X Electric SUV (0 KM)",
+        "prizeTitleAm": "2026 ቶዮታ bZ4X ኤሌክትሪክ መኪና",
+        "prizeTitleOm": "Konkolaataa Elektiriikii Toyota bZ4X 2026",
+        "valueAmount": "ETB 5,500,000",
+        "description": "Brand new electric luxury SUV with 500km range, home charger and 3-year warranty."
+      },
+      {
+        "_key": "prize-3",
+        "rank": 3,
+        "label": "3rd Prize · Tech Tier",
+        "labelAm": "3ኛ ዕጣ · ቴክኖሎጂ",
+        "labelOm": "Carraa 3ffaa · Teeknooloojii",
+        "prizeTitle": "iPhone 16 Pro Max 1TB + MacBook Pro M3",
+        "prizeTitleAm": "አይፎን 16 ፕሮ ማክስ + ማክቡክ ፕሮ M3",
+        "prizeTitleOm": "iPhone 16 Pro Max + MacBook Pro M3",
+        "valueAmount": "ETB 450,000",
+        "description": "Apple ecosystem powerhouse package with Apple Watch Ultra 2."
+      },
+      {
+        "_key": "prize-4",
+        "rank": 4,
+        "label": "4th–10th Prizes · Cash Rewards",
+        "labelAm": "ከ 4ኛ–10ኛ ዕጣ · የገንዘብ ሽልማት",
+        "labelOm": "Carraa 4ffaa–10ffaa · Badhaasa Maallaqaa",
+        "prizeTitle": "ETB 100,000 Direct Cash Transfer Each",
+        "prizeTitleAm": "ለእያንዳንዳቸው 100,000 የኢትዮጵያ ብር የባንክ ዝውውር",
+        "prizeTitleOm": "Tokkoon Tokkoo Isaaniif Qarshii 100,000",
+        "valueAmount": "ETB 700,000 Total",
+        "description": "Deposited instantly via Telebirr or direct Commercial Bank of Ethiopia transfer."
+      }
+    ],
+    "paymentMethods": [
+      {
+        "_key": "pm-telebirr",
+        "id": "telebirr",
+        "name": "Telebirr SuperApp",
+        "accountDetail": "0911223344 (Shega Draws Official)"
+      },
+      {
+        "_key": "pm-cbe",
+        "id": "cbe",
+        "name": "Commercial Bank of Ethiopia (CBE)",
+        "accountDetail": "Acc: 1000554433221 (Shega Draws Ltd)"
+      },
+      {
+        "_key": "pm-awash",
+        "id": "awash",
+        "name": "Awash Bank",
+        "accountDetail": "Acc: 01320887766500 (Shega Digital)"
+      }
+    ],
+    "commitment": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "_id": "promo-001",
+    "_type": "promotion",
+    "title": "Grand Holiday Special · Double Entry Bonus",
+    "titleAm": "የበዓል ልዩ ቦነስ · እጥፍ እድል",
+    "titleOm": "Badhaasa Addaa Ayyaanaa · Carraa Dachaa",
+    "badge": "HOT EVENT · LIMITED TIME",
+    "badgeAm": "ልዩ ቅናሽ · የፈጠነ ያገኛል",
+    "badgeOm": "Carraa Addaa",
+    "description": "Enter before Friday midnight to receive automated entry into our weekly ETB 50,000 mini-jackpot with verified instant winner notification!",
+    "descriptionAm": "እስከ አርብ እኩለ ሌሊት ድረስ ቲኬት ይቁረጡ እና የሳምንቱን የ 50,000 ብር ቦነስ ያሸንፉ!",
+    "descriptionOm": "Hanga Jimaataatti galmaa'aa badhaasa Qarshii 50,000 argadhaa!",
+    "ctaText": "Enter Active Draw",
+    "ctaLink": "/enter",
+    "sponsorName": "Telebirr Powered",
+    "highlightColor": "#D4AF37",
+    "isActive": true,
+    "priority": 1,
+    "isSponsored": true
+  },
+  {
+    "_id": "siteSettings",
+    "_type": "siteSettings",
+    "siteName": "Shega Draws",
+    "tagline": "Transparent, Cryptographically Verifiable Digital Lottery",
+    "contactPhone": "+251 911 00 22 33",
+    "supportEmail": "support@shegadraws.et",
+    "telegramUrl": "https://t.me/shegadraws",
+    "whatsappUrl": "https://wa.me/251911002233"
+  }
+]

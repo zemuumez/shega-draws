@@ -2,11 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Ticket, ShieldCheck, Phone, Mail, Send, Award } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 
 export function Footer() {
+  const pathname = usePathname();
   const { t } = useLanguage();
+
+  if (pathname?.startsWith("/studio")) {
+    return null;
+  }
 
   return (
     <footer

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
@@ -16,6 +16,14 @@ const STEPS = ["Sign up", "Pick a number", "Choose amount", "Pay & confirm"];
 interface PayMethod { id: string; name: string; accountDetail: string; }
 
 export default function EnterPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: "center", padding: "60px 20px" }}><Loader2 className="animate-spin" /></div>}>
+      <EnterWizard />
+    </Suspense>
+  );
+}
+
+function EnterWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialNum = searchParams.get("num") || "07";
