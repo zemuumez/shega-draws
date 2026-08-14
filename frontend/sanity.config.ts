@@ -25,8 +25,7 @@ export default defineConfig({
             S.listItem()
               .title("⚙️ Global Platform Settings")
               .child(
-                S.editor()
-                  .id("siteSettings")
+                S.document()
                   .schemaType("siteSettings")
                   .documentId("siteSettings")
               ),
