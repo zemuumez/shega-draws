@@ -111,6 +111,33 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
   }
 `);
 
+/** Fetch FAQs from CMS ordered by display priority. */
+export const FAQS_QUERY = defineQuery(`
+  *[_type == "faq"] | order(order asc) {
+    _id,
+    question,
+    questionAm,
+    questionOm,
+    answer,
+    answerAm,
+    answerOm,
+    category,
+    order
+  }
+`);
+
+export interface CMSFAQ {
+  _id: string;
+  question: string;
+  questionAm?: string;
+  questionOm?: string;
+  answer: string;
+  answerAm?: string;
+  answerOm?: string;
+  category?: string;
+  order?: number;
+}
+
 export interface Prize {
   rank: number;
   label: string;

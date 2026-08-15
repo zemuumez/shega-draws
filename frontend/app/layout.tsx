@@ -3,6 +3,8 @@ import "../styles/globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
+import { MobileBottomBar } from "@/components/ui/MobileBottomBar";
 
 export const metadata: Metadata = {
   title: { default: "PrimeDraws — Cryptographic Digital Lottery & Raffles", template: "%s · PrimeDraws" },
@@ -20,16 +22,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="bg-subtle-mesh">
         <LanguageProvider>
+          <ScrollProgressBar />
           <Nav />
           <main id="main-content" className="page-content">
             {children}
           </main>
+          <MobileBottomBar />
           <Footer />
         </LanguageProvider>
       </body>

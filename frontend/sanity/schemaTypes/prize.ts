@@ -7,9 +7,9 @@ export const prizeType = defineType({
   fields: [
     defineField({
       name: "rank",
-      title: "Rank / Position",
+      title: "Rank / Tier Number",
       type: "number",
-      description: "1 for 1st Prize (Grand Jackpot), 2 for 2nd Prize, etc.",
+      description: "1 = 1st Prize (Grand Prize), 2 = 2nd Prize, 3 = 3rd Prize...",
       validation: (Rule) => Rule.required().min(1),
     }),
     defineField({
@@ -17,6 +17,7 @@ export const prizeType = defineType({
       title: "Badge Label (English)",
       type: "string",
       placeholder: "1st Prize · Grand Jackpot",
+      description: "Suggestions: 1st Prize · Grand Jackpot | 2nd Prize · Luxury EV | 3rd Prize · Tech Bundle | 4th–10th Prizes · Cash Rewards",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -36,6 +37,7 @@ export const prizeType = defineType({
       title: "Prize Title (English)",
       type: "string",
       placeholder: "Luxury Villa in Bole Bulbula",
+      description: "Suggestions: Luxury Villa | 2026 Toyota bZ4X EV | iPhone 16 Pro Max + MacBook | ETB 100,000 Cash Transfer",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -52,24 +54,22 @@ export const prizeType = defineType({
     }),
     defineField({
       name: "valueAmount",
-      title: "Estimated Monetary Value",
+      title: "Monetary Value (Display)",
       type: "string",
       placeholder: "ETB 15,000,000",
     }),
     defineField({
       name: "description",
-      title: "Prize Details / Specifications",
+      title: "Prize Specifications / Details",
       type: "text",
-      rows: 3,
-      placeholder: "G+2 fully furnished 4-bedroom villa with smart security and garden.",
+      rows: 2,
+      placeholder: "G+2 fully finished smart home with solar backup, compound, and parking.",
     }),
     defineField({
       name: "image",
-      title: "Prize Photograph / Asset",
+      title: "Prize Photo",
       type: "image",
-      options: {
-        hotspot: true,
-      },
+      options: { hotspot: true },
     }),
   ],
   preview: {
@@ -77,12 +77,13 @@ export const prizeType = defineType({
       title: "prizeTitle",
       subtitle: "label",
       rank: "rank",
+      value: "valueAmount",
       media: "image",
     },
-    prepare({ title, subtitle, rank, media }) {
+    prepare({ title, subtitle, rank, value, media }) {
       return {
         title: title || `Prize #${rank}`,
-        subtitle: subtitle ? `#${rank} — ${subtitle}` : `Rank #${rank}`,
+        subtitle: `${subtitle ?? `Rank #${rank}`} ${value ? `(${value})` : ""}`,
         media,
       };
     },

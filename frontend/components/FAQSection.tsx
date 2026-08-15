@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import type { CMSFAQ } from "@/lib/sanity/queries";
 
 interface FAQItem {
   qEn: string;
@@ -13,7 +14,7 @@ interface FAQItem {
   aOm: string;
 }
 
-const FAQ_ITEMS: FAQItem[] = [
+const DEFAULT_FAQ_ITEMS: FAQItem[] = [
   {
     qEn: "How do I know the winning numbers were not rigged or changed after payment?",
     qAm: "የአሸናፊው ቁጥር ክፍያ ከተፈጸመ በኋላ እንዳልተቀየረ ወይም እንዳልተጭበረበረ እንዴት አውቃለሁ?",
@@ -45,12 +46,26 @@ const FAQ_ITEMS: FAQItem[] = [
     aEn: "We support Telebirr, CBE Birr, Commercial Bank of Ethiopia (CBE) Mobile Banking, and Bank of Abyssinia direct transfers.",
     aAm: "ቴሌብር፣ ሲቢኢ ብር፣ የኢትዮጵያ ንግድ ባንክ ሞባይል ባንኪንግ እና አቢሲንያ ባንክ እንቀበላለን።",
     aOm: "Telebirr, CBE Birr, Baankii Daldala Itoophiyaa fi Baankii Abisiiniyaa ni fudhanna.",
-  }
+  },
 ];
 
-export function FAQSection() {
+interface FAQSectionProps {
+  faqs?: CMSFAQ[];
+}
+
+export function FAQSection({ faqs }: FAQSectionProps) {
   const { t, language } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const items = faqs && faqs.length > 0
+    ? faqs.map((f) => ({
+        q: language === "am" && f.questionAm ? f.questionAm : language === "om" && f.questionOm ? f.questionOm : f.question,
+        a: language === "am" && f.answerAm ? f.answerAm : language === "om" && f.answerOm ? f.answerOm : f.answer,
+      }))
+    : DEFAULT_FAQ_ITEMS.map((item) => ({
+        q: language === "am" ? item.qAm : language === "om" ? item.qOm : item.qEn,
+        a: language === "am" ? item.aAm : language === "om" ? item.aOm : item.aEn,
+      }));
 
   return (
     <section style={{ margin: "56px 0" }}>
@@ -64,10 +79,8 @@ export function FAQSection() {
       </div>
 
       <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", gap: 12 }}>
-        {FAQ_ITEMS.map((item, idx) => {
+        {items.map((item, idx) => {
           const isOpen = openIndex === idx;
-          const q = language === "am" ? item.qAm : language === "om" ? item.qOm : item.qEn;
-          const a = language === "am" ? item.aAm : language === "om" ? item.aOm : item.aEn;
 
           return (
             <div
@@ -98,7 +111,7 @@ export function FAQSection() {
                   gap: 16,
                 }}
               >
-                <span>{q}</span>
+                <span>{item.q}</span>
                 <ChevronDown
                   size={18}
                   color={isOpen ? "var(--gold)" : "var(--gray)"}
@@ -112,7 +125,7 @@ export function FAQSection() {
 
               {isOpen && (
                 <div style={{ padding: "0 22px 20px", color: "var(--paper-muted)", fontSize: "0.875rem", lineHeight: 1.65 }}>
-                  {a}
+                  {item.a}
                 </div>
               )}
             </div>

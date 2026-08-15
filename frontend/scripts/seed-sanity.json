@@ -1,6 +1,6 @@
 [
   {
-    "_id": "draw-active-001",
+    "_id": "draw-grand-meskel-001",
     "_type": "draw",
     "drawId": "PD-2026-08A",
     "title": "Grand Meskel & Holiday Jackpot",
@@ -23,11 +23,11 @@
         "label": "1st Prize · Grand Jackpot",
         "labelAm": "1ኛ ዕጣ · ዋና ጃክፖት",
         "labelOm": "Carraa 1ffaa · Badhaasa Guddaa",
-        "prizeTitle": "Luxury 4-Bedroom Villa in Bole Bulbula",
-        "prizeTitleAm": "ዘመናዊ ባለ 4 መኝታ ቪላ ቤት በቦሌ ቡልቡላ",
-        "prizeTitleOm": "Manna Viillaa Ammayyaa Boolee Bulbulaa",
+        "prizeTitle": "G+2 Luxury Villa in CMC, Addis Ababa",
+        "prizeTitleAm": "ዘመናዊ ባለ 4 መኝታ ቪላ ቤት በሲኤምሲ አዲስ አበባ",
+        "prizeTitleOm": "Manna Viillaa Ammayyaa CMC Finfinnee",
         "valueAmount": "ETB 15,000,000",
-        "description": "G+2 fully finished smart home with solar backup, private compound and security."
+        "description": "Fully finished 4-bedroom villa with Italian kitchen, solar backup, garden and 2-car garage."
       },
       {
         "_key": "prize-2",
@@ -35,35 +35,35 @@
         "label": "2nd Prize · Luxury EV",
         "labelAm": "2ኛ ዕጣ · ዘመናዊ መኪና",
         "labelOm": "Carraa 2ffaa · Konkolaataa Ammayyaa",
-        "prizeTitle": "2026 Toyota bZ4X Electric SUV (0 KM)",
-        "prizeTitleAm": "2026 ቶዮታ bZ4X ኤሌክትሪክ መኪና",
-        "prizeTitleOm": "Konkolaataa Elektiriikii Toyota bZ4X 2026",
+        "prizeTitle": "2026 BYD Song Plus EV (Zero Km)",
+        "prizeTitleAm": "2026 ቢዋይዲ ሶንግ ፕላስ ኤሌክትሪክ መኪና",
+        "prizeTitleOm": "Konkolaataa Elektiriikii BYD Song Plus 2026",
         "valueAmount": "ETB 5,500,000",
-        "description": "Brand new electric luxury SUV with 500km range, home charger and 3-year warranty."
+        "description": "Flagship luxury all-electric SUV with 605km range, panoramic sunroof, and home fast-charger."
       },
       {
         "_key": "prize-3",
         "rank": 3,
-        "label": "3rd Prize · Tech Tier",
+        "label": "3rd Prize · Tech Powerhouse",
         "labelAm": "3ኛ ዕጣ · ቴክኖሎጂ",
         "labelOm": "Carraa 3ffaa · Teeknooloojii",
         "prizeTitle": "iPhone 16 Pro Max 1TB + MacBook Pro M3",
-        "prizeTitleAm": "አይፎን 16 ፕሮ ማክስ + ማክቡክ ፕሮ M3",
+        "prizeTitleAm": "አይፎን 16 ፕሮ ማክስ 1TB + ማክቡክ ፕሮ M3",
         "prizeTitleOm": "iPhone 16 Pro Max + MacBook Pro M3",
         "valueAmount": "ETB 450,000",
-        "description": "Apple ecosystem powerhouse package with Apple Watch Ultra 2."
+        "description": "Apple flagship ecosystem with Apple Watch Ultra 2 and AirPods Pro."
       },
       {
         "_key": "prize-4",
         "rank": 4,
-        "label": "4th–10th Prizes · Cash Rewards",
+        "label": "4th–10th Prizes · Direct Cash Rewards",
         "labelAm": "ከ 4ኛ–10ኛ ዕጣ · የገንዘብ ሽልማት",
         "labelOm": "Carraa 4ffaa–10ffaa · Badhaasa Maallaqaa",
         "prizeTitle": "ETB 100,000 Direct Cash Transfer Each",
         "prizeTitleAm": "ለእያንዳንዳቸው 100,000 የኢትዮጵያ ብር የባንክ ዝውውር",
         "prizeTitleOm": "Tokkoon Tokkoo Isaaniif Qarshii 100,000",
         "valueAmount": "ETB 700,000 Total",
-        "description": "Deposited instantly via Telebirr or direct Commercial Bank of Ethiopia transfer."
+        "description": "Instant verified transfer via Telebirr or direct Commercial Bank of Ethiopia (CBE) deposit."
       }
     ],
     "paymentMethods": [
@@ -89,6 +89,94 @@
     "commitment": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
+    "_id": "draw-addis-newyear-002",
+    "_type": "draw",
+    "drawId": "PD-2026-09B",
+    "title": "Addis New Year Mega Raffle",
+    "titleAm": "የአዲስ አመት ታላቅ ራፍል",
+    "titleOm": "Badhaasa Guddaa Bara Haaraa Finfinnee",
+    "slug": { "_type": "slug", "current": "addis-new-year-mega-raffle" },
+    "status": "upcoming",
+    "deadline": "2026-10-15T18:00:00.000Z",
+    "description": "Welcome the New Year with life-changing rewards! Featuring luxury modern apartments, brand-new 4WD pickups, and cash prizes.",
+    "descriptionAm": "አዲሱን ዓመት በታላላቅ ሽልማቶች ይቀበሉ! ዘመናዊ አፓርታማዎች፣ አዳዲስ ተሸከርካሪዎች እና የገንዘብ ሽልማቶች።",
+    "descriptionOm": "Bara haaraa badhaasawwan gurguddoon simadhaa! Manna jireenyaa, konkolaataa fi qarshii.",
+    "ticketPrice": 200,
+    "totalPrizeValue": "ETB 40,000,000+",
+    "maxNumber": 99,
+    "entryAmounts": [100, 200, 500, 1000],
+    "prizes": [
+      {
+        "_key": "prize-1",
+        "rank": 1,
+        "label": "1st Prize · Luxury Apartment",
+        "labelAm": "1ኛ ዕጣ · አፓርታማ",
+        "labelOm": "Carraa 1ffaa · Manna Jireenyaa",
+        "prizeTitle": "3-Bedroom Apartment in Bole Rwanda",
+        "prizeTitleAm": "ባለ 3 መኝታ ዘመናዊ አፓርታማ በቦሌ ሩዋንዳ",
+        "prizeTitleOm": "Manna Jireenyaa Boolee Ruwaandaa",
+        "valueAmount": "ETB 20,000,000",
+        "description": "Furnished modern residence with city panoramic views and underground parking."
+      },
+      {
+        "_key": "prize-2",
+        "rank": 2,
+        "label": "2nd Prize · Pickup 4WD",
+        "labelAm": "2ኛ ዕጣ · ቶዮታ ፒካፕ",
+        "labelOm": "Carraa 2ffaa · Konkolaataa 4WD",
+        "prizeTitle": "2026 Toyota Hilux Double Cabin 4WD",
+        "prizeTitleAm": "2026 ቶዮታ ሃይሉክስ ደብል ካቢን 4WD",
+        "prizeTitleOm": "Toyota Hilux Double Cabin 2026",
+        "valueAmount": "ETB 11,000,000",
+        "description": "Zero km heavy duty off-road workhorse with leather interior and roll bar."
+      }
+    ],
+    "commitment": "a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0"
+  },
+  {
+    "_id": "draw-weekly-cash-003",
+    "_type": "draw",
+    "drawId": "PD-2026-07C",
+    "title": "Weekly Provably Fair Community Draw",
+    "titleAm": "የሳምንቱ የታማኝነት የማህበረሰብ ዕጣ",
+    "titleOm": "Carraa Hawaasaa Torbanii",
+    "slug": { "_type": "slug", "current": "weekly-community-draw-07c" },
+    "status": "revealed",
+    "deadline": "2026-08-01T18:00:00.000Z",
+    "description": "Concluded and verified draw. Results derived deterministically from the committed seed.",
+    "descriptionAm": "የተጠናቀቀ እና በምስጢራዊ ኮድ የተረጋገጠ ዕጣ።",
+    "descriptionOm": "Carraa xumuramee koodiin isaa mirkanaa'e.",
+    "ticketPrice": 50,
+    "totalPrizeValue": "ETB 1,500,000",
+    "maxNumber": 99,
+    "winningNumbers": ["42", "07", "89"],
+    "seed": "shega_draws_secret_seed_2026_07c_meskel_fairness_audit_key",
+    "commitment": "8f481c00994d5051ff6a79893d5de1b9f67a2a0a2df3fb302da4842512f4625b",
+    "prizes": [
+      {
+        "_key": "prize-1",
+        "rank": 1,
+        "label": "1st Prize",
+        "prizeTitle": "ETB 1,000,000 Cash Transfer",
+        "valueAmount": "ETB 1,000,000"
+      },
+      {
+        "_key": "prize-2",
+        "rank": 2,
+        "label": "2nd Prize",
+        "prizeTitle": "ETB 300,000 Cash Transfer",
+        "valueAmount": "ETB 300,000"
+      },
+      {
+        "_key": "prize-3",
+        "rank": 3,
+        "label": "3rd Prize",
+        "prizeTitle": "ETB 200,000 Cash Transfer",
+        "valueAmount": "ETB 200,000"
+      }
+    ]
+  },
+  {
     "_id": "promo-001",
     "_type": "promotion",
     "title": "Grand Holiday Special · Double Entry Bonus",
@@ -107,6 +195,74 @@
     "isActive": true,
     "priority": 1,
     "isSponsored": true
+  },
+  {
+    "_id": "promo-002",
+    "_type": "promotion",
+    "title": "Telebirr Cashback Partner Special",
+    "titleAm": "የቴሌብር ካሽባክ አጋርነት",
+    "titleOm": "Kaffaltii Telebirr fi Cashback",
+    "badge": "5% CASHBACK",
+    "badgeAm": "5% ተመላሽ",
+    "badgeOm": "5% Deebii",
+    "description": "Pay for your ticket using Telebirr SuperApp and get an instant 5% cashback directly returned to your Telebirr wallet.",
+    "descriptionAm": "በቴሌብር ክፍያ ሲፈጽሙ 5% ቅናሽ ወዲያውኑ ወደ አካውንትዎ ተመላሽ ይደረጋል!",
+    "descriptionOm": "Telebirr fayyadamuun yoo kaffaltan dhibbeentaa 5 battalumatti deebifadhaa.",
+    "ctaText": "Claim Bonus",
+    "ctaLink": "/enter",
+    "sponsorName": "Ethio Telecom",
+    "highlightColor": "#2BB694",
+    "isActive": true,
+    "priority": 2,
+    "isSponsored": true
+  },
+  {
+    "_id": "faq-001",
+    "_type": "faq",
+    "question": "How do I know the winning numbers were not rigged or changed after payment?",
+    "questionAm": "የአሸናፊው ቁጥር ክፍያ ከተፈጸመ በኋላ እንዳልተቀየረ ወይም እንዳልተጭበረበረ እንዴት አውቃለሁ?",
+    "questionOm": "Lakkoofsi mo'ate erga kaffaltiin raawwatamee booda akka hin jijjiiramne akkamittiin beeka?",
+    "answer": "We publish a cryptographic SHA-256 fingerprint (commitment) of the secret seed BEFORE any tickets are sold. On draw day, we reveal the original seed. You can run the SHA-256 hash in your browser or any tool to verify that the seed matches the pre-published commitment perfectly.",
+    "answerAm": "ቲኬት ሽያጭ ከመጀመሩ በፊት የ32-ባይት ሚስጥራዊ ኮዱን SHA-256 አሻራ በይፋ እናትማለን። በእጣው ቀን ሚስጥራዊው ኮድ ሲገለጽ በእራስዎ ብሮውዘር ላይ ኮዱ አስቀድሞ ከታተመው ጋር እንደሚገጥም በራስዎ ማረጋገጥ ይችላሉ።",
+    "answerOm": "Duraan dursinee mallattoo SHA-256 ifatti baafna. Guyyaa carraa immoo koodichi ni ifooma; ofumaan akka inni wal simu mirkaneeffachuu dandeessu.",
+    "category": "fairness",
+    "order": 1
+  },
+  {
+    "_id": "faq-002",
+    "_type": "faq",
+    "question": "What happens if two participants choose the same number?",
+    "questionAm": "ሁለት ወይም ከዚያ በላይ ተሳታፊዎች አንድ አይነት ቁጥር ቢመርጡ ምን ይሆናል?",
+    "questionOm": "Namoonni lama yoo lakkoofsa walfakkaataa filatan maaltu ta'a?",
+    "answer": "The participant whose payment proof is verified and confirmed first in our system wins that prize rank. The second participant is eligible for secondary prize tiers or subsequent prize allocations.",
+    "answerAm": "በስርዓታችን ቀድሞ ክፍያውን የፈጸመውና የተረጋገጠለት ተሳታፊ የዚያን ደረጃ ሽልማት ያሸንፋል። ቀጥሎ ክፍያ ያረጋገጠው ለቀጣይ የሽልማት ደረጃዎች ይገባል።",
+    "answerOm": "Namni dura kaffaltii nagahee galchee sirnaan mirkanaa'e badhaasa sadarkaa sanaa fudhata.",
+    "category": "payments",
+    "order": 2
+  },
+  {
+    "_id": "faq-003",
+    "_type": "faq",
+    "question": "How are prizes disbursed to winners?",
+    "questionAm": "አሸናፊዎች ሽልማታቸውን እንዴት ይቀበላሉ?",
+    "questionOm": "Mo'attoonni badhaasa isaanii akkamitti fudhatu?",
+    "answer": "Cash prizes are transferred directly to the winner's registered Telebirr or CBE Bank account within 2 hours of verification. Physical prizes (Villas, Vehicles) are officially handed over in Addis Ababa with legal registration papers.",
+    "answerAm": "የገንዘብ ሽልማቶች አሸናፊው በተመዘገበበት የቴሌብር ወይም የኢትዮጵያ ንግድ ባንክ አካውንት በ2 ሰዓት ውስጥ ይተላለፋሉ። ተሸከርካሪዎች እና ቤቶች በህጋዊ ሰነድ ርክክብ ይፈጸማል።",
+    "answerOm": "Badhaasni qarshii sa'aatii 2 keessatti gara Telebirr ykn herrega Baankii Daldala Itoophiyaa isaaniitti ni ergama. Manneeniifi konkolaataan seeraan dabarfamu.",
+    "category": "prizes",
+    "order": 3
+  },
+  {
+    "_id": "faq-004",
+    "_type": "faq",
+    "question": "What payment methods are supported?",
+    "questionAm": "የትኞቹ የክፍያ አማራጮች ይሰራሉ?",
+    "questionOm": "Malleen kaffaltii kamtu hojjeta?",
+    "answer": "We support Telebirr, CBE Birr, Commercial Bank of Ethiopia (CBE) Mobile Banking, and Bank of Abyssinia direct transfers.",
+    "answerAm": "ቴሌብር፣ ሲቢኢ ብር፣ የኢትዮጵያ ንግድ ባንክ ሞባይል ባንኪንግ እና አቢሲንያ ባንክ እንቀበላለን።",
+    "answerOm": "Telebirr, CBE Birr, Baankii Daldala Itoophiyaa fi Baankii Abisiiniyaa ni fudhanna.",
+    "category": "payments",
+    "order": 4
   },
   {
     "_id": "siteSettings",

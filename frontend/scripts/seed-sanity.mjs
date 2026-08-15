@@ -25,10 +25,12 @@ if (existsSync(envPath)) {
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || envVars.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || envVars.NEXT_PUBLIC_SANITY_DATASET || "production";
 const token = process.env.SANITY_API_TOKEN || envVars.SANITY_API_TOKEN;
+const isClearMode = process.argv.includes("--clear") || process.argv.includes("-c");
 
-console.log("🎟️  Shega Draws — Sanity CMS Seed Utility");
+console.log("🎟️  Shega Draws — Sanity CMS Seed & Reset Utility");
 console.log(`📌 Project ID: ${projectId ?? "Not configured"}`);
 console.log(`📦 Dataset:    ${dataset}`);
+console.log(`⚙️  Mode:       ${isClearMode ? "🧹 CLEAR / DELETE TEMPORARY DOCUMENTS" : "🚀 IMPORT / SYNC SEED DOCUMENTS"}`);
 
 if (!projectId || projectId === "your-project-id-here") {
   console.error("❌ Error: NEXT_PUBLIC_SANITY_PROJECT_ID is not configured in .env.local");
@@ -37,9 +39,10 @@ if (!projectId || projectId === "your-project-id-here") {
 }
 
 if (!token) {
-  console.warn("⚠️  SANITY_API_TOKEN not found in environment or .env.local.");
+  console.warn("\n⚠️  SANITY_API_TOKEN not found in environment or .env.local.");
   console.log("👉 You can generate an Editor or Write Token at https://sanity.io/manage/project/" + projectId + "/api#tokens");
-  console.log("👉 Add SANITY_API_TOKEN=your_token_here to .env.local to run automated imports.");
+  console.log("👉 Add SANITY_API_TOKEN=your_token_here to .env.local to run automated imports or clears.");
+  console.log("👉 Note: In the meantime, you can also edit/create documents manually in the Studio at http://localhost:3000/studio\n");
   process.exit(1);
 }
 
@@ -51,13 +54,26 @@ const client = createClient({
   useCdn: false,
 });
 
-async function seed() {
+async function main() {
   const seedFile = resolve(__dirname, "seed-sanity.json");
   const rawData = readFileSync(seedFile, "utf-8");
   const documents = JSON.parse(rawData);
 
-  console.log(`🚀 Uploading ${documents.length} seed documents...`);
+  if (isClearMode) {
+    console.log(`\n🧹 Clearing ${documents.length} temporary seed documents from Sanity CMS...`);
+    for (const doc of documents) {
+      try {
+        await client.delete(doc._id);
+        console.log(`🗑️  Deleted: [${doc._type}] ${doc._id}`);
+      } catch (err) {
+        console.warn(`ℹ️  Could not delete ${doc._id}: ${err.message}`);
+      }
+    }
+    console.log("\n✨ Temporary CMS contents successfully cleared!");
+    return;
+  }
 
+  console.log(`\n🚀 Uploading ${documents.length} seed documents...`);
   for (const doc of documents) {
     try {
       const res = await client.createOrReplace(doc);
@@ -70,7 +86,7 @@ async function seed() {
   console.log("\n🎉 CMS seed completed successfully! Check your Studio at http://localhost:3000/studio");
 }
 
-seed().catch((err) => {
+main().catch((err) => {
   console.error("Fatal error during seeding:", err);
   process.exit(1);
 });

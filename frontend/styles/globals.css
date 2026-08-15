@@ -376,12 +376,76 @@ h1, h2, h3, h4, h5 {
 }
 
 .page-content {
-  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 @media (min-width: 860px) {
-  .page-content { padding-bottom: 40px; }
+  .page-content { padding-bottom: 48px; }
 }
 
 @media (max-width: 640px) {
   .container { padding: 0 16px; }
 }
+
+/* ── Global Scroll Progress Indicator ─────────────────────────────── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-rich), var(--gold), var(--teal-soft));
+  transform-origin: 0%;
+  z-index: 999;
+  pointer-events: none;
+}
+
+/* ── Interactive Card Micro-Interactions ──────────────────────────── */
+.card-interactive {
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1), border-color 260ms ease;
+}
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 16px rgba(212, 175, 55, 0.18);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+/* ── Mobile Floating Action Bar ───────────────────────────────────── */
+.mobile-floating-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 14, 19, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--gray-line);
+  padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+  z-index: 90;
+  display: block;
+}
+
+@media (min-width: 860px) {
+  .mobile-floating-bar {
+    display: none;
+  }
+}
+
+.mobile-floating-inner {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  justifyContent: space-between;
+  alignItems: center;
+  gap: 12px;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal-soft);
+  box-shadow: 0 0 8px var(--teal-soft);
+  animation: pulse 1.5s infinite;
+  display: inline-block;
+}
+

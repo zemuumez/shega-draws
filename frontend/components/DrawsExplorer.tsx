@@ -2,12 +2,43 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Ticket, Trophy, Calendar, CheckCircle2, ShieldCheck, ArrowRight, Search, Clock, Award, Hash } from "lucide-react";
+import { Ticket, Trophy, Calendar, ShieldCheck, ArrowRight, Search, Clock, Award, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { DrawState } from "@/lib/api";
 
+export interface ExtendedDrawItem extends Partial<DrawState> {
+  id: string;
+  draw_id: string;
+  title?: string;
+  titleAm?: string;
+  titleOm?: string;
+  description?: string;
+  descriptionAm?: string;
+  descriptionOm?: string;
+  status: "open" | "upcoming" | "closed" | "revealed";
+  deadline: string;
+  ticket_price?: number;
+  ticketPrice?: number;
+  totalPrizeValue?: string;
+  heroImage?: string;
+  winning_numbers?: string[];
+  winningNumbers?: string[];
+  prizes?: Array<{
+    rank: number;
+    label: string;
+    labelAm?: string;
+    labelOm?: string;
+    prizeTitle: string;
+    prizeTitleAm?: string;
+    prizeTitleOm?: string;
+    valueAmount?: string;
+    description?: string;
+    image?: string;
+  }>;
+}
+
 interface DrawsExplorerProps {
-  initialDraws: DrawState[];
+  initialDraws: ExtendedDrawItem[];
 }
 
 export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
@@ -22,12 +53,14 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
 
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
-      const matchTitle = (draw.title ?? "").toLowerCase().includes(q);
-      const matchID = draw.draw_id.toLowerCase().includes(q);
-      const matchPrize = draw.prizes?.some((p) => p.prizeTitle.toLowerCase().includes(q));
-      return matchTitle || matchID || matchPrize;
+      const localizedTitle = (
+        language === "am" && draw.titleAm ? draw.titleAm : language === "om" && draw.titleOm ? draw.titleOm : (draw.title ?? "")
+      ).toLowerCase();
+      const matchID = (draw.draw_id ?? "").toLowerCase().includes(q);
+      const matchPrize = draw.prizes?.some((p) => (p.prizeTitle ?? "").toLowerCase().includes(q));
+      return localizedTitle.includes(q) || matchID || matchPrize;
     });
-  }, [initialDraws, activeTab, searchQuery]);
+  }, [initialDraws, activeTab, searchQuery, language]);
 
   const counts = useMemo(() => {
     return {
@@ -38,20 +71,29 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
   }, [initialDraws]);
 
   return (
-    <section id="draws-catalog" style={{ margin: "48px 0" }}>
+    <section id="draws-catalog" style={{ margin: "56px 0" }}>
       {/* Section Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          flexWrap: "wrap",
+          gap: 18,
+          marginBottom: 26,
+        }}
+      >
         <div>
           <div className="badge badge-gold" style={{ marginBottom: 8 }}>
             <Award size={12} /> {t.drawsExplorer.title}
           </div>
-          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2rem)", color: "var(--paper)", lineHeight: 1.15 }}>
+          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.15rem)", color: "var(--paper)", lineHeight: 1.15 }}>
             {t.drawsExplorer.subtitle}
           </h2>
         </div>
 
         {/* Search box */}
-        <div style={{ position: "relative", minWidth: 260 }}>
+        <div style={{ position: "relative", minWidth: 260, width: "100%", maxWidth: 340 }}>
           <Search size={15} color="var(--gray)" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
@@ -59,13 +101,13 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
             placeholder={t.drawsExplorer.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ paddingLeft: 38, minHeight: 44, fontSize: "0.875rem" }}
+            style={{ paddingLeft: 38, minHeight: 44, fontSize: "0.875rem", width: "100%" }}
           />
         </div>
       </div>
 
-      {/* Tabs Filter Bar */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 24, overflowX: "auto", paddingBottom: 6 }}>
+      {/* Tabs Filter Bar (Mobile Touch Scrollable) */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 26, overflowX: "auto", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}>
         <div className="tab-filter-container">
           <button
             onClick={() => setActiveTab("open")}
@@ -100,23 +142,37 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
           <p style={{ color: "var(--gray)", fontSize: "0.9375rem" }}>{t.drawsExplorer.noDrawsFound}</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 22 }}>
           {filteredDraws.map((draw) => {
+            const localizedTitle =
+              language === "am" && draw.titleAm ? draw.titleAm : language === "om" && draw.titleOm ? draw.titleOm : (draw.title || "The Grand Reward Raffle");
+            const localizedDesc =
+              language === "am" && draw.descriptionAm ? draw.descriptionAm : language === "om" && draw.descriptionOm ? draw.descriptionOm : draw.description;
+
             const topPrize = draw.prizes?.find((p) => p.rank === 1) || draw.prizes?.[0];
+            const topPrizeTitle = topPrize
+              ? (language === "am" && topPrize.prizeTitleAm ? topPrize.prizeTitleAm : language === "om" && topPrize.prizeTitleOm ? topPrize.prizeTitleOm : topPrize.prizeTitle)
+              : null;
+            const topPrizeLabel = topPrize
+              ? (language === "am" && topPrize.labelAm ? topPrize.labelAm : language === "om" && topPrize.labelOm ? topPrize.labelOm : topPrize.label)
+              : null;
+
             const isRevealed = draw.status === "revealed";
             const isUpcoming = draw.status === "upcoming";
             const isOpen = draw.status === "open";
+            const winningNum = draw.winning_numbers?.[1] || draw.winningNumbers?.[0] || "42";
+            const price = draw.ticket_price || draw.ticketPrice || 100;
 
             return (
               <div
-                key={draw.id}
-                className="physical-ticket animate-fade"
+                key={draw.id || draw.draw_id}
+                className="physical-ticket card-interactive animate-fade"
                 style={{
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                   background: "linear-gradient(180deg, var(--ink-card) 0%, var(--ink-deep) 100%)",
-                  border: isOpen ? "1.5px solid rgba(212, 175, 55, 0.4)" : "1px solid var(--gray-line)",
+                  border: isOpen ? "1.5px solid rgba(212, 175, 55, 0.45)" : "1px solid var(--gray-line)",
                 }}
               >
                 {/* Notches for tactile ticket feel */}
@@ -138,14 +194,14 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
 
                   {/* Title & Description */}
                   <h3 className="display" style={{ fontSize: "1.25rem", color: "var(--paper)", lineHeight: 1.25, marginBottom: 8 }}>
-                    {draw.title || "The Grand Reward Raffle"}
+                    {localizedTitle}
                   </h3>
                   <p style={{ color: "var(--paper-muted)", fontSize: "0.8125rem", lineHeight: 1.55, marginBottom: 16 }}>
-                    {draw.description}
+                    {localizedDesc}
                   </p>
 
                   {/* Grand Prize Spotlight Box */}
-                  {topPrize && (
+                  {topPrize && topPrizeTitle && (
                     <div
                       style={{
                         background: "rgba(255, 255, 255, 0.03)",
@@ -156,14 +212,14 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
                       }}
                     >
                       <div className="mono" style={{ fontSize: "0.625rem", color: "var(--gold-soft)", textTransform: "uppercase", marginBottom: 3 }}>
-                        🏆 {t.prizes.rank1} : {topPrize.label}
+                        🏆 {t.prizes.rank1} : {topPrizeLabel ?? topPrize.label}
                       </div>
                       <div className="display" style={{ fontSize: "1.0625rem", color: "var(--paper)", fontWeight: 700 }}>
-                        {topPrize.prizeTitle}
+                        {topPrizeTitle}
                       </div>
-                      {topPrize.valueAmount && (
+                      {(topPrize.valueAmount || draw.totalPrizeValue) && (
                         <div className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-soft)", marginTop: 2 }}>
-                          {t.drawsExplorer.prizePool}: {topPrize.valueAmount}
+                          {t.drawsExplorer.prizePool}: {topPrize.valueAmount || draw.totalPrizeValue}
                         </div>
                       )}
                     </div>
@@ -176,7 +232,7 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
                         {t.drawsExplorer.ticketPrice}
                       </span>
                       <strong style={{ color: "var(--paper)", fontSize: "0.875rem" }}>
-                        {draw.ticket_price ? `${draw.ticket_price} ETB` : "100 ETB"}
+                        {price} ETB
                       </strong>
                     </div>
 
@@ -185,13 +241,13 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
                         {isRevealed ? t.drawsExplorer.completedOn : t.drawsExplorer.drawDate}
                       </span>
                       <strong style={{ color: "var(--paper)", fontSize: "0.8125rem" }}>
-                        {new Date(draw.deadline).toLocaleDateString(language === "am" ? "am-ET" : "en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        {draw.deadline ? new Date(draw.deadline).toLocaleDateString(language === "am" ? "am-ET" : "en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBA"}
                       </strong>
                     </div>
                   </div>
 
                   {/* Winning Numbers Pill if revealed */}
-                  {isRevealed && draw.winning_numbers && (
+                  {isRevealed && (
                     <div
                       style={{
                         background: "rgba(43, 182, 148, 0.08)",
@@ -205,7 +261,7 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
                         {t.drawsExplorer.winningNumbers} (1st Place):
                       </div>
                       <div className="display" style={{ fontSize: "1.75rem", color: "var(--gold)", fontWeight: 800 }}>
-                        #{draw.winning_numbers[1] || "42"}
+                        #{winningNum}
                       </div>
                     </div>
                   )}
@@ -230,7 +286,7 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
                     <button
                       className="btn-base btn-secondary"
                       style={{ width: "100%", justifyContent: "center" }}
-                      onClick={() => alert(`Draw #${draw.draw_id} is scheduled to open on ${new Date(draw.deadline).toLocaleDateString()}`)}
+                      onClick={() => alert(`Draw #${draw.draw_id} opens on ${new Date(draw.deadline).toLocaleDateString()}`)}
                     >
                       <Calendar size={15} /> {t.drawsExplorer.startsIn} {new Date(draw.deadline).toLocaleDateString()}
                     </button>
