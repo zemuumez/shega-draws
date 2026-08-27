@@ -28,38 +28,39 @@ export default async function ResultsPage() {
   const isRevealed     = drawState?.status === "revealed";
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 20px" }}>
+    <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px 20px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
         <div
           style={{
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             borderRadius: "50%",
-            background: "rgba(31,111,92,0.18)",
+            background: "var(--teal-bg)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
+            border: "1px solid var(--teal-border)",
           }}
         >
-          <ShieldCheck size={18} color="var(--teal-soft)" />
+          <ShieldCheck size={22} color="var(--teal)" />
         </div>
         <div>
-          <h1 className="display" style={{ fontSize: "1.5rem", color: "var(--paper)", lineHeight: 1.1 }}>
-            {isRevealed ? "The draw has been run" : "Fairness commitment"}
+          <h1 className="display" style={{ fontSize: "1.625rem", color: "var(--text-main)", lineHeight: 1.1 }}>
+            {isRevealed ? "Draw Results & Winning Numbers" : "Fairness & Cryptographic Proof"}
           </h1>
-          <p style={{ color: "var(--gray)", fontSize: "0.875rem", marginTop: 4 }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 4 }}>
             {isRevealed
-              ? "Verify the outcome with the client-side SHA-256 check below."
-              : "The draw hasn't happened yet. The commitment below proves the result was pre-determined and cannot be changed."}
+              ? "All 10 winning numbers derived publicly. Audit the seed in your browser below."
+              : "The draw is locked with a SHA-256 cryptographic seed fingerprint before tickets are sold."}
           </p>
         </div>
       </div>
 
       {/* Commitment + verifier */}
       {drawState && (
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 24 }}>
           <ResultsVerifier
             commitment={drawState.commitment}
             seed={isRevealed ? (drawState as any).seed : undefined}
@@ -70,7 +71,7 @@ export default async function ResultsPage() {
 
       {/* Results / prize table */}
       {prizes.length > 0 && (
-        <Card>
+        <Card style={{ marginBottom: 24 }}>
           <PrizeTable
             prizes={prizes}
             winningNumbers={winningNumbers}
@@ -79,34 +80,34 @@ export default async function ResultsPage() {
       )}
 
       {/* Algorithm explanation */}
-      <Card style={{ marginTop: 20 }}>
-        <h2 className="display" style={{ fontSize: "1rem", color: "var(--paper)", marginBottom: 12 }}>
-          How the winning number is derived
+      <Card>
+        <h2 className="display" style={{ fontSize: "1.125rem", color: "var(--text-main)", marginBottom: 10 }}>
+          How the winning numbers are calculated
         </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem", color: "var(--gray)", lineHeight: 1.65 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: "0.875rem", color: "var(--text-muted)", lineHeight: 1.65 }}>
           <p>
-            <strong style={{ color: "var(--paper)" }}>Before entries close</strong>, we generate a random 32-byte secret seed and publish{" "}
-            <code style={{ color: "var(--gold-soft)", fontFamily: "var(--font-mono)" }}>SHA-256(seed)</code> as the commitment above. This fingerprint locks in the seed without revealing it.
+            <strong style={{ color: "var(--text-main)" }}>1. Before ticket sales start</strong>: We generate a 32-byte secret random seed and publish its SHA-256 fingerprint.
           </p>
           <p>
-            <strong style={{ color: "var(--paper)" }}>On draw day</strong>, we reveal the seed. The winning number for each rank is computed as:
+            <strong style={{ color: "var(--text-main)" }}>2. On draw day</strong>: We reveal the original seed. Each of the 10 winning numbers is calculated deterministically:
           </p>
           <pre
             className="mono"
             style={{
-              background: "var(--ink)",
+              background: "#F8FAFC",
               border: "1px solid var(--gray-line)",
               borderRadius: 8,
               padding: "12px 14px",
-              color: "var(--gold-soft)",
+              color: "var(--gold-dark)",
               fontSize: "0.75rem",
+              fontWeight: 700,
               overflowX: "auto",
             }}
           >
 {`winning_number = parseInt(SHA256(seed + ":" + drawID + ":" + rank).slice(0, 8), 16) % 100`}
           </pre>
           <p>
-            You can run this in your browser&apos;s DevTools console to confirm the published winning numbers match.
+            Because the hash function is one-way, no organizer or player could have predicted or changed the numbers in advance.
           </p>
         </div>
       </Card>

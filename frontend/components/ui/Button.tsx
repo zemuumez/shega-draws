@@ -12,11 +12,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const styles: Record<Variant, React.CSSProperties> = {
-  primary:   { background: "var(--gold)",      color: "var(--ink)",  border: "none" },
-  secondary: { background: "transparent",       color: "var(--paper)", border: "1px solid var(--gray-line)" },
-  ghost:     { background: "transparent",       color: "var(--gray)",  border: "none" },
-  danger:    { background: "transparent",       color: "var(--rust-soft)", border: "1px solid var(--rust)" },
-  confirm:   { background: "var(--teal)",       color: "var(--paper)", border: "none" },
+  primary:   { background: "var(--gold)",      color: "#FFFFFF",        border: "none", boxShadow: "0 2px 8px rgba(217,119,6,0.28)" },
+  secondary: { background: "#FFFFFF",          color: "var(--text-main)", border: "1px solid var(--gray-line)", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" },
+  ghost:     { background: "transparent",       color: "var(--text-muted)", border: "none" },
+  danger:    { background: "var(--rust-bg)",    color: "var(--rust-dark)", border: "1px solid var(--rust-border)" },
+  confirm:   { background: "var(--teal)",       color: "#FFFFFF",        border: "none" },
 };
 
 export function Button({
@@ -37,9 +37,6 @@ export function Button({
       style={{
         ...styles[variant],
         width: full ? "100%" : "auto",
-        ...(variant === "primary" && !disabled && !loading
-          ? { boxShadow: "0 2px 12px rgba(201,162,39,0.25)" }
-          : {}),
         ...style,
       }}
     >

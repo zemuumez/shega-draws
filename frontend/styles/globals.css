@@ -1,70 +1,75 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PrimeDraws — Global Design System
-   Human-Crafted, Tactile Dark Palette with Physical Raffle Aesthetics
+   PrimeDraws — Global Design System (Light Theme & Physical Ticket Style)
+   Clean, accessible, high-contrast & user-friendly
 ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap');
 
-/* ── Design Tokens ─────────────────────────────────────────────────── */
+/* ── Light Mode Design Tokens ───────────────────────────────────────── */
 :root {
-  /* Rich obsidian & warm dark slate */
-  --ink:         #0A0E13;
-  --ink-deep:    #06090D;
-  --ink-soft:    #121820;
-  --ink-card:    #161F2A;
-  --ink-card-alt:#1B2533;
+  /* Clean Light Theme Surfaces */
+  --bg-page:      #F8FAFC;
+  --bg-surface:   #FFFFFF;
+  --bg-subtle:    #F1F5F9;
+  --bg-card:      #FFFFFF;
+  --bg-ticket:    #FFFDF9;
+  --bg-ticket-stub:#FAF5EC;
   
-  /* Primary & secondary text */
-  --paper:       #FBF8F1;
-  --paper-dim:   #EDE6D6;
-  --paper-muted: #B8B2A4;
+  /* Primary & Secondary Typography */
+  --ink:          #0F172A;
+  --text-main:    #0F172A;
+  --text-muted:   #475569;
+  --text-subtle:  #64748B;
+  --paper:        #0F172A;
   
-  /* Metallic Gold & Champagne */
-  --gold:        #D4AF37;
-  --gold-rich:   #C29B24;
-  --gold-soft:   #F3E5AB;
-  --gold-light:  #FFF8DC;
-  --gold-glow:   rgba(212, 175, 55, 0.16);
-  --gold-glow-lg:rgba(212, 175, 55, 0.28);
+  /* Amber Gold Accents (Rich & High-Contrast on White) */
+  --gold:         #D97706;
+  --gold-dark:    #B45309;
+  --gold-light:   #F59E0B;
+  --gold-bg:      #FEF3C7;
+  --gold-border:  #FDE68A;
+  --gold-glow:    rgba(217, 119, 6, 0.12);
   
-  /* Accent jewel tones */
-  --teal:        #1A745E;
-  --teal-soft:   #2BB694;
-  --teal-glow:   rgba(43, 182, 148, 0.18);
-  --rust:        #B83A26;
-  --rust-soft:   #E76852;
-  --rust-glow:   rgba(184, 58, 38, 0.18);
+  /* Jewel Green / Success */
+  --teal:         #059669;
+  --teal-dark:    #047857;
+  --teal-bg:      #D1FAE5;
+  --teal-border:  #A7F3D0;
   
-  /* Neutral border lines */
-  --gray:        #8C93A0;
-  --gray-dark:   #4E5562;
-  --gray-line:   #25303E;
-  --gray-line-light: rgba(255, 255, 255, 0.08);
-  --gray-faint:  rgba(140, 147, 160, 0.08);
+  /* Crimson Rust / Error / Alert */
+  --rust:         #DC2626;
+  --rust-dark:    #B91C1C;
+  --rust-bg:      #FEE2E2;
+  --rust-border:  #FECACA;
+  
+  /* Clean Borders */
+  --gray-line:    #E2E8F0;
+  --gray-border:  #CBD5E1;
+  --gray-bg:      #F1F5F9;
+  --gray:         #64748B;
 
-  /* Fonts */
-  --font-body:    'IBM Plex Sans', 'Noto Sans Ethiopic', system-ui, sans-serif;
+  /* Typography */
+  --font-body:    'Plus Jakarta Sans', 'Noto Sans Ethiopic', system-ui, sans-serif;
   --font-display: 'Fraunces', 'Noto Sans Ethiopic', Georgia, serif;
-  --font-mono:    'IBM Plex Mono', 'Courier New', monospace;
+  --font-mono:    'IBM Plex Mono', monospace;
 
   /* Radii */
-  --radius-xs:  6px;
-  --radius-sm:  10px;
-  --radius-md:  14px;
-  --radius-lg:  18px;
-  --radius-xl:  24px;
-  --radius-full: 9999px;
+  --radius-xs:    6px;
+  --radius-sm:    10px;
+  --radius-md:    14px;
+  --radius-lg:    18px;
+  --radius-xl:    24px;
+  --radius-full:  9999px;
 
-  /* Shadows */
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 1px rgba(212, 175, 55, 0.3);
-  --shadow-gold: 0 4px 24px rgba(212, 175, 55, 0.25);
-  --shadow-inner-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  /* Physical Ticket & Card Shadows */
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-card:  0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-card-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+  --shadow-ticket: 0 8px 24px -4px rgba(180, 83, 9, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 
   /* Transitions */
-  --transition-fast: 140ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-base: 220ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 140ms ease;
+  --transition-base: 220ms ease;
 }
 
 /* ── Reset ─────────────────────────────────────────────────────────── */
@@ -73,13 +78,13 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  background: var(--ink);
+  background: var(--bg-page);
 }
 
 body {
   font-family: var(--font-body);
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--bg-page);
+  color: var(--text-main);
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -92,103 +97,89 @@ body {
 .mono    { font-family: var(--font-mono); }
 
 h1, h2, h3, h4, h5 {
-  color: var(--paper);
-  letter-spacing: -0.015em;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
-
-/* ── Scrollbars ────────────────────────────────────────────────────── */
-::-webkit-scrollbar        { width: 7px; height: 7px; }
-::-webkit-scrollbar-track  { background: var(--ink-deep); }
-::-webkit-scrollbar-thumb  { background: var(--gray-line); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-rich); }
 
 /* ── Focus ─────────────────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--gold);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
-/* ── Subtle tactile background patterns ────────────────────────────── */
-.bg-subtle-mesh {
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 175, 55, 0.08), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(26, 116, 94, 0.06), transparent 70%);
-}
-
-.bg-dot-matrix {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* ── Card Styles ───────────────────────────────────────────────────── */
+/* ── Clean Card Styles ─────────────────────────────────────────────── */
 .card-base {
-  background: var(--ink-card);
+  background: var(--bg-surface);
   border: 1px solid var(--gray-line);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card), var(--shadow-inner-bevel);
-  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-base);
 }
 
 .card-base:hover {
-  border-color: rgba(212, 175, 55, 0.35);
   box-shadow: var(--shadow-card-hover);
+  border-color: var(--gray-border);
 }
 
-.glass-card {
-  background: rgba(22, 31, 42, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card), var(--shadow-inner-bevel);
-}
-
-.glass-card-gold {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(22, 31, 42, 0.85) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-gold), var(--shadow-inner-bevel);
-}
-
-/* ── Physical Perforated Ticket Aesthetics ─────────────────────────── */
-.physical-ticket {
+/* ── Physical Lottery Ticket Styling ───────────────────────────────── */
+.physical-lottery-ticket {
   position: relative;
-  background: var(--ink-card);
-  border: 1px solid var(--gray-line);
-  border-radius: var(--radius-md);
+  background: var(--bg-ticket);
+  border: 1.5px solid #EADDC8;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-ticket);
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-.ticket-notch-left, .ticket-notch-right {
+.physical-lottery-ticket:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--gold);
+}
+
+/* Perforated ticket punch notches */
+.ticket-punch-top, .ticket-punch-bottom {
   position: absolute;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  background: var(--ink);
+  width: 22px;
+  height: 22px;
+  background: var(--bg-page);
   border-radius: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-  border: 1px solid var(--gray-line);
-}
-.ticket-notch-left  { left: -9px; }
-.ticket-notch-right { right: -9px; }
-
-.ticket-divider-line {
-  border: none;
-  border-top: 1.5px dashed var(--gray-line);
-  margin: 12px 0;
+  z-index: 10;
+  border: 1.5px solid #EADDC8;
 }
 
-.ticket-edge {
-  width: 14px;
-  flex-shrink: 0;
-  background-image: radial-gradient(circle, var(--ink) 3px, transparent 3px);
-  background-size: 14px 14px;
-  background-color: var(--paper-dim);
+.ticket-perforation-v {
+  border-left: 2px dashed #DCCBB0;
+  height: 100%;
+}
+
+.ticket-perforation-h {
+  border-top: 2px dashed #DCCBB0;
+  width: 100%;
+  margin: 14px 0;
+}
+
+.barcode-pattern {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #0F172A 0px,
+    #0F172A 2px,
+    transparent 2px,
+    transparent 4px,
+    #0F172A 4px,
+    #0F172A 7px,
+    transparent 7px,
+    transparent 9px,
+    #0F172A 9px,
+    #0F172A 10px,
+    transparent 10px,
+    transparent 13px
+  );
+  height: 34px;
+  width: 100%;
+  opacity: 0.85;
 }
 
 /* ── Button Styles ─────────────────────────────────────────────────── */
@@ -196,42 +187,41 @@ h1, h2, h3, h4, h5 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: 0.9375rem;
   font-weight: 600;
-  padding: 12px 22px;
+  padding: 11px 20px;
   cursor: pointer;
   transition: all var(--transition-fast);
   text-decoration: none;
   border: none;
   user-select: none;
 }
-.btn-base:active { transform: scale(0.975); }
-.btn-base:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-base:active { transform: scale(0.98); }
+.btn-base:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary {
   background: var(--gold);
-  color: var(--ink-deep);
+  color: #FFFFFF;
   font-weight: 700;
-  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.28);
 }
 .btn-primary:hover {
-  background: var(--gold-soft);
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5);
-  transform: translateY(-1px);
+  background: var(--gold-dark);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--paper);
+  background: var(--bg-surface);
+  color: var(--text-main);
   border: 1px solid var(--gray-line);
+  box-shadow: var(--shadow-sm);
 }
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--gold);
-  color: var(--gold-soft);
+  background: var(--bg-subtle);
+  border-color: var(--gray-border);
 }
 
 /* ── Badges ────────────────────────────────────────────────────────── */
@@ -240,66 +230,64 @@ h1, h2, h3, h4, h5 {
   align-items: center;
   gap: 5px;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  padding: 4px 11px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
   border-radius: var(--radius-full);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   white-space: nowrap;
 }
 
 .badge-gold {
-  background: rgba(212, 175, 55, 0.14);
-  color: var(--gold-soft);
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: var(--gold-bg);
+  color: var(--gold-dark);
+  border: 1px solid var(--gold-border);
 }
 
 .badge-teal {
-  background: rgba(43, 182, 148, 0.14);
-  color: var(--teal-soft);
-  border: 1px solid rgba(43, 182, 148, 0.35);
+  background: var(--teal-bg);
+  color: var(--teal-dark);
+  border: 1px solid var(--teal-border);
 }
 
 .badge-rust {
-  background: rgba(184, 58, 38, 0.14);
-  color: var(--rust-soft);
-  border: 1px solid rgba(184, 58, 38, 0.35);
+  background: var(--rust-bg);
+  color: var(--rust-dark);
+  border: 1px solid var(--rust-border);
 }
 
 .badge-gray {
-  background: rgba(140, 147, 160, 0.12);
-  color: var(--gray);
+  background: var(--gray-bg);
+  color: var(--text-muted);
   border: 1px solid var(--gray-line);
 }
 
-/* ── Inputs ────────────────────────────────────────────────────────── */
+/* ── Input Fields ──────────────────────────────────────────────────── */
 .input-base {
   width: 100%;
-  background: var(--ink-deep);
-  border: 1px solid var(--gray-line);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--gray-line);
   border-radius: var(--radius-sm);
-  padding: 13px 16px;
-  color: var(--paper);
+  padding: 12px 16px;
+  color: var(--text-main);
   font-family: var(--font-body);
   font-size: 1rem;
-  min-height: 50px;
+  min-height: 48px;
   transition: all var(--transition-fast);
 }
-.input-base::placeholder { color: var(--gray-dark); }
+.input-base::placeholder { color: #94A3B8; }
 .input-base:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
-  background: var(--ink-soft);
+  box-shadow: 0 0 0 3px var(--gold-glow);
 }
 
-/* ── Tab Switcher Filter Pills ─────────────────────────────────────── */
+/* ── Tab Filter Pills ──────────────────────────────────────────────── */
 .tab-filter-container {
   display: inline-flex;
   align-items: center;
-  background: var(--ink-deep);
-  border: 1px solid var(--gray-line);
+  background: #E2E8F0;
   border-radius: var(--radius-md);
   padding: 4px;
   gap: 4px;
@@ -307,145 +295,58 @@ h1, h2, h3, h4, h5 {
 
 .tab-filter-btn {
   background: transparent;
-  color: var(--gray);
+  color: var(--text-muted);
   border: none;
   border-radius: var(--radius-sm);
   padding: 9px 18px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap;
 }
 
 .tab-filter-btn.active {
-  background: var(--gold);
-  color: var(--ink-deep);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: var(--bg-surface);
+  color: var(--gold-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .tab-filter-btn:hover:not(.active) {
-  color: var(--paper);
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
 }
 
-/* ── Progress bar ──────────────────────────────────────────────────── */
-.progress-bar {
-  height: 4px;
-  border-radius: 4px;
-  background: var(--gray-line);
+/* ── Capacity Progress Bar ─────────────────────────────────────────── */
+.progress-bar-track {
+  height: 8px;
+  border-radius: 8px;
+  background: #E2E8F0;
   overflow: hidden;
+  position: relative;
 }
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold-rich), var(--gold-soft));
-  border-radius: 4px;
-  transition: width 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 8px;
+  transition: width 400ms ease;
 }
-
-/* ── Animations ────────────────────────────────────────────────────── */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.45; }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.animate-pulse { animation: pulse 1.8s ease-in-out infinite; }
-.animate-spin  { animation: spin 0.8s linear infinite; }
-.animate-fade  { animation: fadeIn 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 /* ── Layout & Responsiveness ───────────────────────────────────────── */
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
 .page-content {
-  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 @media (min-width: 860px) {
   .page-content { padding-bottom: 48px; }
 }
-
 @media (max-width: 640px) {
   .container { padding: 0 16px; }
 }
-
-/* ── Global Scroll Progress Indicator ─────────────────────────────── */
-.scroll-progress-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--gold-rich), var(--gold), var(--teal-soft));
-  transform-origin: 0%;
-  z-index: 999;
-  pointer-events: none;
-}
-
-/* ── Interactive Card Micro-Interactions ──────────────────────────── */
-.card-interactive {
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1), border-color 260ms ease;
-}
-.card-interactive:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 16px rgba(212, 175, 55, 0.18);
-  border-color: rgba(212, 175, 55, 0.45);
-}
-
-/* ── Mobile Floating Action Bar ───────────────────────────────────── */
-.mobile-floating-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(10, 14, 19, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--gray-line);
-  padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
-  z-index: 90;
-  display: block;
-}
-
-@media (min-width: 860px) {
-  .mobile-floating-bar {
-    display: none;
-  }
-}
-
-.mobile-floating-inner {
-  max-width: 500px;
-  margin: 0 auto;
-  display: flex;
-  justifyContent: space-between;
-  alignItems: center;
-  gap: 12px;
-}
-
-.live-pulse-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--teal-soft);
-  box-shadow: 0 0 8px var(--teal-soft);
-  animation: pulse 1.5s infinite;
-  display: inline-block;
-}
-

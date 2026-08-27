@@ -11,12 +11,12 @@ interface CardProps {
 export function Card({ children, style, glass }: CardProps) {
   return (
     <div
-      className={glass ? "glass-card" : undefined}
+      className="card-base"
       style={{
-        background: glass ? undefined : "var(--ink-soft)",
+        background: "var(--bg-card)",
         border: "1px solid var(--gray-line)",
         borderRadius: "var(--radius-lg)",
-        padding: "20px",
+        padding: "24px",
         boxShadow: "var(--shadow-card)",
         ...style,
       }}

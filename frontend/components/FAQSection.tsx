@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import type { CMSFAQ } from "@/lib/sanity/queries";
 
 interface FAQItem {
   qEn: string;
@@ -14,73 +13,61 @@ interface FAQItem {
   aOm: string;
 }
 
-const DEFAULT_FAQ_ITEMS: FAQItem[] = [
+const FAQ_ITEMS: FAQItem[] = [
   {
-    qEn: "How do I know the winning numbers were not rigged or changed after payment?",
-    qAm: "የአሸናፊው ቁጥር ክፍያ ከተፈጸመ በኋላ እንዳልተቀየረ ወይም እንዳልተጭበረበረ እንዴት አውቃለሁ?",
-    qOm: "Lakkoofsi mo'ate erga kaffaltiin raawwatamee booda akka hin jijjiiramne akkamittiin beeka?",
-    aEn: "We publish a cryptographic SHA-256 fingerprint (commitment) of the secret seed BEFORE any tickets are sold. On draw day, we reveal the original seed. You can run the SHA-256 hash in your browser or any tool to verify that the seed matches the pre-published commitment perfectly.",
-    aAm: "ቲኬት ሽያጭ ከመጀመሩ በፊት የ32-ባይት ሚስጥራዊ ኮዱን SHA-256 አሻራ በይፋ እናትማለን። በእጣው ቀን ሚስጥራዊው ኮድ ሲገለጽ በእራስዎ ብሮውዘር ላይ ኮዱ አስቀድሞ ከታተመው ጋር እንደሚገጥም በራስዎ ማረጋገጥ ይችላሉ።",
-    aOm: "Duraan dursinee mallattoo SHA-256 ifatti baafna. Guyyaa carraa immoo koodichi ni ifooma; ofumaan akka inni wal simu mirkaneeffachuu dandeessu.",
+    qEn: "How do I know the winning numbers are fair and untampered?",
+    qAm: "የአሸናፊው ቁጥር ፍትሃዊና ያልተጭበረበረ መሆኑን እንዴት ማወቅ እችላለሁ?",
+    qOm: "Lakkoofsi mo'ate sirrii fi kan hin jijjiiramne ta'uu akkamittiin beeka?",
+    aEn: "Before tickets are sold, we lock and publish a secret mathematical SHA-256 fingerprint. On draw day, the secret seed is revealed so anyone can verify on their phone or browser that the outcome was 100% predetermined.",
+    aAm: "ቲኬት ሽያጭ ከመጀመሩ በፊት የSHA-256 የጣት አሻራ ኮድ በይፋ እናትማለን። በእጣው ቀን ሚስጥራዊው ኮድ ይፋ ሲደረግ በራስዎ ስልክ ወይም ብሮውዘር ላይ ትክክለኛነቱን ማረጋገጥ ይችላሉ።",
+    aOm: "Duraan dursinee mallattoo SHA-256 ifatti baafna. Guyyaa carraa immoo koodichi ni ifooma; ofumaan bu'aa isaa mirkaneeffachuu dandeessu.",
   },
   {
-    qEn: "What happens if two participants choose the same number?",
-    qAm: "ሁለት ወይም ከዚያ በላይ ተሳታፊዎች አንድ አይነት ቁጥር ቢመርጡ ምን ይሆናል?",
+    qEn: "How much does a ticket cost, and how many tickets are in a draw?",
+    qAm: "የቲኬት ዋጋ ስንት ነው? በአንድ እጣ ውስጥ ስንት ቲኬት ይሸጣል?",
+    qOm: "Gatiin tikkeettii meeqa? Carraa tokko keessatti tikkeettiin meeqa gurgurama?",
+    aEn: "Every draw has a fixed ticket price (e.g. 100 ETB or 50 ETB) and a set limit of tickets (e.g. 1,000 or 2,000 tickets). Once all tickets are sold or the countdown ends, the draw takes place immediately.",
+    aAm: "እያንዳንዱ እጣ ቋሚ የቲኬት ዋጋ (ለምሳሌ 100 ብር ወይም 50 ብር) እና የተወሰነ የተሳታፊ ገደብ (ለምሳሌ 1,000 ወይም 2,000 ሰዎች) አለው።",
+    aOm: "Carraan hundi gatii murtaa'aa (fakkeenyaaf Qarshii 100 ykn 50) fi lakkoofsa tikkeettii daangeffame (fakkeenyaaf 1,000 ykn 2,000) qaba.",
+  },
+  {
+    qEn: "How do the Top 10 prize payouts work?",
+    qAm: "የምርጥ 10 አሸናፊዎች የሽልማት አከፋፈል እንዴት ነው?",
+    qOm: "Kaffaltiin badhaasa sadarkaa 1ffaa hanga 10ffaa akkamitti hojjeta?",
+    aEn: "Prizes are distributed to 10 winning numbers: 1st Place takes 80,000 ETB, 2nd Place takes 65,000 ETB, 3rd Place takes 40,000 ETB, and the rest receive tiered cash prizes directly via Telebirr or CBE Bank within 2 hours.",
+    aAm: "ሽልማቱ ለ10 አሸናፊ ቁጥሮች ይከፋፈላል፡ 1ኛ የወጣው 80,000 ብር፣ 2ኛ 65,000 ብር፣ 3ኛ 40,000 ብር፣ እና እስከ 10ኛ ደረጃ ያሉት በ2 ሰዓት ውስጥ በቴሌብር ወይም በሲቢኢ ባንክ በቀጥታ ይላክላቸዋል።",
+    aOm: "Badhaasni mo'attoota 10f qoodama: 1ffaan Qarshii 80,000, 2ffaan Qarshii 65,000, 3ffaan Qarshii 40,000 fi kanneen hafan Telebirr ykn Baankii CBE dhaan sa'aatii 2 keessatti kaffalamu.",
+  },
+  {
+    qEn: "What happens if two people pick the same lucky number?",
+    qAm: "ሁለት ሰዎች አንድ አይነት ቁጥር ቢመርጡ ምን ይሆናል?",
     qOm: "Namoonni lama yoo lakkoofsa walfakkaataa filatan maaltu ta'a?",
-    aEn: "The participant whose payment proof is verified and confirmed first in our system wins that prize rank. The second participant is eligible for secondary prize tiers or subsequent prize allocations.",
-    aAm: "በስርዓታችን ቀድሞ ክፍያውን የፈጸመውና የተረጋገጠለት ተሳታፊ የዚያን ደረጃ ሽልማት ያሸንፋል። ቀጥሎ ክፍያ ያረጋገጠው ለቀጣይ የሽልማት ደረጃዎች ይገባል።",
-    aOm: "Namni dura kaffaltii nagahee galchee sirnaan mirkanaa'e badhaasa sadarkaa sanaa fudhata.",
-  },
-  {
-    qEn: "How are prizes disbursed to winners?",
-    qAm: "አሸናፊዎች ሽልማታቸውን እንዴት ይቀበላሉ?",
-    qOm: "Mo'attoonni badhaasa isaanii akkamitti fudhatu?",
-    aEn: "Cash prizes are transferred directly to the winner's registered Telebirr or CBE Bank account within 2 hours of verification. Physical prizes (Villas, Vehicles) are officially handed over in Addis Ababa with legal registration papers.",
-    aAm: "የገንዘብ ሽልማቶች አሸናፊው በተመዘገበበት የቴሌብር ወይም የኢትዮጵያ ንግድ ባንክ አካውንት በ2 ሰዓት ውስጥ ይተላለፋሉ። ተሸከርካሪዎች እና ቤቶች በህጋዊ ሰነድ ርክክብ ይፈጸማል።",
-    aOm: "Badhaasni qarshii sa'aatii 2 keessatti gara Telebirr ykn herrega Baankii Daldala Itoophiyaa isaaniitti ni ergama. Manneeniifi konkolaataan seeraan dabarfamu.",
-  },
-  {
-    qEn: "What payment methods are supported?",
-    qAm: "የትኞቹ የክፍያ አማራጮች ይሰራሉ?",
-    qOm: "Malleen kaffaltii kamtu hojjeta?",
-    aEn: "We support Telebirr, CBE Birr, Commercial Bank of Ethiopia (CBE) Mobile Banking, and Bank of Abyssinia direct transfers.",
-    aAm: "ቴሌብር፣ ሲቢኢ ብር፣ የኢትዮጵያ ንግድ ባንክ ሞባይል ባንኪንግ እና አቢሲንያ ባንክ እንቀበላለን።",
-    aOm: "Telebirr, CBE Birr, Baankii Daldala Itoophiyaa fi Baankii Abisiiniyaa ni fudhanna.",
-  },
+    aEn: "The person whose payment confirmation is approved first wins that specific prize rank. The second person remains eligible for other winning ranks.",
+    aAm: "በስርዓቱ ቀድሞ ክፍያ የፈጸመውና የተረጋገጠለት ተሳታፊ የዚያን ደረጃ ሽልማት ያሸንፋል።",
+    aOm: "Namni dura kaffaltii xumuree nagaheen isaa mirkanaa'e badhaasa sadarkaa sanaa fudhata.",
+  }
 ];
 
-interface FAQSectionProps {
-  faqs?: CMSFAQ[];
-}
-
-export function FAQSection({ faqs }: FAQSectionProps) {
+export function FAQSection() {
   const { t, language } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const items = faqs && faqs.length > 0
-    ? faqs.map((f) => ({
-        q: language === "am" && f.questionAm ? f.questionAm : language === "om" && f.questionOm ? f.questionOm : f.question,
-        a: language === "am" && f.answerAm ? f.answerAm : language === "om" && f.answerOm ? f.answerOm : f.answer,
-      }))
-    : DEFAULT_FAQ_ITEMS.map((item) => ({
-        q: language === "am" ? item.qAm : language === "om" ? item.qOm : item.qEn,
-        a: language === "am" ? item.aAm : language === "om" ? item.aOm : item.aEn,
-      }));
-
   return (
-    <section style={{ margin: "56px 0" }}>
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
+    <section style={{ margin: "48px 0" }}>
+      <div style={{ textAlign: "center", marginBottom: 28 }}>
         <div className="badge badge-gold" style={{ marginBottom: 8 }}>
           <HelpCircle size={12} /> FAQ
         </div>
-        <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", color: "var(--paper)", maxWidth: 580, margin: "0 auto" }}>
+        <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3.5vw, 2rem)", color: "var(--text-main)", maxWidth: 580, margin: "0 auto" }}>
           {t.faq.title}
         </h2>
       </div>
 
-      <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", gap: 12 }}>
-        {items.map((item, idx) => {
+      <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", gap: 10 }}>
+        {FAQ_ITEMS.map((item, idx) => {
           const isOpen = openIndex === idx;
+          const q = language === "am" ? item.qAm : language === "om" ? item.qOm : item.qEn;
+          const a = language === "am" ? item.aAm : language === "om" ? item.aOm : item.aEn;
 
           return (
             <div
@@ -89,32 +76,32 @@ export function FAQSection({ faqs }: FAQSectionProps) {
               style={{
                 borderRadius: "var(--radius-md)",
                 overflow: "hidden",
-                border: isOpen ? "1px solid var(--gold)" : "1px solid var(--gray-line)",
-                background: isOpen ? "var(--ink-card-alt)" : "var(--ink-card)",
+                border: isOpen ? "1.5px solid var(--gold)" : "1px solid var(--gray-line)",
+                background: isOpen ? "#FFFDF9" : "#FFFFFF",
               }}
             >
               <button
                 onClick={() => setOpenIndex(isOpen ? null : idx)}
                 style={{
                   width: "100%",
-                  padding: "18px 22px",
+                  padding: "16px 20px",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   background: "transparent",
                   border: "none",
-                  color: "var(--paper)",
+                  color: "var(--text-main)",
                   textAlign: "left",
-                  fontSize: "1rem",
-                  fontWeight: 600,
+                  fontSize: "0.9375rem",
+                  fontWeight: 700,
                   cursor: "pointer",
                   gap: 16,
                 }}
               >
-                <span>{item.q}</span>
+                <span>{q}</span>
                 <ChevronDown
                   size={18}
-                  color={isOpen ? "var(--gold)" : "var(--gray)"}
+                  color={isOpen ? "var(--gold-dark)" : "var(--text-muted)"}
                   style={{
                     transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform var(--transition-fast)",
@@ -124,8 +111,8 @@ export function FAQSection({ faqs }: FAQSectionProps) {
               </button>
 
               {isOpen && (
-                <div style={{ padding: "0 22px 20px", color: "var(--paper-muted)", fontSize: "0.875rem", lineHeight: 1.65 }}>
-                  {item.a}
+                <div style={{ padding: "0 20px 18px", color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+                  {a}
                 </div>
               )}
             </div>

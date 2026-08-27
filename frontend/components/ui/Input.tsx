@@ -15,7 +15,7 @@ export function Input({ label, error, hint, id, style, ...props }: InputProps) {
       {label && (
         <label
           htmlFor={inputId}
-          style={{ fontSize: "0.75rem", color: "var(--gray)", fontWeight: 500 }}
+          style={{ fontSize: "0.8125rem", color: "var(--text-main)", fontWeight: 600 }}
         >
           {label}
         </label>
@@ -32,12 +32,12 @@ export function Input({ label, error, hint, id, style, ...props }: InputProps) {
         {...props}
       />
       {error && (
-        <p id={`${inputId}-error`} role="alert" style={{ fontSize: "0.75rem", color: "var(--rust-soft)" }}>
+        <p id={`${inputId}-error`} role="alert" style={{ fontSize: "0.75rem", color: "var(--rust-dark)", fontWeight: 600 }}>
           {error}
         </p>
       )}
       {hint && !error && (
-        <p id={`${inputId}-hint`} style={{ fontSize: "0.75rem", color: "var(--gray)" }}>
+        <p id={`${inputId}-hint`} style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
           {hint}
         </p>
       )}

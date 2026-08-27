@@ -21,7 +21,7 @@ async function sha256Hex(input: string): Promise<string> {
 
 function CopyableHash({ hex, full = false }: { hex: string; full?: boolean }) {
   const [copied, setCopied] = useState(false);
-  const short = `${hex.slice(0, 12)}…${hex.slice(-10)}`;
+  const short = `${hex.slice(0, 16)}…${hex.slice(-12)}`;
 
   function copy() {
     navigator.clipboard.writeText(hex).catch(() => {});
@@ -34,12 +34,13 @@ function CopyableHash({ hex, full = false }: { hex: string; full?: boolean }) {
       className="mono"
       onClick={copy}
       style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px dashed var(--gray-line)",
+        background: "#F8FAFC",
+        border: "1px solid var(--gray-line)",
         borderRadius: 8,
-        padding: "9px 12px",
-        color: "var(--gold-soft)",
-        fontSize: "0.75rem",
+        padding: "10px 14px",
+        color: "var(--text-main)",
+        fontSize: "0.8125rem",
+        fontWeight: 600,
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
@@ -48,11 +49,11 @@ function CopyableHash({ hex, full = false }: { hex: string; full?: boolean }) {
         textAlign: "left",
         width: "100%",
       }}
-      title="Click to copy"
+      title="Click to copy hash"
     >
       <span style={{ flex: 1 }}>{full ? hex : short}</span>
-      <Copy size={12} color="var(--gray)" style={{ flexShrink: 0 }} />
-      {copied && <span style={{ color: "var(--teal-soft)", fontSize: "0.625rem" }}>copied</span>}
+      <Copy size={14} color="var(--text-subtle)" style={{ flexShrink: 0 }} />
+      {copied && <span style={{ color: "var(--teal-dark)", fontSize: "0.75rem", fontWeight: 700 }}>Copied!</span>}
     </button>
   );
 }
@@ -70,20 +71,20 @@ export function ResultsVerifier({ commitment, seed, revealed }: ResultsVerifierP
   }
 
   return (
-    <Card>
+    <Card style={{ background: "#FFFFFF", padding: "28px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
         {revealed
-          ? <Unlock size={18} color="var(--teal-soft)" />
-          : <Lock size={18} color="var(--gold)" />
+          ? <Unlock size={20} color="var(--teal)" />
+          : <Lock size={20} color="var(--gold-dark)" />
         }
-        <span className="display" style={{ fontSize: "1.125rem", color: "var(--paper)" }}>
-          {revealed ? "Draw revealed" : "Commitment published — draw not yet run"}
+        <span className="display" style={{ fontSize: "1.25rem", color: "var(--text-main)", fontWeight: 700 }}>
+          {revealed ? "Draw Seed Revealed & Auditable" : "Locked Cryptographic Commitment"}
         </span>
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <p className="mono" style={{ fontSize: "0.625rem", color: "var(--gray)", marginBottom: 8, textTransform: "uppercase" }}>
-          Published commitment (SHA-256)
+        <p className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", marginBottom: 6, textTransform: "uppercase", fontWeight: 700 }}>
+          Published SHA-256 Fingerprint (Locked before draw opened)
         </p>
         <CopyableHash hex={commitment} />
       </div>
@@ -91,45 +92,48 @@ export function ResultsVerifier({ commitment, seed, revealed }: ResultsVerifierP
       {revealed && seed ? (
         <>
           <div style={{ marginBottom: 16 }}>
-            <p className="mono" style={{ fontSize: "0.625rem", color: "var(--gray)", marginBottom: 8, textTransform: "uppercase" }}>
-              Revealed secret seed
+            <p className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", marginBottom: 6, textTransform: "uppercase", fontWeight: 700 }}>
+              Revealed Secret Seed
             </p>
             <CopyableHash hex={seed} full />
           </div>
 
           <Button
-            variant="secondary"
+            variant="primary"
             icon={verifying ? undefined : ShieldCheck}
             loading={verifying}
             onClick={verify}
           >
-            {verifying ? "Verifying…" : "Verify seed matches commitment"}
+            {verifying ? "Checking SHA-256..." : "Verify Hash In Your Browser"}
           </Button>
 
           {result !== null && (
             <div
               role="status"
               style={{
-                marginTop: 14,
+                marginTop: 16,
                 display: "flex",
                 alignItems: "flex-start",
-                gap: 8,
+                gap: 10,
                 fontSize: "0.875rem",
-                color: result ? "var(--teal-soft)" : "var(--rust-soft)",
-                animation: "fadeIn 200ms ease",
+                fontWeight: 600,
+                color: result ? "var(--teal-dark)" : "var(--rust-dark)",
+                background: result ? "var(--teal-bg)" : "var(--rust-bg)",
+                border: `1px solid ${result ? "var(--teal-border)" : "var(--rust-border)"}`,
+                padding: "12px 14px",
+                borderRadius: 8,
               }}
             >
-              {result ? <Check size={16} style={{ flexShrink: 0, marginTop: 2 }} /> : <X size={16} style={{ flexShrink: 0, marginTop: 2 }} />}
+              {result ? <Check size={18} style={{ flexShrink: 0 }} /> : <X size={18} style={{ flexShrink: 0 }} />}
               {result
-                ? "Match confirmed. The revealed seed hashes to the exact commitment published before entries closed."
-                : "Mismatch detected. The seed does not match the commitment — something is wrong."}
+                ? "Match Confirmed (100% Provably Fair). The revealed seed generates the exact cryptographic fingerprint published before ticket sales opened."
+                : "Mismatch Detected. The revealed seed does not match the published commitment."}
             </div>
           )}
         </>
       ) : (
-        <p style={{ color: "var(--gray)", fontSize: "0.8125rem", lineHeight: 1.6 }}>
-          The secret behind this fingerprint stays hidden until entries close and the organizer reveals it.
-          Save this commitment now — once the seed is revealed, you can verify it yourself using the button above.
+        <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+          This cryptographic fingerprint was generated and locked before tickets went on sale. Once the countdown ends, the secret seed will be made public so you can mathematically verify the results yourself.
         </p>
       )}
     </Card>

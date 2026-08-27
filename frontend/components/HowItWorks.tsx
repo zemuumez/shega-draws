@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Ticket, CreditCard, Sparkles, Trophy } from "lucide-react";
+import { Ticket, CreditCard, Trophy, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function HowItWorks() {
@@ -29,17 +29,17 @@ export function HowItWorks() {
   ];
 
   return (
-    <section style={{ margin: "56px 0" }}>
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
+    <section style={{ margin: "48px 0" }}>
+      <div style={{ textAlign: "center", marginBottom: 28 }}>
         <div className="badge badge-gold" style={{ marginBottom: 8 }}>
           <Sparkles size={12} /> {t.howItWorks.title}
         </div>
-        <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", color: "var(--paper)", maxWidth: 580, margin: "0 auto" }}>
+        <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3.5vw, 2rem)", color: "var(--text-main)", maxWidth: 580, margin: "0 auto" }}>
           {t.howItWorks.subtitle}
         </h2>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
         {steps.map((step) => {
           const Icon = step.icon;
           return (
@@ -47,9 +47,9 @@ export function HowItWorks() {
               key={step.num}
               className="card-base"
               style={{
-                padding: "28px 24px",
+                padding: "26px 24px",
                 position: "relative",
-                background: "var(--ink-card)",
+                background: "#FFFFFF",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -58,24 +58,24 @@ export function HowItWorks() {
                     width: 44,
                     height: 44,
                     borderRadius: "var(--radius-sm)",
-                    background: "rgba(212, 175, 55, 0.12)",
-                    border: "1px solid rgba(212, 175, 55, 0.3)",
+                    background: "var(--gold-bg)",
+                    border: "1px solid var(--gold-border)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  <Icon size={20} color="var(--gold)" />
+                  <Icon size={20} color="var(--gold-dark)" />
                 </div>
-                <span className="mono" style={{ fontSize: "1.25rem", fontWeight: 800, color: "rgba(255, 255, 255, 0.15)" }}>
+                <span className="mono" style={{ fontSize: "1.25rem", fontWeight: 800, color: "#CBD5E1" }}>
                   {step.num}
                 </span>
               </div>
 
-              <h3 className="display" style={{ fontSize: "1.1875rem", color: "var(--paper)", marginBottom: 8 }}>
+              <h3 className="display" style={{ fontSize: "1.125rem", color: "var(--text-main)", marginBottom: 8 }}>
                 {step.title}
               </h3>
-              <p style={{ color: "var(--paper-muted)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+              <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.55 }}>
                 {step.desc}
               </p>
             </div>

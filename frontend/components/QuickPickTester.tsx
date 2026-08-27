@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Dice5, Sparkles, ArrowRight, ShieldCheck, Check } from "lucide-react";
+import { Dice5, Sparkles, ArrowRight, Check } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export function QuickPickTester() {
@@ -25,9 +25,9 @@ export function QuickPickTester() {
   };
 
   return (
-    <section style={{ margin: "56px 0" }}>
+    <section style={{ margin: "48px 0" }}>
       <div
-        className="glass-card-gold"
+        className="card-base"
         style={{
           padding: "36px 32px",
           display: "flex",
@@ -35,18 +35,18 @@ export function QuickPickTester() {
           alignItems: "center",
           flexWrap: "wrap",
           gap: 32,
-          position: "relative",
-          overflow: "hidden",
+          background: "linear-gradient(135deg, #FEF3C7 0%, #FFFFFF 60%)",
+          border: "1.5px solid #FDE68A",
         }}
       >
         <div style={{ maxWidth: 540 }}>
           <div className="badge badge-gold" style={{ marginBottom: 10 }}>
             <Sparkles size={12} /> {t.quickPick.title}
           </div>
-          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", color: "var(--paper)", lineHeight: 1.2, marginBottom: 12 }}>
+          <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3vw, 1.875rem)", color: "var(--text-main)", lineHeight: 1.2, marginBottom: 10 }}>
             {t.quickPick.subtitle}
           </h2>
-          <p style={{ color: "var(--paper-muted)", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: 20 }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: 20 }}>
             {t.quickPick.hint}
           </p>
 
@@ -55,7 +55,7 @@ export function QuickPickTester() {
               onClick={rollRandom}
               disabled={isSpinning}
               className="btn-base btn-secondary"
-              style={{ borderColor: "var(--gold)", color: "var(--gold-soft)" }}
+              style={{ borderColor: "var(--gold)", color: "var(--gold-dark)" }}
             >
               <Dice5 size={18} className={isSpinning ? "animate-spin" : ""} />
               {t.quickPick.randomPick}
@@ -71,19 +71,19 @@ export function QuickPickTester() {
         </div>
 
         {/* Tactile Big Number Ball Display */}
-        <div style={{ textAlign: "center", minWidth: 220, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", minWidth: 200, margin: "0 auto" }}>
           <div
             style={{
-              width: 140,
-              height: 140,
+              width: 130,
+              height: 130,
               borderRadius: "50%",
-              background: "radial-gradient(circle at 35% 35%, rgba(212, 175, 55, 0.4) 0%, var(--ink-deep) 85%)",
-              border: "3px solid var(--gold)",
-              boxShadow: "0 0 35px rgba(212, 175, 55, 0.35), inset 0 2px 10px rgba(255, 255, 255, 0.3)",
+              background: "radial-gradient(circle at 35% 35%, #FEF3C7 0%, #F59E0B 100%)",
+              border: "3px solid #D97706",
+              boxShadow: "0 8px 24px rgba(217, 119, 6, 0.28)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 14px",
+              margin: "0 auto 12px",
               transition: "transform var(--transition-fast)",
               transform: isSpinning ? "scale(1.08) rotate(10deg)" : "scale(1)",
             }}
@@ -91,18 +91,18 @@ export function QuickPickTester() {
             <span
               className="display"
               style={{
-                fontSize: "3.75rem",
+                fontSize: "3.5rem",
                 fontWeight: 800,
-                color: "var(--gold-light)",
+                color: "#FFFFFF",
                 lineHeight: 1,
-                textShadow: "0 2px 10px rgba(0,0,0,0.6)",
+                textShadow: "0 2px 6px rgba(0,0,0,0.25)",
               }}
             >
               {selectedNum}
             </span>
           </div>
 
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--teal-soft)", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--teal-dark)", fontSize: "0.8125rem", fontWeight: 700 }}>
             <Check size={14} /> {t.quickPick.available}
           </div>
         </div>

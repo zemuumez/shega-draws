@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface CountdownTimerProps {
-  target: string | Date; // ISO string or Date
+  target: string | Date;
 }
 
 interface TimeParts {
@@ -24,7 +24,7 @@ function getParts(target: Date): TimeParts {
 }
 
 export function CountdownTimer({ target }: CountdownTimerProps) {
-  const targetDate = target instanceof Date ? target : new Date(target);
+  const targetDate = useMemo(() => (target instanceof Date ? target : new Date(target)), [target]);
   const [parts, setParts] = useState<TimeParts>(getParts(targetDate));
 
   useEffect(() => {
@@ -40,24 +40,30 @@ export function CountdownTimer({ target }: CountdownTimerProps) {
   ];
 
   return (
-    <div role="timer" aria-label="Time until draw closes" style={{ display: "flex", gap: 16 }}>
+    <div role="timer" aria-label="Time until draw closes" style={{ display: "flex", gap: 14 }}>
       {labels.map(({ value, label }) => (
         <div key={label} style={{ textAlign: "center" }}>
           <div
-            className="display"
+            className="mono"
             style={{
-              fontSize: "1.75rem",
-              color: "var(--paper)",
+              fontSize: "1.625rem",
+              fontWeight: 800,
+              color: "var(--text-main)",
               lineHeight: 1,
               fontVariantNumeric: "tabular-nums",
-              minWidth: 40,
+              minWidth: 38,
+              background: "#FFFFFF",
+              border: "1px solid var(--gray-line)",
+              borderRadius: 8,
+              padding: "6px 8px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
             }}
           >
             {String(value).padStart(2, "0")}
           </div>
           <div
             className="mono"
-            style={{ fontSize: "0.625rem", color: "var(--gray)", marginTop: 5, textTransform: "uppercase" }}
+            style={{ fontSize: "0.625rem", color: "var(--text-subtle)", marginTop: 4, textTransform: "uppercase", fontWeight: 600 }}
           >
             {label}
           </div>

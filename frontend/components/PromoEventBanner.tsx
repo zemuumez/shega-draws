@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowRight, Tag, Megaphone, Flame } from "lucide-react";
+import { Sparkles, ArrowRight, Flame, Megaphone } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSPromotion } from "@/lib/sanity/queries";
 
@@ -13,36 +13,36 @@ interface PromoEventBannerProps {
 const DEFAULT_PROMOTIONS: CMSPromotion[] = [
   {
     _id: "promo-enkutatash-2026",
-    badge: "Holiday Grand Jackpot",
-    badgeAm: "የበዓል ልዩ ታላቅ ጃክፖት",
-    badgeOm: "Jaakpootii Ayyaana Addaa",
-    title: "Enkutatash Golden New Year Bonanza — 2x Suzuki Dzires Added!",
-    titleAm: "የእንቁጣጣሽ አዲስ ዓመት ልዩ ድግስ — 2 አዳዲስ ሱዙኪ ድዛይር መኪናዎች ተካተዋል!",
-    titleOm: "Ayyaana Enkuxaaxashii Waggaa Haaraa — Konkolaataan 2 Dabalamaniiru!",
-    description: "Enter any draw this week and receive automatic free ticket entry into the Holiday Golden Vault. Guaranteed 10 Extra Gold Coin Winners.",
-    descriptionAm: "በዚህ ሳምንት በማንኛውም እጣ ሲሳተፉ ለበዓሉ ልዩ የወርቅ ሳንቲም እጣ በነጻ የቲኬት ማለፊያ ያገኛሉ። 10 ተጨማሪ የወርቅ ሳንቲም አሸናፊዎች!",
-    descriptionOm: "Torbee kana carraa kamiyyuu yoo bitattan tikkeettii bilisaa Jaakpootii Ayyaanaa ni argattu. Mo'attoota warqee dabalataa 10.",
-    ctaText: "Explore Holiday Draw",
-    ctaLink: "#draws-catalog",
-    sponsorName: "Telebirr Official Partner Special",
-    highlightColor: "#D4AF37",
+    badge: "Special Event · 300,000 ETB Jackpot",
+    badgeAm: "የበዓል ልዩ እጣ · 300,000 ብር ጃክፖት",
+    badgeOm: "Qophii Addaa · Jaakpootii Qarshii 300,000",
+    title: "100 Birr Fixed Ticket Event — 10 Guaranteed Cash Winners!",
+    titleAm: "የ100 ብር እጣ — ለ10 እድለኞች 300,000 ብር የተዘጋጀ ሽልማት!",
+    titleOm: "Carraa Tikkeettii Qarshii 100 — Mo'attoota 10f Qarshii 300,000!",
+    description: "Limited to 2,000 verified ticket holders. 1st place gets 80,000 ETB, 2nd gets 65,000 ETB, and 3rd to 10th win tiered cash payouts.",
+    descriptionAm: "ለ2,000 ተሳታፊዎች ብቻ የተወሰነ። 1ኛ የወጣው 80,000 ብር፣ 2ኛ 65,000 ብር፣ ከ3ኛ እስከ 10ኛ የወጡትም ከፍተኛ የገንዘብ ሽልማት ያገኛሉ።",
+    descriptionOm: "Hirmaattota 2,000 qofaaf. Sadarkaan 1ffaa Qarshii 80,000, 2ffaan Qarshii 65,000, fi 3ffaa hanga 10ffaan badhaasa qarshii argatu.",
+    ctaText: "Buy Ticket (100 ETB)",
+    ctaLink: "/enter",
+    sponsorName: "Telebirr Official Partner",
+    highlightColor: "#D97706",
     isSponsored: true,
   },
   {
     _id: "promo-telebirr-cashback",
-    badge: "Payment Deal · 0% Service Fee",
-    badgeAm: "የክፍያ ቅናሽ · 0% የአገልግሎት ክፍያ",
-    badgeOm: "Gurgurtaa Kaffaltii · 0% Kaffaltii Tajaajilaa",
-    title: "Zero-Fee Telebirr Direct Checkout + Instant 50 ETB Reward",
-    titleAm: "በቴሌብር ያለ ምንም ተጨማሪ ክፍያ ይክፈሉ + የ50 ብር ፈጣን የቦነስ ስጦታ",
-    titleOm: "Telebirr dhaan kaffaltii tajaajilaa malee kaffalaa + Qarshii 50 badhaasa",
-    description: "Pay for 3 or more tickets in a single checkout to claim instant 15% cashback credited back to your registered mobile wallet.",
-    descriptionAm: "በአንድ ጊዜ 3 ወይም ከዚያ በላይ ቲኬቶችን ሲገዙ የ15% ተመላሽ ክፍያ በስልክ ቁጥርዎ ይላክልዎታል።",
-    descriptionOm: "Yeroo tokkotti tikkeettii 3 fi isaa ol yoo bitattan qarshii 15% gara herrega keessaniitti ni deebi'a.",
-    ctaText: "Get 3 Tickets",
+    badge: "Zero Fee Payment",
+    badgeAm: "ያለ ምንም ተጨማሪ ክፍያ",
+    badgeOm: "Kaffaltii Tajaajilaa Malee",
+    title: "Direct Telebirr & CBE Birr Payment Checkout",
+    titleAm: "በቴሌብር እና በሲቢኢ ብር በቀጥታ ይክፈሉ",
+    titleOm: "Telebirr fi CBE Birr dhaan kallattiin kaffalaa",
+    description: "Simple mobile transfer with immediate receipt verification and ticket confirmation.",
+    descriptionAm: "በቀላሉ በስልክዎ ከፍለው ደረሰኝ በማስገባት የተረጋገጠ የሎተሪ ቲኬትዎን ይያዙ።",
+    descriptionOm: "Salphaatti kaffaltii xumurtanii nagahee galchuun tikkeettii keessan mirkaneeffadhaa.",
+    ctaText: "Get Ticket Now",
     ctaLink: "/enter",
-    sponsorName: "FinTech Sponsor",
-    highlightColor: "#2BB694",
+    sponsorName: "Fast Verification",
+    highlightColor: "#059669",
     isSponsored: false,
   }
 ];
@@ -58,12 +58,12 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
   const localizedDesc = language === "am" ? (activePromo.descriptionAm || activePromo.description) : language === "om" ? (activePromo.descriptionOm || activePromo.description) : activePromo.description;
 
   return (
-    <div style={{ margin: "24px 0 36px" }}>
+    <div style={{ margin: "20px 0 32px" }}>
       {/* Featured Header & Tab Toggles */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Flame size={18} color="var(--rust-soft)" />
-          <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gold-soft)", letterSpacing: "1px", textTransform: "uppercase" }}>
+          <Flame size={18} color="var(--gold-dark)" />
+          <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gold-dark)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
             {t.promo.badge}
           </span>
         </div>
@@ -75,15 +75,15 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
                 key={p._id}
                 onClick={() => setActiveIndex(idx)}
                 style={{
-                  background: activeIndex === idx ? "var(--gold)" : "rgba(255, 255, 255, 0.08)",
+                  background: activeIndex === idx ? "var(--gold)" : "#CBD5E1",
                   border: "none",
-                  width: activeIndex === idx ? 24 : 8,
+                  width: activeIndex === idx ? 22 : 8,
                   height: 8,
                   borderRadius: 4,
                   cursor: "pointer",
                   transition: "all var(--transition-fast)",
                 }}
-                aria-label={`Show event ${idx + 1}`}
+                aria-label={`Show promo ${idx + 1}`}
               />
             ))}
           </div>
@@ -95,68 +95,39 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
         className="card-base animate-fade"
         style={{
           padding: "24px 28px",
-          background: "linear-gradient(135deg, rgba(22, 31, 42, 0.95) 0%, rgba(14, 20, 27, 0.95) 100%)",
-          border: `1.5px solid ${activePromo.highlightColor ? activePromo.highlightColor + "55" : "rgba(212, 175, 55, 0.35)"}`,
+          background: "linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%)",
+          border: "1.5px solid #FDE68A",
           borderRadius: "var(--radius-lg)",
-          position: "relative",
-          overflow: "hidden",
         }}
       >
-        {/* Glow backdrop accent */}
-        <div
-          style={{
-            position: "absolute",
-            top: -40,
-            right: -40,
-            width: 180,
-            height: 180,
-            background: activePromo.highlightColor ? `${activePromo.highlightColor}22` : "rgba(212, 175, 55, 0.15)",
-            borderRadius: "50%",
-            filter: "blur(40px)",
-            pointerEvents: "none",
-          }}
-        />
-
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 20, position: "relative", zIndex: 2 }}>
-          <div style={{ maxWidth: 650 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
-              <span
-                className="badge"
-                style={{
-                  background: activePromo.highlightColor ? `${activePromo.highlightColor}22` : "rgba(212, 175, 55, 0.18)",
-                  color: activePromo.highlightColor || "var(--gold)",
-                  border: `1px solid ${activePromo.highlightColor ? activePromo.highlightColor + "66" : "rgba(212, 175, 55, 0.4)"}`,
-                }}
-              >
-                <Sparkles size={11} /> {localizedBadge}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
+          <div style={{ maxWidth: 640 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
+              <span className="badge badge-gold">
+                <Sparkles size={12} /> {localizedBadge}
               </span>
 
               {activePromo.sponsorName && (
-                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gray)", display: "inline-flex", alignItems: "center", gap: 4 }}>
-                  <Megaphone size={11} /> {activePromo.sponsorName}
+                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <Megaphone size={12} color="var(--gold-dark)" /> {activePromo.sponsorName}
                 </span>
               )}
             </div>
 
-            <h3 className="display" style={{ fontSize: "clamp(1.1875rem, 3vw, 1.4375rem)", color: "var(--paper)", lineHeight: 1.25, marginBottom: 8 }}>
+            <h3 className="display" style={{ fontSize: "clamp(1.125rem, 2.5vw, 1.375rem)", color: "var(--text-main)", lineHeight: 1.25, marginBottom: 6 }}>
               {localizedTitle}
             </h3>
 
-            <p style={{ color: "var(--paper-muted)", fontSize: "0.875rem", lineHeight: 1.6, maxWidth: 580 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.55 }}>
               {localizedDesc}
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, justifyContent: "center" }}>
+          <div>
             <Link
               href={activePromo.ctaLink}
               className="btn-base btn-primary"
-              style={{
-                background: activePromo.highlightColor || "var(--gold)",
-                color: "var(--ink-deep)",
-                padding: "11px 20px",
-                fontSize: "0.875rem",
-              }}
+              style={{ fontSize: "0.875rem", padding: "10px 20px" }}
             >
               {activePromo.ctaText} <ArrowRight size={15} />
             </Link>

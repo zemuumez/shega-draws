@@ -18,12 +18,12 @@ export function PrizeTable({ prizes, confirmedCount, winningNumbers }: PrizeTabl
           marginBottom: 16,
         }}
       >
-        <span className="display" style={{ fontSize: "1.25rem", color: "var(--paper)" }}>
-          Prize table
+        <span className="display" style={{ fontSize: "1.25rem", color: "var(--text-main)", fontWeight: 700 }}>
+          Top 10 Prize Schedule
         </span>
         {confirmedCount !== undefined && (
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gray)" }}>
-            {confirmedCount} confirmed {confirmedCount === 1 ? "entry" : "entries"} so far
+          <span className="mono" style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 600 }}>
+            {confirmedCount} confirmed {confirmedCount === 1 ? "entry" : "entries"}
           </span>
         )}
       </div>
@@ -31,6 +31,8 @@ export function PrizeTable({ prizes, confirmedCount, winningNumbers }: PrizeTabl
       <div role="list">
         {prizes.map((prize, i) => {
           const winner = winningNumbers?.[prize.rank];
+          const isTop3 = prize.rank <= 3;
+
           return (
             <div
               key={prize.rank}
@@ -39,31 +41,31 @@ export function PrizeTable({ prizes, confirmedCount, winningNumbers }: PrizeTabl
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                padding: "13px 4px",
+                padding: "12px 6px",
                 borderTop: i === 0 ? "none" : "1px solid var(--gray-line)",
-                animation: "fadeIn 300ms ease both",
-                animationDelay: `${i * 40}ms`,
+                background: isTop3 ? "rgba(254, 243, 199, 0.25)" : "transparent",
+                borderRadius: 6,
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <span className="mono" style={{ color: "var(--gray)", fontSize: "0.75rem", width: 20 }}>
-                  {prize.rank}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span className="mono" style={{ color: "var(--text-subtle)", fontSize: "0.8125rem", fontWeight: 700, width: 22 }}>
+                  #{prize.rank}
                 </span>
-                {prize.rank <= 2 && (
-                  <Trophy size={14} color="var(--gold)" aria-hidden="true" />
+                {isTop3 && (
+                  <Trophy size={15} color="var(--gold-dark)" aria-hidden="true" />
                 )}
-                <span style={{ color: "var(--paper)", fontSize: "0.875rem" }}>{prize.label}</span>
+                <span style={{ color: "var(--text-main)", fontSize: "0.875rem", fontWeight: 600 }}>{prize.label}</span>
               </div>
 
               <div style={{ textAlign: "right" }}>
                 <div
-                  className="display"
-                  style={{ color: prize.rank <= 2 ? "var(--gold)" : "var(--paper)", fontSize: "0.9375rem" }}
+                  className="mono"
+                  style={{ color: isTop3 ? "var(--gold-dark)" : "var(--text-main)", fontSize: "0.9375rem", fontWeight: 700 }}
                 >
-                  {prize.prizeTitle}
+                  {prize.valueAmount || prize.prizeTitle}
                 </div>
                 {winner && (
-                  <div className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold)", marginTop: 2 }}>
+                  <div className="mono" style={{ fontSize: "0.75rem", color: "var(--teal-dark)", marginTop: 2, fontWeight: 700 }}>
                     Winner: #{winner}
                   </div>
                 )}
