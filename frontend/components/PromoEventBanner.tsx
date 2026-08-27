@@ -12,37 +12,37 @@ interface PromoEventBannerProps {
 
 const DEFAULT_PROMOTIONS: CMSPromotion[] = [
   {
-    _id: "promo-enkutatash-2026",
-    badge: "Special Event · 300,000 ETB Jackpot",
-    badgeAm: "የበዓል ልዩ እጣ · 300,000 ብር ጃክፖት",
-    badgeOm: "Qophii Addaa · Jaakpootii Qarshii 300,000",
-    title: "100 Birr Fixed Ticket Event — 10 Guaranteed Cash Winners!",
-    titleAm: "የ100 ብር እጣ — ለ10 እድለኞች 300,000 ብር የተዘጋጀ ሽልማት!",
-    titleOm: "Carraa Tikkeettii Qarshii 100 — Mo'attoota 10f Qarshii 300,000!",
-    description: "Limited to 2,000 verified ticket holders. 1st place gets 80,000 ETB, 2nd gets 65,000 ETB, and 3rd to 10th win tiered cash payouts.",
-    descriptionAm: "ለ2,000 ተሳታፊዎች ብቻ የተወሰነ። 1ኛ የወጣው 80,000 ብር፣ 2ኛ 65,000 ብር፣ ከ3ኛ እስከ 10ኛ የወጡትም ከፍተኛ የገንዘብ ሽልማት ያገኛሉ።",
-    descriptionOm: "Hirmaattota 2,000 qofaaf. Sadarkaan 1ffaa Qarshii 80,000, 2ffaan Qarshii 65,000, fi 3ffaa hanga 10ffaan badhaasa qarshii argatu.",
-    ctaText: "Buy Ticket (100 ETB)",
-    ctaLink: "/enter",
-    sponsorName: "Telebirr Official Partner",
-    highlightColor: "#D97706",
+    _id: "promo-mega-5k",
+    badge: "5,000 People Pool · 1,200,000 ETB Mega Jackpot",
+    badgeAm: "የ5,000 ሰዎች እጣ · 1,200,000 ብር ሜጋ ጃክፖት",
+    badgeOm: "Carraa Namoota 5,000 · Jaakpootii Qarshii 1,200,000",
+    title: "5K Mega Raffle — 400,000 ETB 1st Place & 10 Guaranteed Winners!",
+    titleAm: "የ5ሺህ ሰዎች ሜጋ እጣ — 1ኛ ለወጣው 400,000 ብር እና ለ10 አሸናፊዎች የተዘጋጀ!",
+    titleOm: "Carraa Meegaa 5K — Sadarkaa 1ffaaf Qarshii 400,000 fi Mo'attoota 10f!",
+    description: "Choose 1K, 2K, 3K, or 5K people pool sizes. 100% provably fair with SHA-256 cryptographic verification.",
+    descriptionAm: "የ1ሺህ፣ 2ሺህ፣ 3ሺህ ወይም 5ሺህ ሰዎችን ገደብ ይምረጡ። በSHA-256 የተረጋገጠ ፍጹም ፍትሃዊ እጣ።",
+    descriptionOm: "Daangaa namoota 1K, 2K, 3K ykn 5K filadhaa. SHA-256 dhaan kan mirkanaa'e.",
+    ctaText: "Choose Pool & Enter",
+    ctaLink: "/enter?size=5000",
+    sponsorName: "Official Mega Pool",
+    highlightColor: "#EAB308",
     isSponsored: true,
   },
   {
-    _id: "promo-telebirr-cashback",
-    badge: "Zero Fee Payment",
-    badgeAm: "ያለ ምንም ተጨማሪ ክፍያ",
-    badgeOm: "Kaffaltii Tajaajilaa Malee",
-    title: "Direct Telebirr & CBE Birr Payment Checkout",
-    titleAm: "በቴሌብር እና በሲቢኢ ብር በቀጥታ ይክፈሉ",
-    titleOm: "Telebirr fi CBE Birr dhaan kallattiin kaffalaa",
-    description: "Simple mobile transfer with immediate receipt verification and ticket confirmation.",
-    descriptionAm: "በቀላሉ በስልክዎ ከፍለው ደረሰኝ በማስገባት የተረጋገጠ የሎተሪ ቲኬትዎን ይያዙ።",
-    descriptionOm: "Salphaatti kaffaltii xumurtanii nagahee galchuun tikkeettii keessan mirkaneeffadhaa.",
-    ctaText: "Get Ticket Now",
+    _id: "promo-promo-code",
+    badge: "Use Promo Code",
+    badgeAm: "የፕሮሞ ኮድ ይጠቀሙ",
+    badgeOm: "Koodii Proomoo Fayyadamaa",
+    title: "Enter Code 'PRIMEDRAW2026' for Free Extra Verified Entry Points!",
+    titleAm: "በ'PRIMEDRAW2026' ኮድ ተጨማሪ የተረጋገጡ የነጥብ እድሎችን ያግኙ!",
+    titleOm: "Koodii 'PRIMEDRAW2026' fayyadamuun carraa dabalataa argadhaa!",
+    description: "Enter promo codes at checkout in Step 1 (optional). Instant Telebirr and CBE Birr verification.",
+    descriptionAm: "በመጀመሪያው ደረጃ ላይ የፕሮሞ ኮድዎን በማስገባት በቴሌብር ወይም በሲቢኢ ብር ክፍያዎን ያጠናቁ።",
+    descriptionOm: "Tarkaanfii 1ffaa irratti koodii proomoo galchaa, Telebirr ykn CBE Birr dhaan kaffalaa.",
+    ctaText: "Enter with Promo",
     ctaLink: "/enter",
-    sponsorName: "Fast Verification",
-    highlightColor: "#059669",
+    sponsorName: "Special Promo",
+    highlightColor: "#2563EB",
     isSponsored: false,
   }
 ];
@@ -63,7 +63,7 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Flame size={18} color="var(--gold-dark)" />
-          <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gold-dark)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+          <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", letterSpacing: "0.5px", textTransform: "uppercase" }}>
             {t.promo.badge}
           </span>
         </div>
@@ -75,7 +75,7 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
                 key={p._id}
                 onClick={() => setActiveIndex(idx)}
                 style={{
-                  background: activeIndex === idx ? "var(--gold)" : "#CBD5E1",
+                  background: activeIndex === idx ? "var(--blue-royal)" : "#CBD5E1",
                   border: "none",
                   width: activeIndex === idx ? 22 : 8,
                   height: 8,
@@ -95,8 +95,8 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
         className="card-base animate-fade"
         style={{
           padding: "24px 28px",
-          background: "linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%)",
-          border: "1.5px solid #FDE68A",
+          background: "linear-gradient(135deg, #FEF9C3 0%, #EFF6FF 100%)",
+          border: "1.5px solid #FDE047",
           borderRadius: "var(--radius-lg)",
         }}
       >
@@ -108,13 +108,13 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
               </span>
 
               {activePromo.sponsorName && (
-                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", display: "inline-flex", alignItems: "center", gap: 4 }}>
-                  <Megaphone size={12} color="var(--gold-dark)" /> {activePromo.sponsorName}
+                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--blue-navy)", display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 700 }}>
+                  <Megaphone size={12} color="var(--blue-royal)" /> {activePromo.sponsorName}
                 </span>
               )}
             </div>
 
-            <h3 className="display" style={{ fontSize: "clamp(1.125rem, 2.5vw, 1.375rem)", color: "var(--text-main)", lineHeight: 1.25, marginBottom: 6 }}>
+            <h3 className="display" style={{ fontSize: "clamp(1.125rem, 2.5vw, 1.375rem)", color: "var(--blue-navy)", lineHeight: 1.25, marginBottom: 6, fontWeight: 800 }}>
               {localizedTitle}
             </h3>
 
@@ -127,7 +127,7 @@ export function PromoEventBanner({ promotions = DEFAULT_PROMOTIONS }: PromoEvent
             <Link
               href={activePromo.ctaLink}
               className="btn-base btn-primary"
-              style={{ fontSize: "0.875rem", padding: "10px 20px" }}
+              style={{ fontSize: "0.875rem", padding: "11px 22px" }}
             >
               {activePromo.ctaText} <ArrowRight size={15} />
             </Link>

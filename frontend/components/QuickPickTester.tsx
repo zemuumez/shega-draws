@@ -35,15 +35,15 @@ export function QuickPickTester() {
           alignItems: "center",
           flexWrap: "wrap",
           gap: 32,
-          background: "linear-gradient(135deg, #FEF3C7 0%, #FFFFFF 60%)",
-          border: "1.5px solid #FDE68A",
+          background: "linear-gradient(135deg, #FEF9C3 0%, #EFF6FF 100%)",
+          border: "1.5px solid #FDE047",
         }}
       >
         <div style={{ maxWidth: 540 }}>
           <div className="badge badge-gold" style={{ marginBottom: 10 }}>
             <Sparkles size={12} /> {t.quickPick.title}
           </div>
-          <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3vw, 1.875rem)", color: "var(--text-main)", lineHeight: 1.2, marginBottom: 10 }}>
+          <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3vw, 1.875rem)", color: "var(--blue-navy)", lineHeight: 1.2, marginBottom: 10, fontWeight: 800 }}>
             {t.quickPick.subtitle}
           </h2>
           <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: 20 }}>
@@ -52,10 +52,10 @@ export function QuickPickTester() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             <button
+              type="button"
               onClick={rollRandom}
               disabled={isSpinning}
               className="btn-base btn-secondary"
-              style={{ borderColor: "var(--gold)", color: "var(--gold-dark)" }}
             >
               <Dice5 size={18} className={isSpinning ? "animate-spin" : ""} />
               {t.quickPick.randomPick}
@@ -77,9 +77,9 @@ export function QuickPickTester() {
               width: 130,
               height: 130,
               borderRadius: "50%",
-              background: "radial-gradient(circle at 35% 35%, #FEF3C7 0%, #F59E0B 100%)",
-              border: "3px solid #D97706",
-              boxShadow: "0 8px 24px rgba(217, 119, 6, 0.28)",
+              background: "radial-gradient(circle at 35% 35%, #FEF08A 0%, #EAB308 60%, #CA8A04 100%)",
+              border: "3px solid #854D0E",
+              boxShadow: "0 8px 24px rgba(234, 179, 8, 0.35)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -93,9 +93,9 @@ export function QuickPickTester() {
               style={{
                 fontSize: "3.5rem",
                 fontWeight: 800,
-                color: "#FFFFFF",
+                color: "#1E3A8A",
                 lineHeight: 1,
-                textShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                textShadow: "0 1px 3px rgba(255,255,255,0.6)",
               }}
             >
               {selectedNum}

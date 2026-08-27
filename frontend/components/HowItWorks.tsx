@@ -34,7 +34,7 @@ export function HowItWorks() {
         <div className="badge badge-gold" style={{ marginBottom: 8 }}>
           <Sparkles size={12} /> {t.howItWorks.title}
         </div>
-        <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3.5vw, 2rem)", color: "var(--text-main)", maxWidth: 580, margin: "0 auto" }}>
+        <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3.5vw, 2rem)", color: "var(--blue-navy)", maxWidth: 580, margin: "0 auto", fontWeight: 800 }}>
           {t.howItWorks.subtitle}
         </h2>
       </div>
@@ -50,6 +50,7 @@ export function HowItWorks() {
                 padding: "26px 24px",
                 position: "relative",
                 background: "#FFFFFF",
+                border: "1.5px solid var(--blue-border)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -65,14 +66,14 @@ export function HowItWorks() {
                     justifyContent: "center",
                   }}
                 >
-                  <Icon size={20} color="var(--gold-dark)" />
+                  <Icon size={20} color="var(--gold-deep)" />
                 </div>
-                <span className="mono" style={{ fontSize: "1.25rem", fontWeight: 800, color: "#CBD5E1" }}>
+                <span className="mono" style={{ fontSize: "1.25rem", fontWeight: 800, color: "var(--blue-border)" }}>
                   {step.num}
                 </span>
               </div>
 
-              <h3 className="display" style={{ fontSize: "1.125rem", color: "var(--text-main)", marginBottom: 8 }}>
+              <h3 className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", marginBottom: 8, fontWeight: 700 }}>
                 {step.title}
               </h3>
               <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.55 }}>

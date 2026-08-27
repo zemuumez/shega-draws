@@ -23,7 +23,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
 
   return (
     <>
-      {/* ── Desktop top nav (Light Theme) ───────────────────── */}
+      {/* ── Desktop top nav (Gold Yellow & Royal Blue Theme) ───── */}
       <nav
         aria-label="Main navigation"
         style={{
@@ -31,13 +31,13 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "16px 36px",
-          borderBottom: "1px solid var(--gray-line)",
+          borderBottom: "1.5px solid var(--blue-border)",
           position: "sticky",
           top: 0,
-          background: "rgba(255, 255, 255, 0.95)",
+          background: "rgba(255, 255, 255, 0.96)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+          boxShadow: "0 2px 8px rgba(30, 58, 138, 0.05)",
           zIndex: 100,
         }}
         id="nav-desktop"
@@ -45,20 +45,21 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <div
             style={{
-              width: 34,
-              height: 34,
+              width: 36,
+              height: 36,
               borderRadius: "var(--radius-sm)",
-              background: "var(--gold)",
+              background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 2px 6px rgba(217, 119, 6, 0.28)",
+              boxShadow: "0 2px 8px rgba(234, 179, 8, 0.4)",
+              border: "1px solid #FDE047",
             }}
           >
-            <Ticket size={18} color="#FFFFFF" />
+            <Ticket size={20} color="#1E3A8A" />
           </div>
           <div>
-            <span className="display" style={{ fontSize: "1.25rem", color: "var(--text-main)", fontWeight: 800 }}>
+            <span className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", fontWeight: 800, letterSpacing: "-0.5px" }}>
               {t.appName}
             </span>
           </div>
@@ -73,13 +74,13 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                 key={href}
                 href={href}
                 style={{
-                  background: active ? "var(--gold-bg)" : "transparent",
-                  border: active ? "1px solid var(--gold-border)" : "1px solid transparent",
+                  background: active ? "var(--blue-bg)" : "transparent",
+                  border: active ? "1.5px solid var(--blue-border)" : "1.5px solid transparent",
                   borderRadius: 10,
-                  padding: "8px 14px",
-                  color: active ? "var(--gold-dark)" : "var(--text-muted)",
+                  padding: "8px 16px",
+                  color: active ? "var(--blue-royal)" : "var(--text-muted)",
                   fontSize: "0.875rem",
-                  fontWeight: active ? 700 : 500,
+                  fontWeight: active ? 800 : 600,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -89,7 +90,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                   transition: "all var(--transition-fast)",
                 }}
               >
-                <Icon size={16} color={active ? "var(--gold-dark)" : "var(--text-muted)"} />
+                <Icon size={16} color={active ? "var(--blue-royal)" : "var(--text-subtle)"} />
                 {label}
                 {href === "/admin" && pendingCount > 0 && (
                   <span
@@ -131,7 +132,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           alignItems: "center",
           padding: "14px 18px",
           background: "#FFFFFF",
-          borderBottom: "1px solid var(--gray-line)",
+          borderBottom: "1.5px solid var(--blue-border)",
           position: "sticky",
           top: 0,
           zIndex: 90,
@@ -141,18 +142,19 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <div
             style={{
-              width: 28,
-              height: 28,
+              width: 30,
+              height: 30,
               borderRadius: 6,
-              background: "var(--gold)",
+              background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              border: "1px solid #FDE047",
             }}
           >
-            <Ticket size={16} color="#FFFFFF" />
+            <Ticket size={17} color="#1E3A8A" />
           </div>
-          <span className="display" style={{ fontSize: "1.125rem", color: "var(--text-main)", fontWeight: 800 }}>
+          <span className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800 }}>
             {t.appName}
           </span>
         </Link>
@@ -170,10 +172,10 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           display: "flex",
           justifyContent: "space-around",
           background: "#FFFFFF",
-          borderTop: "1px solid var(--gray-line)",
+          borderTop: "1.5px solid var(--blue-border)",
           padding: "8px 4px",
           paddingBottom: "calc(8px + env(safe-area-inset-bottom))",
-          boxShadow: "0 -2px 10px rgba(0,0,0,0.04)",
+          boxShadow: "0 -2px 10px rgba(30, 58, 138, 0.06)",
           zIndex: 100,
         }}
         id="nav-mobile"
@@ -187,13 +189,13 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
               style={{
                 background: "transparent",
                 border: "none",
-                color: active ? "var(--gold-dark)" : "var(--text-muted)",
+                color: active ? "var(--blue-royal)" : "var(--text-subtle)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 3,
                 fontSize: "0.6875rem",
-                fontWeight: active ? 700 : 500,
+                fontWeight: active ? 800 : 600,
                 cursor: "pointer",
                 position: "relative",
                 padding: "4px 8px",
@@ -201,7 +203,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                 transition: "color var(--transition-fast)",
               }}
             >
-              <Icon size={18} color={active ? "var(--gold-dark)" : "var(--text-muted)"} />
+              <Icon size={18} color={active ? "var(--blue-royal)" : "var(--text-subtle)"} />
               {short}
               {href === "/admin" && pendingCount > 0 && (
                 <span

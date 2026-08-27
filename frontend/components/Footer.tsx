@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Ticket, ShieldCheck, Phone, Mail, Send, Award } from "lucide-react";
+import { Ticket, ShieldCheck, Phone, Mail, Send, Award, Users } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 
 export function Footer() {
@@ -12,7 +12,7 @@ export function Footer() {
     <footer
       style={{
         background: "#FFFFFF",
-        borderTop: "1px solid var(--gray-line)",
+        borderTop: "1.5px solid var(--blue-border)",
         padding: "48px 20px 32px",
         marginTop: 56,
       }}
@@ -24,18 +24,19 @@ export function Footer() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <div
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   borderRadius: "var(--radius-sm)",
-                  background: "var(--gold)",
+                  background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  border: "1px solid #FDE047",
                 }}
               >
-                <Ticket size={18} color="#FFFFFF" />
+                <Ticket size={18} color="#1E3A8A" />
               </div>
-              <span className="display" style={{ fontSize: "1.25rem", color: "var(--text-main)", fontWeight: 800 }}>
+              <span className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800 }}>
                 {t.appName}
               </span>
             </div>
@@ -49,7 +50,7 @@ export function Footer() {
 
           {/* Navigation Links */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--gold-dark)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 700 }}>
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
               {t.footer.quickLinks}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem" }}>
@@ -61,38 +62,38 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Trust & Transparency */}
+          {/* Pool Sizes & Transparency */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--gold-dark)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 700 }}>
-              {t.footer.transparency}
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
+              Pool Sizes & Transparency
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Users size={14} color="var(--blue-royal)" /> 1K, 2K, 3K, and 5K Ticket Capacities
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <ShieldCheck size={14} color="var(--teal)" /> SHA-256 Commit-Reveal Protocol
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Award size={14} color="var(--gold-dark)" /> 100% Client-Side Auditable Math
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Ticket size={14} color="var(--gold-dark)" /> 10-Tier Fixed Guaranteed Prizes
+                <Award size={14} color="var(--gold-dark)" /> 10-Tier Fixed Guaranteed Prizes
               </div>
             </div>
           </div>
 
           {/* Contact & Support */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--gold-dark)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 700 }}>
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
               Customer Support
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Phone size={14} color="var(--text-main)" /> +251 911 000 000 / 0912 345 678
+                <Phone size={14} color="var(--blue-navy)" /> +251 911 000 000 / 0912 345 678
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Mail size={14} color="var(--text-main)" /> support@primedraws.com
+                <Mail size={14} color="var(--blue-navy)" /> support@primedraws.com
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Send size={14} color="var(--teal)" /> Official Telegram: @PrimeDrawsOfficial
+                <Send size={14} color="var(--blue-royal)" /> Official Telegram: @PrimeDrawsOfficial
               </div>
             </div>
           </div>

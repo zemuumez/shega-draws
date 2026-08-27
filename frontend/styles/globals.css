@@ -1,71 +1,82 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   PrimeDraws — Global Design System (Light Theme & Physical Ticket Style)
-   Clean, accessible, high-contrast & user-friendly
+   PrimeDraws — Global Design System
+   Gold Yellow & Complementary Royal Blue Theme
+   Clean, accessible, high-contrast & authentic physical lottery aesthetics
 ═══════════════════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700&display=swap');
 
-/* ── Light Mode Design Tokens ───────────────────────────────────────── */
+/* ── Gold Yellow & Complementary Blue Design Tokens ────────────────────── */
 :root {
-  /* Clean Light Theme Surfaces */
-  --bg-page:      #F8FAFC;
-  --bg-surface:   #FFFFFF;
-  --bg-subtle:    #F1F5F9;
-  --bg-card:      #FFFFFF;
-  --bg-ticket:    #FFFDF9;
-  --bg-ticket-stub:#FAF5EC;
+  /* Surfaces */
+  --bg-page:        #F8FAFC;
+  --bg-surface:     #FFFFFF;
+  --bg-subtle:      #F0F7FF;
+  --bg-card:        #FFFFFF;
+  --bg-ticket:      #FFFDF7;
+  --bg-ticket-stub:  #F8FAFC;
   
-  /* Primary & Secondary Typography */
-  --ink:          #0F172A;
-  --text-main:    #0F172A;
-  --text-muted:   #475569;
-  --text-subtle:  #64748B;
-  --paper:        #0F172A;
+  /* Primary Royal / Deep Blue Typography & Ink */
+  --ink:            #0F172A;
+  --text-main:      #0F254A;
+  --text-muted:     #334E68;
+  --text-subtle:    #627D98;
+  --paper:          #0F254A;
   
-  /* Amber Gold Accents (Rich & High-Contrast on White) */
-  --gold:         #D97706;
-  --gold-dark:    #B45309;
-  --gold-light:   #F59E0B;
-  --gold-bg:      #FEF3C7;
-  --gold-border:  #FDE68A;
-  --gold-glow:    rgba(217, 119, 6, 0.12);
+  /* Vibrant Gold Yellow (Primary Accent) */
+  --gold:           #EAB308;
+  --gold-yellow:    #FACC15;
+  --gold-dark:      #A16207;
+  --gold-deep:      #854D0E;
+  --gold-bg:        #FEF9C3;
+  --gold-border:    #FDE047;
+  --gold-glow:      rgba(234, 179, 8, 0.22);
+
+  /* Complementary Royal / Navy Blue (Secondary & Brand Anchors) */
+  --blue:           #1D4ED8;
+  --blue-royal:     #2563EB;
+  --blue-navy:      #1E3A8A;
+  --blue-dark:      #0F172A;
+  --blue-bg:        #EFF6FF;
+  --blue-border:    #BFDBFE;
+  --blue-glow:      rgba(37, 99, 235, 0.15);
   
-  /* Jewel Green / Success */
-  --teal:         #059669;
-  --teal-dark:    #047857;
-  --teal-bg:      #D1FAE5;
-  --teal-border:  #A7F3D0;
+  /* Emerald Teal (Verified / Success) */
+  --teal:           #059669;
+  --teal-dark:      #047857;
+  --teal-bg:        #ECFDF5;
+  --teal-border:    #A7F3D0;
   
-  /* Crimson Rust / Error / Alert */
-  --rust:         #DC2626;
-  --rust-dark:    #B91C1C;
-  --rust-bg:      #FEE2E2;
-  --rust-border:  #FECACA;
+  /* Crimson Rust (Alert / Danger) */
+  --rust:           #DC2626;
+  --rust-dark:      #B91C1C;
+  --rust-bg:        #FEF2F2;
+  --rust-border:    #FECACA;
   
-  /* Clean Borders */
-  --gray-line:    #E2E8F0;
-  --gray-border:  #CBD5E1;
-  --gray-bg:      #F1F5F9;
-  --gray:         #64748B;
+  /* Clean Slate Borders */
+  --gray-line:      #E2E8F0;
+  --gray-border:    #CBD5E1;
+  --gray-bg:        #F8FAFC;
+  --gray:           #64748B;
 
   /* Typography */
-  --font-body:    'Plus Jakarta Sans', 'Noto Sans Ethiopic', system-ui, sans-serif;
-  --font-display: 'Fraunces', 'Noto Sans Ethiopic', Georgia, serif;
-  --font-mono:    'IBM Plex Mono', monospace;
+  --font-body:      'Plus Jakarta Sans', 'Noto Sans Ethiopic', system-ui, sans-serif;
+  --font-display:   'Fraunces', 'Noto Sans Ethiopic', Georgia, serif;
+  --font-mono:      'IBM Plex Mono', monospace;
 
   /* Radii */
-  --radius-xs:    6px;
-  --radius-sm:    10px;
-  --radius-md:    14px;
-  --radius-lg:    18px;
-  --radius-xl:    24px;
-  --radius-full:  9999px;
+  --radius-xs:      6px;
+  --radius-sm:      10px;
+  --radius-md:      14px;
+  --radius-lg:      18px;
+  --radius-xl:      24px;
+  --radius-full:    9999px;
 
-  /* Physical Ticket & Card Shadows */
-  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-card:  0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-  --shadow-card-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
-  --shadow-ticket: 0 8px 24px -4px rgba(180, 83, 9, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  /* Shadows */
+  --shadow-sm:      0 1px 3px rgba(15, 37, 74, 0.05);
+  --shadow-card:    0 4px 16px -2px rgba(15, 37, 74, 0.08), 0 2px 6px -1px rgba(15, 37, 74, 0.04);
+  --shadow-card-hover: 0 12px 28px -4px rgba(15, 37, 74, 0.12), 0 4px 10px -2px rgba(15, 37, 74, 0.06);
+  --shadow-ticket:  0 8px 24px -4px rgba(161, 98, 7, 0.08), 0 4px 12px -2px rgba(15, 37, 74, 0.06);
 
   /* Transitions */
   --transition-fast: 140ms ease;
@@ -98,130 +109,132 @@ body {
 
 h1, h2, h3, h4, h5 {
   color: var(--text-main);
-  letter-spacing: -0.02em;
   font-weight: 700;
+  letter-spacing: -0.015em;
 }
 
-/* ── Focus ─────────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
+/* ── Layout Container ──────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* ── Clean Card Styles ─────────────────────────────────────────────── */
+/* ── Base Card & Surfaces ──────────────────────────────────────────── */
 .card-base {
-  background: var(--bg-surface);
+  background: var(--bg-card);
   border: 1px solid var(--gray-line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  transition: all var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .card-base:hover {
   box-shadow: var(--shadow-card-hover);
-  border-color: var(--gray-border);
 }
 
-/* ── Physical Lottery Ticket Styling ───────────────────────────────── */
+/* ── Physical Lottery Ticket Styling (Perforation & Punch Notches) ── */
 .physical-lottery-ticket {
-  position: relative;
   background: var(--bg-ticket);
-  border: 1.5px solid #EADDC8;
+  border: 1.5px solid #FDE047;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-ticket);
   overflow: hidden;
+  position: relative;
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .physical-lottery-ticket:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--gold);
+  box-shadow: 0 14px 32px -4px rgba(30, 58, 138, 0.12), 0 4px 12px -2px rgba(234, 179, 8, 0.10);
 }
 
-/* Perforated ticket punch notches */
+/* Cutout punch holes on perforation tear line */
 .ticket-punch-top, .ticket-punch-bottom {
   position: absolute;
   width: 22px;
   height: 22px;
   background: var(--bg-page);
   border-radius: 50%;
-  z-index: 10;
-  border: 1.5px solid #EADDC8;
+  border: 1.5px solid #E2E8F0;
+  z-index: 5;
 }
 
-.ticket-perforation-v {
-  border-left: 2px dashed #DCCBB0;
-  height: 100%;
-}
-
-.ticket-perforation-h {
-  border-top: 2px dashed #DCCBB0;
-  width: 100%;
-  margin: 14px 0;
-}
-
+/* Barcode Graphic Pattern */
 .barcode-pattern {
-  background-image: repeating-linear-gradient(
+  height: 28px;
+  width: 100%;
+  background: repeating-linear-gradient(
     90deg,
-    #0F172A 0px,
-    #0F172A 2px,
+    #1E3A8A 0px,
+    #1E3A8A 2px,
     transparent 2px,
     transparent 4px,
-    #0F172A 4px,
-    #0F172A 7px,
+    #1E3A8A 4px,
+    #1E3A8A 7px,
     transparent 7px,
     transparent 9px,
-    #0F172A 9px,
-    #0F172A 10px,
+    #1E3A8A 9px,
+    #1E3A8A 10px,
     transparent 10px,
-    transparent 13px
+    transparent 13px,
+    #1E3A8A 13px,
+    #1E3A8A 16px
   );
-  height: 34px;
-  width: 100%;
   opacity: 0.85;
 }
 
-/* ── Button Styles ─────────────────────────────────────────────────── */
+/* ── Interactive Buttons (Gold Yellow & Royal Blue) ────────────────── */
 .btn-base {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: var(--radius-sm);
   font-family: var(--font-body);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  padding: 11px 20px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all var(--transition-fast);
   text-decoration: none;
-  border: none;
-  user-select: none;
+  transition: all var(--transition-fast);
 }
-.btn-base:active { transform: scale(0.98); }
-.btn-base:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary {
-  background: var(--gold);
-  color: #FFFFFF;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.28);
+  background: linear-gradient(135deg, #FACC15 0%, #EAB308 100%);
+  color: #1E3A8A;
+  border: 1px solid #FACC15;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.35);
 }
+
 .btn-primary:hover {
-  background: var(--gold-dark);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+  background: linear-gradient(135deg, #FDE047 0%, #FACC15 100%);
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-blue {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  border: 1px solid #1D4ED8;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+}
+
+.btn-blue:hover {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: var(--bg-surface);
-  color: var(--text-main);
-  border: 1px solid var(--gray-line);
-  box-shadow: var(--shadow-sm);
+  background: #FFFFFF;
+  color: var(--blue-navy);
+  border: 1.5px solid var(--blue-border);
+  box-shadow: 0 1px 3px rgba(15, 37, 74, 0.04);
 }
+
 .btn-secondary:hover {
-  background: var(--bg-subtle);
-  border-color: var(--gray-border);
+  background: var(--blue-bg);
+  border-color: var(--blue-royal);
+  color: var(--blue-royal);
 }
 
 /* ── Badges ────────────────────────────────────────────────────────── */
@@ -229,20 +242,22 @@ h1, h2, h3, h4, h5 {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: var(--radius-full);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
 }
 
 .badge-gold {
   background: var(--gold-bg);
-  color: var(--gold-dark);
+  color: var(--gold-deep);
   border: 1px solid var(--gold-border);
+}
+
+.badge-blue {
+  background: var(--blue-bg);
+  color: var(--blue-navy);
+  border: 1px solid var(--blue-border);
 }
 
 .badge-teal {
@@ -258,95 +273,84 @@ h1, h2, h3, h4, h5 {
 }
 
 .badge-gray {
-  background: var(--gray-bg);
-  color: var(--text-muted);
-  border: 1px solid var(--gray-line);
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
 }
 
-/* ── Input Fields ──────────────────────────────────────────────────── */
+/* ── Inputs ────────────────────────────────────────────────────────── */
 .input-base {
   width: 100%;
-  background: var(--bg-surface);
+  padding: 12px 16px;
+  background: #FFFFFF;
   border: 1.5px solid var(--gray-line);
   border-radius: var(--radius-sm);
-  padding: 12px 16px;
   color: var(--text-main);
+  font-size: 0.9375rem;
   font-family: var(--font-body);
-  font-size: 1rem;
-  min-height: 48px;
   transition: all var(--transition-fast);
 }
-.input-base::placeholder { color: #94A3B8; }
+
 .input-base:focus {
   outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--blue-royal);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* ── Tab Filter Pills ──────────────────────────────────────────────── */
+/* ── Tab Filter Container ──────────────────────────────────────────── */
 .tab-filter-container {
   display: inline-flex;
-  align-items: center;
-  background: #E2E8F0;
-  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  border: 1px solid var(--gray-line);
   padding: 4px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   gap: 4px;
 }
 
 .tab-filter-btn {
-  background: transparent;
-  color: var(--text-muted);
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 9px 18px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
 }
 
 .tab-filter-btn.active {
-  background: var(--bg-surface);
-  color: var(--gold-dark);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: var(--blue-navy);
+  color: #FFFFFF;
+  font-weight: 700;
 }
 
-.tab-filter-btn:hover:not(.active) {
-  color: var(--text-main);
-}
-
-/* ── Capacity Progress Bar ─────────────────────────────────────────── */
+/* ── Progress Bar ──────────────────────────────────────────────────── */
 .progress-bar-track {
+  width: 100%;
   height: 8px;
-  border-radius: 8px;
   background: #E2E8F0;
+  border-radius: var(--radius-full);
   overflow: hidden;
-  position: relative;
 }
+
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold), var(--gold-light));
-  border-radius: 8px;
+  background: linear-gradient(90deg, #FACC15 0%, #2563EB 100%);
+  border-radius: var(--radius-full);
   transition: width 400ms ease;
 }
 
-/* ── Layout & Responsiveness ───────────────────────────────────────── */
-.container {
-  width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 24px;
+/* ── Keyframe Animations ───────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.page-content {
-  padding-bottom: calc(84px + env(safe-area-inset-bottom));
-}
-@media (min-width: 860px) {
-  .page-content { padding-bottom: 48px; }
-}
-@media (max-width: 640px) {
-  .container { padding: 0 16px; }
+.animate-fade {
+  animation: fadeIn 300ms ease forwards;
 }

@@ -14,7 +14,7 @@ export function FairnessDiagram() {
       icon: Lock,
       title: t.fairness.step1Title,
       desc: t.fairness.step1Desc,
-      color: "var(--gold-dark)",
+      color: "var(--gold-deep)",
       bg: "var(--gold-bg)",
     },
     {
@@ -30,25 +30,25 @@ export function FairnessDiagram() {
       icon: Unlock,
       title: t.fairness.step3Title,
       desc: t.fairness.step3Desc,
-      color: "#0F172A",
-      bg: "#F1F5F9",
+      color: "var(--blue-navy)",
+      bg: "var(--blue-bg)",
     },
   ];
 
   return (
     <section style={{ margin: "48px 0" }}>
-      <div className="card-base" style={{ padding: "36px 30px", background: "#FFFFFF" }}>
+      <div className="card-base" style={{ padding: "36px 30px", background: "#FFFFFF", border: "1.5px solid var(--blue-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
           <div>
-            <div className="badge badge-teal" style={{ marginBottom: 8 }}>
+            <div className="badge badge-blue" style={{ marginBottom: 8 }}>
               <ShieldCheck size={12} /> {t.fairness.title}
             </div>
-            <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3vw, 1.875rem)", color: "var(--text-main)" }}>
+            <h2 className="display" style={{ fontSize: "clamp(1.375rem, 3vw, 1.875rem)", color: "var(--blue-navy)", fontWeight: 800 }}>
               {t.fairness.subtitle}
             </h2>
           </div>
 
-          <Link href="/results" className="btn-base btn-secondary" style={{ borderColor: "var(--teal)", color: "var(--teal-dark)" }}>
+          <Link href="/results" className="btn-base btn-secondary">
             {t.fairness.verifyBtn} <ArrowRight size={15} />
           </Link>
         </div>
@@ -82,12 +82,12 @@ export function FairnessDiagram() {
                   >
                     <Icon size={18} color={s.color} />
                   </div>
-                  <span className="mono" style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-subtle)" }}>
+                  <span className="mono" style={{ fontSize: "0.875rem", fontWeight: 800, color: "var(--blue-royal)" }}>
                     {s.num}
                   </span>
                 </div>
 
-                <h3 className="display" style={{ fontSize: "1.0625rem", color: "var(--text-main)", marginBottom: 6 }}>
+                <h3 className="display" style={{ fontSize: "1.0625rem", color: "var(--blue-navy)", marginBottom: 6, fontWeight: 700 }}>
                   {s.title}
                 </h3>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", lineHeight: 1.55 }}>
@@ -101,8 +101,8 @@ export function FairnessDiagram() {
         {/* Algorithm Code Box */}
         <div
           style={{
-            background: "#F1F5F9",
-            border: "1px solid var(--gray-line)",
+            background: "var(--blue-bg)",
+            border: "1px solid var(--blue-border)",
             borderRadius: "var(--radius-sm)",
             padding: "16px 18px",
             display: "flex",
@@ -110,19 +110,20 @@ export function FairnessDiagram() {
             gap: 6,
           }}
         >
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold-dark)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
-            <Binary size={14} /> {t.fairness.algoTitle}
+          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--blue-navy)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6, fontWeight: 800 }}>
+            <Binary size={14} color="var(--blue-royal)" /> {t.fairness.algoTitle}
           </span>
           <code
             className="mono"
             style={{
-              color: "var(--text-main)",
+              color: "var(--blue-navy)",
               fontSize: "0.75rem",
               wordBreak: "break-all",
               background: "#FFFFFF",
-              border: "1px solid var(--gray-line)",
+              border: "1px solid var(--blue-border)",
               padding: "8px 10px",
               borderRadius: 6,
+              fontWeight: 700,
             }}
           >
             {t.fairness.formula}

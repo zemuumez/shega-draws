@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Ticket, Trophy, Calendar, Users, ShieldCheck, ChevronDown, ChevronUp, Sparkles, CheckCircle2 } from "lucide-react";
+import { Ticket, Trophy, Calendar, Users, ShieldCheck, ChevronDown, ChevronUp, Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { DrawState } from "@/lib/api";
 
@@ -20,7 +20,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
   const ticketPrice = draw.ticket_price || 100;
   const maxCapacity = draw.max_capacity || 2000;
-  const totalEntries = draw.total_entries || (isRevealed ? maxCapacity : 1420);
+  const totalEntries = draw.total_entries || (isRevealed ? maxCapacity : Math.round(maxCapacity * 0.7));
   const percentageSold = Math.min(100, Math.round((totalEntries / maxCapacity) * 100));
 
   const prizes = draw.prizes || [];
@@ -31,95 +31,96 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
       className="physical-lottery-ticket animate-fade"
       style={{
         display: "grid",
-        gridTemplateColumns: "1fr 280px",
-        margin: "0 0 24px 0",
+        gridTemplateColumns: "1fr 270px",
+        margin: "0 0 22px 0",
         position: "relative",
+        background: "#FFFDF7",
+        border: "1.5px solid #FDE047",
       }}
     >
       {/* ── Left / Main Ticket Body ───────────────────────────────────── */}
-      <div style={{ padding: "28px 28px 24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+      <div style={{ padding: "26px 28px 22px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
-          {/* Top Bar: Serial & Status */}
+          {/* Top Bar: People Size & Status */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span
                 className="badge"
                 style={{
-                  background: isOpen ? "var(--teal-bg)" : isUpcoming ? "var(--gold-bg)" : "var(--gray-bg)",
+                  background: isOpen ? "var(--teal-bg)" : isUpcoming ? "var(--gold-bg)" : "#F1F5F9",
                   color: isOpen ? "var(--teal-dark)" : isUpcoming ? "var(--gold-dark)" : "var(--text-muted)",
                   border: `1px solid ${isOpen ? "var(--teal-border)" : isUpcoming ? "var(--gold-border)" : "var(--gray-line)"}`,
                 }}
               >
-                {isOpen ? t.drawsExplorer.statusOpen : isUpcoming ? t.drawsExplorer.statusUpcoming : t.drawsExplorer.statusRevealed}
+                {isOpen ? "● ACTIVE DRAW" : isUpcoming ? "🕒 SCHEDULED" : "✓ COMPLETED"}
               </span>
-              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 600 }}>
-                SERIAL #{draw.draw_id}
+
+              {/* People Capacity Size Badge */}
+              <span className="badge badge-blue" style={{ fontSize: "0.75rem", fontWeight: 800 }}>
+                <Users size={12} /> {maxCapacity.toLocaleString()} People Pool
+              </span>
+
+              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 700 }}>
+                #{draw.draw_id}
               </span>
             </div>
 
             <div className="mono" style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
-              <Calendar size={13} color="var(--gold-dark)" />
+              <Calendar size={13} color="var(--blue-royal)" />
               <span>{new Date(draw.deadline).toLocaleDateString(language === "am" ? "am-ET" : "en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
             </div>
           </div>
 
-          {/* Title & Description */}
-          <h3 className="display" style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.625rem)", color: "var(--text-main)", marginBottom: 6, lineHeight: 1.2 }}>
-            {draw.title || "The 100 Birr Grand Jackpot Draw"}
-          </h3>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.5, marginBottom: 20 }}>
-            {draw.description}
-          </p>
-
-          {/* Capacity Progress & Prize Pool Stat Strip */}
-          <div
-            style={{
-              background: "#F8FAFC",
-              border: "1px solid var(--gray-line)",
-              borderRadius: "var(--radius-md)",
-              padding: "16px 18px",
-              marginBottom: 20,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
-              <div>
-                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block" }}>
-                  TOTAL PRIZE POOL
-                </span>
-                <span className="display" style={{ fontSize: "1.375rem", color: "var(--gold-dark)", fontWeight: 800 }}>
-                  {draw.total_prize_value || "300,000 ETB"}
-                </span>
-              </div>
-
-              <div style={{ textAlign: "right" }}>
-                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block" }}>
-                  TICKET CAPACITY
-                </span>
-                <span className="mono" style={{ fontSize: "0.875rem", color: "var(--text-main)", fontWeight: 700 }}>
-                  {totalEntries.toLocaleString()} / {maxCapacity.toLocaleString()} Tickets ({percentageSold}%)
-                </span>
-              </div>
+          {/* Title & Pool Sum */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
+            <div>
+              <h3 className="display" style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.5rem)", color: "var(--blue-navy)", lineHeight: 1.2, fontWeight: 800 }}>
+                {draw.title || `${maxCapacity.toLocaleString()} People Draw (${ticketPrice} Birr)`}
+              </h3>
+              <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 4 }}>
+                {draw.description}
+              </p>
             </div>
 
-            {/* Visual Progress Bar */}
+            <div style={{ textAlign: "right", background: "#FEF9C3", padding: "8px 14px", borderRadius: 10, border: "1px solid #FDE047" }}>
+              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--gold-deep)", textTransform: "uppercase", display: "block", fontWeight: 700 }}>
+                TOTAL PRIZE POOL
+              </span>
+              <span className="display" style={{ fontSize: "1.25rem", color: "var(--gold-deep)", fontWeight: 800 }}>
+                {draw.total_prize_value || "300,000 ETB"}
+              </span>
+            </div>
+          </div>
+
+          {/* Ticket Capacity Sold Progress */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
+                TICKETS CONFIRMED
+              </span>
+              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 700 }}>
+                {totalEntries.toLocaleString()} / {maxCapacity.toLocaleString()} ({percentageSold}%)
+              </span>
+            </div>
             <div className="progress-bar-track">
               <div className="progress-bar-fill" style={{ width: `${percentageSold}%` }} />
             </div>
           </div>
 
-          {/* ── Top 10 Prize Breakdown Grid ────────────────────────────── */}
+          {/* ── Top 10 Prize Breakdown ─────────────────────────────────── */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-main)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
-                <Trophy size={14} color="var(--gold)" /> Top 10 Winner Prize Breakdown
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
+                <Trophy size={14} color="var(--gold-dark)" /> Guaranteed Top 10 Winner Prizes
               </span>
               {prizes.length > 4 && (
                 <button
+                  type="button"
                   onClick={() => setShowAllPrizes(!showAllPrizes)}
                   style={{
                     background: "transparent",
                     border: "none",
-                    color: "var(--gold-dark)",
+                    color: "var(--blue-royal)",
                     fontSize: "0.75rem",
                     fontWeight: 700,
                     cursor: "pointer",
@@ -134,7 +135,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
               )}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8 }}>
               {topPrizesToDisplay.map((p) => {
                 const isRank1 = p.rank === 1;
                 const isRank2 = p.rank === 2;
@@ -144,8 +145,8 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                   <div
                     key={p.rank}
                     style={{
-                      background: isRank1 ? "#FEF3C7" : isRank2 ? "#F1F5F9" : isRank3 ? "#FFFBEB" : "#FFFFFF",
-                      border: isRank1 ? "1.5px solid #FDE68A" : "1px solid var(--gray-line)",
+                      background: isRank1 ? "#FEF9C3" : isRank2 ? "#EFF6FF" : isRank3 ? "#ECFDF5" : "#FFFFFF",
+                      border: isRank1 ? "1.5px solid #FDE047" : isRank2 ? "1px solid #BFDBFE" : "1px solid var(--gray-line)",
                       borderRadius: 8,
                       padding: "8px 12px",
                       display: "flex",
@@ -153,20 +154,18 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                       alignItems: "center",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span
-                        className="mono"
-                        style={{
-                          fontSize: "0.6875rem",
-                          fontWeight: 700,
-                          color: isRank1 ? "var(--gold-dark)" : "var(--text-subtle)",
-                        }}
-                      >
-                        {isRank1 ? "🥇 1st" : isRank2 ? "🥈 2nd" : isRank3 ? "🥉 3rd" : `#${p.rank}`}
-                      </span>
-                    </div>
+                    <span
+                      className="mono"
+                      style={{
+                        fontSize: "0.6875rem",
+                        fontWeight: 800,
+                        color: isRank1 ? "var(--gold-deep)" : isRank2 ? "var(--blue-navy)" : "var(--text-subtle)",
+                      }}
+                    >
+                      {isRank1 ? "🥇 1st" : isRank2 ? "🥈 2nd" : isRank3 ? "🥉 3rd" : `#${p.rank}`}
+                    </span>
 
-                    <strong className="mono" style={{ fontSize: "0.8125rem", color: isRank1 ? "var(--gold-dark)" : "var(--text-main)" }}>
+                    <strong className="mono" style={{ fontSize: "0.8125rem", color: isRank1 ? "var(--gold-deep)" : "var(--text-main)" }}>
                       {p.valueAmount || p.prizeTitle}
                     </strong>
                   </div>
@@ -180,8 +179,8 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
         {isRevealed && draw.winning_numbers && (
           <div
             style={{
-              background: "#ECFDF5",
-              border: "1.5px dashed #A7F3D0",
+              background: "#EFF6FF",
+              border: "1.5px dashed #BFDBFE",
               borderRadius: "var(--radius-sm)",
               padding: "12px 16px",
               marginTop: 16,
@@ -191,19 +190,19 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             }}
           >
             <div>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", textTransform: "uppercase", display: "block" }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--blue-navy)", textTransform: "uppercase", display: "block", fontWeight: 700 }}>
                 🏆 1st Place Winning Number
               </span>
-              <span className="display" style={{ fontSize: "1.875rem", color: "var(--teal-dark)", fontWeight: 800 }}>
+              <span className="display" style={{ fontSize: "1.875rem", color: "var(--blue-royal)", fontWeight: 800 }}>
                 #{draw.winning_numbers[1] || "42"}
               </span>
             </div>
             <Link
               href="/results"
-              className="btn-base"
-              style={{ background: "#FFFFFF", border: "1px solid #A7F3D0", color: "var(--teal-dark)", fontSize: "0.75rem", padding: "8px 12px" }}
+              className="btn-base btn-secondary"
+              style={{ fontSize: "0.75rem", padding: "8px 12px" }}
             >
-              <ShieldCheck size={14} /> Audit All 10 Numbers
+              <ShieldCheck size={14} /> Audit All Numbers
             </Link>
           </div>
         )}
@@ -213,8 +212,8 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
       <div
         style={{
           background: "var(--bg-ticket-stub)",
-          borderLeft: "2px dashed #DCCBB0",
-          padding: "28px 20px",
+          borderLeft: "2px dashed #CBD5E1",
+          padding: "26px 18px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -229,49 +228,51 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
         {/* Stub Header & Brand */}
         <div style={{ width: "100%" }}>
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold-dark)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700 }}>
-            OFFICIAL ENTRY TICKET
+          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--blue-royal)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 800 }}>
+            OFFICIAL ENTRY
           </span>
-          <div className="display" style={{ fontSize: "1.0625rem", color: "var(--text-main)", fontWeight: 800, margin: "4px 0 12px" }}>
+          <div className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, margin: "2px 0 10px" }}>
             PrimeDraws
+          </div>
+
+          {/* People Pool Size Tag on Stub */}
+          <div className="badge badge-blue" style={{ marginBottom: 12, fontSize: "0.6875rem" }}>
+            {maxCapacity.toLocaleString()} People Pool
           </div>
 
           {/* Fixed Price Stamp */}
           <div
             style={{
               background: "#FFFFFF",
-              border: "1.5px solid #DCCBB0",
+              border: "1.5px solid #FDE047",
               borderRadius: "var(--radius-md)",
-              padding: "12px 14px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
-              marginBottom: 16,
+              padding: "10px 12px",
+              boxShadow: "0 2px 6px rgba(234, 179, 8, 0.15)",
+              marginBottom: 14,
             }}
           >
             <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block" }}>
-              FIXED TICKET COST
+              INPUT MONEY
             </span>
-            <span className="display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--gold-dark)", lineHeight: 1 }}>
+            <span className="display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--gold-deep)", lineHeight: 1 }}>
               {ticketPrice} <span style={{ fontSize: "0.875rem" }}>ETB</span>
-            </span>
-            <span className="mono" style={{ fontSize: "0.625rem", color: "var(--teal-dark)", display: "block", marginTop: 4, fontWeight: 600 }}>
-              ✓ No hidden fees
             </span>
           </div>
 
           {/* Barcode Graphic */}
           <div className="barcode-pattern" style={{ marginBottom: 6 }} />
           <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)" }}>
-            PD-{draw.draw_id}-V26
+            PD-{draw.draw_id}-{maxCapacity}
           </span>
         </div>
 
         {/* Action Button on the Stub */}
-        <div style={{ width: "100%", marginTop: 14 }}>
+        <div style={{ width: "100%", marginTop: 12 }}>
           {isOpen && (
             <Link
-              href={`/enter?draw=${draw.id}`}
+              href={`/enter?size=${maxCapacity}&draw=${draw.id}`}
               className="btn-base btn-primary"
-              style={{ width: "100%", padding: "12px 16px", fontSize: "0.9375rem" }}
+              style={{ width: "100%", padding: "12px 14px", fontSize: "0.9375rem" }}
             >
               <Ticket size={16} /> Buy Ticket ({ticketPrice} ETB)
             </Link>
@@ -279,9 +280,10 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
           {isUpcoming && (
             <button
+              type="button"
               className="btn-base btn-secondary"
               style={{ width: "100%", fontSize: "0.8125rem", padding: "10px" }}
-              onClick={() => alert(`Draw #${draw.draw_id} opens on ${new Date(draw.deadline).toLocaleDateString()}`)}
+              onClick={() => alert(`Draw #${draw.draw_id} (${maxCapacity} people) opens soon!`)}
             >
               <Calendar size={14} /> Scheduled Soon
             </button>
@@ -291,7 +293,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             <Link
               href="/results"
               className="btn-base btn-secondary"
-              style={{ width: "100%", borderColor: "var(--teal)", color: "var(--teal-dark)", fontSize: "0.8125rem", padding: "10px" }}
+              style={{ width: "100%", fontSize: "0.8125rem", padding: "10px" }}
             >
               <ShieldCheck size={15} /> Audit Outcomes
             </Link>
@@ -299,16 +301,13 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
         </div>
       </div>
 
-      {/* Responsive layout tweak for small mobile */}
+      {/* Responsive layout tweak for mobile */}
       <style>{`
         @media (max-width: 768px) {
           .physical-lottery-ticket {
             grid-template-columns: 1fr !important;
           }
           .ticket-punch-top, .ticket-punch-bottom {
-            display: none !important;
-          }
-          .ticket-perforation-v {
             display: none !important;
           }
         }
