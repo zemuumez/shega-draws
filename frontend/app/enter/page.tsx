@@ -185,12 +185,12 @@ function EnterWizard() {
                   style={{
                     padding: "14px 12px",
                     borderRadius: "var(--radius-md)",
-                    border: isSelected ? "2px solid #2563EB" : "1.5px solid var(--gray-line)",
-                    background: isSelected ? "#EFF6FF" : "#FFFFFF",
+                    border: isSelected ? "2px solid #2A65E6" : "1.5px solid var(--gray-line)",
+                    background: isSelected ? "var(--blue-bg)" : "#FFFFFF",
                     textAlign: "center",
                     cursor: "pointer",
                     transition: "all var(--transition-fast)",
-                    boxShadow: isSelected ? "0 4px 12px rgba(37, 99, 235, 0.15)" : "none",
+                    boxShadow: isSelected ? "0 4px 12px rgba(42, 101, 230, 0.18)" : "none",
                   }}
                 >
                   <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 800, color: isSelected ? "var(--blue-royal)" : "var(--blue-navy)", display: "block" }}>
@@ -315,8 +315,8 @@ function EnterWizard() {
                 onClick={() => setMethod(m.id)}
                 style={{
                   padding: "10px 16px",
-                  border: method === m.id ? "2px solid #2563EB" : "1px solid var(--gray-line)",
-                  background: method === m.id ? "#EFF6FF" : "#FFFFFF",
+                  border: method === m.id ? "2px solid #2A65E6" : "1px solid var(--gray-line)",
+                  background: method === m.id ? "var(--blue-bg)" : "#FFFFFF",
                   color: method === m.id ? "var(--blue-royal)" : "var(--text-main)",
                   fontSize: "0.875rem",
                   fontWeight: 700,

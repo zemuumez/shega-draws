@@ -16,12 +16,12 @@
   --bg-ticket:      #FFFDF7;
   --bg-ticket-stub:  #F8FAFC;
   
-  /* Primary Royal / Deep Blue Typography & Ink */
-  --ink:            #0F172A;
-  --text-main:      #0F254A;
+  /* Primary Typography & Ink */
+  --ink:            #0A193B;
+  --text-main:      #0A193B;
   --text-muted:     #334E68;
   --text-subtle:    #627D98;
-  --paper:          #0F254A;
+  --paper:          #0A193B;
   
   /* Vibrant Gold Yellow (Primary Accent) */
   --gold:           #EAB308;
@@ -32,14 +32,14 @@
   --gold-border:    #FDE047;
   --gold-glow:      rgba(234, 179, 8, 0.22);
 
-  /* Complementary Royal / Navy Blue (Secondary & Brand Anchors) */
-  --blue:           #1D4ED8;
-  --blue-royal:     #2563EB;
-  --blue-navy:      #1E3A8A;
-  --blue-dark:      #0F172A;
-  --blue-bg:        #EFF6FF;
-  --blue-border:    #BFDBFE;
-  --blue-glow:      rgba(37, 99, 235, 0.15);
+  /* User Specified Blue #2A65E6 & Brand Scale */
+  --blue:           #2A65E6;
+  --blue-royal:     #2A65E6;
+  --blue-navy:      #1642A8;
+  --blue-dark:      #0C2666;
+  --blue-bg:        #EFF5FF;
+  --blue-border:    #C3DAFE;
+  --blue-glow:      rgba(42, 101, 230, 0.18);
   
   /* Emerald Teal (Verified / Success) */
   --teal:           #059669;
@@ -73,10 +73,10 @@
   --radius-full:    9999px;
 
   /* Shadows */
-  --shadow-sm:      0 1px 3px rgba(15, 37, 74, 0.05);
-  --shadow-card:    0 4px 16px -2px rgba(15, 37, 74, 0.08), 0 2px 6px -1px rgba(15, 37, 74, 0.04);
-  --shadow-card-hover: 0 12px 28px -4px rgba(15, 37, 74, 0.12), 0 4px 10px -2px rgba(15, 37, 74, 0.06);
-  --shadow-ticket:  0 8px 24px -4px rgba(161, 98, 7, 0.08), 0 4px 12px -2px rgba(15, 37, 74, 0.06);
+  --shadow-sm:      0 1px 3px rgba(42, 101, 230, 0.06);
+  --shadow-card:    0 4px 16px -2px rgba(10, 25, 59, 0.08), 0 2px 6px -1px rgba(10, 25, 59, 0.04);
+  --shadow-card-hover: 0 12px 28px -4px rgba(42, 101, 230, 0.14), 0 4px 10px -2px rgba(10, 25, 59, 0.06);
+  --shadow-ticket:  0 8px 24px -4px rgba(161, 98, 7, 0.08), 0 4px 12px -2px rgba(10, 25, 59, 0.06);
 
   /* Transitions */
   --transition-fast: 140ms ease;
@@ -121,7 +121,7 @@ h1, h2, h3, h4, h5 {
   padding: 0 20px;
 }
 
-/* ── Base Card & Surfaces ──────────────────────────────────────────── */
+/* ── Base Card & Surfaces ──────────────────────────────────── */
 .card-base {
   background: var(--bg-card);
   border: 1px solid var(--gray-line);
@@ -147,7 +147,7 @@ h1, h2, h3, h4, h5 {
 
 .physical-lottery-ticket:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 32px -4px rgba(30, 58, 138, 0.12), 0 4px 12px -2px rgba(234, 179, 8, 0.10);
+  box-shadow: 0 14px 32px -4px rgba(42, 101, 230, 0.14), 0 4px 12px -2px rgba(234, 179, 8, 0.10);
 }
 
 /* Cutout punch holes on perforation tear line */
@@ -167,25 +167,25 @@ h1, h2, h3, h4, h5 {
   width: 100%;
   background: repeating-linear-gradient(
     90deg,
-    #1E3A8A 0px,
-    #1E3A8A 2px,
+    #2A65E6 0px,
+    #2A65E6 2px,
     transparent 2px,
     transparent 4px,
-    #1E3A8A 4px,
-    #1E3A8A 7px,
+    #2A65E6 4px,
+    #2A65E6 7px,
     transparent 7px,
     transparent 9px,
-    #1E3A8A 9px,
-    #1E3A8A 10px,
+    #2A65E6 9px,
+    #2A65E6 10px,
     transparent 10px,
     transparent 13px,
-    #1E3A8A 13px,
-    #1E3A8A 16px
+    #2A65E6 13px,
+    #2A65E6 16px
   );
   opacity: 0.85;
 }
 
-/* ── Interactive Buttons (Gold Yellow & Royal Blue) ────────────────── */
+/* ── Interactive Buttons (Gold Yellow & #2A65E6 Blue) ────────────────── */
 .btn-base {
   display: inline-flex;
   align-items: center;
@@ -201,7 +201,7 @@ h1, h2, h3, h4, h5 {
 
 .btn-primary {
   background: linear-gradient(135deg, #FACC15 0%, #EAB308 100%);
-  color: #1E3A8A;
+  color: #0C2666;
   border: 1px solid #FACC15;
   box-shadow: 0 2px 8px rgba(234, 179, 8, 0.35);
 }
@@ -213,14 +213,14 @@ h1, h2, h3, h4, h5 {
 }
 
 .btn-blue {
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  background: linear-gradient(135deg, #3B7BF6 0%, #2A65E6 100%);
   color: #FFFFFF;
-  border: 1px solid #1D4ED8;
-  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+  border: 1px solid #2A65E6;
+  box-shadow: 0 2px 8px rgba(42, 101, 230, 0.35);
 }
 
 .btn-blue:hover {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: linear-gradient(135deg, #578FF8 0%, #3B7BF6 100%);
   transform: translateY(-1px);
 }
 
@@ -228,7 +228,7 @@ h1, h2, h3, h4, h5 {
   background: #FFFFFF;
   color: var(--blue-navy);
   border: 1.5px solid var(--blue-border);
-  box-shadow: 0 1px 3px rgba(15, 37, 74, 0.04);
+  box-shadow: 0 1px 3px rgba(42, 101, 230, 0.04);
 }
 
 .btn-secondary:hover {
@@ -293,8 +293,8 @@ h1, h2, h3, h4, h5 {
 
 .input-base:focus {
   outline: none;
-  border-color: var(--blue-royal);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #2A65E6;
+  box-shadow: 0 0 0 3px rgba(42, 101, 230, 0.14);
 }
 
 /* ── Tab Filter Container ──────────────────────────────────────────── */
@@ -324,7 +324,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .tab-filter-btn.active {
-  background: var(--blue-navy);
+  background: #1642A8;
   color: #FFFFFF;
   font-weight: 700;
 }
@@ -340,7 +340,7 @@ h1, h2, h3, h4, h5 {
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FACC15 0%, #2563EB 100%);
+  background: linear-gradient(90deg, #FACC15 0%, #2A65E6 100%);
   border-radius: var(--radius-full);
   transition: width 400ms ease;
 }
