@@ -1,13 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { Clock, Trophy, Sparkles, Globe, Ticket, HelpCircle, Calendar, Users } from "lucide-react";
 import { HowToBuyModal } from "./HowToBuyModal";
+import { BuyTicketModal } from "./BuyTicketModal";
+import { type Currency } from "@/lib/api";
 
 export function JackpotCardsSection() {
   const [mounted, setMounted] = useState(false);
   const [isHowToBuyOpen, setIsHowToBuyOpen] = useState(false);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
+  const [selectedBuyTicket, setSelectedBuyTicket] = useState<{ currency: Currency; price: number; drawId: string }>({
+    currency: "USD",
+    price: 250,
+    drawId: "RDL-USD-250",
+  });
 
   const [timeLeft, setTimeLeft] = useState({
     days: 2,
@@ -38,7 +45,7 @@ export function JackpotCardsSection() {
       badgeIcon: Globe,
       title: "$250 Grand Diaspora Tier",
       ticketPrice: 250,
-      currency: "USD",
+      currency: "USD" as Currency,
       currSymbol: "$",
       grandPrize: "$1,250,000",
       topPrizeText: "$400,000 for 1st Place",
@@ -52,7 +59,7 @@ export function JackpotCardsSection() {
       badgeIcon: Trophy,
       title: "200 Birr Grand Holiday Jackpot",
       ticketPrice: 200,
-      currency: "ETB",
+      currency: "ETB" as Currency,
       currSymbol: "ETB",
       grandPrize: "1,000,000 ETB",
       topPrizeText: "320,000 ETB for 1st Place",
@@ -66,7 +73,7 @@ export function JackpotCardsSection() {
       badgeIcon: Sparkles,
       title: "100 Birr Classic Multi-Pool",
       ticketPrice: 100,
-      currency: "ETB",
+      currency: "ETB" as Currency,
       currSymbol: "ETB",
       grandPrize: "500,000 ETB",
       topPrizeText: "160,000 ETB for 1st Place",
@@ -75,11 +82,24 @@ export function JackpotCardsSection() {
     },
   ];
 
+  const handleOpenBuy = (currency: Currency, price: number, drawId: string) => {
+    setSelectedBuyTicket({ currency, price, drawId });
+    setIsBuyModalOpen(true);
+  };
+
   return (
     <>
       <HowToBuyModal
         isOpen={isHowToBuyOpen}
         onClose={() => setIsHowToBuyOpen(false)}
+      />
+
+      <BuyTicketModal
+        isOpen={isBuyModalOpen}
+        onClose={() => setIsBuyModalOpen(false)}
+        initialCurrency={selectedBuyTicket.currency}
+        initialPrice={selectedBuyTicket.price}
+        initialDrawId={selectedBuyTicket.drawId}
       />
 
       <section style={{ margin: "24px 0 32px" }}>
@@ -143,7 +163,7 @@ export function JackpotCardsSection() {
                       <Trophy size={11} color="var(--gold-dark)" /> 10 Winners · {ticket.topPrizeText}
                     </span>
 
-                    {/* Compact Available Pools (No Sums, Horizontal Clean Row) */}
+                    {/* Compact Available Pools */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                       <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
                         Pools:
@@ -201,8 +221,9 @@ export function JackpotCardsSection() {
                       <HelpCircle size={11} /> How to Buy Ticket
                     </button>
 
-                    <Link
-                      href={`/enter?currency=${ticket.currency}&price=${ticket.ticketPrice}`}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenBuy(ticket.currency, ticket.ticketPrice, ticket.serial)}
                       className="btn-base"
                       style={{
                         background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)",
@@ -212,14 +233,14 @@ export function JackpotCardsSection() {
                         padding: "6px 4px",
                         borderRadius: "6px",
                         boxShadow: "0 2px 6px rgba(234, 179, 8, 0.3)",
-                        textDecoration: "none",
                         border: "1px solid #FEF08A",
+                        cursor: "pointer",
                         justifyContent: "center",
                         gap: 3,
                       }}
                     >
                       <Ticket size={11} /> Buy Now
-                    </Link>
+                    </button>
                   </div>
                 </div>
 

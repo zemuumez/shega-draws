@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Ticket, Trophy, Calendar, Users, ShieldCheck, ChevronDown, ChevronUp, Sparkles, Globe } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { type DrawState, type Currency, USD_TICKET_CONFIGS, ETB_TICKET_CONFIGS } from "@/lib/api";
+import { BuyTicketModal } from "./BuyTicketModal";
 
 interface PhysicalDrawTicketProps {
   draw: DrawState;
@@ -13,6 +14,7 @@ interface PhysicalDrawTicketProps {
 export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
   const { t, language } = useLanguage();
   const [showAllPrizes, setShowAllPrizes] = useState(false);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
   const currency: Currency = draw.currency || "ETB";
   const isUSD = currency === "USD";
@@ -128,21 +130,6 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                   </span>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Tickets Confirmed Progress */}
-          <div style={{ marginBottom: 16, background: "#F8FAFC", border: "1px solid var(--gray-line)", borderRadius: 10, padding: "12px 14px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
-                TICKETS CONFIRMED ({basePool.label})
-              </span>
-              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 800 }}>
-                {totalEntries.toLocaleString()} / {maxCapacity.toLocaleString()} Tickets ({percentageSold}%)
-              </span>
-            </div>
-            <div className="progress-bar-track">
-              <div className="progress-bar-fill" style={{ width: `${percentageSold}%` }} />
             </div>
           </div>
 
@@ -306,14 +293,23 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
         {/* Action Button on the Stub */}
         <div style={{ width: "100%", marginTop: 12 }}>
           {isOpen && (
-            <Link
-              href={`/enter?draw=${draw.id}&currency=${currency}&price=${ticketPrice}`}
+            <button
+              type="button"
+              onClick={() => setIsBuyModalOpen(true)}
               className="btn-base btn-primary"
-              style={{ width: "100%", padding: "13px 14px", fontSize: "0.9375rem" }}
+              style={{ width: "100%", padding: "13px 14px", fontSize: "0.9375rem", cursor: "pointer" }}
             >
               <Ticket size={16} /> Buy Ticket ({isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`})
-            </Link>
+            </button>
           )}
+
+          <BuyTicketModal
+            isOpen={isBuyModalOpen}
+            onClose={() => setIsBuyModalOpen(false)}
+            initialCurrency={currency}
+            initialPrice={ticketPrice}
+            initialDrawId={draw.id}
+          />
 
           {isUpcoming && (
             <button

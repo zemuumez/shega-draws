@@ -339,6 +339,28 @@ export function BuyTicketModal({
                 })}
               </div>
             </div>
+
+            {/* Tickets Confirmed Progress Bar inside Modal */}
+            <div style={{ background: "#F8FAFC", border: "1px solid var(--gray-line)", borderRadius: 10, padding: "10px 12px", marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
+                  TICKETS CONFIRMED ({currentPool.label})
+                </span>
+                <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 800 }}>
+                  {Math.round(selectedSize * 0.72).toLocaleString()} / {selectedSize.toLocaleString()} Tickets (72%)
+                </span>
+              </div>
+              <div className="progress-bar-track" style={{ height: 6, borderRadius: 4, background: "#E2E8F0", overflow: "hidden" }}>
+                <div
+                  style={{
+                    height: "100%",
+                    width: "72%",
+                    borderRadius: 4,
+                    background: "linear-gradient(90deg, #EAB308 0%, #2A65E6 100%)",
+                  }}
+                />
+              </div>
+            </div>
           </div>
         )}
 

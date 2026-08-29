@@ -18,6 +18,7 @@ import { DrawsExplorer } from "@/components/DrawsExplorer";
 import { SidebarWidgets } from "@/components/SidebarWidgets";
 import { WhyRimnaLottery } from "@/components/WhyRimnaLottery";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
+import { HeroBuyButton } from "@/components/HeroBuyButton";
 
 export const metadata: Metadata = {
   title: "Rimna Digital Lottery — Transparent Live Digital Raffle & Lottery",
@@ -107,29 +108,15 @@ export default async function HomePage() {
 
             <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
               <span className="mono" style={{ fontSize: "0.875rem", color: "var(--text-muted)", fontWeight: 700 }}>
-                📅 Live Broadcast: <strong>Aug 31, 2026</strong>
+                Live Broadcast: <strong>Aug 31, 2026</strong>
               </span>
 
-              {/* Big Golden BUY NOW Button */}
-              <Link
-                href={`/enter?draw=${currentApprovedDraw?.id}&currency=${activeCurrency}&price=${activeTicketPrice}`}
-                className="btn-base"
-                style={{
-                  background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
-                  color: "#0C2666",
-                  fontSize: "1.125rem",
-                  fontWeight: 900,
-                  padding: "12px 32px",
-                  borderRadius: "10px",
-                  boxShadow: "0 4px 16px rgba(234, 179, 8, 0.5)",
-                  textDecoration: "none",
-                  border: "1.5px solid #FEF08A",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                BUY NOW
-              </Link>
+              {/* Big Golden BUY NOW Button (Opens Responsive BuyTicketModal) */}
+              <HeroBuyButton
+                drawId={currentApprovedDraw?.id}
+                currency={activeCurrency}
+                price={activeTicketPrice}
+              />
             </div>
 
             {/* Quick Guarantees */}
