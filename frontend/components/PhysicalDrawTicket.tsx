@@ -10,76 +10,115 @@ interface PhysicalDrawTicketProps {
   draw: DrawState;
 }
 
-const DEFAULT_PRIZES_BY_CAPACITY: Record<number, Array<{ rank: number; label: string; prizeTitle: string; valueAmount: string }>> = {
-  5000: [
-    { rank: 1, label: "1st Place Jackpot", prizeTitle: "400,000 ETB Cash", valueAmount: "400,000 ETB" },
-    { rank: 2, label: "2nd Place Prize", prizeTitle: "250,000 ETB Cash", valueAmount: "250,000 ETB" },
-    { rank: 3, label: "3rd Place Prize", prizeTitle: "150,000 ETB Cash", valueAmount: "150,000 ETB" },
-    { rank: 4, label: "4th Place Prize", prizeTitle: "100,000 ETB Cash", valueAmount: "100,000 ETB" },
-    { rank: 5, label: "5th Place Prize", prizeTitle: "75,000 ETB Cash", valueAmount: "75,000 ETB" },
-    { rank: 6, label: "6th Place Prize", prizeTitle: "60,000 ETB Cash", valueAmount: "60,000 ETB" },
-    { rank: 7, label: "7th Place Prize", prizeTitle: "50,000 ETB Cash", valueAmount: "50,000 ETB" },
-    { rank: 8, label: "8th Place Prize", prizeTitle: "45,000 ETB Cash", valueAmount: "45,000 ETB" },
-    { rank: 9, label: "9th Place Prize", prizeTitle: "40,000 ETB Cash", valueAmount: "40,000 ETB" },
-    { rank: 10, label: "10th Place Prize", prizeTitle: "30,000 ETB Cash", valueAmount: "30,000 ETB" },
-  ],
-  3000: [
-    { rank: 1, label: "1st Place Jackpot", prizeTitle: "180,000 ETB Cash", valueAmount: "180,000 ETB" },
-    { rank: 2, label: "2nd Place Prize", prizeTitle: "120,000 ETB Cash", valueAmount: "120,000 ETB" },
-    { rank: 3, label: "3rd Place Prize", prizeTitle: "80,000 ETB Cash", valueAmount: "80,000 ETB" },
-    { rank: 4, label: "4th Place Prize", prizeTitle: "50,000 ETB Cash", valueAmount: "50,000 ETB" },
-    { rank: 5, label: "5th Place Prize", prizeTitle: "40,000 ETB Cash", valueAmount: "40,000 ETB" },
-    { rank: 6, label: "6th Place Prize", prizeTitle: "35,000 ETB Cash", valueAmount: "35,000 ETB" },
-    { rank: 7, label: "7th Place Prize", prizeTitle: "30,000 ETB Cash", valueAmount: "30,000 ETB" },
-    { rank: 8, label: "8th Place Prize", prizeTitle: "25,000 ETB Cash", valueAmount: "25,000 ETB" },
-    { rank: 9, label: "9th Place Prize", prizeTitle: "20,000 ETB Cash", valueAmount: "20,000 ETB" },
-    { rank: 10, label: "10th Place Prize", prizeTitle: "20,000 ETB Cash", valueAmount: "20,000 ETB" },
-  ],
-  2000: [
-    { rank: 1, label: "1st Place Jackpot", prizeTitle: "80,000 ETB Cash", valueAmount: "80,000 ETB" },
-    { rank: 2, label: "2nd Place Prize", prizeTitle: "65,000 ETB Cash", valueAmount: "65,000 ETB" },
-    { rank: 3, label: "3rd Place Prize", prizeTitle: "40,000 ETB Cash", valueAmount: "40,000 ETB" },
-    { rank: 4, label: "4th Place Prize", prizeTitle: "25,000 ETB Cash", valueAmount: "25,000 ETB" },
-    { rank: 5, label: "5th Place Prize", prizeTitle: "20,000 ETB Cash", valueAmount: "20,000 ETB" },
-    { rank: 6, label: "6th Place Prize", prizeTitle: "15,000 ETB Cash", valueAmount: "15,000 ETB" },
-    { rank: 7, label: "7th Place Prize", prizeTitle: "15,000 ETB Cash", valueAmount: "15,000 ETB" },
-    { rank: 8, label: "8th Place Prize", prizeTitle: "15,000 ETB Cash", valueAmount: "15,000 ETB" },
-    { rank: 9, label: "9th Place Prize", prizeTitle: "13,000 ETB Cash", valueAmount: "13,000 ETB" },
-    { rank: 10, label: "10th Place Prize", prizeTitle: "12,000 ETB Cash", valueAmount: "12,000 ETB" },
-  ],
-  1000: [
-    { rank: 1, label: "1st Place Jackpot", prizeTitle: "35,000 ETB Cash", valueAmount: "35,000 ETB" },
-    { rank: 2, label: "2nd Place Prize", prizeTitle: "20,000 ETB Cash", valueAmount: "20,000 ETB" },
-    { rank: 3, label: "3rd Place Prize", prizeTitle: "15,000 ETB Cash", valueAmount: "15,000 ETB" },
-    { rank: 4, label: "4th Place Prize", prizeTitle: "8,000 ETB Cash", valueAmount: "8,000 ETB" },
-    { rank: 5, label: "5th Place Prize", prizeTitle: "6,000 ETB Cash", valueAmount: "6,000 ETB" },
-    { rank: 6, label: "6th Place Prize", prizeTitle: "4,000 ETB Cash", valueAmount: "4,000 ETB" },
-    { rank: 7, label: "7th Place Prize", prizeTitle: "3,000 ETB Cash", valueAmount: "3,000 ETB" },
-    { rank: 8, label: "8th Place Prize", prizeTitle: "3,000 ETB Cash", valueAmount: "3,000 ETB" },
-    { rank: 9, label: "9th Place Prize", prizeTitle: "3,000 ETB Cash", valueAmount: "3,000 ETB" },
-    { rank: 10, label: "10th Place Prize", prizeTitle: "3,000 ETB Cash", valueAmount: "3,000 ETB" },
-  ],
-};
+interface PoolTier {
+  size: number;
+  label: string;
+  totalPrizeValue: string;
+  jackpot1st: string;
+  prizes: Array<{ rank: number; label: string; prizeTitle: string; valueAmount: string }>;
+  confirmedCount: number;
+}
 
 export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
   const { t, language } = useLanguage();
+  
+  const ticketPrice = draw.ticket_price || 100;
+
+  // Pools configuration for this ticket (e.g. 100 ETB ticket has 1k, 2k, 3k, 5k pools)
+  const poolTiers: PoolTier[] = [
+    {
+      size: 1000,
+      label: "1,000 (1K)",
+      totalPrizeValue: `${(1000 * ticketPrice).toLocaleString()} ETB`,
+      jackpot1st: `${(1000 * ticketPrice * 0.35).toLocaleString()} ETB`,
+      confirmedCount: 740,
+      prizes: [
+        { rank: 1, label: "1st Place", prizeTitle: "1st Place Cash", valueAmount: `${(1000 * ticketPrice * 0.35).toLocaleString()} ETB` },
+        { rank: 2, label: "2nd Place", prizeTitle: "2nd Place Cash", valueAmount: `${(1000 * ticketPrice * 0.20).toLocaleString()} ETB` },
+        { rank: 3, label: "3rd Place", prizeTitle: "3rd Place Cash", valueAmount: `${(1000 * ticketPrice * 0.15).toLocaleString()} ETB` },
+        { rank: 4, label: "4th Place", prizeTitle: "4th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.08).toLocaleString()} ETB` },
+        { rank: 5, label: "5th Place", prizeTitle: "5th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.06).toLocaleString()} ETB` },
+        { rank: 6, label: "6th Place", prizeTitle: "6th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 7, label: "7th Place", prizeTitle: "7th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+        { rank: 8, label: "8th Place", prizeTitle: "8th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+        { rank: 9, label: "9th Place", prizeTitle: "9th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+        { rank: 10, label: "10th Place", prizeTitle: "10th Place Cash", valueAmount: `${(1000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+      ],
+    },
+    {
+      size: 2000,
+      label: "2,000 (2K)",
+      totalPrizeValue: `${(2000 * ticketPrice).toLocaleString()} ETB`,
+      jackpot1st: `${(2000 * ticketPrice * 0.30).toLocaleString()} ETB`,
+      confirmedCount: 1480,
+      prizes: [
+        { rank: 1, label: "1st Place", prizeTitle: "1st Place Cash", valueAmount: `${(2000 * ticketPrice * 0.30).toLocaleString()} ETB` },
+        { rank: 2, label: "2nd Place", prizeTitle: "2nd Place Cash", valueAmount: `${(2000 * ticketPrice * 0.225).toLocaleString()} ETB` },
+        { rank: 3, label: "3rd Place", prizeTitle: "3rd Place Cash", valueAmount: `${(2000 * ticketPrice * 0.15).toLocaleString()} ETB` },
+        { rank: 4, label: "4th Place", prizeTitle: "4th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.075).toLocaleString()} ETB` },
+        { rank: 5, label: "5th Place", prizeTitle: "5th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.06).toLocaleString()} ETB` },
+        { rank: 6, label: "6th Place", prizeTitle: "6th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.05).toLocaleString()} ETB` },
+        { rank: 7, label: "7th Place", prizeTitle: "7th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 8, label: "8th Place", prizeTitle: "8th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 9, label: "9th Place", prizeTitle: "9th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+        { rank: 10, label: "10th Place", prizeTitle: "10th Place Cash", valueAmount: `${(2000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+      ],
+    },
+    {
+      size: 3000,
+      label: "3,000 (3K)",
+      totalPrizeValue: `${(3000 * ticketPrice).toLocaleString()} ETB`,
+      jackpot1st: `${(3000 * ticketPrice * 0.30).toLocaleString()} ETB`,
+      confirmedCount: 2210,
+      prizes: [
+        { rank: 1, label: "1st Place", prizeTitle: "1st Place Cash", valueAmount: `${(3000 * ticketPrice * 0.30).toLocaleString()} ETB` },
+        { rank: 2, label: "2nd Place", prizeTitle: "2nd Place Cash", valueAmount: `${(3000 * ticketPrice * 0.20).toLocaleString()} ETB` },
+        { rank: 3, label: "3rd Place", prizeTitle: "3rd Place Cash", valueAmount: `${(3000 * ticketPrice * 0.15).toLocaleString()} ETB` },
+        { rank: 4, label: "4th Place", prizeTitle: "4th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.08).toLocaleString()} ETB` },
+        { rank: 5, label: "5th Place", prizeTitle: "5th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.06).toLocaleString()} ETB` },
+        { rank: 6, label: "6th Place", prizeTitle: "6th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.05).toLocaleString()} ETB` },
+        { rank: 7, label: "7th Place", prizeTitle: "7th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 8, label: "8th Place", prizeTitle: "8th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 9, label: "9th Place", prizeTitle: "9th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 10, label: "10th Place", prizeTitle: "10th Place Cash", valueAmount: `${(3000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+      ],
+    },
+    {
+      size: 5000,
+      label: "5,000 (5K)",
+      totalPrizeValue: `${(5000 * ticketPrice).toLocaleString()} ETB`,
+      jackpot1st: `${(5000 * ticketPrice * 0.32).toLocaleString()} ETB`,
+      confirmedCount: 3850,
+      prizes: [
+        { rank: 1, label: "1st Place", prizeTitle: "1st Place Cash", valueAmount: `${(5000 * ticketPrice * 0.32).toLocaleString()} ETB` },
+        { rank: 2, label: "2nd Place", prizeTitle: "2nd Place Cash", valueAmount: `${(5000 * ticketPrice * 0.20).toLocaleString()} ETB` },
+        { rank: 3, label: "3rd Place", prizeTitle: "3rd Place Cash", valueAmount: `${(5000 * ticketPrice * 0.14).toLocaleString()} ETB` },
+        { rank: 4, label: "4th Place", prizeTitle: "4th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.08).toLocaleString()} ETB` },
+        { rank: 5, label: "5th Place", prizeTitle: "5th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.06).toLocaleString()} ETB` },
+        { rank: 6, label: "6th Place", prizeTitle: "6th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.05).toLocaleString()} ETB` },
+        { rank: 7, label: "7th Place", prizeTitle: "7th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 8, label: "8th Place", prizeTitle: "8th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 9, label: "9th Place", prizeTitle: "9th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.04).toLocaleString()} ETB` },
+        { rank: 10, label: "10th Place", prizeTitle: "10th Place Cash", valueAmount: `${(5000 * ticketPrice * 0.03).toLocaleString()} ETB` },
+      ],
+    }
+  ];
+
+  // Default active pool selection on the ticket card
+  const initialPoolIdx = draw.max_capacity === 1000 ? 0 : draw.max_capacity === 3000 ? 2 : draw.max_capacity === 5000 ? 3 : 1;
+  const [selectedPoolIdx, setSelectedPoolIdx] = useState(initialPoolIdx);
   const [showAllPrizes, setShowAllPrizes] = useState(false);
+
+  const currentPool = poolTiers[selectedPoolIdx] || poolTiers[1];
+  const maxCapacity = currentPool.size;
+  const totalEntries = draw.status === "revealed" ? maxCapacity : currentPool.confirmedCount;
+  const percentageSold = Math.min(100, Math.round((totalEntries / maxCapacity) * 100));
 
   const isOpen = draw.status === "open";
   const isUpcoming = draw.status === "upcoming";
   const isRevealed = draw.status === "revealed";
 
-  const maxCapacity = draw.max_capacity || 2000;
-  const ticketPrice = draw.ticket_price || (maxCapacity === 1000 ? 50 : maxCapacity === 2000 ? 100 : maxCapacity === 3000 ? 150 : 200);
-  const totalEntries = draw.total_entries || (isRevealed ? maxCapacity : Math.round(maxCapacity * 0.72));
-  const percentageSold = Math.min(100, Math.round((totalEntries / maxCapacity) * 100));
-
-  // Ensure full 10-tier prize list is always available
-  const prizes = (draw.prizes && draw.prizes.length >= 10) 
-    ? draw.prizes 
-    : (DEFAULT_PRIZES_BY_CAPACITY[maxCapacity] || DEFAULT_PRIZES_BY_CAPACITY[2000]);
-
-  const displayedPrizes = showAllPrizes ? prizes : prizes.slice(0, 3);
+  const displayedPrizes = showAllPrizes ? currentPool.prizes : currentPool.prizes.slice(0, 3);
 
   return (
     <div
@@ -94,7 +133,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
       {/* ── Left / Main Ticket Body ───────────────────────────────────── */}
       <div className="ticket-body-padding" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
-          {/* Top Bar: People Size & Status */}
+          {/* Top Bar: Serial & Status */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span
@@ -108,9 +147,8 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                 {isOpen ? "● ACTIVE DRAW" : isUpcoming ? "🕒 SCHEDULED" : "✓ COMPLETED"}
               </span>
 
-              {/* People Capacity Size Badge */}
-              <span className="badge badge-blue" style={{ fontSize: "0.75rem", fontWeight: 800 }}>
-                <Users size={12} /> {maxCapacity.toLocaleString()} People Pool
+              <span className="badge badge-gold" style={{ fontSize: "0.75rem", fontWeight: 800 }}>
+                {ticketPrice} ETB Fixed Ticket Price
               </span>
 
               <span className="mono" style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 700 }}>
@@ -124,35 +162,55 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             </div>
           </div>
 
-          {/* Title & Pool Sum */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
-            <div>
-              <h3 className="display" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.45rem)", color: "var(--blue-navy)", lineHeight: 1.2, fontWeight: 800 }}>
-                {draw.title || `${maxCapacity.toLocaleString()} People Draw (${ticketPrice} Birr)`}
-              </h3>
-              <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 4 }}>
-                {draw.description}
-              </p>
-            </div>
+          {/* Title & Pool Options Selector Strip */}
+          <div style={{ marginBottom: 14 }}>
+            <h3 className="display" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.45rem)", color: "var(--blue-navy)", lineHeight: 1.2, fontWeight: 800, marginBottom: 6 }}>
+              {draw.title || `${ticketPrice} Birr Multi-Pool Jackpot Draw`}
+            </h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 14 }}>
+              Choose a pool size below to see the guaranteed 10 winner prizes and total cash pool:
+            </p>
 
-            <div style={{ textAlign: "right", background: "#FEF9C3", padding: "8px 14px", borderRadius: 10, border: "1px solid #FDE047" }}>
-              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--gold-deep)", textTransform: "uppercase", display: "block", fontWeight: 700 }}>
-                TOTAL PRIZE POOL
-              </span>
-              <span className="display" style={{ fontSize: "1.25rem", color: "var(--gold-deep)", fontWeight: 800 }}>
-                {draw.total_prize_value || "300,000 ETB"}
-              </span>
+            {/* Interactive Pool Size Chips on the Ticket Card */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8, marginBottom: 14 }}>
+              {poolTiers.map((pool, idx) => {
+                const isSelected = selectedPoolIdx === idx;
+                return (
+                  <button
+                    key={pool.size}
+                    type="button"
+                    onClick={() => setSelectedPoolIdx(idx)}
+                    style={{
+                      padding: "8px 10px",
+                      borderRadius: 8,
+                      border: isSelected ? "2px solid #2A65E6" : "1.5px solid #E2E8F0",
+                      background: isSelected ? "var(--blue-bg)" : "#FFFFFF",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      transition: "all var(--transition-fast)",
+                      boxShadow: isSelected ? "0 2px 8px rgba(42, 101, 230, 0.18)" : "none",
+                    }}
+                  >
+                    <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "var(--blue-royal)" : "var(--blue-navy)", display: "block" }}>
+                      👥 {pool.label}
+                    </span>
+                    <span className="display" style={{ fontSize: "0.9375rem", fontWeight: 800, color: isSelected ? "var(--gold-deep)" : "var(--text-main)", display: "block", marginTop: 2 }}>
+                      {pool.totalPrizeValue}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Ticket Capacity Sold Progress */}
-          <div style={{ marginBottom: 18 }}>
+          {/* Tickets Confirmed Progress for Selected Pool */}
+          <div style={{ marginBottom: 16, background: "#F8FAFC", border: "1px solid var(--gray-line)", borderRadius: 10, padding: "12px 14px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
-                TICKETS CONFIRMED
+                {currentPool.label} TICKETS CONFIRMED
               </span>
-              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 700 }}>
-                {totalEntries.toLocaleString()} / {maxCapacity.toLocaleString()} ({percentageSold}%)
+              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 800 }}>
+                {totalEntries.toLocaleString()} / {maxCapacity.toLocaleString()} Tickets ({percentageSold}%)
               </span>
             </div>
             <div className="progress-bar-track">
@@ -160,14 +218,14 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             </div>
           </div>
 
-          {/* ── Top 10 Prize Breakdown Section ────────────────────────── */}
+          {/* ── Guaranteed Top 10 Winner Prizes ────────────────────────── */}
           <div style={{ background: "#FFFFFF", border: "1px solid var(--gray-line)", borderRadius: 12, padding: "14px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 6 }}>
               <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
-                <Trophy size={15} color="var(--gold-dark)" /> Guaranteed 10 Winner Prizes
+                <Trophy size={15} color="var(--gold-dark)" /> Guaranteed 10 Winner Prizes ({currentPool.totalPrizeValue} Total)
               </span>
               
-              {/* Working Interactive Toggle Button */}
+              {/* Interactive Toggle Button */}
               <button
                 type="button"
                 onClick={() => setShowAllPrizes((prev) => !prev)}
@@ -186,13 +244,13 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                   transition: "all var(--transition-fast)",
                 }}
               >
-                {showAllPrizes ? "Collapse to Top 3" : `View All ${prizes.length} Prizes`}
+                {showAllPrizes ? "Collapse to Top 3" : "View All 10 Prizes"}
                 {showAllPrizes ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
             </div>
 
             {/* Prize list grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
               {displayedPrizes.map((p) => {
                 const isRank1 = p.rank === 1;
                 const isRank2 = p.rank === 2;
@@ -269,26 +327,26 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
       {/* ── Perforated Tear-off Ticket Stub ──────────────────────────── */}
       <div className="ticket-stub-container">
-        {/* Cutout punch notches on tear-line (Desktop) */}
+        {/* Cutout punch notches (Desktop) */}
         <div className="ticket-punch-top desk-punch" style={{ top: -11, left: -11 }} />
         <div className="ticket-punch-bottom desk-punch" style={{ bottom: -11, left: -11 }} />
         
-        {/* Cutout punch notches on tear-line (Mobile) */}
+        {/* Cutout punch notches (Mobile) */}
         <div className="ticket-punch-left mob-punch" style={{ top: -11, left: -11 }} />
         <div className="ticket-punch-right mob-punch" style={{ top: -11, right: -11 }} />
 
         {/* Stub Header & Brand */}
         <div style={{ width: "100%" }}>
           <span className="mono" style={{ fontSize: "0.6875rem", color: "#2A65E6", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 800 }}>
-            OFFICIAL ENTRY
+            OFFICIAL RAFFLE TICKET
           </span>
           <div className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, margin: "2px 0 10px" }}>
             PrimeDraws
           </div>
 
-          {/* People Pool Size Tag on Stub */}
+          {/* Selected Pool Tag on Stub */}
           <div className="badge badge-blue" style={{ marginBottom: 12, fontSize: "0.75rem", fontWeight: 800 }}>
-            {maxCapacity.toLocaleString()} People Pool
+            {currentPool.label} Pool
           </div>
 
           {/* Fixed Price Stamp */}
@@ -303,7 +361,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             }}
           >
             <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block" }}>
-              INPUT MONEY
+              TICKET PRICE
             </span>
             <span className="display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--gold-deep)", lineHeight: 1 }}>
               {ticketPrice} <span style={{ fontSize: "0.875rem" }}>ETB</span>

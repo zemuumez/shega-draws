@@ -74,6 +74,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 		// Auth
 		r.Route("/auth", func(r chi.Router) {
 			r.With(authRL.Middleware).Post("/register", authH.RegisterPlayer)
+			r.With(authRL.Middleware).Post("/player-login", authH.LoginPlayer)
 			r.With(authRL.Middleware).Post("/login", authH.LoginAdmin)
 			r.Post("/refresh", authH.Refresh)
 			r.With(authenticate).Post("/logout", authH.Logout)

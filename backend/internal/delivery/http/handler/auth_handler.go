@@ -50,6 +50,35 @@ func (h *AuthHandler) RegisterPlayer(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// LoginPlayer handles POST /api/v1/auth/player-login
+func (h *AuthHandler) LoginPlayer(w http.ResponseWriter, r *http.Request) {
+	var input usecase.LoginPlayerInput
+	if !decodeJSON(w, r, &input) {
+		return
+	}
+	if err := validator.Validate(input); err != nil {
+		respondError(w, err)
+		return
+	}
+
+	tokens, user, err := h.authUC.LoginPlayer(r.Context(), input)
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+
+	h.setRefreshCookie(w, tokens.RefreshToken)
+	respond(w, http.StatusOK, map[string]interface{}{
+		"access_token": tokens.AccessToken,
+		"user": map[string]interface{}{
+			"id":    user.ID,
+			"name":  user.Name,
+			"phone": user.Phone,
+			"role":  user.Role,
+		},
+	})
+}
+
 // LoginAdmin handles POST /api/v1/auth/login
 // Password-based login for admin and superadmin users.
 func (h *AuthHandler) LoginAdmin(w http.ResponseWriter, r *http.Request) {

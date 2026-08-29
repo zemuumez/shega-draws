@@ -61,14 +61,23 @@ type TokenPair struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-// RegisterPlayer creates a phone-only player account and issues tokens.
+// RegisterPlayer creates a phone-only player account or logs in existing player and issues tokens.
 func (uc *AuthUseCase) RegisterPlayer(ctx context.Context, input RegisterPlayerInput) (*TokenPair, *domain.User, error) {
 	exists, err := uc.userRepo.ExistsByPhone(ctx, input.Phone)
 	if err != nil {
 		return nil, nil, fmt.Errorf("checking phone existence: %w", err)
 	}
 	if exists {
-		return nil, nil, domain.ErrUserAlreadyExists
+		existing, err := uc.userRepo.FindByPhone(ctx, input.Phone)
+		if err != nil {
+			return nil, nil, fmt.Errorf("finding existing player: %w", err)
+		}
+		pair, err := uc.issueTokens(ctx, existing)
+		if err != nil {
+			return nil, nil, err
+		}
+		log.Info().Str("user_id", existing.ID.String()).Str("phone", existing.Phone).Msg("existing player authenticated")
+		return pair, existing, nil
 	}
 
 	user := &domain.User{
@@ -92,6 +101,26 @@ func (uc *AuthUseCase) RegisterPlayer(ctx context.Context, input RegisterPlayerI
 
 	log.Info().Str("user_id", created.ID.String()).Str("phone", created.Phone).Msg("player registered")
 	return pair, created, nil
+}
+
+// LoginPlayerInput is used for phone-only player login.
+type LoginPlayerInput struct {
+	Phone string `validate:"required,e164"`
+}
+
+// LoginPlayer authenticates a player by phone number.
+func (uc *AuthUseCase) LoginPlayer(ctx context.Context, input LoginPlayerInput) (*TokenPair, *domain.User, error) {
+	user, err := uc.userRepo.FindByPhone(ctx, input.Phone)
+	if err != nil {
+		return nil, nil, domain.ErrInvalidCredentials
+	}
+
+	pair, err := uc.issueTokens(ctx, user)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return pair, user, nil
 }
 
 // LoginAdminInput is used for admin/superadmin password login.

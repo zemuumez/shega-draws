@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, Ticket, ShieldCheck, Users, Tag, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, CheckCircle2, Ticket, ShieldCheck, Users, Tag, Sparkles, Trophy, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -10,15 +10,15 @@ import { NumberPicker } from "@/components/NumberPicker";
 import { PaymentProofUploader } from "@/components/PaymentProofUploader";
 import { registerPlayer, submitEntry, getActiveDraw, listDraws, type DrawState } from "@/lib/api";
 
-const STEPS = ["1. Pool Size & Info", "2. Pick Number", "3. Pay & Confirm"];
+const STEPS = ["1. Pool Size", "2. Player Info", "3. Pick Number", "4. Pay & Confirm"];
 
 interface PayMethod { id: string; name: string; accountDetail: string; }
 
 const POOL_OPTIONS = [
-  { size: 1000, label: "1,000 People", price: 50,  pool: "100,000 ETB", jackpot: "35,000 ETB (1st)" },
-  { size: 2000, label: "2,000 People", price: 100, pool: "300,000 ETB", jackpot: "80,000 ETB (1st)" },
-  { size: 3000, label: "3,000 People", price: 150, pool: "600,000 ETB", jackpot: "180,000 ETB (1st)" },
-  { size: 5000, label: "5,000 People", price: 200, pool: "1,200,000 ETB", jackpot: "400,000 ETB (1st)" },
+  { size: 1000, label: "1,000 People (1K)", price: 100, pool: "100,000 ETB", jackpot: "35,000 ETB (1st Place)" },
+  { size: 2000, label: "2,000 People (2K)", price: 100, pool: "200,000 ETB", jackpot: "60,000 ETB (1st Place)" },
+  { size: 3000, label: "3,000 People (3K)", price: 100, pool: "300,000 ETB", jackpot: "90,000 ETB (1st Place)" },
+  { size: 5000, label: "5,000 People (5K)", price: 100, pool: "500,000 ETB", jackpot: "160,000 ETB (1st Place)" },
 ];
 
 export default function EnterPage() {
@@ -32,7 +32,7 @@ export default function EnterPage() {
 function EnterWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialNum = searchParams.get("num") || "07";
+  const initialNum = searchParams.get("num") || "7";
   const initialSize = parseInt(searchParams.get("size") || "2000", 10);
   const initialDrawParam = searchParams.get("draw") || "";
 
@@ -41,7 +41,7 @@ function EnterWizard() {
   const [selectedSize, setSize]     = useState<number>(initialSize);
   const [activeDraw, setActiveDraw] = useState<DrawState | null>(null);
 
-  // Step state (0: info & pool, 1: number, 2: pay, 3: success)
+  // Step state (0: Pool Size, 1: Player Info, 2: Pick Number, 3: Pay & Confirm, 4: Success)
   const [step, setStep]       = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
@@ -69,12 +69,12 @@ function EnterWizard() {
       .catch(() => {});
   }, [initialDrawParam, initialSize]);
 
-  // Update draw when user changes pool size
+  // Current pool configuration
   const currentPool = useMemo(() => {
     return POOL_OPTIONS.find((p) => p.size === selectedSize) || POOL_OPTIONS[1];
   }, [selectedSize]);
 
-  const fixedTicketPrice = currentPool.price;
+  const fixedTicketPrice = activeDraw?.ticket_price || currentPool.price || 100;
 
   const handleSelectSize = (size: number) => {
     setSize(size);
@@ -91,9 +91,10 @@ function EnterWizard() {
   };
 
   const canAdvance = [
-    name.trim().length >= 2 && phone.trim().length >= 9,
-    number.length === 2,
-    !!proofFile && !!method,
+    selectedSize > 0, // Step 0: pool chosen
+    name.trim().length >= 2 && phone.trim().length >= 9, // Step 1: info
+    number.trim().length > 0 && parseInt(number, 10) >= 1 && parseInt(number, 10) <= selectedSize, // Step 2: number within pool
+    !!proofFile && !!method, // Step 3: pay proof
   ];
 
   function handleProof(file: File) {
@@ -107,7 +108,7 @@ function EnterWizard() {
     setLoading(true);
     setError("");
     try {
-      // Step 1: register player
+      // Step 1: register or login player
       await registerPlayer({ name: name.trim(), phone: phone.trim() });
 
       // Step 2: submit entry
@@ -120,7 +121,7 @@ function EnterWizard() {
       form.append("proof", proofFile!);
 
       await submitEntry(form);
-      setStep(3); // success
+      setStep(4); // success screen
     } catch (e: any) {
       setError(e.message ?? "Something went wrong. Please try again.");
     } finally {
@@ -129,9 +130,9 @@ function EnterWizard() {
   }
 
   return (
-    <div style={{ maxWidth: 620, margin: "0 auto", padding: "32px 20px" }}>
-      {/* Progress bar */}
-      {step < 3 && (
+    <div style={{ maxWidth: 640, margin: "0 auto", padding: "32px 20px" }}>
+      {/* ── Progress bar (4 Steps) ───────────────────────────── */}
+      {step < 4 && (
         <nav aria-label="Progress" style={{ display: "flex", gap: 8, marginBottom: 26 }}>
           {STEPS.map((s, i) => (
             <div key={s} style={{ flex: 1 }}>
@@ -139,7 +140,7 @@ function EnterWizard() {
                 style={{
                   height: 6,
                   borderRadius: 6,
-                  background: i <= step ? "var(--blue-royal)" : "#E2E8F0",
+                  background: i <= step ? "#2A65E6" : "#E2E8F0",
                   transition: "all 300ms ease",
                 }}
               />
@@ -160,17 +161,17 @@ function EnterWizard() {
         </nav>
       )}
 
-      {/* ── Step 0: Choose Pool Size & Player Info ─────────────── */}
+      {/* ── Step 0: Choose Available Pools ───────────────────── */}
       {step === 0 && (
         <Card style={{ padding: "32px 28px" }}>
           <div className="badge badge-blue" style={{ marginBottom: 10 }}>
-            <Users size={12} /> Step 1: Select Draw & Information
+            <Users size={12} /> Step 1: Choose Available Pool
           </div>
-          <h1 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6 }}>
-            Choose People Pool Size
+          <h1 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6, fontWeight: 800 }}>
+            Select Your Preferred Pool Size
           </h1>
           <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>
-            Select how many people are in the draw. Each pool size has a fixed ticket price and guaranteed top 10 prizes.
+            Choose how many participants are in the draw. Each pool features a dedicated ticket price, total prize pool, and guaranteed 10 winner prizes.
           </p>
 
           {/* People Pool Size Selector (1000, 2000, 3000, 5000) */}
@@ -183,7 +184,7 @@ function EnterWizard() {
                   type="button"
                   onClick={() => handleSelectSize(p.size)}
                   style={{
-                    padding: "14px 12px",
+                    padding: "16px 12px",
                     borderRadius: "var(--radius-md)",
                     border: isSelected ? "2px solid #2A65E6" : "1.5px solid var(--gray-line)",
                     background: isSelected ? "var(--blue-bg)" : "#FFFFFF",
@@ -194,21 +195,64 @@ function EnterWizard() {
                   }}
                 >
                   <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 800, color: isSelected ? "var(--blue-royal)" : "var(--blue-navy)", display: "block" }}>
-                    {p.label}
+                    👥 {p.label}
                   </span>
-                  <span className="display" style={{ fontSize: "1.25rem", fontWeight: 800, color: isSelected ? "var(--gold-dark)" : "var(--text-main)", margin: "4px 0 2px", display: "block" }}>
-                    {p.price} ETB
+                  <span className="display" style={{ fontSize: "1.25rem", fontWeight: 800, color: isSelected ? "var(--gold-deep)" : "var(--text-main)", margin: "4px 0 2px", display: "block" }}>
+                    {p.pool}
                   </span>
-                  <span className="mono" style={{ fontSize: "0.625rem", color: isSelected ? "var(--blue-navy)" : "var(--text-subtle)", fontWeight: 600, display: "block" }}>
-                    Pool: {p.pool}
+                  <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", fontWeight: 700, display: "block" }}>
+                    {p.price} ETB / Ticket
                   </span>
                 </button>
               );
             })}
           </div>
 
-          {/* Player Name & Phone */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, borderTop: "1px solid var(--gray-line)", paddingTop: 20 }}>
+          {/* Selected Pool Overview Box */}
+          <div
+            style={{
+              background: "#FEF9C3",
+              border: "1px solid #FDE047",
+              borderRadius: "var(--radius-sm)",
+              padding: "16px 18px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+              <div>
+                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold-deep)", textTransform: "uppercase", fontWeight: 800, display: "block" }}>
+                  GUARANTEED 1ST PLACE REWARD
+                </span>
+                <span className="display" style={{ fontSize: "1.25rem", color: "var(--gold-deep)", fontWeight: 800 }}>
+                  {currentPool.jackpot}
+                </span>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold-deep)", textTransform: "uppercase", fontWeight: 800, display: "block" }}>
+                  TOTAL PRIZE POOL
+                </span>
+                <span className="mono" style={{ fontSize: "1rem", color: "var(--blue-navy)", fontWeight: 800 }}>
+                  {currentPool.pool}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* ── Step 1: Player Information & Optional Promo Code ───── */}
+      {step === 1 && (
+        <Card style={{ padding: "32px 28px" }}>
+          <div className="badge badge-blue" style={{ marginBottom: 10 }}>
+            <Users size={12} /> Step 2: Player Information
+          </div>
+          <h2 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6, fontWeight: 800 }}>
+            Your Contact Information
+          </h2>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>
+            We will use your phone number to verify your ticket payment and send your prize payout.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <Input
               label="Full Name"
               id="entry-name"
@@ -220,7 +264,7 @@ function EnterWizard() {
               minLength={2}
             />
             <Input
-              label="Phone Number (For Prize Verification)"
+              label="Phone Number (Mobile Transfer Account)"
               id="entry-phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -231,7 +275,7 @@ function EnterWizard() {
             />
 
             {/* Optional Promo Code Input */}
-            <div style={{ background: "#FEF9C3", padding: "14px 16px", borderRadius: "var(--radius-sm)", border: "1px solid #FDE047" }}>
+            <div style={{ background: "#FEF9C3", padding: "14px 16px", borderRadius: "var(--radius-sm)", border: "1px solid #FDE047", marginTop: 6 }}>
               <label htmlFor="promo-code" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "var(--gold-deep)", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                 <Tag size={14} /> Have a Promo Code? (Optional)
               </label>
@@ -260,7 +304,7 @@ function EnterWizard() {
 
               {promoApplied && (
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, color: "var(--teal-dark)", fontSize: "0.75rem", fontWeight: 700 }}>
-                  <CheckCircle2 size={13} /> Promo code &ldquo;{promoCode.toUpperCase()}&rdquo; applied!
+                  <CheckCircle2 size={13} /> Promo code &ldquo;{promoCode.toUpperCase()}&rdquo; applied successfully!
                 </div>
               )}
             </div>
@@ -268,37 +312,39 @@ function EnterWizard() {
         </Card>
       )}
 
-      {/* ── Step 1: Pick Lucky 2-Digit Number ──────────────────── */}
-      {step === 1 && (
+      {/* ── Step 2: Pick Number (Scrollable Number Board sized to Pool) ── */}
+      {step === 2 && (
         <Card style={{ padding: "32px 28px" }}>
           <div className="badge badge-blue" style={{ marginBottom: 10 }}>
-            <Ticket size={12} /> Step 2: Choose Number
+            <Ticket size={12} /> Step 3: Number Selection
           </div>
-          <h2 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6 }}>
-            Select Your 2-Digit Lucky Number
+          <h2 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6, fontWeight: 800 }}>
+            Pick Number in {currentPool.label}
           </h2>
           <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>
-            Selected Pool: <strong style={{ color: "var(--blue-royal)" }}>{currentPool.label}</strong> ({fixedTicketPrice} ETB). Choose any number from 00 to 99.
+            Choose any available lucky number from <strong>#1 to #{selectedSize.toLocaleString()}</strong>. Red numbers are already taken and disabled.
           </p>
+
           <NumberPicker
             value={number}
             onChange={setNumber}
+            poolSize={selectedSize}
             takenNumbers={[]}
           />
         </Card>
       )}
 
-      {/* ── Step 2: Pay & Upload Proof ────────────────────────── */}
-      {step === 2 && (
+      {/* ── Step 3: Pay & Confirm ────────────────────────────── */}
+      {step === 3 && (
         <Card style={{ padding: "32px 28px" }}>
           <div className="badge badge-gold" style={{ marginBottom: 10 }}>
-            <ShieldCheck size={12} /> Step 3: Payment & Receipt
+            <ShieldCheck size={12} /> Step 4: Payment & Receipt
           </div>
-          <h2 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6 }}>
+          <h2 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", marginBottom: 6, fontWeight: 800 }}>
             Transfer Payment & Upload Receipt
           </h2>
           <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 18 }}>
-            Send exactly <strong style={{ color: "var(--gold-deep)", fontSize: "1.125rem" }}>{fixedTicketPrice} ETB</strong> for <strong style={{ color: "var(--blue-royal)" }}>{currentPool.label}</strong> (Ticket Number <strong style={{ color: "var(--blue-navy)" }}>#{number}</strong>).
+            Send exactly <strong style={{ color: "var(--gold-deep)", fontSize: "1.125rem" }}>{fixedTicketPrice} ETB</strong> for your chosen ticket number <strong style={{ color: "var(--blue-royal)", fontSize: "1.125rem" }}>#{number}</strong> in the {currentPool.label}.
           </p>
 
           {/* Payment Method Selector */}
@@ -361,8 +407,8 @@ function EnterWizard() {
         </Card>
       )}
 
-      {/* ── Step 3: Success Screen ───────────────────────────── */}
-      {step === 3 && (
+      {/* ── Step 4: Success Screen ───────────────────────────── */}
+      {step === 4 && (
         <Card style={{ textAlign: "center", padding: "40px 24px" }}>
           <div
             style={{
@@ -379,11 +425,11 @@ function EnterWizard() {
             <CheckCircle2 size={32} color="var(--teal)" />
           </div>
 
-          <h1 className="display" style={{ fontSize: "1.5rem", color: "var(--blue-navy)", marginBottom: 8 }}>
+          <h1 className="display" style={{ fontSize: "1.5rem", color: "var(--blue-navy)", marginBottom: 8, fontWeight: 800 }}>
             Ticket Confirmed for {currentPool.label}!
           </h1>
           <p style={{ color: "var(--text-muted)", fontSize: "0.9375rem", maxWidth: 460, margin: "0 auto 24px", lineHeight: 1.6 }}>
-            Your entry for lucky number <strong style={{ color: "var(--gold-deep)", fontSize: "1.125rem" }}>#{number}</strong> in the <strong style={{ color: "var(--blue-royal)" }}>{currentPool.label} ({fixedTicketPrice} ETB)</strong> draw is registered. Our team will verify your receipt and send SMS confirmation.
+            Your entry for lucky number <strong style={{ color: "var(--gold-deep)", fontSize: "1.125rem" }}>#{number}</strong> in the <strong style={{ color: "var(--blue-royal)" }}>{currentPool.label}</strong> is submitted. Our team will verify your receipt and confirm your slot.
           </p>
 
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -398,7 +444,7 @@ function EnterWizard() {
       )}
 
       {/* Wizard navigation buttons */}
-      {step < 3 && (
+      {step < 4 && (
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24 }}>
           <Button
             variant="secondary"
@@ -408,7 +454,7 @@ function EnterWizard() {
           >
             Back
           </Button>
-          {step < 2 ? (
+          {step < 3 ? (
             <Button
               variant="primary"
               disabled={!canAdvance[step]}
@@ -419,7 +465,7 @@ function EnterWizard() {
           ) : (
             <Button
               variant="primary"
-              disabled={!canAdvance[2] || loading}
+              disabled={!canAdvance[3] || loading}
               loading={loading}
               onClick={submit}
             >
