@@ -1,10 +1,32 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Clock, Trophy, Sparkles, Globe, Ticket, HelpCircle, Calendar } from "lucide-react";
+import { Clock, Globe, Trophy, Sparkles, HelpCircle, Ticket } from "lucide-react";
 import { HowToBuyModal } from "./HowToBuyModal";
 import { BuyTicketModal } from "./BuyTicketModal";
 import { type Currency } from "@/lib/api";
+
+function TicketOrnament() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        width: "100%",
+        maxWidth: 240,
+        margin: "6px auto 10px",
+      }}
+    >
+      <div style={{ flex: "1 1 0%", height: 0, borderTop: "1.5px dotted rgba(17, 24, 39, 0.65)" }} />
+      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#111827", flexShrink: 0 }} />
+      <div style={{ flex: "1 1 0%", height: 0, borderTop: "1.5px dotted rgba(17, 24, 39, 0.65)" }} />
+      <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#111827", flexShrink: 0 }} />
+      <div style={{ flex: "1 1 0%", height: 0, borderTop: "1.5px dotted rgba(17, 24, 39, 0.65)" }} />
+    </div>
+  );
+}
 
 export function JackpotCardsSection() {
   const [mounted, setMounted] = useState(false);
@@ -43,41 +65,35 @@ export function JackpotCardsSection() {
       serial: "RDL-USD-250",
       badgeTitle: "DIASPORA USD JACKPOT",
       badgeIcon: Globe,
-      title: "$250 Grand Diaspora Tier",
       ticketPrice: 250,
       currency: "USD" as Currency,
       currSymbol: "$",
       grandPrize: "$1,250,000",
-      topPrizeText: "$400,000 for 1st Place",
-      drawDate: "Aug 31, 2026",
+      drawDate: "Friday 18th July",
       poolLabels: ["1K", "3K", "5K"],
     },
     {
       id: "etb-200",
       serial: "RDL-ETB-200",
-      badgeTitle: "LOCAL ETB JACKPOT",
+      badgeTitle: "200 BIRR HOLIDAY JACKPOT",
       badgeIcon: Trophy,
-      title: "200 Birr Grand Holiday Jackpot",
       ticketPrice: 200,
       currency: "ETB" as Currency,
       currSymbol: "ETB",
       grandPrize: "1,000,000 ETB",
-      topPrizeText: "320,000 ETB for 1st Place",
-      drawDate: "Aug 31, 2026",
+      drawDate: "Friday 18th July",
       poolLabels: ["1K", "3K", "5K"],
     },
     {
       id: "etb-100",
       serial: "RDL-ETB-100",
-      badgeTitle: "POPULAR MULTI-POOL",
+      badgeTitle: "100 BIRR CLASSIC MULTI-POOL",
       badgeIcon: Sparkles,
-      title: "100 Birr Classic Multi-Pool",
       ticketPrice: 100,
       currency: "ETB" as Currency,
       currSymbol: "ETB",
       grandPrize: "500,000 ETB",
-      topPrizeText: "160,000 ETB for 1st Place",
-      drawDate: "Aug 31, 2026",
+      drawDate: "Friday 18th July",
       poolLabels: ["1K", "2K", "3K", "5K"],
     },
   ];
@@ -103,191 +119,168 @@ export function JackpotCardsSection() {
       />
 
       <section style={{ margin: "24px 0 32px", width: "100%" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, width: "100%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 20, width: "100%" }}>
           {jackpotTickets.map((ticket) => {
             const BadgeIcon = ticket.badgeIcon;
 
             return (
               <div
                 key={ticket.id}
-                className="jackpot-physical-card interactive-ticket-card lottery-watermark animate-fade"
-                style={{
-                  background: "#FFFDF7",
-                  border: "1.5px solid #FDE047",
-                  borderRadius: "14px",
-                  overflow: "hidden",
-                  boxShadow: "0 6px 18px -4px rgba(234, 179, 8, 0.2)",
-                  position: "relative",
-                  width: "100%",
-                  boxSizing: "border-box",
-                }}
+                className="gold-admission-ticket"
               >
-                {/* Left / Main Ticket Body */}
-                <div className="jackpot-ticket-body" style={{ padding: "16px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div>
-                    {/* Top Bar: Badge & Date */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 4 }}>
-                      <span
-                        style={{
-                          background: ticket.currency === "USD" ? "var(--blue-bg)" : "#FEF9C3",
-                          color: ticket.currency === "USD" ? "#2A65E6" : "var(--gold-deep)",
-                          border: `1px solid ${ticket.currency === "USD" ? "var(--blue-border)" : "#FDE047"}`,
-                          padding: "2px 7px",
-                          borderRadius: "5px",
-                          fontSize: "0.625rem",
-                          fontWeight: 800,
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 4,
-                          letterSpacing: "0.3px",
-                        }}
-                      >
-                        <BadgeIcon size={11} /> {ticket.badgeTitle}
-                      </span>
+                {/* Inner Engraved Ticket Frame */}
+                <div className="gold-ticket-inner-frame">
+                  {/* Perfectly Centered Top Dotted Security Ornament */}
+                  <TicketOrnament />
 
-                      <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                        <Calendar size={11} color="#111827" /> {ticket.drawDate}
-                      </span>
-                    </div>
+                  {/* Badge Header Tag */}
+                  <span
+                    style={{
+                      background: "rgba(17, 24, 39, 0.08)",
+                      border: "1px solid rgba(17, 24, 39, 0.2)",
+                      borderRadius: "6px",
+                      padding: "2px 8px",
+                      fontSize: "0.625rem",
+                      fontWeight: 900,
+                      color: "#111827",
+                      letterSpacing: "0.5px",
+                      textTransform: "uppercase",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <BadgeIcon size={12} /> {ticket.badgeTitle}
+                  </span>
 
-                    <h3 className="display" style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", color: "#111827", fontWeight: 800, lineHeight: 1.2, margin: "3px 0 2px" }}>
-                      {ticket.title}
-                    </h3>
+                  {/* Next Jackpot Subtitle */}
+                  <span
+                    style={{
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      color: "#4B5563",
+                      display: "block",
+                      marginBottom: 1,
+                    }}
+                  >
+                    Next Jackpot
+                  </span>
 
-                    {/* Grand Prize Total */}
-                    <div className="display" style={{ fontSize: "clamp(1.25rem, 3vw, 1.45rem)", color: "var(--gold-deep)", fontWeight: 900, lineHeight: 1.15 }}>
-                      {ticket.grandPrize}
-                    </div>
-
-                    <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4, margin: "3px 0 8px" }}>
-                      <Trophy size={11} color="var(--gold-dark)" /> 10 Winners · {ticket.topPrizeText}
-                    </span>
-
-                    {/* Compact Available Pools */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-                      <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
-                        Pools:
-                      </span>
-                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                        {ticket.poolLabels.map((label, idx) => (
-                          <span
-                            key={idx}
-                            style={{
-                              background: "#FFFFFF",
-                              border: "1px solid #E2E8F0",
-                              borderRadius: 4,
-                              padding: "1px 6px",
-                              fontSize: "0.625rem",
-                              fontWeight: 800,
-                              color: "#111827",
-                            }}
-                          >
-                            {label}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Live Countdown Clock */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#F8FAFC", padding: "5px 8px", borderRadius: 6, border: "1px solid #E2E8F0" }}>
-                      <span className="mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}>
-                        <Clock size={11} color="#DC2626" /> Live Draw:
-                      </span>
-                      <span className="mono" suppressHydrationWarning style={{ fontSize: "0.6875rem", fontWeight: 800, color: "#DC2626" }}>
-                        {mounted ? `${String(timeLeft.days).padStart(2, "0")}d ${String(timeLeft.hours).padStart(2, "0")}h ${String(timeLeft.mins).padStart(2, "0")}m` : "--"}
-                      </span>
-                    </div>
+                  {/* Massive Bold Black Typography Amount */}
+                  <div
+                    className="display"
+                    style={{
+                      fontSize: "clamp(1.75rem, 3.2vw, 2.3rem)",
+                      color: "#111827",
+                      fontWeight: 900,
+                      lineHeight: 1.1,
+                      letterSpacing: "-0.5px",
+                      margin: "2px 0 6px",
+                      textShadow: "0 1px 1px rgba(255, 255, 255, 0.8)",
+                    }}
+                  >
+                    {ticket.grandPrize}
                   </div>
 
-                  {/* Ticket Action Buttons */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 10 }}>
+                  {/* Draw Release Date */}
+                  <span
+                    style={{
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      color: "#374151",
+                      display: "block",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {ticket.drawDate}
+                  </span>
+
+                  {/* Available Pools Pills */}
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 5, marginBottom: 10, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "0.625rem", fontWeight: 800, color: "#4B5563", textTransform: "uppercase" }}>
+                      Pools:
+                    </span>
+                    {ticket.poolLabels.map((label, idx) => (
+                      <span
+                        key={idx}
+                        style={{
+                          background: "#FFFFFF",
+                          border: "1px solid rgba(17, 24, 39, 0.2)",
+                          borderRadius: 4,
+                          padding: "1px 6px",
+                          fontSize: "0.625rem",
+                          fontWeight: 800,
+                          color: "#111827",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Live Countdown Clock (Restored Previous Style) */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      background: "rgba(255, 255, 255, 0.9)",
+                      padding: "7px 10px",
+                      borderRadius: 8,
+                      border: "1px solid rgba(17, 24, 39, 0.15)",
+                      margin: "4px 0 8px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <span
+                      className="mono"
+                      style={{
+                        fontSize: "0.6875rem",
+                        fontWeight: 700,
+                        color: "#374151",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      <Clock size={12} color="#DC2626" /> Next Draw:
+                    </span>
+                    <span
+                      className="mono"
+                      suppressHydrationWarning
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 800,
+                        color: "#DC2626",
+                      }}
+                    >
+                      {mounted
+                        ? `${String(timeLeft.days).padStart(2, "0")}d ${String(timeLeft.hours).padStart(2, "0")}h ${String(timeLeft.mins).padStart(2, "0")}m ${String(timeLeft.secs).padStart(2, "0")}s`
+                        : "--"}
+                    </span>
+                  </div>
+
+                  {/* Perfectly Centered Bottom Dotted Security Ornament */}
+                  <TicketOrnament />
+
+                  {/* Action Buttons: Dark Elegant "How to Buy" & Glossy Red "Buy Now" */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                     <button
                       type="button"
                       onClick={() => setIsHowToBuyOpen(true)}
-                      className="btn-base"
-                      style={{
-                        background: "#F1F5F9",
-                        border: "1px solid #CBD5E1",
-                        color: "#111827",
-                        fontSize: "0.6875rem",
-                        fontWeight: 800,
-                        padding: "7px 4px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        justifyContent: "center",
-                        gap: 3,
-                      }}
+                      className="gold-ticket-btn-dark"
                     >
-                      <HelpCircle size={11} /> How to Buy Ticket
+                      <HelpCircle size={14} /> How to Buy
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleOpenBuy(ticket.currency, ticket.ticketPrice, ticket.serial)}
-                      className="btn-base"
-                      style={{
-                        background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)",
-                        color: "#111827",
-                        fontSize: "0.6875rem",
-                        fontWeight: 900,
-                        padding: "7px 4px",
-                        borderRadius: "6px",
-                        boxShadow: "0 2px 6px rgba(234, 179, 8, 0.3)",
-                        border: "1px solid #FEF08A",
-                        cursor: "pointer",
-                        justifyContent: "center",
-                        gap: 3,
-                      }}
+                      className="gold-ticket-btn-red"
                     >
-                      <Ticket size={11} /> Buy Now
+                      <Ticket size={14} /> Buy Now
                     </button>
-                  </div>
-                </div>
-
-                {/* Perforated Ticket Stub */}
-                <div
-                  className="jackpot-ticket-stub"
-                  style={{
-                    background: "var(--bg-ticket-stub)",
-                    padding: "14px 8px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    textAlign: "center",
-                    position: "relative",
-                  }}
-                >
-                  <div>
-                    <span className="mono" style={{ fontSize: "0.5rem", color: "#2A65E6", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.5px" }}>
-                      RIMNA LOTTERY
-                    </span>
-                    <div
-                      style={{
-                        background: "#FFFFFF",
-                        border: "1px solid #FDE047",
-                        borderRadius: 5,
-                        padding: "4px 6px",
-                        marginTop: 4,
-                      }}
-                    >
-                      <span className="mono" style={{ fontSize: "0.5rem", color: "var(--text-subtle)", display: "block" }}>
-                        PRICE
-                      </span>
-                      <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "var(--gold-deep)", lineHeight: 1 }}>
-                        {ticket.currency === "USD" ? `$${ticket.ticketPrice}` : `${ticket.ticketPrice}`}
-                      </span>
-                      <span className="mono" style={{ fontSize: "0.5rem", color: "var(--text-muted)", display: "block" }}>
-                        {ticket.currSymbol}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div style={{ width: "100%" }}>
-                    <div className="barcode-pattern" style={{ height: 20, marginBottom: 2 }} />
-                    <span className="mono" style={{ fontSize: "0.5rem", color: "var(--text-subtle)", display: "block" }}>
-                      {ticket.serial}
-                    </span>
                   </div>
                 </div>
               </div>

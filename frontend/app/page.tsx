@@ -54,17 +54,18 @@ export default async function HomePage() {
 
   return (
     <div style={{ paddingBottom: 60, width: "100%", overflowX: "hidden" }}>
-      {/* ── 1. Current Active Admin-Approved Draw Hero Banner ── */}
+      {/* ── 1. Current Active Admin-Approved Draw Hero Banner (Full Viewport Width & 0 Border Radius) ── */}
       <section
         className="hero-section-wrapper lottery-guilloche-bg reveal-item is-revealed"
         style={{
           background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 50%, #FEF9C3 100%)",
-          border: "2px solid #FDE047",
-          borderRadius: "20px",
+          borderTop: "2px solid #FDE047",
+          borderBottom: "2px solid #FDE047",
+          borderLeft: "none",
+          borderRight: "none",
+          borderRadius: 0,
           boxShadow: "0 16px 36px -8px rgba(234, 179, 8, 0.25)",
-          marginBottom: 28,
-          width: "100%",
-          boxSizing: "border-box",
+          marginBottom: 32,
           position: "relative",
           overflow: "hidden",
         }}
@@ -124,7 +125,9 @@ export default async function HomePage() {
           #77
         </div>
 
-        <div className="hero-grid-layout" style={{ display: "grid", gap: 24, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
+        {/* Centered Content Container */}
+        <div style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "0 clamp(16px, 3vw, 32px)", width: "100%", boxSizing: "border-box" }}>
+          <div className="hero-grid-layout" style={{ display: "grid", gap: 24, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
           {/* Left Column: Headline, Active Draw Info & CTA */}
           <div style={{ width: "100%" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -254,45 +257,49 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
-      <div className="reveal-item">
-        <JackpotCardsSection />
       </div>
+    </section>
 
-      {/* ── 3. Main 2-Column Portal Section (Live Broadcast & Draws) ── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 340px",
-          gap: 28,
-          alignItems: "start",
-          width: "100%",
-        }}
-        className="portal-grid-container reveal-item"
-      >
-        {/* Left Column: Live Stream Banner + Draws Catalog + Why Rimna */}
-        <div style={{ width: "100%", minWidth: 0 }}>
-          {/* Live Broadcast & Stream Information */}
-          <LiveBroadcastBanner />
-
-          {/* Full Draws Catalog (with ETB / USD Currency Switcher) */}
-          <DrawsExplorer initialDraws={allDraws} />
-
-          {/* Why Rimna Lottery Public Transparency Section */}
-          <WhyRimnaLottery />
+      {/* ── Page Inner Container for content below full-width hero ── */}
+      <div className="page-inner-container">
+        {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
+        <div className="reveal-item">
+          <JackpotCardsSection />
         </div>
 
-        {/* Right Column: Sidebar Widgets (Results, 24/7 Support, Promos) */}
-        <div style={{ width: "100%", minWidth: 0 }}>
-          <SidebarWidgets />
-        </div>
-      </div>
+        {/* ── 3. Main 2-Column Portal Section (Live Broadcast & Draws) ── */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 340px",
+            gap: 28,
+            alignItems: "start",
+            width: "100%",
+          }}
+          className="portal-grid-container reveal-item"
+        >
+          {/* Left Column: Live Stream Banner + Draws Catalog + Why Rimna */}
+          <div style={{ width: "100%", minWidth: 0 }}>
+            {/* Live Broadcast & Stream Information */}
+            <LiveBroadcastBanner />
 
-      {/* ── 4. Bottom Testimonials & Newsletter Section ────────── */}
-      <div className="reveal-item">
-        <TestimonialsNewsletter />
+            {/* Full Draws Catalog (with ETB / USD Currency Switcher) */}
+            <DrawsExplorer initialDraws={allDraws} />
+
+            {/* Why Rimna Lottery Public Transparency Section */}
+            <WhyRimnaLottery />
+          </div>
+
+          {/* Right Column: Sidebar Widgets (Results, 24/7 Support, Promos) */}
+          <div style={{ width: "100%", minWidth: 0 }}>
+            <SidebarWidgets />
+          </div>
+        </div>
+
+        {/* ── 4. Bottom Testimonials & Newsletter Section ────────── */}
+        <div className="reveal-item">
+          <TestimonialsNewsletter />
+        </div>
       </div>
     </div>
   );
