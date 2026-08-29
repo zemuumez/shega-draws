@@ -57,7 +57,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
   return (
     <div
-      className="physical-lottery-ticket ticket-card-container animate-fade"
+      className="physical-lottery-ticket ticket-card-container interactive-ticket-card lottery-watermark animate-fade"
       style={{
         margin: "0 0 24px 0",
         position: "relative",

@@ -18,7 +18,7 @@ export function LiveBroadcastBanner() {
       />
 
       <div
-        className="card-base"
+        className="card-base interactive-ticket-card lottery-guilloche-bg"
         style={{
           background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 60%, #EFF6FF 100%)",
           border: "2px solid #FDE047",
@@ -46,7 +46,7 @@ export function LiveBroadcastBanner() {
                 marginBottom: 8,
               }}
             >
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#FFFFFF", animation: "pulse 1.5s infinite" }} />
+              <span className="pulse-radar" style={{ width: 8, height: 8, borderRadius: "50%", background: "#FFFFFF", display: "inline-block" }} />
               LIVE PUBLIC WINNER DRAWING
             </span>
 

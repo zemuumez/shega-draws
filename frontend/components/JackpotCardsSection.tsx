@@ -110,7 +110,7 @@ export function JackpotCardsSection() {
             return (
               <div
                 key={ticket.id}
-                className="jackpot-physical-card animate-fade"
+                className="jackpot-physical-card interactive-ticket-card lottery-watermark animate-fade"
                 style={{
                   background: "#FFFDF7",
                   border: "1.5px solid #FDE047",

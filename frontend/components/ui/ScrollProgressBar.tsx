@@ -6,6 +6,7 @@ export function ScrollProgressBar() {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
+    // 1. Top progress bar
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (totalHeight > 0) {
@@ -15,16 +16,39 @@ export function ScrollProgressBar() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // 2. IntersectionObserver for smooth scroll reveals
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+          }
+        });
+      },
+      {
+        threshold: 0.08,
+        rootMargin: "0px 0px -40px 0px",
+      }
+    );
+
+    const revealElements = document.querySelectorAll(".reveal-item");
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <div
-      className="scroll-progress-bar"
-      style={{
-        width: `${scrollProgress}%`,
-        display: scrollProgress > 0 ? "block" : "none",
-      }}
-    />
+    <div className="scroll-progress-container" aria-hidden="true">
+      <div
+        className="scroll-progress-bar"
+        style={{
+          width: `${scrollProgress}%`,
+        }}
+      />
+    </div>
   );
 }

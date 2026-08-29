@@ -56,7 +56,7 @@ export default async function HomePage() {
     <div style={{ paddingBottom: 60, width: "100%", overflowX: "hidden" }}>
       {/* ── 1. Current Active Admin-Approved Draw Hero Banner ── */}
       <section
-        className="hero-section-wrapper"
+        className="hero-section-wrapper lottery-guilloche-bg reveal-item is-revealed"
         style={{
           background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 50%, #FEF9C3 100%)",
           border: "2px solid #FDE047",
@@ -65,9 +65,66 @@ export default async function HomePage() {
           marginBottom: 28,
           width: "100%",
           boxSizing: "border-box",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <div className="hero-grid-layout" style={{ display: "grid", gap: 24, alignItems: "center", width: "100%" }}>
+        {/* Floating Ambient Lottery Spheres */}
+        <div
+          className="float-slow"
+          style={{
+            position: "absolute",
+            top: -15,
+            right: "25%",
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #FEF08A 0%, #EAB308 100%)",
+            border: "2px solid #FFFFFF",
+            boxShadow: "0 6px 14px rgba(234, 179, 8, 0.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#111827",
+            fontWeight: 900,
+            fontSize: "0.875rem",
+            fontFamily: "var(--font-mono)",
+            pointerEvents: "none",
+            zIndex: 2,
+            opacity: 0.85,
+          }}
+        >
+          #7
+        </div>
+
+        <div
+          className="float-reverse"
+          style={{
+            position: "absolute",
+            bottom: 20,
+            left: "48%",
+            width: 38,
+            height: 38,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #DBEAFE 0%, #2A65E6 100%)",
+            border: "2px solid #FFFFFF",
+            boxShadow: "0 4px 12px rgba(42, 101, 230, 0.3)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#FFFFFF",
+            fontWeight: 900,
+            fontSize: "0.75rem",
+            fontFamily: "var(--font-mono)",
+            pointerEvents: "none",
+            zIndex: 2,
+            opacity: 0.8,
+          }}
+        >
+          #77
+        </div>
+
+        <div className="hero-grid-layout" style={{ display: "grid", gap: 24, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
           {/* Left Column: Headline, Active Draw Info & CTA */}
           <div style={{ width: "100%" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -98,55 +155,70 @@ export default async function HomePage() {
                 fontWeight: 900,
                 letterSpacing: "-1px",
                 margin: "4px 0 8px",
-                textShadow: "0 2px 4px rgba(0,0,0,0.06)",
-                wordBreak: "break-word",
               }}
             >
-              {(currentApprovedDraw as any)?.total_prize_value || "$1,250,000 / 1,000,000 ETB"}
+              {(currentApprovedDraw as any)?.total_prize_value || (currentApprovedDraw as any)?.prize_pool_estimate || "$1,250,000 / 1,000,000 ETB"}
             </div>
 
-            <h2 className="display" style={{ fontSize: "clamp(1.05rem, 2.5vw, 1.25rem)", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 14, lineHeight: 1.25 }}>
-              {currentApprovedDraw?.title || "100 Birr Ticket · 10 Guaranteed Cash Winners"}
-            </h2>
+            <h1
+              className="display"
+              style={{
+                fontSize: "clamp(1.125rem, 2.5vw, 1.5rem)",
+                color: "#111827",
+                fontWeight: 800,
+                lineHeight: 1.25,
+                marginBottom: 10,
+              }}
+            >
+              {currentApprovedDraw?.title || "Rimna Grand Jackpot — Multi-Pool Live Drawing"}
+            </h1>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
-              <span className="mono" style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 700 }}>
-                Live Broadcast: <strong>Aug 31, 2026</strong>
+            <p style={{ color: "var(--text-muted)", fontSize: "clamp(0.875rem, 1.5vw, 0.95rem)", lineHeight: 1.6, marginBottom: 20, maxWidth: 580 }}>
+              Pick your lucky numbers across 4 fixed participant pools. Watch the owner draw and display winning numbers live on broadcast with guaranteed payouts for the Top 10 winners!
+            </p>
+
+            {/* Hero Quick Trust Signals */}
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 24 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
               </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                <Tv size={15} color="#2A65E6" /> Live Public Video Broadcast
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                <Ticket size={15} color="var(--gold-deep)" /> Fixed Capped Pools (1K-5K)
+              </span>
+            </div>
 
-              {/* Big Golden BUY NOW Button (Opens Responsive BuyTicketModal) */}
+            {/* Buy Ticket CTA Button */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
               <HeroBuyButton
-                drawId={(currentApprovedDraw as any)?.id}
+                drawId={(currentApprovedDraw as any)?.id || "RDL-ACTIVE"}
                 currency={activeCurrency}
                 price={activeTicketPrice}
               />
-            </div>
 
-            {/* Quick Guarantees */}
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <Tv size={15} color="#DC2626" /> Drawn Live on Stream
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <Globe size={15} color="var(--gold-deep)" /> ETB & Diaspora USD ($25+)
-              </span>
+              <Link
+                href="#draws-catalog"
+                className="btn-base btn-secondary"
+                style={{ padding: "12px 22px", fontSize: "0.9375rem", fontWeight: 800 }}
+              >
+                Browse All Draws <ArrowRight size={16} />
+              </Link>
             </div>
           </div>
 
-          {/* Right Column: 3D Hero Graphic & Countdown */}
-          <div style={{ position: "relative", width: "100%" }}>
+          {/* Right Column: Hero Visual Ticket Card with Countdown */}
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
             <div
-              className="card-base"
+              className="card-base interactive-ticket-card"
               style={{
-                overflow: "hidden",
                 borderRadius: "16px",
+                overflow: "hidden",
                 border: "2px solid #FDE047",
-                boxShadow: "0 12px 30px -6px rgba(42, 101, 230, 0.16)",
                 background: "#FFFFFF",
-                position: "relative",
+                boxShadow: "0 12px 28px -4px rgba(234, 179, 8, 0.35)",
+                maxWidth: 420,
                 width: "100%",
               }}
             >
@@ -166,7 +238,7 @@ export default async function HomePage() {
                   }}
                 />
                 <div style={{ position: "absolute", bottom: 10, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
-                  <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "var(--blue-navy)", fontWeight: 800, fontSize: "0.6875rem" }}>
+                  <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "#111827", fontWeight: 800, fontSize: "0.6875rem" }}>
                     <Trophy size={12} color="var(--gold-dark)" /> 100% Guaranteed Payouts
                   </span>
                   <span className="mono" style={{ fontSize: "0.6875rem", color: "#FFFFFF", fontWeight: 700 }}>
@@ -185,7 +257,9 @@ export default async function HomePage() {
       </section>
 
       {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
-      <JackpotCardsSection />
+      <div className="reveal-item">
+        <JackpotCardsSection />
+      </div>
 
       {/* ── 3. Main 2-Column Portal Section (Live Broadcast & Draws) ── */}
       <div
@@ -196,7 +270,7 @@ export default async function HomePage() {
           alignItems: "start",
           width: "100%",
         }}
-        className="portal-grid-container"
+        className="portal-grid-container reveal-item"
       >
         {/* Left Column: Live Stream Banner + Draws Catalog + Why Rimna */}
         <div style={{ width: "100%", minWidth: 0 }}>
@@ -217,7 +291,9 @@ export default async function HomePage() {
       </div>
 
       {/* ── 4. Bottom Testimonials & Newsletter Section ────────── */}
-      <TestimonialsNewsletter />
+      <div className="reveal-item">
+        <TestimonialsNewsletter />
+      </div>
     </div>
   );
 }
