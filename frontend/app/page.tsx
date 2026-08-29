@@ -125,8 +125,8 @@ export default async function HomePage() {
           #77
         </div>
 
-        {/* Centered Content Container */}
-        <div style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "0 clamp(16px, 3vw, 32px)", width: "100%", boxSizing: "border-box" }}>
+        {/* Centered Content Container matching exact indentation of other sections */}
+        <div className="page-inner-container">
           <div className="hero-grid-layout" style={{ display: "grid", gap: 24, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
           {/* Left Column: Headline, Active Draw Info & CTA */}
           <div style={{ width: "100%" }}>
