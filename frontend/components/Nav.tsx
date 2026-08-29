@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Ticket, ListChecks, ShieldCheck, Trophy, Sparkles } from "lucide-react";
+import { Home, Ticket, ListChecks, ShieldCheck, Sparkles, UserCheck } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 
 export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
@@ -13,60 +13,61 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
     return null;
   }
 
+  // Clean, focused user navigation items
   const navItems = [
-    { href: "/",        label: t.nav.draws,       short: t.nav.draws,     icon: Home },
-    { href: "/enter",   label: t.nav.enter,       short: t.nav.enter,     icon: Ticket },
-    { href: "/entries", label: t.nav.myEntries,   short: t.nav.myEntries, icon: ListChecks },
-    { href: "/results", label: t.nav.results,     short: t.nav.results,   icon: ShieldCheck },
-    { href: "/admin",   label: t.nav.admin,       short: "Admin",         icon: Trophy },
+    { href: "/",        label: t.nav.draws,     short: t.nav.draws,     icon: Home },
+    { href: "/enter",   label: t.nav.enter,     short: t.nav.enter,     icon: Ticket },
+    { href: "/entries", label: t.nav.myEntries, short: t.nav.myEntries, icon: ListChecks },
+    { href: "/results", label: t.nav.results,   short: t.nav.results,   icon: ShieldCheck },
   ];
 
   return (
     <>
-      {/* ── Desktop top nav (Gold Yellow & Royal Blue Theme) ───── */}
+      {/* ── Desktop Top Nav (Professional Header) ───── */}
       <nav
         aria-label="Main navigation"
         style={{
           display: "none",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "16px 36px",
+          padding: "14px 32px",
           borderBottom: "1.5px solid var(--blue-border)",
           position: "sticky",
           top: 0,
-          background: "rgba(255, 255, 255, 0.96)",
+          background: "rgba(255, 255, 255, 0.98)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          boxShadow: "0 2px 8px rgba(30, 58, 138, 0.05)",
+          boxShadow: "0 2px 8px rgba(42, 101, 230, 0.06)",
           zIndex: 100,
         }}
         id="nav-desktop"
       >
+        {/* Brand Logo */}
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <div
             style={{
-              width: 36,
-              height: 36,
+              width: 38,
+              height: 38,
               borderRadius: "var(--radius-sm)",
               background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 2px 8px rgba(234, 179, 8, 0.4)",
+              boxShadow: "0 2px 8px rgba(234, 179, 8, 0.35)",
               border: "1px solid #FDE047",
             }}
           >
-            <Ticket size={20} color="#1E3A8A" />
+            <Ticket size={22} color="#0C2666" />
           </div>
           <div>
-            <span className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", fontWeight: 800, letterSpacing: "-0.5px" }}>
+            <span className="display" style={{ fontSize: "1.45rem", color: "var(--blue-navy)", fontWeight: 800, letterSpacing: "-0.5px" }}>
               {t.appName}
             </span>
           </div>
         </Link>
 
-        {/* Center links */}
-        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        {/* Center Main Links */}
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href));
             return (
@@ -78,7 +79,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                   border: active ? "1.5px solid var(--blue-border)" : "1.5px solid transparent",
                   borderRadius: 10,
                   padding: "8px 16px",
-                  color: active ? "var(--blue-royal)" : "var(--text-muted)",
+                  color: active ? "#2A65E6" : "var(--text-muted)",
                   fontSize: "0.875rem",
                   fontWeight: active ? 800 : 600,
                   cursor: "pointer",
@@ -86,51 +87,36 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                   alignItems: "center",
                   gap: 7,
                   textDecoration: "none",
-                  position: "relative",
                   transition: "all var(--transition-fast)",
                 }}
               >
-                <Icon size={16} color={active ? "var(--blue-royal)" : "var(--text-subtle)"} />
+                <Icon size={16} color={active ? "#2A65E6" : "var(--text-subtle)"} />
                 {label}
-                {href === "/admin" && pendingCount > 0 && (
-                  <span
-                    aria-label={`${pendingCount} pending`}
-                    style={{
-                      position: "absolute",
-                      top: 4,
-                      right: 6,
-                      width: 7,
-                      height: 7,
-                      borderRadius: "50%",
-                      background: "var(--rust)",
-                    }}
-                  />
-                )}
               </Link>
             );
           })}
         </div>
 
-        {/* Right side: Language Switcher + Quick Action */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Right side: Language Switcher + Buy Ticket CTA */}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <LanguageSwitcher />
           <Link
             href="/enter"
             className="btn-base btn-primary"
-            style={{ padding: "9px 18px", fontSize: "0.875rem" }}
+            style={{ padding: "9px 20px", fontSize: "0.875rem" }}
           >
-            <Sparkles size={14} /> {t.nav.enter}
+            <Sparkles size={15} /> Buy Ticket
           </Link>
         </div>
       </nav>
 
-      {/* ── Mobile top bar (Brand + Language Switcher) ── */}
+      {/* ── Mobile Top Bar (Brand + Language Switcher + Fast Action) ── */}
       <header
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "14px 18px",
+          padding: "12px 18px",
           background: "#FFFFFF",
           borderBottom: "1.5px solid var(--blue-border)",
           position: "sticky",
@@ -142,43 +128,54 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <div
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 6,
+              width: 32,
+              height: 32,
+              borderRadius: "var(--radius-xs)",
               background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              border: "1px solid #FDE047",
             }}
           >
-            <Ticket size={17} color="#1E3A8A" />
+            <Ticket size={18} color="#0C2666" />
           </div>
-          <span className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800 }}>
+          <span className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800 }}>
             {t.appName}
           </span>
         </Link>
-        <LanguageSwitcher />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <LanguageSwitcher />
+          <Link
+            href="/enter"
+            className="btn-base btn-primary"
+            style={{ padding: "6px 14px", fontSize: "0.75rem" }}
+          >
+            Buy Ticket
+          </Link>
+        </div>
       </header>
 
-      {/* ── Mobile bottom tab bar ──────────────────────────── */}
+      {/* ── Mobile Bottom Navigation Bar ─────────────────────────────── */}
       <nav
-        aria-label="Main navigation"
+        aria-label="Mobile navigation"
         style={{
+          display: "flex",
           position: "fixed",
           bottom: 0,
           left: 0,
           right: 0,
-          display: "flex",
-          justifyContent: "space-around",
-          background: "#FFFFFF",
+          background: "rgba(255, 255, 255, 0.98)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           borderTop: "1.5px solid var(--blue-border)",
-          padding: "8px 4px",
-          paddingBottom: "calc(8px + env(safe-area-inset-bottom))",
-          boxShadow: "0 -2px 10px rgba(30, 58, 138, 0.06)",
-          zIndex: 100,
+          padding: "6px 8px env(safe-area-inset-bottom, 8px)",
+          justifyContent: "space-around",
+          alignItems: "center",
+          zIndex: 90,
+          boxShadow: "0 -2px 12px rgba(42, 101, 230, 0.08)",
         }}
-        id="nav-mobile"
+        id="nav-mobile-bottom"
       >
         {navItems.map(({ href, short, icon: Icon }) => {
           const active = pathname === href || (href !== "/" && pathname.startsWith(href));
@@ -187,48 +184,37 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
               key={href}
               href={href}
               style={{
-                background: "transparent",
-                border: "none",
-                color: active ? "var(--blue-royal)" : "var(--text-subtle)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 3,
-                fontSize: "0.6875rem",
-                fontWeight: active ? 800 : 600,
-                cursor: "pointer",
-                position: "relative",
-                padding: "4px 8px",
+                gap: 2,
+                padding: "6px 10px",
+                borderRadius: 8,
+                color: active ? "#2A65E6" : "var(--text-muted)",
+                background: active ? "var(--blue-bg)" : "transparent",
                 textDecoration: "none",
-                transition: "color var(--transition-fast)",
+                fontSize: "0.6875rem",
+                fontWeight: active ? 800 : 500,
+                minWidth: 54,
+                position: "relative",
               }}
             >
-              <Icon size={18} color={active ? "var(--blue-royal)" : "var(--text-subtle)"} />
-              {short}
-              {href === "/admin" && pendingCount > 0 && (
-                <span
-                  aria-label={`${pendingCount} pending`}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 4,
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: "var(--rust)",
-                  }}
-                />
-              )}
+              <Icon size={18} color={active ? "#2A65E6" : "var(--text-muted)"} />
+              <span>{short}</span>
             </Link>
           );
         })}
       </nav>
 
+      {/* Desktop/Mobile media query toggles */}
       <style>{`
-        @media (min-width: 860px) {
-          #nav-desktop   { display: flex !important; }
+        @media (min-width: 769px) {
+          #nav-desktop { display: flex !important; }
           #header-mobile { display: none !important; }
-          #nav-mobile    { display: none !important; }
+          #nav-mobile-bottom { display: none !important; }
+        }
+        @media (max-width: 768px) {
+          body { padding-bottom: 64px; }
         }
       `}</style>
     </>

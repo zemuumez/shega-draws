@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Ticket, ShieldCheck, Sparkles, Trophy, Clock, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import { Ticket, ShieldCheck, Sparkles, Trophy, Clock, CheckCircle2, ArrowRight, Zap, Users, Gift } from "lucide-react";
 import { sanityClient } from "@/lib/sanity/client";
 import {
   ACTIVE_DRAW_QUERY,
@@ -9,30 +10,24 @@ import {
   type ActiveDraw,
   type CMSPromotion,
 } from "@/lib/sanity/queries";
-import { getActiveDraw, listDraws, type DrawState } from "@/lib/api";
+import { getActiveDraw, listDraws } from "@/lib/api";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { PromoEventBanner } from "@/components/PromoEventBanner";
 import { DrawsExplorer } from "@/components/DrawsExplorer";
-import { PrizeSpotlight } from "@/components/PrizeSpotlight";
-import { QuickPickTester } from "@/components/QuickPickTester";
-import { FairnessDiagram } from "@/components/FairnessDiagram";
 import { WinnersFeed } from "@/components/WinnersFeed";
 import { HowItWorks } from "@/components/HowItWorks";
 import { FAQSection } from "@/components/FAQSection";
 
 export const metadata: Metadata = {
   title: "PrimeDraws — Provably Fair Digital Raffle & Lottery",
-  description: "Browse live prize pools, upcoming holiday jackpots, and verified historical draws. Pick a number, pay securely, and audit the results in your browser.",
+  description: "Official verified multi-pool digital raffle tickets. Pick your lucky number, win guaranteed top 10 cash prizes, and audit results instantly.",
 };
 
-// Revalidate every 30 seconds for live entries & draw updates
 export const revalidate = 30;
 
 export default async function HomePage() {
-  // Fetch CMS data and API state concurrently
-  const [cmsDrawRes, allCmsDrawsRes, promosRes, activeDrawApiRes, allDrawsApiRes] = await Promise.allSettled([
+  const [cmsDrawRes, promosRes, activeDrawApiRes, allDrawsApiRes] = await Promise.allSettled([
     sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
-    sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => null),
     sanityClient.fetch<CMSPromotion[]>(PROMOTIONS_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
@@ -43,36 +38,37 @@ export default async function HomePage() {
   const activeDraw  = activeDrawApiRes.status === "fulfilled" ? activeDrawApiRes.value : null;
   const allDraws    = allDrawsApiRes.status === "fulfilled" && allDrawsApiRes.value ? allDrawsApiRes.value : [];
 
-  const deadline = cmsDraw?.deadline ?? activeDraw?.deadline ?? allDraws[0]?.deadline;
+  const deadline = cmsDraw?.deadline ?? activeDraw?.deadline ?? allDraws[0]?.deadline ?? "2026-09-01T18:00:00Z";
 
   return (
-    <div className="container" style={{ paddingTop: 20 }}>
-      {/* ── 1. Hero Section (Clean Light Theme) ─────────────────────────── */}
+    <div className="container" style={{ paddingTop: 16 }}>
+      {/* ── 1. Modern Professional Hero Section with Visual Image ────── */}
       <section
         style={{
-          display: "flex",
-          justifyContent: "space-between",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: 36,
           alignItems: "center",
-          flexWrap: "wrap",
-          gap: 32,
-          padding: "32px 0 20px",
+          padding: "28px 0 36px",
         }}
       >
-        <div style={{ maxWidth: 640 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <span className="badge badge-gold">
-              <Sparkles size={11} /> OFFICIAL DIGITAL RAFFLE · ENTRIES OPEN
+        {/* Left Column: Headline & Value Proposition */}
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <span className="badge badge-gold" style={{ fontSize: "0.75rem", padding: "5px 12px" }}>
+              <Sparkles size={13} color="var(--gold-deep)" /> OFFICIAL DIGITAL RAFFLE · ENTRIES OPEN
             </span>
           </div>
 
           <h1
             className="display"
             style={{
-              fontSize: "clamp(2rem, 4.8vw, 3rem)",
-              color: "var(--text-main)",
+              fontSize: "clamp(2.1rem, 4.5vw, 3.25rem)",
+              color: "var(--blue-navy)",
               lineHeight: 1.12,
-              marginBottom: 14,
+              marginBottom: 16,
               fontWeight: 800,
+              letterSpacing: "-0.5px",
             }}
           >
             {cmsDraw?.title ?? "100 Birr Ticket. 10 Guaranteed Cash Winners."}
@@ -83,20 +79,50 @@ export default async function HomePage() {
               color: "var(--text-muted)",
               fontSize: "1.0625rem",
               lineHeight: 1.6,
-              maxWidth: 560,
+              maxWidth: 540,
               marginBottom: 24,
             }}
           >
             {cmsDraw?.description ??
-              "Pick your lucky two-digit number (00–99). 1st place wins 80,000 ETB, 2nd wins 65,000 ETB, 3rd wins 40,000 ETB, down to 10th place. 100% verified & auditable."}
+              "Choose your pool size (1K, 2K, 3K, or 5K people), pick your lucky number, and win up to 160,000 ETB in guaranteed cash prizes with 100% cryptographic fairness."}
           </p>
 
-          {/* Action Buttons */}
+          {/* Value Highlights */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--teal-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <CheckCircle2 size={16} color="var(--teal)" />
+              </div>
+              <span style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
+                10 Winners Every Draw
+              </span>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--blue-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <ShieldCheck size={16} color="#2A65E6" />
+              </div>
+              <span style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
+                Provably Fair Algorithm
+              </span>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#FEF9C3", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Zap size={16} color="var(--gold-deep)" />
+              </div>
+              <span style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
+                Instant Mobile Payouts
+              </span>
+            </div>
+          </div>
+
+          {/* Primary Action Buttons */}
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <Link
               href="/enter"
               className="btn-base btn-primary"
-              style={{ padding: "12px 24px", fontSize: "1rem" }}
+              style={{ padding: "13px 28px", fontSize: "1rem" }}
             >
               <Ticket size={18} /> Buy Ticket (100 ETB)
             </Link>
@@ -104,89 +130,84 @@ export default async function HomePage() {
             <Link
               href="#draws-catalog"
               className="btn-base btn-secondary"
-              style={{ padding: "12px 20px", fontSize: "0.9375rem" }}
+              style={{ padding: "13px 22px", fontSize: "0.9375rem" }}
             >
-              <Trophy size={16} color="var(--gold-dark)" /> View All Draws
-            </Link>
-
-            <Link
-              href="/results"
-              style={{
-                color: "var(--text-muted)",
-                fontSize: "0.875rem",
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                fontWeight: 600,
-              }}
-            >
-              <ShieldCheck size={16} color="var(--teal)" /> Audit Results
+              <Trophy size={16} color="#2A65E6" /> Explore Draws
             </Link>
           </div>
         </div>
 
-        {/* Live Draw Ticker Card */}
-        {deadline && (
+        {/* Right Column: Hero Image & Countdown Card */}
+        <div style={{ position: "relative" }}>
           <div
             className="card-base"
             style={{
-              padding: "24px 28px",
-              borderRadius: "var(--radius-lg)",
-              minWidth: 280,
-              background: "linear-gradient(135deg, #FEF3C7 0%, #FFFFFF 100%)",
-              border: "1.5px solid #FDE68A",
-              alignSelf: "center",
-              margin: "0 auto",
+              overflow: "hidden",
+              borderRadius: "var(--radius-xl)",
+              border: "2px solid #FDE047",
+              boxShadow: "0 16px 36px -6px rgba(42, 101, 230, 0.16)",
+              background: "#FFFFFF",
+              position: "relative",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <Clock size={16} color="var(--gold-dark)" />
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold-dark)", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 700 }}>
-                Next Live Draw In
-              </span>
+            {/* Optimized Visual Hero Banner Graphic */}
+            <div style={{ position: "relative", width: "100%", height: 280 }}>
+              <Image
+                src="/images/hero-lottery.jpg"
+                alt="PrimeDraws Gold and Blue Lottery Jackpot"
+                fill
+                priority
+                style={{ objectFit: "cover" }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(180deg, rgba(12, 38, 102, 0.15) 0%, rgba(12, 38, 102, 0.65) 100%)",
+                }}
+              />
+              <div style={{ position: "absolute", bottom: 14, left: 16, right: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "var(--blue-navy)", fontWeight: 800 }}>
+                  <Trophy size={13} color="var(--gold-dark)" /> 500,000 ETB Top Pool
+                </span>
+                <span className="mono" style={{ fontSize: "0.75rem", color: "#FFFFFF", fontWeight: 700 }}>
+                  100% Auditable
+                </span>
+              </div>
             </div>
-            <CountdownTimer target={deadline} />
-            <div
-              className="mono"
-              style={{
-                fontSize: "0.6875rem",
-                color: "var(--text-subtle)",
-                marginTop: 14,
-                borderTop: "1px solid #FDE68A",
-                paddingTop: 8,
-                textAlign: "center",
-                fontWeight: 600,
-              }}
-            >
-              Active Draw: #{activeDraw?.draw_id ?? cmsDraw?.drawId ?? "PD-2026-08A"}
+
+            {/* Countdown bar attached underneath the image */}
+            <div style={{ padding: "18px 20px", background: "#FFFFFF" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Clock size={15} color="#2A65E6" />
+                  <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", fontWeight: 800 }}>
+                    Live Draw Countdown
+                  </span>
+                </div>
+                <span className="badge badge-gold" style={{ fontSize: "0.6875rem" }}>
+                  Active Pool
+                </span>
+              </div>
+              <CountdownTimer target={deadline} />
             </div>
           </div>
-        )}
+        </div>
       </section>
 
-      {/* ── 2. Featured Events, Deals & Sponsored Ads Section ──────────── */}
+      {/* ── 2. Featured Events, Deals & Sponsored Ads ──────────────────── */}
       <PromoEventBanner promotions={promos} />
 
-      {/* ── 3. Flagship Draws Catalog (Physical Lottery Tickets) ────────── */}
+      {/* ── 3. Official Flagship Draws Catalog (Tickets) ──────────────── */}
       <DrawsExplorer initialDraws={allDraws} />
 
-      {/* ── 4. Grand Prize Spotlight (Top 10 Breakdown Highlight) ──────── */}
-      <PrizeSpotlight />
-
-      {/* ── 5. Interactive Quick-Pick Tester ───────────────────────────── */}
-      <QuickPickTester />
-
-      {/* ── 6. Cryptographic Fairness Explainer ────────────────────────── */}
-      <FairnessDiagram />
-
-      {/* ── 7. Verified Recent Winners Feed ────────────────────────────── */}
+      {/* ── 4. Verified Recent Winners Feed ────────────────────────────── */}
       <WinnersFeed />
 
-      {/* ── 8. How It Works 3-Step Guide ───────────────────────────────── */}
+      {/* ── 5. How It Works (Simple 3-Step Guide) ──────────────────────── */}
       <HowItWorks />
 
-      {/* ── 9. Interactive FAQ Accordion ───────────────────────────────── */}
+      {/* ── 6. FAQ Section ─────────────────────────────────────────────── */}
       <FAQSection />
     </div>
   );
