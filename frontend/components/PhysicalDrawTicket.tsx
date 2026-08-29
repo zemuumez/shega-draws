@@ -77,7 +77,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                   border: `1px solid ${isOpen ? "var(--teal-border)" : isUpcoming ? "var(--gold-border)" : "var(--gray-line)"}`,
                 }}
               >
-                {isOpen ? "● ACTIVE DRAW" : isUpcoming ? "🕒 SCHEDULED" : "✓ COMPLETED"}
+                {isOpen ? "ACTIVE DRAW" : isUpcoming ? "SCHEDULED" : "COMPLETED"}
               </span>
 
               {/* Currency Tag */}
@@ -97,22 +97,22 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             </div>
           </div>
 
-          {/* Title & Pool Options Display (Non-clickable overview) */}
+          {/* Title & Pool Options Display */}
           <div style={{ marginBottom: 14 }}>
             <h3 className="display" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.45rem)", color: "var(--blue-navy)", lineHeight: 1.2, fontWeight: 800, marginBottom: 4 }}>
               {draw.title || (isUSD ? `$${ticketPrice} USD International Draw` : `${ticketPrice} Birr Multi-Pool Jackpot Draw`)}
             </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 12 }}>
-              Total prize pool sums per participant pool (Choose your pool size after clicking Buy Ticket):
+            <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 10 }}>
+              Available participant pools (Select pool capacity after clicking Buy Ticket):
             </p>
 
             {/* Non-choosable Info Cards for Pool Sizes */}
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(130px, 1fr))`, gap: 8, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(110px, 1fr))`, gap: 8, marginBottom: 14 }}>
               {pools.map((pool) => (
                 <div
                   key={pool.size}
                   style={{
-                    padding: "10px 10px",
+                    padding: "8px 8px",
                     borderRadius: 8,
                     border: "1.5px solid #E2E8F0",
                     background: "#FFFFFF",
@@ -121,9 +121,9 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                   }}
                 >
                   <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", display: "block" }}>
-                    👥 {pool.label}
+                    {pool.label}
                   </span>
-                  <span className="display" style={{ fontSize: "0.9375rem", fontWeight: 800, color: "var(--gold-deep)", display: "block", marginTop: 2 }}>
+                  <span className="display" style={{ fontSize: "0.875rem", fontWeight: 800, color: "var(--gold-deep)", display: "block", marginTop: 2 }}>
                     {pool.pool}
                   </span>
                 </div>

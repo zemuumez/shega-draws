@@ -83,7 +83,7 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
               transition: "all var(--transition-fast)",
             }}
           >
-            🇪🇹 Local ETB (Birr)
+            Local ETB (Birr)
           </button>
 
           <button
@@ -105,7 +105,7 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
               transition: "all var(--transition-fast)",
             }}
           >
-            <Globe size={14} /> 🌐 Diaspora USD ($25+)
+            <Globe size={14} /> Diaspora USD ($25+)
           </button>
         </div>
       </div>
