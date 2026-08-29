@@ -15,7 +15,7 @@ export function WhyRimnaLottery() {
         marginBottom: 32,
       }}
     >
-      <h3 className="display" style={{ fontSize: "1.35rem", color: "var(--blue-navy)", fontWeight: 900, marginBottom: 12 }}>
+      <h3 className="display" style={{ fontSize: "1.35rem", color: "#111827", fontWeight: 900, marginBottom: 12 }}>
         Why Rimna Digital Lottery?
       </h3>
 

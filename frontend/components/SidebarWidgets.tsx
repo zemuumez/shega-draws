@@ -93,7 +93,7 @@ export function SidebarWidgets() {
 
               {/* Draw Title & Number Balls */}
               <div style={{ flex: 1 }}>
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", display: "block", marginBottom: 4 }}>
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", display: "block", marginBottom: 4 }}>
                   {res.title}
                 </span>
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -142,7 +142,7 @@ export function SidebarWidgets() {
             <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--gold-deep)", textTransform: "uppercase", fontWeight: 800, display: "block" }}>
               INSTANT ASSISTANCE
             </span>
-            <h4 className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 900 }}>
+            <h4 className="display" style={{ fontSize: "1.125rem", color: "#111827", fontWeight: 900 }}>
               Live Support 24/7
             </h4>
           </div>
@@ -165,7 +165,7 @@ export function SidebarWidgets() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: "0.8125rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--blue-navy)", fontWeight: 800 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#111827", fontWeight: 800 }}>
             <Phone size={16} color="#2A65E6" /> +251 911 000 000
           </div>
           <a

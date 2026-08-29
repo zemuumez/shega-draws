@@ -60,7 +60,7 @@ export function DrawsExplorer({ initialDraws }: DrawsExplorerProps) {
           <div className="badge badge-gold" style={{ marginBottom: 8 }}>
             <Award size={13} /> {t.drawsExplorer.title}
           </div>
-          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.125rem)", color: "var(--blue-navy)", lineHeight: 1.15, fontWeight: 800 }}>
+          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.125rem)", color: "#111827", lineHeight: 1.15, fontWeight: 800 }}>
             {t.drawsExplorer.subtitle}
           </h2>
         </div>

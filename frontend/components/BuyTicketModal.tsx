@@ -211,7 +211,7 @@ export function BuyTicketModal({
               {isUSD ? "DIASPORA USD TICKET" : "LOCAL ETB TICKET"}
             </span>
 
-            <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 800 }}>
+            <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 800 }}>
               Fixed Price: {isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`}
             </span>
           </div>
@@ -238,7 +238,7 @@ export function BuyTicketModal({
                   className="mono"
                   style={{
                     fontSize: "0.5625rem",
-                    color: i === step ? "var(--blue-navy)" : "var(--text-subtle)",
+                    color: i === step ? "#111827" : "var(--text-subtle)",
                     fontWeight: i === step ? 800 : 600,
                     display: "block",
                     marginTop: 4,
@@ -260,7 +260,7 @@ export function BuyTicketModal({
             <span className="badge badge-blue" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
               <Users size={11} /> Step 1 of 4: Pool Size
             </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 2 }}>
+            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
               Choose Participant Pool
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 14 }}>
@@ -286,10 +286,10 @@ export function BuyTicketModal({
                       transition: "all var(--transition-fast)",
                     }}
                   >
-                    <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "#2A65E6" : "var(--blue-navy)", display: "block" }}>
+                    <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "#2A65E6" : "#111827", display: "block" }}>
                       {p.label}
                     </span>
-                    <span className="display" style={{ fontSize: "1.1rem", fontWeight: 800, color: isSelected ? "var(--gold-deep)" : "var(--text-main)", margin: "2px 0", display: "block" }}>
+                    <span className="display" style={{ fontSize: "1.1rem", fontWeight: 800, color: isSelected ? "var(--gold-deep)" : "#111827", margin: "2px 0", display: "block" }}>
                       {p.pool}
                     </span>
                     <span className="mono" style={{ fontSize: "0.625rem", color: "var(--teal-dark)", fontWeight: 700, display: "block" }}>
@@ -306,7 +306,7 @@ export function BuyTicketModal({
                 <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
                   TICKETS CONFIRMED ({currentPool.label})
                 </span>
-                <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", fontWeight: 800 }}>
+                <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 800 }}>
                   {Math.round(selectedSize * 0.72).toLocaleString()} / {selectedSize.toLocaleString()} Tickets (72%)
                 </span>
               </div>
@@ -330,7 +330,7 @@ export function BuyTicketModal({
             <span className="badge badge-blue" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
               <Users size={11} /> Step 2 of 4: Player Info
             </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 2 }}>
+            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
               Enter Your Information
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 14 }}>
@@ -339,7 +339,7 @@ export function BuyTicketModal({
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
-                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", display: "block", marginBottom: 4 }}>
+                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", display: "block", marginBottom: 4 }}>
                   Full Name
                 </label>
                 <input
@@ -354,7 +354,7 @@ export function BuyTicketModal({
               </div>
 
               <div>
-                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", display: "block", marginBottom: 4 }}>
+                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", display: "block", marginBottom: 4 }}>
                   {isUSD ? "Phone Number / WhatsApp (+Country Code)" : "Mobile Phone Number (Telebirr / CBE)"}
                 </label>
                 <input
@@ -410,7 +410,7 @@ export function BuyTicketModal({
             <span className="badge badge-blue" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
               <Ticket size={11} /> Step 3 of 4: Lucky Number
             </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 2 }}>
+            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
               Pick Number for {currentPool.label} ({currentPool.pool})
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 14 }}>
@@ -432,7 +432,7 @@ export function BuyTicketModal({
             <span className="badge badge-gold" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
               <ShieldCheck size={11} /> Step 4 of 4: Payment & Receipt
             </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 2 }}>
+            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
               Pay {isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`} for Ticket #{number}
             </h3>
 
@@ -453,7 +453,7 @@ export function BuyTicketModal({
                       padding: "8px 12px",
                       border: method === m.id ? "2px solid #2A65E6" : "1px solid var(--gray-line)",
                       background: method === m.id ? "var(--blue-bg)" : "#FFFFFF",
-                      color: method === m.id ? "#2A65E6" : "var(--text-main)",
+                      color: method === m.id ? "#2A65E6" : "#111827",
                       fontSize: "0.75rem",
                       fontWeight: 700,
                     }}
@@ -476,7 +476,7 @@ export function BuyTicketModal({
                       padding: "8px 12px",
                       border: method === m.id ? "2px solid #2A65E6" : "1px solid var(--gray-line)",
                       background: method === m.id ? "var(--blue-bg)" : "#FFFFFF",
-                      color: method === m.id ? "#2A65E6" : "var(--text-main)",
+                      color: method === m.id ? "#2A65E6" : "#111827",
                       fontSize: "0.75rem",
                       fontWeight: 700,
                     }}
@@ -492,7 +492,7 @@ export function BuyTicketModal({
               <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block", marginBottom: 2 }}>
                 TRANSFER ACCOUNT ({method.toUpperCase()})
               </span>
-              <p className="mono" style={{ color: "var(--blue-navy)", fontSize: "0.875rem", fontWeight: 800 }}>
+              <p className="mono" style={{ color: "#111827", fontSize: "0.875rem", fontWeight: 800 }}>
                 {isUSD ? (
                   method === "card" ? "Instant Stripe Card Checkout" :
                   method === "paypal" ? "PayPal: payments@rimnalottery.com" :
@@ -523,7 +523,7 @@ export function BuyTicketModal({
         {step === 4 && (
           <div style={{ textAlign: "center", padding: "24px 10px" }}>
             <CheckCircle2 size={44} color="var(--teal)" style={{ margin: "0 auto 12px" }} />
-            <h3 className="display" style={{ fontSize: "1.35rem", color: "var(--blue-navy)", fontWeight: 900, marginBottom: 6 }}>
+            <h3 className="display" style={{ fontSize: "1.35rem", color: "#111827", fontWeight: 900, marginBottom: 6 }}>
               Ticket Confirmed for {currentPool.label}!
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>

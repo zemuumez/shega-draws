@@ -50,7 +50,7 @@ export function LiveBroadcastBanner() {
               LIVE PUBLIC WINNER DRAWING
             </span>
 
-            <h3 className="display" style={{ fontSize: "1.35rem", color: "var(--blue-navy)", fontWeight: 900, lineHeight: 1.2 }}>
+            <h3 className="display" style={{ fontSize: "1.35rem", color: "#111827", fontWeight: 900, lineHeight: 1.2 }}>
               Numbers Drawn Live on Video for All Participants
             </h3>
           </div>

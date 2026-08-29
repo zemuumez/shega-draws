@@ -101,7 +101,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
           {/* Title & Pool Options Display */}
           <div style={{ marginBottom: 14 }}>
-            <h3 className="display" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.45rem)", color: "var(--blue-navy)", lineHeight: 1.2, fontWeight: 800, marginBottom: 4 }}>
+            <h3 className="display" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.45rem)", color: "#111827", lineHeight: 1.2, fontWeight: 800, marginBottom: 4 }}>
               {draw.title || (isUSD ? `$${ticketPrice} USD International Draw` : `${ticketPrice} Birr Multi-Pool Jackpot Draw`)}
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 10 }}>
@@ -122,7 +122,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                     boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
                   }}
                 >
-                  <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", display: "block" }}>
+                  <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "#111827", display: "block" }}>
                     {pool.label}
                   </span>
                   <span className="display" style={{ fontSize: "0.875rem", fontWeight: 800, color: "var(--gold-deep)", display: "block", marginTop: 2 }}>
@@ -136,7 +136,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
           {/* ── Guaranteed Top 10 Winner Prizes ────────────────────────── */}
           <div style={{ background: "#FFFFFF", border: "1px solid var(--gray-line)", borderRadius: 12, padding: "14px 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 6 }}>
-              <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
+              <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "#111827", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
                 <Trophy size={15} color="var(--gold-dark)" /> Guaranteed 10 Winner Prizes ({basePool.pool} Pool)
               </span>
               
@@ -255,7 +255,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
           <span className="mono" style={{ fontSize: "0.6875rem", color: "#2A65E6", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 800 }}>
             {isUSD ? "DIASPORA USD TICKET" : "OFFICIAL RAFFLE TICKET"}
           </span>
-          <div className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, margin: "2px 0 10px" }}>
+          <div className="display" style={{ fontSize: "1.125rem", color: "#111827", fontWeight: 800, margin: "2px 0 10px" }}>
             Rimna Lottery
           </div>
 

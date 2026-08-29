@@ -103,7 +103,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
           >
             <Phone size={22} color="#2A65E6" />
           </div>
-          <h3 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", fontWeight: 900 }}>
+          <h3 className="display" style={{ fontSize: "1.375rem", color: "#111827", fontWeight: 900 }}>
             Contact Customer Support
           </h3>
           <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
@@ -124,7 +124,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              color: "var(--blue-navy)",
+              color: "#111827",
             }}
           >
             <Phone size={16} color="#2A65E6" />
@@ -171,7 +171,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
         ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div>
-              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
                 Your Name
               </label>
               <input
@@ -185,7 +185,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
             </div>
 
             <div>
-              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
                 Phone Number / Telegram Handle
               </label>
               <input
@@ -200,7 +200,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
             </div>
 
             <div>
-              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
                 Message / Inquiring Ticket
               </label>
               <textarea
