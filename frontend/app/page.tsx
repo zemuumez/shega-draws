@@ -218,29 +218,6 @@ export default async function HomePage() {
 
       {/* ── 4. Bottom Testimonials & Newsletter Section ────────── */}
       <TestimonialsNewsletter />
-
-      {/* ── Responsive CSS ── */}
-      <style>{`
-        .hero-section-wrapper {
-          padding: 32px 36px;
-        }
-        .hero-grid-layout {
-          grid-template-columns: 1.2fr 1fr;
-        }
-        @media (max-width: 900px) {
-          .hero-section-wrapper {
-            padding: 20px 16px !important;
-          }
-          .hero-grid-layout {
-            grid-template-columns: 1fr !important;
-          }
-        }
-        @media (max-width: 1024px) {
-          .portal-grid-container {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

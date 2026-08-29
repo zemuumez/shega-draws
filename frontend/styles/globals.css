@@ -367,3 +367,150 @@ h1, h2, h3, h4, h5 {
 .animate-fade {
   animation: fadeIn 300ms ease forwards;
 }
+
+/* ── Responsive Layout & Component Utilities ───────────────────────── */
+.hero-section-wrapper {
+  padding: 32px 36px;
+}
+.hero-grid-layout {
+  grid-template-columns: 1.2fr 1fr;
+}
+
+.jackpot-physical-card {
+  display: grid;
+  grid-template-columns: 1fr 115px;
+}
+.jackpot-ticket-stub {
+  border-left: 2px dashed #CBD5E1;
+}
+
+.ticket-card-container {
+  display: grid;
+  grid-template-columns: 1fr 270px;
+}
+.ticket-body-padding {
+  padding: 26px 28px 22px;
+}
+.ticket-stub-container {
+  background: var(--bg-ticket-stub);
+  border-left: 2px dashed #CBD5E1;
+  padding: 26px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+.mob-punch {
+  display: none !important;
+}
+.desk-punch {
+  display: block !important;
+}
+
+@media (max-width: 1024px) {
+  .portal-grid-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-section-wrapper {
+    padding: 20px 16px !important;
+  }
+  .hero-grid-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .ticket-card-container {
+    grid-template-columns: 1fr !important;
+  }
+  .ticket-body-padding {
+    padding: 18px 16px 16px !important;
+  }
+  .ticket-stub-container {
+    border-left: none !important;
+    border-top: 2px dashed #CBD5E1 !important;
+    padding: 20px 16px !important;
+  }
+  .desk-punch {
+    display: none !important;
+  }
+  .mob-punch {
+    display: block !important;
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: var(--bg-page);
+    border-radius: 50%;
+    border: 1.5px solid #E2E8F0;
+    z-index: 5;
+  }
+}
+
+@media (max-width: 640px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .top-ribbon-hotline {
+    font-size: 0.6875rem !important;
+  }
+  .top-ribbon-telegram {
+    font-size: 0.6875rem !important;
+  }
+  .brand-text {
+    font-size: 0.875rem !important;
+  }
+  .nav-links-desktop {
+    gap: 2px !important;
+  }
+  .nav-links-desktop a {
+    padding: 5px 8px !important;
+    font-size: 0.75rem !important;
+  }
+  .contact-nav-btn {
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .jackpot-physical-card {
+    grid-template-columns: 1fr !important;
+  }
+  .jackpot-ticket-stub {
+    border-left: none !important;
+    border-top: 2px dashed #CBD5E1 !important;
+    flex-direction: row !important;
+    padding: 10px 14px !important;
+  }
+  .jackpot-ticket-stub > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .jackpot-ticket-stub > div:first-child > div {
+    margin-top: 0 !important;
+  }
+  .jackpot-ticket-stub > div:last-child {
+    width: auto !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-links-desktop a span,
+  .nav-links-desktop a {
+    font-size: 0.6875rem !important;
+    padding: 4px 6px !important;
+  }
+  .brand-badge {
+    padding: 4px 8px !important;
+  }
+  .contact-btn-text {
+    display: none;
+  }
+}
+

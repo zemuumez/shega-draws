@@ -295,39 +295,6 @@ export function JackpotCardsSection() {
           })}
         </div>
       </section>
-
-      {/* ── Responsive CSS ── */}
-      <style>{`
-        .jackpot-physical-card {
-          display: grid;
-          grid-template-columns: 1fr 115px;
-        }
-        .jackpot-ticket-stub {
-          border-left: 2px dashed #CBD5E1;
-        }
-        @media (max-width: 480px) {
-          .jackpot-physical-card {
-            grid-template-columns: 1fr !important;
-          }
-          .jackpot-ticket-stub {
-            border-left: none !important;
-            border-top: 2px dashed #CBD5E1 !important;
-            flex-direction: row !important;
-            padding: 10px 14px !important;
-          }
-          .jackpot-ticket-stub > div:first-child {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          .jackpot-ticket-stub > div:first-child > div {
-            margin-top: 0 !important;
-          }
-          .jackpot-ticket-stub > div:last-child {
-            width: auto !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

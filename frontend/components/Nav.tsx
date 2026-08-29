@@ -237,48 +237,6 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           </button>
         </div>
       </nav>
-
-      {/* ── Responsive Styling Rules ── */}
-      <style>{`
-        @media (max-width: 640px) {
-          .hide-on-mobile {
-            display: none !important;
-          }
-          .top-ribbon-hotline {
-            font-size: 0.6875rem !important;
-          }
-          .top-ribbon-telegram {
-            font-size: 0.6875rem !important;
-          }
-          .brand-text {
-            font-size: 0.875rem !important;
-          }
-          .nav-links-desktop {
-            gap: 2px !important;
-          }
-          .nav-links-desktop a {
-            padding: 5px 8px !important;
-            font-size: 0.75rem !important;
-          }
-          .contact-nav-btn {
-            padding: 5px 10px !important;
-            font-size: 0.75rem !important;
-          }
-        }
-        @media (max-width: 400px) {
-          .nav-links-desktop a span,
-          .nav-links-desktop a {
-            font-size: 0.6875rem !important;
-            padding: 4px 6px !important;
-          }
-          .brand-badge {
-            padding: 4px 8px !important;
-          }
-          .contact-btn-text {
-            display: none;
-          }
-        }
-      `}</style>
     </>
   );
 }

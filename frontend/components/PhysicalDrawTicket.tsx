@@ -333,62 +333,6 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
           )}
         </div>
       </div>
-
-      {/* ── Responsive CSS for Desktop & Mobile Layout ───────────────── */}
-      <style>{`
-        .ticket-card-container {
-          display: grid;
-          grid-template-columns: 1fr 270px;
-        }
-        .ticket-body-padding {
-          padding: 26px 28px 22px;
-        }
-        .ticket-stub-container {
-          background: var(--bg-ticket-stub);
-          border-left: 2px dashed #CBD5E1;
-          padding: 26px 18px;
-          display: flex;
-          flex-direction: column;
-          justifyContent: space-between;
-          align-items: center;
-          text-align: center;
-          position: relative;
-        }
-        .mob-punch {
-          display: none !important;
-        }
-        .desk-punch {
-          display: block !important;
-        }
-
-        /* Mobile layout styling */
-        @media (max-width: 768px) {
-          .ticket-card-container {
-            grid-template-columns: 1fr !important;
-          }
-          .ticket-body-padding {
-            padding: 18px 16px 16px !important;
-          }
-          .ticket-stub-container {
-            border-left: none !important;
-            border-top: 2px dashed #CBD5E1 !important;
-            padding: 20px 16px !important;
-          }
-          .desk-punch {
-            display: none !important;
-          }
-          .mob-punch {
-            display: block !important;
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: var(--bg-page);
-            border-radius: 50%;
-            border: 1.5px solid #E2E8F0;
-            z-index: 5;
-          }
-        }
-      `}</style>
     </div>
   );
 }
