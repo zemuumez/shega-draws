@@ -7,13 +7,13 @@ import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { MobileBottomBar } from "@/components/ui/MobileBottomBar";
 
 export const metadata: Metadata = {
-  title: { default: "PrimeDraws — Cryptographic Digital Lottery & Raffles", template: "%s · PrimeDraws" },
+  title: { default: "Rimna Digital Lottery — Cryptographic Digital Lottery & Raffles", template: "%s · Rimna Digital Lottery" },
   description: "A transparent, cryptographically verifiable digital raffle platform. Pick a number, pay securely, and verify the outcome yourself.",
-  keywords: ["lottery", "raffle", "digital draw", "Ethiopia", "Telebirr", "CBE Birr", "PrimeDraws", "provably fair raffle"],
+  keywords: ["lottery", "raffle", "digital draw", "Ethiopia", "Telebirr", "CBE Birr", "Rimna Digital Lottery", "provably fair raffle"],
   openGraph: {
     type: "website",
-    siteName: "PrimeDraws",
-    title: "PrimeDraws — Provably Fair Digital Lottery",
+    siteName: "Rimna Digital Lottery",
+    title: "Rimna Digital Lottery — Provably Fair Digital Lottery",
     description: "Pick your number, pay via Telebirr or CBE, and verify the cryptographic seed on draw day.",
   },
 };

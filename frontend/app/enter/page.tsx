@@ -350,9 +350,9 @@ function EnterWizard() {
           {/* Payment Method Selector */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
             {[
-              { id: "telebirr", name: "Telebirr",      accountDetail: "0911 22 33 44 (Prime Draws PLC)" },
-              { id: "cbebirr",  name: "CBE Birr",      accountDetail: "0911 22 33 44 (Prime Draws PLC)" },
-              { id: "bank",     name: "Bank Transfer", accountDetail: "CBE Account: 1000456789012 (Prime Draws PLC)" },
+              { id: "telebirr", name: "Telebirr",      accountDetail: "0911 22 33 44 (Rimna Digital Lottery PLC)" },
+              { id: "cbebirr",  name: "CBE Birr",      accountDetail: "0911 22 33 44 (Rimna Digital Lottery PLC)" },
+              { id: "bank",     name: "Bank Transfer", accountDetail: "CBE Account: 1000456789012 (Rimna Digital Lottery PLC)" },
             ].map((m) => (
               <button
                 key={m.id}
@@ -387,9 +387,9 @@ function EnterWizard() {
               TRANSFER DETAILS ({method.toUpperCase()})
             </span>
             <p className="mono" style={{ color: "var(--blue-navy)", fontSize: "0.9375rem", fontWeight: 800 }}>
-              {method === "telebirr" ? "Telebirr: 0911 22 33 44 (Prime Draws PLC)" :
-               method === "cbebirr"  ? "CBE Birr: 0911 22 33 44 (Prime Draws PLC)" :
-                                       "CBE Bank: 1000456789012 (Prime Draws PLC)"}
+              {method === "telebirr" ? "Telebirr: 0911 22 33 44 (Rimna Digital Lottery PLC)" :
+               method === "cbebirr"  ? "CBE Birr: 0911 22 33 44 (Rimna Digital Lottery PLC)" :
+                                       "CBE Bank: 1000456789012 (Rimna Digital Lottery PLC)"}
             </p>
           </div>
 

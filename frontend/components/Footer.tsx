@@ -90,10 +90,10 @@ export function Footer() {
                 <Phone size={14} color="var(--blue-navy)" /> +251 911 000 000 / 0912 345 678
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Mail size={14} color="var(--blue-navy)" /> support@primedraws.com
+                <Mail size={14} color="var(--blue-navy)" /> support@rimnalottery.com
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Send size={14} color="var(--blue-royal)" /> Official Telegram: @PrimeDrawsOfficial
+                <Send size={14} color="#2A65E6" /> Official Telegram: @RimnaLotteryOfficial
               </div>
             </div>
           </div>

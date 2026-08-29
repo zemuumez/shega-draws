@@ -270,7 +270,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             OFFICIAL RAFFLE TICKET
           </span>
           <div className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, margin: "2px 0 10px" }}>
-            PrimeDraws
+            Rimna Lottery
           </div>
 
           {/* Multi-Pool Tag on Stub */}
@@ -300,7 +300,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
           {/* Barcode Graphic */}
           <div className="barcode-pattern" style={{ marginBottom: 6 }} />
           <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)" }}>
-            PD-{draw.draw_id}
+            RDL-{draw.draw_id}
           </span>
         </div>
 

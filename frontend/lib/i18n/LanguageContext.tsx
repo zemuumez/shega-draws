@@ -20,7 +20,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLangState] = useState<Language>("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem("primedraws_lang") as Language | null;
+    const saved = localStorage.getItem("rimnalottery_lang") as Language | null;
     if (saved && (saved === "en" || saved === "am" || saved === "om")) {
       setLangState(saved);
     }
@@ -28,7 +28,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLangState(lang);
-    localStorage.setItem("primedraws_lang", lang);
+    localStorage.setItem("rimnalottery_lang", lang);
   };
 
   const t = translations[language] ?? translations.en;

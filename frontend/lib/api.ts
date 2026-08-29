@@ -1,8 +1,8 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
 // ── Token management ──────────────────────────────────────────────────
-const TOKEN_KEY = "primedraws_access_token";
-const USER_KEY  = "primedraws_user";
+const TOKEN_KEY = "rimnalottery_access_token";
+const USER_KEY  = "rimnalottery_user";
 
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;

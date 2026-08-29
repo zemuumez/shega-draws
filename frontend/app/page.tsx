@@ -19,7 +19,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { FAQSection } from "@/components/FAQSection";
 
 export const metadata: Metadata = {
-  title: "PrimeDraws — Provably Fair Digital Raffle & Lottery",
+  title: "Rimna Digital Lottery — Provably Fair Digital Raffle & Lottery",
   description: "Official verified multi-pool digital raffle tickets. Pick your lucky number, win guaranteed top 10 cash prizes, and audit results instantly.",
 };
 
@@ -154,7 +154,7 @@ export default async function HomePage() {
             <div style={{ position: "relative", width: "100%", height: 280 }}>
               <Image
                 src="/images/hero-lottery.jpg"
-                alt="PrimeDraws Gold and Blue Lottery Jackpot"
+                alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
                 fill
                 priority
                 style={{ objectFit: "cover" }}
