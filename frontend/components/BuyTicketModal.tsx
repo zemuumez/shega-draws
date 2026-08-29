@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Ticket, Users, Tag, ShieldCheck, Globe, Trophy } from "lucide-react";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
@@ -23,6 +24,11 @@ export function BuyTicketModal({
   initialPrice = 100,
   initialDrawId = "RDL-ACTIVE",
 }: BuyTicketModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const currency: Currency = initialCurrency;
   const ticketPrice: number = initialPrice;
   const drawId: string = initialDrawId;
@@ -111,9 +117,9 @@ export function BuyTicketModal({
     }
   }
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -571,6 +577,7 @@ export function BuyTicketModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

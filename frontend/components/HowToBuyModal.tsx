@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, ChevronRight, ChevronLeft, Ticket, Users, UserCheck, CreditCard, CheckCircle2, Play, Pause } from "lucide-react";
-import Link from "next/link";
+import { createPortal } from "react-dom";
+import { X, ChevronRight, ChevronLeft, Ticket, Users, UserCheck, CreditCard } from "lucide-react";
 
 interface HowToBuyModalProps {
   isOpen: boolean;
@@ -53,8 +53,13 @@ const STEPS = [
 ];
 
 export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auto-advance slides every 3.5 seconds when open
   useEffect(() => {
@@ -65,23 +70,24 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
     return () => clearInterval(interval);
   }, [isOpen, isAutoPlaying]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const stepData = STEPS[currentStep];
   const StepIcon = stepData.icon;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(12, 38, 102, 0.7)",
-        backdropFilter: "blur(6px)",
+        backgroundColor: "rgba(10, 25, 59, 0.75)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
-        zIndex: 9999,
+        zIndex: 99999,
       }}
       onClick={onClose}
     >
@@ -92,7 +98,7 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
           borderRadius: "20px",
           width: "100%",
           maxWidth: 520,
-          padding: "32px 28px 26px",
+          padding: "clamp(20px, 4vw, 32px)",
           position: "relative",
           boxShadow: "0 24px 48px -12px rgba(0,0,0,0.35)",
           border: "2px solid #FDE047",
@@ -107,8 +113,8 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
           onClick={onClose}
           style={{
             position: "absolute",
-            top: 16,
-            right: 16,
+            top: 14,
+            right: 14,
             background: "#F1F5F9",
             border: "none",
             borderRadius: "50%",
@@ -124,18 +130,40 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
           <X size={18} />
         </button>
 
-        {/* Modal Top Header */}
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <span className="badge badge-gold" style={{ marginBottom: 6, fontSize: "0.75rem" }}>
-            📖 SIMPLE 4-STEP GUIDE
-          </span>
-          <h3 className="display" style={{ fontSize: "1.45rem", color: "var(--blue-navy)", fontWeight: 900 }}>
-            How to Buy a Ticket
+        {/* Modal Header with Progress Pills */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span
+              style={{
+                background: "var(--blue-bg)",
+                color: "#2A65E6",
+                border: "1px solid var(--blue-border)",
+                padding: "3px 10px",
+                borderRadius: "12px",
+                fontSize: "0.6875rem",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.4px",
+              }}
+            >
+              Step-by-Step Guide
+            </span>
+
+            <span className="mono" style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 700 }}>
+              Step {currentStep + 1} of {STEPS.length}
+            </span>
+          </div>
+
+          <h3 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", fontWeight: 900, lineHeight: 1.2 }}>
+            How to Buy Your Lottery Ticket
           </h3>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginTop: 2 }}>
+            Follow these 4 simple steps to secure your lucky numbers.
+          </p>
         </div>
 
-        {/* Step Progress Indicators */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+        {/* 4 Step Progress Indicators */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 22 }}>
           {STEPS.map((s, idx) => (
             <button
               key={s.stepNum}
@@ -144,9 +172,9 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
               style={{
                 flex: 1,
                 height: 6,
-                borderRadius: 6,
-                background: idx === currentStep ? "#2A65E6" : idx < currentStep ? "#93C5FD" : "#E2E8F0",
+                borderRadius: 4,
                 border: "none",
+                background: idx === currentStep ? "#2A65E6" : idx < currentStep ? "var(--teal)" : "#E2E8F0",
                 cursor: "pointer",
                 transition: "all 300ms ease",
               }}
@@ -154,67 +182,71 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
           ))}
         </div>
 
-        {/* Active Step Content Slide */}
+        {/* Active Step Content Card */}
         <div
           style={{
             background: stepData.bg,
             border: `1.5px solid ${stepData.border}`,
-            borderRadius: "16px",
-            padding: "24px 20px",
-            textAlign: "center",
-            marginBottom: 24,
-            minHeight: 210,
+            borderRadius: "14px",
+            padding: "20px 22px",
+            marginBottom: 22,
+            minHeight: 180,
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "space-between",
           }}
         >
-          <div
-            style={{
-              width: 54,
-              height: 54,
-              borderRadius: "50%",
-              background: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: `0 4px 12px ${stepData.border}`,
-              marginBottom: 12,
-            }}
-          >
-            <StepIcon size={26} color={stepData.color} />
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  background: "#FFFFFF",
+                  border: `1.5px solid ${stepData.border}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
+                }}
+              >
+                <StepIcon size={18} color={stepData.color} />
+              </div>
+              <div>
+                <span className="mono" style={{ fontSize: "0.6875rem", color: stepData.color, fontWeight: 800, textTransform: "uppercase", display: "block" }}>
+                  Step {stepData.stepNum}
+                </span>
+                <h4 className="display" style={{ fontSize: "1.1rem", color: "var(--blue-navy)", fontWeight: 800, lineHeight: 1.2 }}>
+                  {stepData.title}
+                </h4>
+              </div>
+            </div>
+
+            <p style={{ color: "var(--blue-navy)", fontSize: "0.875rem", lineHeight: 1.55 }}>
+              {stepData.desc}
+            </p>
           </div>
 
-          <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: stepData.color, textTransform: "uppercase", marginBottom: 4 }}>
-            STEP {stepData.stepNum} OF 4
-          </span>
-
-          <h4 className="display" style={{ fontSize: "1.2rem", color: "var(--blue-navy)", fontWeight: 900, marginBottom: 8 }}>
-            {stepData.title}
-          </h4>
-
-          <p style={{ color: "var(--text-main)", fontSize: "0.875rem", lineHeight: 1.5, maxWidth: 420 }}>
-            {stepData.desc}
-          </p>
-
-          <span
+          <div
             style={{
-              marginTop: 10,
-              fontSize: "0.75rem",
-              fontWeight: 800,
-              color: stepData.color,
-              background: "#FFFFFF",
-              padding: "4px 10px",
-              borderRadius: "12px",
-              border: `1px solid ${stepData.border}`,
+              marginTop: 12,
+              background: "rgba(255, 255, 255, 0.8)",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              alignSelf: "flex-start",
             }}
           >
-            ✓ {stepData.highlight}
-          </span>
+            <span style={{ fontSize: "0.75rem", fontWeight: 800, color: stepData.color }}>
+              ✓ {stepData.highlight}
+            </span>
+          </div>
         </div>
 
-        {/* Modal Controls & CTA */}
+        {/* Modal Controls */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", gap: 8 }}>
             <button
@@ -237,16 +269,17 @@ export function HowToBuyModal({ isOpen, onClose }: HowToBuyModalProps) {
             </button>
           </div>
 
-          <Link
-            href="/enter"
+          <button
+            type="button"
             onClick={onClose}
             className="btn-base btn-primary"
             style={{ padding: "10px 20px", fontSize: "0.875rem", fontWeight: 800 }}
           >
-            <Ticket size={16} /> Buy Ticket Now
-          </Link>
+            <Ticket size={16} /> Got It & Buy Ticket
+          </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

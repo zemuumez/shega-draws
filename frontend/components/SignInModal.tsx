@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Lock, Phone, User, Loader2, CheckCircle2, ShieldCheck, Ticket } from "lucide-react";
 import { loginPlayer, registerPlayer, setAccessToken, setUser, type StoredUser } from "@/lib/api";
 
@@ -11,6 +12,7 @@ interface SignInModalProps {
 }
 
 export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -18,7 +20,11 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,18 +61,19 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(12, 38, 102, 0.65)",
-        backdropFilter: "blur(6px)",
+        backgroundColor: "rgba(10, 25, 59, 0.75)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
-        zIndex: 9999,
+        zIndex: 99999,
       }}
       onClick={onClose}
     >
@@ -74,12 +81,12 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
         className="card-base animate-fade"
         style={{
           background: "#FFFFFF",
-          borderRadius: "var(--radius-lg)",
+          borderRadius: "20px",
           width: "100%",
           maxWidth: 420,
-          padding: "28px 24px",
+          padding: "clamp(20px, 4vw, 32px)",
           position: "relative",
-          boxShadow: "0 20px 40px -10px rgba(0,0,0,0.3)",
+          boxShadow: "0 24px 48px -12px rgba(0,0,0,0.35)",
           border: "2px solid #FDE047",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -90,8 +97,8 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
           onClick={onClose}
           style={{
             position: "absolute",
-            top: 16,
-            right: 16,
+            top: 14,
+            right: 14,
             background: "#F1F5F9",
             border: "none",
             borderRadius: "50%",
@@ -111,43 +118,42 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <div
             style={{
-              width: 52,
-              height: 52,
+              width: 48,
+              height: 48,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
+              background: "linear-gradient(135deg, #FEF9C3 0%, #FDE047 100%)",
+              border: "1.5px solid #EAB308",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 12px",
-              boxShadow: "0 4px 14px rgba(234, 179, 8, 0.4)",
+              margin: "0 auto 10px",
             }}
           >
-            <Ticket size={26} color="#0C2666" />
+            <Ticket size={24} color="#0C2666" />
           </div>
-          <h2 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 4 }}>
-            {isRegistering ? "Create Player Account" : "Sign In to Rimna"}
-          </h2>
-          <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
-            Access your purchased tickets, track draw outcomes, and claim cash payouts.
+          <h3 className="display" style={{ fontSize: "1.375rem", color: "var(--blue-navy)", fontWeight: 900 }}>
+            {isRegistering ? "Create Player Account" : "Sign In to Rimna Lottery"}
+          </h3>
+          <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", marginTop: 2 }}>
+            {isRegistering ? "Register to track your purchased tickets & payouts" : "Enter your registered phone number to access My Tickets"}
           </p>
         </div>
 
         {success ? (
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <CheckCircle2 size={40} color="var(--teal)" style={{ margin: "0 auto 10px" }} />
-            <p style={{ fontWeight: 800, color: "var(--blue-navy)", fontSize: "1.05rem" }}>
-              Successfully Signed In!
-            </p>
+          <div style={{ textAlign: "center", padding: "20px 0", color: "var(--teal-dark)" }}>
+            <CheckCircle2 size={36} color="var(--teal)" style={{ margin: "0 auto 8px" }} />
+            <h4 style={{ fontSize: "1.125rem", fontWeight: 800 }}>Welcome!</h4>
+            <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>Redirecting to your tickets dashboard...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {isRegistering && (
               <div>
-                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
                   Full Name
                 </label>
                 <div style={{ position: "relative" }}>
-                  <User size={16} color="var(--text-subtle)" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+                  <User size={16} color="var(--text-subtle)" style={{ position: "absolute", left: 12, top: 12 }} />
                   <input
                     type="text"
                     className="input-base"
@@ -161,15 +167,15 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
             )}
 
             <div>
-              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                Phone Number / Mobile Account
+              <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
+                Phone Number / Telegram
               </label>
               <div style={{ position: "relative" }}>
-                <Phone size={16} color="var(--text-subtle)" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+                <Phone size={16} color="var(--text-subtle)" style={{ position: "absolute", left: 12, top: 12 }} />
                 <input
-                  type="tel"
+                  type="text"
                   className="input-base"
-                  placeholder="+251 9xx xxx xxx or +1 555 123 4567"
+                  placeholder="+251 9xx xxx xxx or international number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
@@ -213,6 +219,7 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

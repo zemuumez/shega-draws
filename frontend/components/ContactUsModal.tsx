@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, Phone, Mail, Send, MapPin, CheckCircle2, MessageSquare, Clock } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { X, Phone, Send, CheckCircle2 } from "lucide-react";
 
 interface ContactUsModalProps {
   isOpen: boolean;
@@ -9,12 +10,17 @@ interface ContactUsModalProps {
 }
 
 export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,18 +33,19 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(12, 38, 102, 0.7)",
-        backdropFilter: "blur(6px)",
+        backgroundColor: "rgba(10, 25, 59, 0.75)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
-        zIndex: 9999,
+        zIndex: 99999,
       }}
       onClick={onClose}
     >
@@ -49,7 +56,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
           borderRadius: "20px",
           width: "100%",
           maxWidth: 480,
-          padding: "28px 24px",
+          padding: "clamp(20px, 4vw, 28px)",
           position: "relative",
           boxShadow: "0 24px 48px -12px rgba(0,0,0,0.35)",
           border: "2px solid #FDE047",
@@ -62,8 +69,8 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
           onClick={onClose}
           style={{
             position: "absolute",
-            top: 16,
-            right: 16,
+            top: 14,
+            right: 14,
             background: "#F1F5F9",
             border: "none",
             borderRadius: "50%",
@@ -217,6 +224,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
