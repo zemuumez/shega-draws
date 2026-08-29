@@ -15,12 +15,12 @@ interface FAQItem {
 
 const FAQ_ITEMS: FAQItem[] = [
   {
-    qEn: "How do I know the winning numbers are fair and untampered?",
-    qAm: "የአሸናፊው ቁጥር ፍትሃዊና ያልተጭበረበረ መሆኑን እንዴት ማወቅ እችላለሁ?",
-    qOm: "Lakkoofsi mo'ate sirrii fi kan hin jijjiiramne ta'uu akkamittiin beeka?",
-    aEn: "Before tickets are sold, we lock and publish a secret mathematical SHA-256 fingerprint. On draw day, the secret seed is revealed so anyone can verify on their phone or browser that the outcome was 100% predetermined.",
-    aAm: "ቲኬት ሽያጭ ከመጀመሩ በፊት የSHA-256 የጣት አሻራ ኮድ በይፋ እናትማለን። በእጣው ቀን ሚስጥራዊው ኮድ ይፋ ሲደረግ በራስዎ ስልክ ወይም ብሮውዘር ላይ ትክክለኛነቱን ማረጋገጥ ይችላሉ።",
-    aOm: "Duraan dursinee mallattoo SHA-256 ifatti baafna. Guyyaa carraa immoo koodichi ni ifooma; ofumaan bu'aa isaa mirkaneeffachuu dandeessu.",
+    qEn: "How do I know the winning numbers are fair and transparent?",
+    qAm: "የአሸናፊው ቁጥር ፍትሃዊና ግልጽ መሆኑን እንዴት ማወቅ እችላለሁ?",
+    qOm: "Lakkoofsi mo'ate sirrii fi iftoomina qabaachuu akkamittiin beeka?",
+    aEn: "All winning numbers are drawn live on video stream by the lottery founders during our scheduled public broadcast. Every drawn ticket is shown on camera in real time so all participants can watch and confirm live.",
+    aAm: "ሁሉም አሸናፊ ቁጥሮች በይፋዊ የቀጥታ የቪዲዮ ስርጭት ላይ በእጣ አውጪዎች ፊት ለፊት ይወጣሉ፤ እያንዳንዱ አሸናፊ ቲኬት በካሜራ ፊት ለሁሉም ተመልካች በግልጽ ይታያል።",
+    aOm: "Lakkoofsi mo'ate hundi tamsaasa viidiyoo kallattiin baafama; tikkeettiin mo'ate hundi kaameraa fuulduratti ifatti agarsiifama.",
   },
   {
     qEn: "How much does a ticket cost, and how many tickets are in a draw?",

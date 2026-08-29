@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Trophy, Users, Award, Lock, Sparkles } from "lucide-react";
+import { Trophy, Users, Award, Tv, Send, CheckCircle2 } from "lucide-react";
 
 export function WhyRimnaLottery() {
   return (
@@ -21,11 +21,11 @@ export function WhyRimnaLottery() {
 
       <div style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.7, display: "flex", flexDirection: "column", gap: 12 }}>
         <p>
-          Traditional lotteries rely on centralized black-box draws where participants have no ability to inspect or verify how numbers were drawn. <strong>Rimna Digital Lottery</strong> was built on a cryptographic foundation where <strong>provable fairness</strong> is guaranteed by mathematics rather than blind trust.
+          Unlike automated lotteries with hidden black-box systems, <strong>Rimna Digital Lottery</strong> is built on genuine public transparency. All winning tickets are drawn live on video by the company founders during our scheduled public stream, where every selected number is held up and announced in real time for everyone to see.
         </p>
 
         <p>
-          Before any ticket sales commence, the system generates a 256-bit random seed and publishes its <strong>SHA-256 cryptographic hash</strong> publicly. Because a cryptographic hash cannot be reversed or modified after publication, the draw outcome is mathematically locked in advance. Once the draw closes, the secret seed is revealed so any participant can re-run the hash algorithm in their browser to verify 100% genuine fairness.
+          Every ticket tier operates with fixed, capped participant capacities (1,000, 2,000, 3,000, or 5,000 people). This guarantees that your odds of winning remain high, and <strong>every single draw awards guaranteed cash prizes to the Top 10 winning ranks</strong> without rollover delays.
         </p>
 
         {/* Feature Grid */}
@@ -41,10 +41,10 @@ export function WhyRimnaLottery() {
 
           <div style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", padding: "12px 14px", borderRadius: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#2A65E6", fontWeight: 800, fontSize: "0.8125rem", marginBottom: 4 }}>
-              <ShieldCheck size={15} /> SHA-256 Commit-Reveal
+              <Tv size={15} /> 100% Live Streamed Draws
             </div>
             <span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>
-              Cryptographic verification ensures zero administrative tampering.
+              Numbers drawn live on video broadcast so every participant sees the real outcome.
             </span>
           </div>
 
@@ -53,7 +53,7 @@ export function WhyRimnaLottery() {
               <Users size={15} /> Fixed Pool Sizes
             </div>
             <span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>
-              Pools are capped at 1K, 2K, 3K, and 5K tickets for transparent winning odds.
+              Pools are capped at 1K, 2K, 3K, and 5K tickets for transparent, fair odds.
             </span>
           </div>
         </div>

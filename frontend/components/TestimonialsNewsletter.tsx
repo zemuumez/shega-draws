@@ -13,7 +13,7 @@ export function TestimonialsNewsletter() {
       name: "Tewodros Kassahun",
       location: "Addis Ababa",
       prize: "80,000 ETB (1st Place Winner)",
-      quote: "I verified my SHA-256 hash immediately after the draw. The CBE transfer arrived in my account in less than 20 minutes!",
+      quote: "I watched the live video broadcast when my number was drawn! The CBE transfer arrived in my account in less than 20 minutes!",
     },
     {
       name: "Helen Mengistu",

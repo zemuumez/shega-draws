@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Ticket, ShieldCheck, Sparkles, Trophy, Clock, CheckCircle2, ArrowRight, Zap, Users, Gift, Globe } from "lucide-react";
+import { Ticket, Tv, Sparkles, Trophy, Clock, CheckCircle2, ArrowRight, Zap, Users, Gift, Globe } from "lucide-react";
 import { sanityClient } from "@/lib/sanity/client";
 import {
   ACTIVE_DRAW_QUERY,
@@ -13,15 +13,15 @@ import {
 import { getActiveDraw, listDraws } from "@/lib/api";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { JackpotCardsSection } from "@/components/JackpotCardsSection";
-import { InteractiveQuickPlay } from "@/components/InteractiveQuickPlay";
+import { LiveBroadcastBanner } from "@/components/LiveBroadcastBanner";
 import { DrawsExplorer } from "@/components/DrawsExplorer";
 import { SidebarWidgets } from "@/components/SidebarWidgets";
 import { WhyRimnaLottery } from "@/components/WhyRimnaLottery";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 
 export const metadata: Metadata = {
-  title: "Rimna Digital Lottery — Provably Fair Digital Raffle & Lottery",
-  description: "Official verified multi-pool digital raffle tickets. Pick your lucky number, win guaranteed top 10 cash prizes, and audit results instantly.",
+  title: "Rimna Digital Lottery — Transparent Live Digital Raffle & Lottery",
+  description: "Official verified multi-pool digital raffle tickets. Pick your lucky number, win guaranteed top 10 cash prizes, and watch winning numbers drawn live on broadcast.",
 };
 
 export const revalidate = 30;
@@ -39,11 +39,14 @@ export default async function HomePage() {
   const activeDraw  = activeDrawApiRes.status === "fulfilled" ? activeDrawApiRes.value : null;
   const allDraws    = allDrawsApiRes.status === "fulfilled" && allDrawsApiRes.value ? allDrawsApiRes.value : [];
 
-  const deadline = cmsDraw?.deadline ?? activeDraw?.deadline ?? allDraws[0]?.deadline ?? "2026-09-01T18:00:00Z";
+  const currentApprovedDraw = activeDraw || allDraws.find((d) => d.status === "open") || allDraws[0];
+  const deadline = cmsDraw?.deadline ?? currentApprovedDraw?.deadline ?? "2026-09-01T18:00:00Z";
+  const activeTicketPrice = currentApprovedDraw?.ticket_price || 100;
+  const activeCurrency = currentApprovedDraw?.currency || "ETB";
 
   return (
     <div className="container" style={{ paddingTop: 16 }}>
-      {/* ── 1. Classic Grand Hero Banner (Matching Reference Image Style) ── */}
+      {/* ── 1. Current Active Admin-Approved Draw Hero Banner ── */}
       <section
         style={{
           background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 50%, #FEF9C3 100%)",
@@ -62,7 +65,7 @@ export default async function HomePage() {
             alignItems: "center",
           }}
         >
-          {/* Left Column: Big Red Jackpot Headline & Buy CTA */}
+          {/* Left Column: Headline, Active Draw Info & CTA */}
           <div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <span
@@ -78,38 +81,38 @@ export default async function HomePage() {
                   boxShadow: "0 2px 6px rgba(185, 28, 28, 0.35)",
                 }}
               >
-                ★ OFFICIAL DIGITAL LOTTERY · PROVABLY FAIR
+                ★ OFFICIAL LIVE DRAW · {currentApprovedDraw?.draw_id || "RDL-ACTIVE"}
               </span>
             </div>
 
-            {/* Huge Jackpot Amount (PowerBall style) */}
+            {/* Huge Jackpot Display */}
             <div
               className="display"
               style={{
-                fontSize: "clamp(2.5rem, 5.5vw, 4rem)",
+                fontSize: "clamp(2.3rem, 5vw, 3.75rem)",
                 color: "#DC2626",
                 lineHeight: 1.05,
                 fontWeight: 900,
                 letterSpacing: "-1px",
-                margin: "4px 0 10px",
+                margin: "4px 0 8px",
                 textShadow: "0 2px 4px rgba(0,0,0,0.06)",
               }}
             >
-              $1,250,000
+              {currentApprovedDraw?.total_prize_value || "$1,250,000 / 1,000,000 ETB"}
             </div>
 
-            <div className="mono" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 18 }}>
-              + 1,000,000 ETB Top Holiday Jackpot Pools
-            </div>
+            <h2 className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 16 }}>
+              {currentApprovedDraw?.title || "100 Birr Ticket · 10 Guaranteed Cash Winners"}
+            </h2>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 22 }}>
               <span className="mono" style={{ fontSize: "0.875rem", color: "var(--text-muted)", fontWeight: 700 }}>
-                Next Draw: <strong>Fri, Aug 31 6:00 PM</strong>
+                📅 Live Broadcast: <strong>Aug 31, 2026</strong>
               </span>
 
               {/* Big Golden BUY NOW Button */}
               <Link
-                href="/enter"
+                href={`/enter?draw=${currentApprovedDraw?.id}&currency=${activeCurrency}&price=${activeTicketPrice}`}
                 className="btn-base"
                 style={{
                   background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
@@ -135,7 +138,7 @@ export default async function HomePage() {
                 <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <ShieldCheck size={15} color="#2A65E6" /> SHA-256 Verified
+                <Tv size={15} color="#DC2626" /> Drawn Live on Stream
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <Globe size={15} color="var(--gold-deep)" /> ETB & Diaspora USD ($25+)
@@ -143,7 +146,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Right Column: Visual 3D Hero Image & Countdown */}
+          {/* Right Column: 3D Hero Graphic & Countdown */}
           <div style={{ position: "relative" }}>
             <div
               className="card-base"
@@ -176,7 +179,7 @@ export default async function HomePage() {
                     <Trophy size={13} color="var(--gold-dark)" /> 100% Guaranteed Cash Payouts
                   </span>
                   <span className="mono" style={{ fontSize: "0.75rem", color: "#FFFFFF", fontWeight: 700 }}>
-                    Live SHA-256 Seed
+                    Live Video Draw
                   </span>
                 </div>
               </div>
@@ -190,10 +193,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 2. Triple Scalloped Golden Jackpot Cards (Diaspora & Local) ── */}
+      {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
       <JackpotCardsSection />
 
-      {/* ── 3. Main 2-Column Portal Section (Interactive & Sidebar) ── */}
+      {/* ── 3. Main 2-Column Portal Section (Live Broadcast & Draws) ── */}
       <div
         style={{
           display: "grid",
@@ -203,15 +206,15 @@ export default async function HomePage() {
         }}
         className="portal-grid-container"
       >
-        {/* Left Column: Quick Play + Draws Catalog + Why Rimna */}
+        {/* Left Column: Live Stream Banner + Draws Catalog + Why Rimna */}
         <div>
-          {/* Interactive Step 1 & 2 Number Picker Box */}
-          <InteractiveQuickPlay />
+          {/* Live Broadcast & Stream Information */}
+          <LiveBroadcastBanner />
 
           {/* Full Draws Catalog (with ETB / USD Currency Switcher) */}
           <DrawsExplorer initialDraws={allDraws} />
 
-          {/* Why Rimna Lottery Editorial Section */}
+          {/* Why Rimna Lottery Public Transparency Section */}
           <WhyRimnaLottery />
         </div>
 

@@ -72,7 +72,7 @@ export function Footer() {
                 <Users size={14} color="var(--blue-royal)" /> 1K, 2K, 3K, and 5K Ticket Capacities
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <ShieldCheck size={14} color="var(--teal)" /> SHA-256 Commit-Reveal Protocol
+                <ShieldCheck size={14} color="var(--teal)" /> 100% Live Video Broadcast Draws
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Award size={14} color="var(--gold-dark)" /> 10-Tier Fixed Guaranteed Prizes

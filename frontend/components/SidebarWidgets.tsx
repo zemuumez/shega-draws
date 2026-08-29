@@ -121,7 +121,7 @@ export function SidebarWidgets() {
             className="btn-base btn-secondary"
             style={{ fontSize: "0.75rem", padding: "8px 12px", width: "100%", justifyContent: "center", marginTop: 4 }}
           >
-            <ShieldCheck size={14} /> Verify All Cryptographic Seeds
+            <Trophy size={14} /> View All Live Draw Results
           </Link>
         </div>
       </div>
