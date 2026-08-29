@@ -3,16 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Ticket, ListChecks, ShieldCheck, User, LogIn, LogOut, HelpCircle, Phone, Send, Globe } from "lucide-react";
+import { Home, Ticket, ListChecks, ShieldCheck, User, LogIn, Phone, Send, MessageSquare } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 import { getUser, logout, type StoredUser } from "@/lib/api";
 import { SignInModal } from "./SignInModal";
+import { ContactUsModal } from "./ContactUsModal";
 
 export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const [currentUser, setCurrentUser] = useState<StoredUser | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   useEffect(() => {
     setCurrentUser(getUser());
@@ -45,6 +47,11 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         isOpen={isSignInOpen}
         onClose={() => setIsSignInOpen(false)}
         onSuccess={(u) => setCurrentUser(u)}
+      />
+
+      <ContactUsModal
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
       />
 
       {/* ── Top Utility Header Ribbon (Classic Portal Style) ─── */}
@@ -82,7 +89,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           {currentUser ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className="mono" style={{ color: "var(--blue-navy)", fontWeight: 800 }}>
-                👤 {currentUser.name || currentUser.phone}
+                {currentUser.name || currentUser.phone}
               </span>
               <button
                 type="button"
@@ -114,7 +121,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         </div>
       </div>
 
-      {/* ── Main Navigation Bar (With Center Gold Ribbon Badge) ───── */}
+      {/* ── Main Navigation Bar ───── */}
       <nav
         aria-label="Main navigation"
         style={{
@@ -192,44 +199,29 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           })}
         </div>
 
-        {/* Right side: Sign In Button (Replaced Buy Ticket CTA) */}
+        {/* Right side: Contact Us CTA */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {currentUser ? (
-            <Link
-              href="/entries"
-              className="btn-base"
-              style={{
-                background: "var(--blue-bg)",
-                border: "1.5px solid #2A65E6",
-                color: "#2A65E6",
-                padding: "8px 16px",
-                fontSize: "0.8125rem",
-                fontWeight: 800,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                borderRadius: 8,
-              }}
-            >
-              <Ticket size={15} /> My Tickets
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsSignInOpen(true)}
-              className="btn-base btn-primary"
-              style={{
-                padding: "9px 22px",
-                fontSize: "0.875rem",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                fontWeight: 800,
-              }}
-            >
-              <User size={16} /> Sign In
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setIsContactOpen(true)}
+            className="btn-base"
+            style={{
+              background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)",
+              color: "#0C2666",
+              border: "1px solid #FEF08A",
+              padding: "8px 20px",
+              fontSize: "0.875rem",
+              fontWeight: 900,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              borderRadius: 8,
+              boxShadow: "0 2px 8px rgba(234, 179, 8, 0.35)",
+              cursor: "pointer",
+            }}
+          >
+            <Phone size={15} /> Contact Us
+          </button>
         </div>
       </nav>
 

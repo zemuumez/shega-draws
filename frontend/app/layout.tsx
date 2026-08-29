@@ -4,7 +4,6 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
-import { MobileBottomBar } from "@/components/ui/MobileBottomBar";
 
 export const metadata: Metadata = {
   title: { default: "Rimna Digital Lottery — Cryptographic Digital Lottery & Raffles", template: "%s · Rimna Digital Lottery" },
@@ -33,7 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main id="main-content" className="page-content">
             {children}
           </main>
-          <MobileBottomBar />
           <Footer />
         </LanguageProvider>
       </body>
