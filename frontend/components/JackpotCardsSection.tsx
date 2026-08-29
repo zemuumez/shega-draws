@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Clock, Trophy, Sparkles, Globe, Ticket, HelpCircle, Calendar, Users } from "lucide-react";
+import { Clock, Trophy, Sparkles, Globe, Ticket, HelpCircle, Calendar } from "lucide-react";
 import { HowToBuyModal } from "./HowToBuyModal";
 import { BuyTicketModal } from "./BuyTicketModal";
 import { type Currency } from "@/lib/api";
@@ -102,31 +102,31 @@ export function JackpotCardsSection() {
         initialDrawId={selectedBuyTicket.drawId}
       />
 
-      <section style={{ margin: "24px 0 32px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(310px, 1fr))", gap: 16 }}>
+      <section style={{ margin: "24px 0 32px", width: "100%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, width: "100%" }}>
           {jackpotTickets.map((ticket) => {
             const BadgeIcon = ticket.badgeIcon;
 
             return (
               <div
                 key={ticket.id}
-                className="physical-lottery-ticket animate-fade"
+                className="jackpot-physical-card animate-fade"
                 style={{
                   background: "#FFFDF7",
                   border: "1.5px solid #FDE047",
                   borderRadius: "14px",
                   overflow: "hidden",
                   boxShadow: "0 6px 18px -4px rgba(234, 179, 8, 0.2)",
-                  display: "grid",
-                  gridTemplateColumns: "1fr 115px",
                   position: "relative",
+                  width: "100%",
+                  boxSizing: "border-box",
                 }}
               >
-                {/* Left Ticket Body */}
-                <div style={{ padding: "16px 16px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                {/* Left / Main Ticket Body */}
+                <div className="jackpot-ticket-body" style={{ padding: "16px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div>
-                    {/* Top Bar: Badge & Date (No Emojis) */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    {/* Top Bar: Badge & Date */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 4 }}>
                       <span
                         style={{
                           background: ticket.currency === "USD" ? "var(--blue-bg)" : "#FEF9C3",
@@ -139,7 +139,7 @@ export function JackpotCardsSection() {
                           display: "inline-flex",
                           alignItems: "center",
                           gap: 4,
-                          letterSpacing: "0.4px",
+                          letterSpacing: "0.3px",
                         }}
                       >
                         <BadgeIcon size={11} /> {ticket.badgeTitle}
@@ -150,25 +150,25 @@ export function JackpotCardsSection() {
                       </span>
                     </div>
 
-                    <h3 className="display" style={{ fontSize: "1.05rem", color: "var(--blue-navy)", fontWeight: 800, lineHeight: 1.2, margin: "2px 0 1px" }}>
+                    <h3 className="display" style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", color: "var(--blue-navy)", fontWeight: 800, lineHeight: 1.2, margin: "3px 0 2px" }}>
                       {ticket.title}
                     </h3>
 
                     {/* Grand Prize Total */}
-                    <div className="display" style={{ fontSize: "1.45rem", color: "var(--gold-deep)", fontWeight: 900, lineHeight: 1.15 }}>
+                    <div className="display" style={{ fontSize: "clamp(1.25rem, 3vw, 1.45rem)", color: "var(--gold-deep)", fontWeight: 900, lineHeight: 1.15 }}>
                       {ticket.grandPrize}
                     </div>
 
-                    <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4, margin: "2px 0 8px" }}>
+                    <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4, margin: "3px 0 8px" }}>
                       <Trophy size={11} color="var(--gold-dark)" /> 10 Winners · {ticket.topPrizeText}
                     </span>
 
                     {/* Compact Available Pools */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
                       <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
                         Pools:
                       </span>
-                      <div style={{ display: "flex", gap: 4 }}>
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                         {ticket.poolLabels.map((label, idx) => (
                           <span
                             key={idx}
@@ -189,7 +189,7 @@ export function JackpotCardsSection() {
                     </div>
 
                     {/* Live Countdown Clock */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#F8FAFC", padding: "4px 8px", borderRadius: 6, border: "1px solid #E2E8F0" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#F8FAFC", padding: "5px 8px", borderRadius: 6, border: "1px solid #E2E8F0" }}>
                       <span className="mono" style={{ fontSize: "0.625rem", fontWeight: 700, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}>
                         <Clock size={11} color="#DC2626" /> Live Draw:
                       </span>
@@ -211,7 +211,7 @@ export function JackpotCardsSection() {
                         color: "var(--blue-navy)",
                         fontSize: "0.6875rem",
                         fontWeight: 800,
-                        padding: "6px 4px",
+                        padding: "7px 4px",
                         borderRadius: "6px",
                         cursor: "pointer",
                         justifyContent: "center",
@@ -230,7 +230,7 @@ export function JackpotCardsSection() {
                         color: "#0C2666",
                         fontSize: "0.6875rem",
                         fontWeight: 900,
-                        padding: "6px 4px",
+                        padding: "7px 4px",
                         borderRadius: "6px",
                         boxShadow: "0 2px 6px rgba(234, 179, 8, 0.3)",
                         border: "1px solid #FEF08A",
@@ -244,11 +244,11 @@ export function JackpotCardsSection() {
                   </div>
                 </div>
 
-                {/* Right Perforated Ticket Stub */}
+                {/* Perforated Ticket Stub */}
                 <div
+                  className="jackpot-ticket-stub"
                   style={{
                     background: "var(--bg-ticket-stub)",
-                    borderLeft: "2px dashed #CBD5E1",
                     padding: "14px 8px",
                     display: "flex",
                     flexDirection: "column",
@@ -267,7 +267,7 @@ export function JackpotCardsSection() {
                         background: "#FFFFFF",
                         border: "1px solid #FDE047",
                         borderRadius: 5,
-                        padding: "4px 4px",
+                        padding: "4px 6px",
                         marginTop: 4,
                       }}
                     >
@@ -284,7 +284,7 @@ export function JackpotCardsSection() {
                   </div>
 
                   <div style={{ width: "100%" }}>
-                    <div className="barcode-pattern" style={{ height: 22, marginBottom: 3 }} />
+                    <div className="barcode-pattern" style={{ height: 20, marginBottom: 2 }} />
                     <span className="mono" style={{ fontSize: "0.5rem", color: "var(--text-subtle)", display: "block" }}>
                       {ticket.serial}
                     </span>
@@ -295,6 +295,39 @@ export function JackpotCardsSection() {
           })}
         </div>
       </section>
+
+      {/* ── Responsive CSS ── */}
+      <style>{`
+        .jackpot-physical-card {
+          display: grid;
+          grid-template-columns: 1fr 115px;
+        }
+        .jackpot-ticket-stub {
+          border-left: 2px dashed #CBD5E1;
+        }
+        @media (max-width: 480px) {
+          .jackpot-physical-card {
+            grid-template-columns: 1fr !important;
+          }
+          .jackpot-ticket-stub {
+            border-left: none !important;
+            border-top: 2px dashed #CBD5E1 !important;
+            flex-direction: row !important;
+            padding: 10px 14px !important;
+          }
+          .jackpot-ticket-stub > div:first-child {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .jackpot-ticket-stub > div:first-child > div {
+            margin-top: 0 !important;
+          }
+          .jackpot-ticket-stub > div:last-child {
+            width: auto !important;
+          }
+        }
+      `}</style>
     </>
   );
 }
