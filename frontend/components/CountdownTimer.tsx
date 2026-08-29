@@ -25,9 +25,12 @@ function getParts(target: Date): TimeParts {
 
 export function CountdownTimer({ target }: CountdownTimerProps) {
   const targetDate = useMemo(() => (target instanceof Date ? target : new Date(target)), [target]);
-  const [parts, setParts] = useState<TimeParts>(getParts(targetDate));
+  const [mounted, setMounted] = useState(false);
+  const [parts, setParts] = useState<TimeParts>({ days: 3, hours: 8, minutes: 24, seconds: 0 });
 
   useEffect(() => {
+    setMounted(true);
+    setParts(getParts(targetDate));
     const interval = setInterval(() => setParts(getParts(targetDate)), 1000);
     return () => clearInterval(interval);
   }, [targetDate]);
@@ -45,6 +48,7 @@ export function CountdownTimer({ target }: CountdownTimerProps) {
         <div key={label} style={{ textAlign: "center" }}>
           <div
             className="mono"
+            suppressHydrationWarning
             style={{
               fontSize: "1.625rem",
               fontWeight: 800,
@@ -59,11 +63,17 @@ export function CountdownTimer({ target }: CountdownTimerProps) {
               boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
             }}
           >
-            {String(value).padStart(2, "0")}
+            {mounted ? String(value).padStart(2, "0") : "--"}
           </div>
           <div
             className="mono"
-            style={{ fontSize: "0.625rem", color: "var(--text-subtle)", marginTop: 4, textTransform: "uppercase", fontWeight: 600 }}
+            style={{
+              fontSize: "0.625rem",
+              color: "var(--text-subtle)",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              marginTop: 4,
+            }}
           >
             {label}
           </div>

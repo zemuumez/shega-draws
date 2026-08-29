@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Clock, Trophy, Sparkles, ChevronRight, Globe, Ticket } from "lucide-react";
 
 export function JackpotCardsSection() {
+  const [mounted, setMounted] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 1,
     hours: 17,
@@ -13,6 +14,7 @@ export function JackpotCardsSection() {
   });
 
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev.secs > 0) return { ...prev, secs: prev.secs - 1 };
@@ -118,7 +120,7 @@ export function JackpotCardsSection() {
                 {card.drawDate}
               </span>
 
-              {/* Countdown Timer Box (Matching Reference Image) */}
+              {/* Countdown Timer Box */}
               <div
                 style={{
                   background: "#FFFFFF",
@@ -157,8 +159,12 @@ export function JackpotCardsSection() {
                     { val: String(timeLeft.secs).padStart(2, "0"), lbl: "Secs" },
                   ].map((tUnit, idx) => (
                     <div key={idx} style={{ minWidth: 32 }}>
-                      <span className="mono" style={{ fontSize: "0.9375rem", fontWeight: 900, color: "#0C2666", lineHeight: 1, display: "block" }}>
-                        {tUnit.val}
+                      <span
+                        className="mono"
+                        suppressHydrationWarning
+                        style={{ fontSize: "0.9375rem", fontWeight: 900, color: "#0C2666", lineHeight: 1, display: "block" }}
+                      >
+                        {mounted ? tUnit.val : "--"}
                       </span>
                       <span className="mono" style={{ fontSize: "0.5625rem", color: "var(--text-subtle)", textTransform: "uppercase" }}>
                         {tUnit.lbl}
@@ -168,7 +174,7 @@ export function JackpotCardsSection() {
                 </div>
               </div>
 
-              {/* Action Buttons (How to play + Play Now) */}
+              {/* Action Buttons */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 <Link
                   href="#how-it-works"
