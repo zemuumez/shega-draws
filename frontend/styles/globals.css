@@ -16,12 +16,12 @@
   --bg-ticket:      #FFFDF7;
   --bg-ticket-stub:  #F8FAFC;
   
-  /* Primary Typography & Ink */
-  --ink:            #0A193B;
-  --text-main:      #0A193B;
-  --text-muted:     #334E68;
-  --text-subtle:    #627D98;
-  --paper:          #0A193B;
+  /* Primary Typography & Ink (Crisp Black / Deep Charcoal) */
+  --ink:            #111827;
+  --text-main:      #111827;
+  --text-muted:     #4B5563;
+  --text-subtle:    #6B7280;
+  --paper:          #111827;
   
   /* Vibrant Gold Yellow (Primary Accent) */
   --gold:           #EAB308;
@@ -32,11 +32,11 @@
   --gold-border:    #FDE047;
   --gold-glow:      rgba(234, 179, 8, 0.22);
 
-  /* User Specified Blue #2A65E6 & Brand Scale */
+  /* User Specified Blue #2A65E6 & Brand Accent */
   --blue:           #2A65E6;
   --blue-royal:     #2A65E6;
-  --blue-navy:      #1642A8;
-  --blue-dark:      #0C2666;
+  --blue-navy:      #111827;
+  --blue-dark:      #111827;
   --blue-bg:        #EFF5FF;
   --blue-border:    #C3DAFE;
   --blue-glow:      rgba(42, 101, 230, 0.18);

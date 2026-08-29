@@ -34,7 +34,7 @@ export function HeroBuyButton({
         className="btn-base"
         style={{
           background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
-          color: "#0C2666",
+          color: "#111827",
           fontSize: "1.125rem",
           fontWeight: 900,
           padding: "12px 32px",

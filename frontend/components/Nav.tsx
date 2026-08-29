@@ -94,7 +94,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           <LanguageSwitcher />
           {currentUser ? (
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span className="mono" style={{ color: "var(--blue-navy)", fontWeight: 800, fontSize: "0.6875rem" }}>
+              <span className="mono" style={{ color: "#111827", fontWeight: 800, fontSize: "0.6875rem" }}>
                 {currentUser.name || currentUser.phone}
               </span>
               <button
@@ -162,12 +162,12 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
               gap: 6,
             }}
           >
-            <Ticket size={18} color="#0C2666" />
+            <Ticket size={18} color="#111827" />
             <span
               className="display brand-text"
               style={{
                 fontSize: "clamp(0.95rem, 2vw, 1.25rem)",
-                color: "#0C2666",
+                color: "#111827",
                 fontWeight: 900,
                 letterSpacing: "-0.3px",
                 textTransform: "uppercase",
@@ -192,7 +192,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                   border: active ? "1.5px solid var(--blue-border)" : "1.5px solid transparent",
                   borderRadius: 8,
                   padding: "6px 12px",
-                  color: active ? "#2A65E6" : "var(--blue-navy)",
+                  color: active ? "#2A65E6" : "#111827",
                   fontSize: "0.8125rem",
                   fontWeight: active ? 800 : 700,
                   cursor: "pointer",
@@ -204,7 +204,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                   transition: "all var(--transition-fast)",
                 }}
               >
-                <Icon size={15} color={active ? "#2A65E6" : "var(--text-subtle)"} />
+                <Icon size={15} color={active ? "#2A65E6" : "#4B5563"} />
                 {label}
               </Link>
             );
@@ -219,7 +219,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
             className="btn-base contact-nav-btn"
             style={{
               background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)",
-              color: "#0C2666",
+              color: "#111827",
               border: "1px solid #FEF08A",
               padding: "6px clamp(8px, 1.5vw, 16px)",
               fontSize: "0.8125rem",

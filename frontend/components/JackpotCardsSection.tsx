@@ -146,11 +146,11 @@ export function JackpotCardsSection() {
                       </span>
 
                       <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                        <Calendar size={11} color="var(--blue-navy)" /> {ticket.drawDate}
+                        <Calendar size={11} color="#111827" /> {ticket.drawDate}
                       </span>
                     </div>
 
-                    <h3 className="display" style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", color: "var(--blue-navy)", fontWeight: 800, lineHeight: 1.2, margin: "3px 0 2px" }}>
+                    <h3 className="display" style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", color: "#111827", fontWeight: 800, lineHeight: 1.2, margin: "3px 0 2px" }}>
                       {ticket.title}
                     </h3>
 
@@ -179,7 +179,7 @@ export function JackpotCardsSection() {
                               padding: "1px 6px",
                               fontSize: "0.625rem",
                               fontWeight: 800,
-                              color: "var(--blue-navy)",
+                              color: "#111827",
                             }}
                           >
                             {label}
@@ -208,7 +208,7 @@ export function JackpotCardsSection() {
                       style={{
                         background: "#F1F5F9",
                         border: "1px solid #CBD5E1",
-                        color: "var(--blue-navy)",
+                        color: "#111827",
                         fontSize: "0.6875rem",
                         fontWeight: 800,
                         padding: "7px 4px",
@@ -227,7 +227,7 @@ export function JackpotCardsSection() {
                       className="btn-base"
                       style={{
                         background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)",
-                        color: "#0C2666",
+                        color: "#111827",
                         fontSize: "0.6875rem",
                         fontWeight: 900,
                         padding: "7px 4px",
