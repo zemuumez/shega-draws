@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Ticket, ShieldCheck, Sparkles, Trophy, Clock, CheckCircle2, ArrowRight, Zap, Users, Gift } from "lucide-react";
+import { Ticket, ShieldCheck, Sparkles, Trophy, Clock, CheckCircle2, ArrowRight, Zap, Users, Gift, Globe } from "lucide-react";
 import { sanityClient } from "@/lib/sanity/client";
 import {
   ACTIVE_DRAW_QUERY,
@@ -12,11 +12,12 @@ import {
 } from "@/lib/sanity/queries";
 import { getActiveDraw, listDraws } from "@/lib/api";
 import { CountdownTimer } from "@/components/CountdownTimer";
-import { PromoEventBanner } from "@/components/PromoEventBanner";
+import { JackpotCardsSection } from "@/components/JackpotCardsSection";
+import { InteractiveQuickPlay } from "@/components/InteractiveQuickPlay";
 import { DrawsExplorer } from "@/components/DrawsExplorer";
-import { WinnersFeed } from "@/components/WinnersFeed";
-import { HowItWorks } from "@/components/HowItWorks";
-import { FAQSection } from "@/components/FAQSection";
+import { SidebarWidgets } from "@/components/SidebarWidgets";
+import { WhyRimnaLottery } from "@/components/WhyRimnaLottery";
+import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 
 export const metadata: Metadata = {
   title: "Rimna Digital Lottery — Provably Fair Digital Raffle & Lottery",
@@ -42,173 +43,195 @@ export default async function HomePage() {
 
   return (
     <div className="container" style={{ paddingTop: 16 }}>
-      {/* ── 1. Modern Professional Hero Section with Visual Image ────── */}
+      {/* ── 1. Classic Grand Hero Banner (Matching Reference Image Style) ── */}
       <section
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: 36,
-          alignItems: "center",
-          padding: "28px 0 36px",
+          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 50%, #FEF9C3 100%)",
+          border: "2px solid #FDE047",
+          borderRadius: "20px",
+          padding: "32px 36px",
+          boxShadow: "0 16px 36px -8px rgba(234, 179, 8, 0.25)",
+          marginBottom: 28,
         }}
       >
-        {/* Left Column: Headline & Value Proposition */}
-        <div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-            <span className="badge badge-gold" style={{ fontSize: "0.75rem", padding: "5px 12px" }}>
-              <Sparkles size={13} color="var(--gold-deep)" /> OFFICIAL DIGITAL RAFFLE · ENTRIES OPEN
-            </span>
-          </div>
-
-          <h1
-            className="display"
-            style={{
-              fontSize: "clamp(2.1rem, 4.5vw, 3.25rem)",
-              color: "var(--blue-navy)",
-              lineHeight: 1.12,
-              marginBottom: 16,
-              fontWeight: 800,
-              letterSpacing: "-0.5px",
-            }}
-          >
-            {cmsDraw?.title ?? "100 Birr Ticket. 10 Guaranteed Cash Winners."}
-          </h1>
-
-          <p
-            style={{
-              color: "var(--text-muted)",
-              fontSize: "1.0625rem",
-              lineHeight: 1.6,
-              maxWidth: 540,
-              marginBottom: 24,
-            }}
-          >
-            {cmsDraw?.description ??
-              "Choose your pool size (1K, 2K, 3K, or 5K people), pick your lucky number, and win up to 160,000 ETB in guaranteed cash prizes with 100% cryptographic fairness."}
-          </p>
-
-          {/* Value Highlights */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--teal-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <CheckCircle2 size={16} color="var(--teal)" />
-              </div>
-              <span style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
-                10 Winners Every Draw
-              </span>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--blue-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <ShieldCheck size={16} color="#2A65E6" />
-              </div>
-              <span style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
-                Provably Fair Algorithm
-              </span>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#FEF9C3", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Zap size={16} color="var(--gold-deep)" />
-              </div>
-              <span style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
-                Instant Mobile Payouts
-              </span>
-            </div>
-          </div>
-
-          {/* Primary Action Buttons */}
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-            <Link
-              href="/enter"
-              className="btn-base btn-primary"
-              style={{ padding: "13px 28px", fontSize: "1rem" }}
-            >
-              <Ticket size={18} /> Buy Ticket (100 ETB)
-            </Link>
-
-            <Link
-              href="#draws-catalog"
-              className="btn-base btn-secondary"
-              style={{ padding: "13px 22px", fontSize: "0.9375rem" }}
-            >
-              <Trophy size={16} color="#2A65E6" /> Explore Draws
-            </Link>
-          </div>
-        </div>
-
-        {/* Right Column: Hero Image & Countdown Card */}
-        <div style={{ position: "relative" }}>
-          <div
-            className="card-base"
-            style={{
-              overflow: "hidden",
-              borderRadius: "var(--radius-xl)",
-              border: "2px solid #FDE047",
-              boxShadow: "0 16px 36px -6px rgba(42, 101, 230, 0.16)",
-              background: "#FFFFFF",
-              position: "relative",
-            }}
-          >
-            {/* Optimized Visual Hero Banner Graphic */}
-            <div style={{ position: "relative", width: "100%", height: 280 }}>
-              <Image
-                src="/images/hero-lottery.jpg"
-                alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
-                fill
-                priority
-                style={{ objectFit: "cover" }}
-              />
-              <div
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 32,
+            alignItems: "center",
+          }}
+        >
+          {/* Left Column: Big Red Jackpot Headline & Buy CTA */}
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span
                 style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(180deg, rgba(12, 38, 102, 0.15) 0%, rgba(12, 38, 102, 0.65) 100%)",
+                  background: "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                  color: "#FFFFFF",
+                  padding: "5px 14px",
+                  borderRadius: "20px",
+                  fontSize: "0.75rem",
+                  fontWeight: 900,
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  boxShadow: "0 2px 6px rgba(185, 28, 28, 0.35)",
                 }}
-              />
-              <div style={{ position: "absolute", bottom: 14, left: 16, right: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "var(--blue-navy)", fontWeight: 800 }}>
-                  <Trophy size={13} color="var(--gold-dark)" /> 500,000 ETB Top Pool
-                </span>
-                <span className="mono" style={{ fontSize: "0.75rem", color: "#FFFFFF", fontWeight: 700 }}>
-                  100% Auditable
-                </span>
-              </div>
+              >
+                ★ OFFICIAL DIGITAL LOTTERY · PROVABLY FAIR
+              </span>
             </div>
 
-            {/* Countdown bar attached underneath the image */}
-            <div style={{ padding: "18px 20px", background: "#FFFFFF" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <Clock size={15} color="#2A65E6" />
-                  <span className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", fontWeight: 800 }}>
-                    Live Draw Countdown
+            {/* Huge Jackpot Amount (PowerBall style) */}
+            <div
+              className="display"
+              style={{
+                fontSize: "clamp(2.5rem, 5.5vw, 4rem)",
+                color: "#DC2626",
+                lineHeight: 1.05,
+                fontWeight: 900,
+                letterSpacing: "-1px",
+                margin: "4px 0 10px",
+                textShadow: "0 2px 4px rgba(0,0,0,0.06)",
+              }}
+            >
+              $1,250,000
+            </div>
+
+            <div className="mono" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 18 }}>
+              + 1,000,000 ETB Top Holiday Jackpot Pools
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
+              <span className="mono" style={{ fontSize: "0.875rem", color: "var(--text-muted)", fontWeight: 700 }}>
+                Next Draw: <strong>Fri, Aug 31 6:00 PM</strong>
+              </span>
+
+              {/* Big Golden BUY NOW Button */}
+              <Link
+                href="/enter"
+                className="btn-base"
+                style={{
+                  background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
+                  color: "#0C2666",
+                  fontSize: "1.125rem",
+                  fontWeight: 900,
+                  padding: "12px 32px",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 16px rgba(234, 179, 8, 0.5)",
+                  textDecoration: "none",
+                  border: "1.5px solid #FEF08A",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                BUY NOW
+              </Link>
+            </div>
+
+            {/* Quick Guarantees */}
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.8125rem", color: "var(--blue-navy)", fontWeight: 700 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <ShieldCheck size={15} color="#2A65E6" /> SHA-256 Verified
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Globe size={15} color="var(--gold-deep)" /> ETB & Diaspora USD ($25+)
+              </span>
+            </div>
+          </div>
+
+          {/* Right Column: Visual 3D Hero Image & Countdown */}
+          <div style={{ position: "relative" }}>
+            <div
+              className="card-base"
+              style={{
+                overflow: "hidden",
+                borderRadius: "16px",
+                border: "2px solid #FDE047",
+                boxShadow: "0 12px 30px -6px rgba(42, 101, 230, 0.16)",
+                background: "#FFFFFF",
+                position: "relative",
+              }}
+            >
+              <div style={{ position: "relative", width: "100%", height: 260 }}>
+                <Image
+                  src="/images/hero-lottery.jpg"
+                  alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
+                  fill
+                  priority
+                  style={{ objectFit: "cover" }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(180deg, rgba(12, 38, 102, 0.1) 0%, rgba(12, 38, 102, 0.65) 100%)",
+                  }}
+                />
+                <div style={{ position: "absolute", bottom: 12, left: 16, right: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                  <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "var(--blue-navy)", fontWeight: 800 }}>
+                    <Trophy size={13} color="var(--gold-dark)" /> 100% Guaranteed Cash Payouts
+                  </span>
+                  <span className="mono" style={{ fontSize: "0.75rem", color: "#FFFFFF", fontWeight: 700 }}>
+                    Live SHA-256 Seed
                   </span>
                 </div>
-                <span className="badge badge-gold" style={{ fontSize: "0.6875rem" }}>
-                  Active Pool
-                </span>
               </div>
-              <CountdownTimer target={deadline} />
+
+              {/* Countdown Strip */}
+              <div style={{ padding: "14px 18px", background: "#FFFFFF", borderTop: "1px solid var(--gray-line)" }}>
+                <CountdownTimer target={deadline} />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 2. Featured Events, Deals & Sponsored Ads ──────────────────── */}
-      <PromoEventBanner promotions={promos} />
+      {/* ── 2. Triple Scalloped Golden Jackpot Cards (Diaspora & Local) ── */}
+      <JackpotCardsSection />
 
-      {/* ── 3. Official Flagship Draws Catalog (Tickets) ──────────────── */}
-      <DrawsExplorer initialDraws={allDraws} />
+      {/* ── 3. Main 2-Column Portal Section (Interactive & Sidebar) ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 340px",
+          gap: 28,
+          alignItems: "start",
+        }}
+        className="portal-grid-container"
+      >
+        {/* Left Column: Quick Play + Draws Catalog + Why Rimna */}
+        <div>
+          {/* Interactive Step 1 & 2 Number Picker Box */}
+          <InteractiveQuickPlay />
 
-      {/* ── 4. Verified Recent Winners Feed ────────────────────────────── */}
-      <WinnersFeed />
+          {/* Full Draws Catalog (with ETB / USD Currency Switcher) */}
+          <DrawsExplorer initialDraws={allDraws} />
 
-      {/* ── 5. How It Works (Simple 3-Step Guide) ──────────────────────── */}
-      <HowItWorks />
+          {/* Why Rimna Lottery Editorial Section */}
+          <WhyRimnaLottery />
+        </div>
 
-      {/* ── 6. FAQ Section ─────────────────────────────────────────────── */}
-      <FAQSection />
+        {/* Right Column: Sidebar Widgets (Results, 24/7 Support, Promos) */}
+        <div>
+          <SidebarWidgets />
+        </div>
+      </div>
+
+      {/* ── 4. Bottom Testimonials & Newsletter Section ────────── */}
+      <TestimonialsNewsletter />
+
+      {/* ── Responsive CSS ── */}
+      <style>{`
+        @media (max-width: 992px) {
+          .portal-grid-container {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

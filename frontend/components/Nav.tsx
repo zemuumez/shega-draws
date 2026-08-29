@@ -1,67 +1,162 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Ticket, ListChecks, ShieldCheck, Sparkles, UserCheck } from "lucide-react";
+import { Home, Ticket, ListChecks, ShieldCheck, User, LogIn, LogOut, HelpCircle, Phone, Send, Globe } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
+import { getUser, logout, type StoredUser } from "@/lib/api";
+import { SignInModal } from "./SignInModal";
 
 export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const [currentUser, setCurrentUser] = useState<StoredUser | null>(null);
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
+
+  useEffect(() => {
+    setCurrentUser(getUser());
+  }, [pathname]);
 
   if (pathname?.startsWith("/studio")) {
     return null;
   }
 
-  // Clean, focused user navigation items
+  const handleSignOut = async () => {
+    await logout();
+    setCurrentUser(null);
+    window.location.reload();
+  };
+
+  // Base navigation links
   const navItems = [
-    { href: "/",        label: t.nav.draws,     short: t.nav.draws,     icon: Home },
-    { href: "/enter",   label: t.nav.enter,     short: t.nav.enter,     icon: Ticket },
-    { href: "/entries", label: t.nav.myEntries, short: t.nav.myEntries, icon: ListChecks },
-    { href: "/results", label: t.nav.results,   short: t.nav.results,   icon: ShieldCheck },
+    { href: "/",        label: t.nav.draws,     icon: Home },
+    { href: "/results", label: t.nav.results,   icon: ShieldCheck },
   ];
+
+  // Add "My Tickets" ONLY if signed in
+  if (currentUser) {
+    navItems.splice(1, 0, { href: "/entries", label: t.nav.myEntries, icon: ListChecks });
+  }
 
   return (
     <>
-      {/* ── Desktop Top Nav (Professional Header) ───── */}
+      <SignInModal
+        isOpen={isSignInOpen}
+        onClose={() => setIsSignInOpen(false)}
+        onSuccess={(u) => setCurrentUser(u)}
+      />
+
+      {/* ── Top Utility Header Ribbon (Classic Portal Style) ─── */}
+      <div
+        style={{
+          background: "#FFFFFF",
+          borderBottom: "1px solid #E2E8F0",
+          padding: "6px 24px",
+          fontSize: "0.75rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          color: "var(--text-muted)",
+        }}
+      >
+        {/* Social / Community Links */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <a
+            href="https://t.me/RimnaLotteryOfficial"
+            target="_blank"
+            rel="noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: 4, color: "#2A65E6", fontWeight: 700, textDecoration: "none" }}
+          >
+            <Send size={12} /> Telegram @RimnaLotteryOfficial
+          </a>
+          <span style={{ color: "#CBD5E1" }}>|</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <Phone size={12} color="var(--teal)" /> 24/7 Hotline: +251 911 000 000
+          </span>
+        </div>
+
+        {/* Top Right Quick Login & Language */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <LanguageSwitcher />
+          {currentUser ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span className="mono" style={{ color: "var(--blue-navy)", fontWeight: 800 }}>
+                👤 {currentUser.name || currentUser.phone}
+              </span>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                style={{ background: "none", border: "none", color: "var(--rust)", cursor: "pointer", fontSize: "0.75rem", fontWeight: 700 }}
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsSignInOpen(true)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#2A65E6",
+                cursor: "pointer",
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <LogIn size={13} /> Login / Register
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Main Navigation Bar (With Center Gold Ribbon Badge) ───── */}
       <nav
         aria-label="Main navigation"
         style={{
-          display: "none",
+          display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "14px 32px",
-          borderBottom: "1.5px solid var(--blue-border)",
+          padding: "10px 32px",
+          background: "linear-gradient(180deg, #FFFFFF 0%, #FFFDF5 100%)",
+          borderBottom: "2px solid #FDE047",
           position: "sticky",
           top: 0,
-          background: "rgba(255, 255, 255, 0.98)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          boxShadow: "0 2px 8px rgba(42, 101, 230, 0.06)",
+          boxShadow: "0 4px 12px rgba(42, 101, 230, 0.08)",
           zIndex: 100,
         }}
         id="nav-desktop"
       >
-        {/* Brand Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        {/* Brand Logo Ribbon Badge */}
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
           <div
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: "var(--radius-sm)",
-              background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
+              padding: "6px 18px",
+              borderRadius: "24px",
+              background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
+              boxShadow: "0 3px 10px rgba(234, 179, 8, 0.45)",
+              border: "1.5px solid #FEF08A",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 8px rgba(234, 179, 8, 0.35)",
-              border: "1px solid #FDE047",
+              gap: 8,
             }}
           >
-            <Ticket size={22} color="#0C2666" />
-          </div>
-          <div>
-            <span className="display" style={{ fontSize: "1.45rem", color: "var(--blue-navy)", fontWeight: 800, letterSpacing: "-0.5px" }}>
-              {t.appName}
+            <Ticket size={20} color="#0C2666" />
+            <span
+              className="display"
+              style={{
+                fontSize: "1.25rem",
+                color: "#0C2666",
+                fontWeight: 900,
+                letterSpacing: "-0.5px",
+                textTransform: "uppercase",
+              }}
+            >
+              Rimna Lottery
             </span>
           </div>
         </Link>
@@ -77,11 +172,11 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                 style={{
                   background: active ? "var(--blue-bg)" : "transparent",
                   border: active ? "1.5px solid var(--blue-border)" : "1.5px solid transparent",
-                  borderRadius: 10,
+                  borderRadius: 8,
                   padding: "8px 16px",
-                  color: active ? "#2A65E6" : "var(--text-muted)",
+                  color: active ? "#2A65E6" : "var(--blue-navy)",
                   fontSize: "0.875rem",
-                  fontWeight: active ? 800 : 600,
+                  fontWeight: active ? 800 : 700,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -97,124 +192,53 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           })}
         </div>
 
-        {/* Right side: Language Switcher + Buy Ticket CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <LanguageSwitcher />
-          <Link
-            href="/enter"
-            className="btn-base btn-primary"
-            style={{ padding: "9px 20px", fontSize: "0.875rem" }}
-          >
-            <Sparkles size={15} /> Buy Ticket
-          </Link>
-        </div>
-      </nav>
-
-      {/* ── Mobile Top Bar (Brand + Language Switcher + Fast Action) ── */}
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "12px 18px",
-          background: "#FFFFFF",
-          borderBottom: "1.5px solid var(--blue-border)",
-          position: "sticky",
-          top: 0,
-          zIndex: 90,
-        }}
-        id="header-mobile"
-      >
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "var(--radius-xs)",
-              background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ticket size={18} color="#0C2666" />
-          </div>
-          <span className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800 }}>
-            {t.appName}
-          </span>
-        </Link>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <LanguageSwitcher />
-          <Link
-            href="/enter"
-            className="btn-base btn-primary"
-            style={{ padding: "6px 14px", fontSize: "0.75rem" }}
-          >
-            Buy Ticket
-          </Link>
-        </div>
-      </header>
-
-      {/* ── Mobile Bottom Navigation Bar ─────────────────────────────── */}
-      <nav
-        aria-label="Mobile navigation"
-        style={{
-          display: "flex",
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: "rgba(255, 255, 255, 0.98)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderTop: "1.5px solid var(--blue-border)",
-          padding: "6px 8px env(safe-area-inset-bottom, 8px)",
-          justifyContent: "space-around",
-          alignItems: "center",
-          zIndex: 90,
-          boxShadow: "0 -2px 12px rgba(42, 101, 230, 0.08)",
-        }}
-        id="nav-mobile-bottom"
-      >
-        {navItems.map(({ href, short, icon: Icon }) => {
-          const active = pathname === href || (href !== "/" && pathname.startsWith(href));
-          return (
+        {/* Right side: Sign In Button (Replaced Buy Ticket CTA) */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {currentUser ? (
             <Link
-              key={href}
-              href={href}
+              href="/entries"
+              className="btn-base"
               style={{
-                display: "flex",
-                flexDirection: "column",
+                background: "var(--blue-bg)",
+                border: "1.5px solid #2A65E6",
+                color: "#2A65E6",
+                padding: "8px 16px",
+                fontSize: "0.8125rem",
+                fontWeight: 800,
+                display: "inline-flex",
                 alignItems: "center",
-                gap: 2,
-                padding: "6px 10px",
+                gap: 6,
                 borderRadius: 8,
-                color: active ? "#2A65E6" : "var(--text-muted)",
-                background: active ? "var(--blue-bg)" : "transparent",
-                textDecoration: "none",
-                fontSize: "0.6875rem",
-                fontWeight: active ? 800 : 500,
-                minWidth: 54,
-                position: "relative",
               }}
             >
-              <Icon size={18} color={active ? "#2A65E6" : "var(--text-muted)"} />
-              <span>{short}</span>
+              <Ticket size={15} /> My Tickets
             </Link>
-          );
-        })}
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsSignInOpen(true)}
+              className="btn-base btn-primary"
+              style={{
+                padding: "9px 22px",
+                fontSize: "0.875rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontWeight: 800,
+              }}
+            >
+              <User size={16} /> Sign In
+            </button>
+          )}
+        </div>
       </nav>
 
-      {/* Desktop/Mobile media query toggles */}
+      {/* ── Responsive CSS ── */}
       <style>{`
-        @media (min-width: 769px) {
-          #nav-desktop { display: flex !important; }
-          #header-mobile { display: none !important; }
-          #nav-mobile-bottom { display: none !important; }
-        }
         @media (max-width: 768px) {
-          body { padding-bottom: 64px; }
+          #nav-desktop {
+            padding: 8px 16px !important;
+          }
         }
       `}</style>
     </>
