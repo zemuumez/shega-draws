@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function ScrollEffects() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const pathname = usePathname();
 
   useEffect(() => {
     // 1. Scroll Progress Bar Calculation
@@ -17,30 +19,10 @@ export function ScrollEffects() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
 
-    // 2. Intersection Observer for Scroll Reveals
-    const observerCallback: IntersectionObserverCallback = (entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-revealed");
-          observer.unobserve(entry.target);
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, {
-      root: null,
-      threshold: 0.12,
-      rootMargin: "0px 0px -40px 0px",
-    });
-
-    const elements = document.querySelectorAll(".reveal-item");
-    elements.forEach((el) => observer.observe(el));
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      observer.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <div className="scroll-progress-container" aria-hidden="true">

@@ -224,17 +224,17 @@ export default async function HomePage() {
       {/* ── Page Inner Container for content below full-width hero ── */}
       <div className="page-inner-container">
         {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
-        <div className="reveal-item" style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 32 }}>
           <JackpotCardsSection cmsCards={cmsJackpotCards} />
         </div>
 
         {/* ── 3. Full Draws Catalog (Dedicated Full-Width Section) ── */}
-        <div className="reveal-item" style={{ marginBottom: 40 }}>
+        <div style={{ marginBottom: 40 }}>
           <DrawsExplorer initialDraws={allDraws} />
         </div>
 
         {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
-        <div className="reveal-item" style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 32 }}>
           <TestimonialsNewsletter />
         </div>
       </div>

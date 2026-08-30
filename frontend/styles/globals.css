@@ -645,17 +645,15 @@ h1, h2, h3, h4, h5 {
   animation: radarPulse 2s infinite;
 }
 
-/* Fast & Snappy Scroll Reveal Transition */
+/* Clean Immediate Section Visibility */
 .reveal-item {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 180ms ease-out, transform 180ms ease-out;
-  will-change: opacity, transform;
+  opacity: 1;
+  transform: none;
 }
 
 .reveal-item.is-revealed {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
