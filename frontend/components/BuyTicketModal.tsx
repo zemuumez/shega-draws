@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Ticket, Users, Tag, ShieldCheck, Globe, Trophy } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Ticket, Users, ShieldCheck, Globe, Trophy } from "lucide-react";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
 import { registerPlayer, submitEntry, type Currency, USD_TICKET_CONFIGS, ETB_TICKET_CONFIGS } from "@/lib/api";
@@ -15,7 +15,7 @@ interface BuyTicketModalProps {
   initialDrawId?: string;
 }
 
-const STEPS = ["1. Pool Size", "2. Player Info", "3. Pick Number", "4. Pay & Confirm"];
+const STEP_LABELS = ["Pool Capacity", "Player Details", "Lucky Number", "Payment & Proof"];
 
 export function BuyTicketModal({
   isOpen,
@@ -29,6 +29,7 @@ export function BuyTicketModal({
   useEffect(() => {
     setMounted(true);
   }, []);
+
   const currency: Currency = initialCurrency;
   const ticketPrice: number = initialPrice;
   const drawId: string = initialDrawId;
@@ -124,237 +125,174 @@ export function BuyTicketModal({
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(10, 25, 59, 0.75)",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
+        backgroundColor: "rgba(17, 24, 39, 0.7)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "16px",
+        padding: "12px",
         zIndex: 99999,
-        overflowY: "auto",
       }}
       onClick={onClose}
     >
       <div
-        className="modal-container-card animate-fade"
+        className="animate-fade"
         style={{
           background: "#FFFFFF",
-          borderRadius: "20px",
+          borderRadius: "16px",
           width: "100%",
-          maxWidth: 560,
-          maxHeight: "90vh",
-          overflowY: "auto",
-          padding: "clamp(18px, 4vw, 28px)",
-          position: "relative",
-          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.4)",
-          border: "2px solid #FDE047",
+          maxWidth: 480,
+          maxHeight: "92vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.25)",
+          border: "2px solid #F59E0B",
+          overflow: "hidden",
           boxSizing: "border-box",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          style={{
-            position: "absolute",
-            top: 14,
-            right: 14,
-            background: "#F1F5F9",
-            border: "none",
-            borderRadius: "50%",
-            width: 32,
-            height: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            color: "var(--text-muted)",
-            zIndex: 10,
-          }}
-        >
-          <X size={18} />
-        </button>
-
-        {/* ── Pre-populated Ticket Header Ribbon ── */}
+        {/* ── 1. Clean Minimalist Header ── */}
         <div
           style={{
-            background: "#FEF9C3",
-            border: "1.5px solid #FDE047",
-            borderRadius: 10,
-            padding: "8px 12px",
+            padding: "14px 18px",
+            borderBottom: "1px solid #E5E7EB",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 14,
-            flexWrap: "wrap",
-            gap: 8,
+            background: "#FAFAFA",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{
-                background: "#FFFFFF",
-                color: "#854D0E",
-                border: "1px solid #FDE047",
-                padding: "2px 8px",
-                borderRadius: 6,
-                fontSize: "0.6875rem",
-                fontWeight: 800,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              {isUSD ? <Globe size={12} /> : <Ticket size={12} />}
-              {isUSD ? "DIASPORA USD TICKET" : "LOCAL ETB TICKET"}
+          <div>
+            <span style={{ fontSize: "0.6875rem", fontWeight: 800, color: "#D97706", textTransform: "uppercase", letterSpacing: "0.5px", display: "block" }}>
+              {isUSD ? "Diaspora USD Ticket" : "Official Raffle Ticket"} · #{drawId}
             </span>
-
-            <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 800 }}>
-              Fixed Price: {isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`}
-            </span>
+            <h3 className="display" style={{ fontSize: "1.15rem", color: "#111827", fontWeight: 900, margin: "1px 0 0" }}>
+              {isUSD ? `$${ticketPrice} USD Entry` : `${ticketPrice} ETB Fixed Price`}
+            </h3>
           </div>
 
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "#059669", fontWeight: 800, display: "flex", alignItems: "center", gap: 4 }}>
-            <Trophy size={12} color="#D97706" /> 10 Guaranteed Winners
-          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #E5E7EB",
+              borderRadius: "50%",
+              width: 32,
+              height: 32,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "#6B7280",
+            }}
+          >
+            <X size={16} />
+          </button>
         </div>
 
-        {/* 4-Step Progress Indicator */}
+        {/* ── 2. Clean 4-Step Progress Indicator ── */}
         {step < 4 && (
-          <nav aria-label="Progress" style={{ display: "flex", gap: 6, marginBottom: 18 }}>
-            {STEPS.map((s, i) => (
-              <div key={s} style={{ flex: 1 }}>
+          <div style={{ padding: "10px 18px 0" }}>
+            <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
+              {[0, 1, 2, 3].map((i) => (
                 <div
+                  key={i}
                   style={{
+                    flex: 1,
                     height: 4,
-                    borderRadius: 4,
-                    background: i <= step ? "#DC2626" : "#E5E7EB",
-                    transition: "all 300ms ease",
+                    borderRadius: 2,
+                    background: i <= step ? "#111827" : "#E5E7EB",
+                    transition: "all 200ms ease",
                   }}
                 />
-                <span
-                  className="mono"
-                  style={{
-                    fontSize: "0.5625rem",
-                    color: i === step ? "#111827" : "#9CA3AF",
-                    fontWeight: i === step ? 900 : 600,
-                    display: "block",
-                    marginTop: 4,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {s}
-                </span>
-              </div>
-            ))}
-          </nav>
-        )}
-
-        {/* ── Step 0: Choose Pool Capacity ── */}
-        {step === 0 && (
-          <div>
-            <span
-              style={{
-                background: "#FEF9C3",
-                color: "#854D0E",
-                border: "1px solid #FDE047",
-                borderRadius: "6px",
-                padding: "2px 8px",
-                fontSize: "0.6875rem",
-                fontWeight: 800,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                marginBottom: 6,
-              }}
-            >
-              <Users size={11} /> Step 1 of 4: Pool Size
-            </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
-              Choose Participant Pool
-            </h3>
-            <p style={{ color: "#6B7280", fontSize: "0.8125rem", marginBottom: 14 }}>
-              Select pool capacity for this {isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`} ticket.
-            </p>
-
-            {/* Pool Selector Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 8, marginBottom: 14 }}>
-              {availablePools.map((p) => {
-                const isSelected = selectedSize === p.size;
-                return (
-                  <button
-                    key={p.size}
-                    type="button"
-                    onClick={() => setSize(p.size)}
-                    style={{
-                      padding: "12px 8px",
-                      borderRadius: 8,
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid #E5E7EB",
-                      background: isSelected ? "#FEF9C3" : "#FAFAFA",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      transition: "all var(--transition-fast)",
-                    }}
-                  >
-                    <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "#D97706" : "#111827", display: "block" }}>
-                      {p.label}
-                    </span>
-                    <span className="display" style={{ fontSize: "1.1rem", fontWeight: 800, color: isSelected ? "#854D0E" : "#111827", margin: "2px 0", display: "block" }}>
-                      {p.pool}
-                    </span>
-                    <span className="mono" style={{ fontSize: "0.625rem", color: "#059669", fontWeight: 700, display: "block" }}>
-                      1st: {p.jackpot}
-                    </span>
-                  </button>
-                );
-              })}
+              ))}
             </div>
-
-            {/* Live Tickets Confirmed Progress Bar */}
-            <div style={{ background: "#F8FAFC", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px 12px", marginBottom: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 4 }}>
-                <span className="mono" style={{ fontSize: "0.6875rem", color: "#6B7280", textTransform: "uppercase", fontWeight: 700 }}>
-                  POOL CAPACITY SOLD ({currentPool.label})
-                </span>
-                <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 800 }}>
-                  {Math.round(selectedSize * 0.72).toLocaleString()} / {selectedSize.toLocaleString()} Tickets (72%)
-                </span>
-              </div>
-              <div className="progress-bar-track" style={{ height: 6, borderRadius: 4, background: "#E5E7EB", overflow: "hidden" }}>
-                <div
-                  style={{
-                    height: "100%",
-                    width: "72%",
-                    borderRadius: 4,
-                    background: "#F59E0B",
-                  }}
-                />
-              </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.6875rem", color: "#6B7280", fontWeight: 700 }}>
+              <span>Step {step + 1} of 4: {STEP_LABELS[step]}</span>
+              <span className="mono" style={{ color: "#D97706", fontWeight: 800 }}>10 Winners Guaranteed</span>
             </div>
           </div>
         )}
 
-        {/* ── Step 1: Player Contact Info ── */}
-        {step === 1 && (
-          <div>
-            <span className="badge badge-blue" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
-              <Users size={11} /> Step 2 of 4: Player Info
-            </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
-              Enter Your Information
-            </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 14 }}>
-              Winning tickets and prize cash notifications are delivered to this number.
-            </p>
+        {/* ── 3. Scrollable Modal Body ── */}
+        <div style={{ padding: "14px 18px", overflowY: "auto", flex: 1 }}>
+          {/* ── Step 0: Choose Pool Capacity ── */}
+          {step === 0 && (
+            <div>
+              <p style={{ color: "#4B5563", fontSize: "0.8125rem", marginBottom: 12 }}>
+                Choose the participant capacity you wish to enter:
+              </p>
 
+              {/* 2x2 Responsive Pool Selector Grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+                {availablePools.map((p) => {
+                  const isSelected = selectedSize === p.size;
+                  return (
+                    <button
+                      key={p.size}
+                      type="button"
+                      onClick={() => setSize(p.size)}
+                      style={{
+                        padding: "10px 8px",
+                        borderRadius: 8,
+                        border: isSelected ? "2px solid #F59E0B" : "1.5px solid #E5E7EB",
+                        background: isSelected ? "#FFFBEB" : "#FAFAFA",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        transition: "all 120ms ease",
+                      }}
+                    >
+                      <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "#D97706" : "#111827", display: "block" }}>
+                        {p.label}
+                      </span>
+                      <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: isSelected ? "#92400E" : "#111827", margin: "2px 0", display: "block" }}>
+                        {p.pool}
+                      </span>
+                      <span className="mono" style={{ fontSize: "0.625rem", color: "#059669", fontWeight: 700, display: "block" }}>
+                        1st: {p.jackpot}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Pool Capacity Sold Bar (Only Shown Inside Modal) */}
+              <div style={{ background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px 12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, fontSize: "0.6875rem" }}>
+                  <span className="mono" style={{ color: "#6B7280", textTransform: "uppercase", fontWeight: 700 }}>
+                    POOL CAPACITY SOLD ({currentPool.label})
+                  </span>
+                  <span className="mono" style={{ color: "#111827", fontWeight: 800 }}>
+                    {Math.round(selectedSize * 0.72).toLocaleString()} / {selectedSize.toLocaleString()} (72%)
+                  </span>
+                </div>
+                <div style={{ height: 6, borderRadius: 4, background: "#E5E7EB", overflow: "hidden" }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: "72%",
+                      borderRadius: 4,
+                      background: "#F59E0B",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Step 1: Player Contact Info ── */}
+          {step === 1 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <p style={{ color: "#4B5563", fontSize: "0.8125rem" }}>
+                Enter your details so your winning payout can be transferred immediately:
+              </p>
+
               <div>
-                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", display: "block", marginBottom: 4 }}>
-                  Full Name
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "#111827", marginBottom: 4 }}>
+                  Full Legal Name (as on Bank/ID)
                 </label>
                 <input
                   type="text"
@@ -362,207 +300,233 @@ export function BuyTicketModal({
                   placeholder="e.g. Abebe Bikila"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  style={{ fontSize: "0.875rem" }}
-                  required
+                  style={{ padding: "8px 12px", fontSize: "0.875rem" }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", display: "block", marginBottom: 4 }}>
-                  {isUSD ? "Phone Number / WhatsApp (+Country Code)" : "Mobile Phone Number (Telebirr / CBE)"}
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "#111827", marginBottom: 4 }}>
+                  Phone Number (for Telebirr / CBE / Payouts)
                 </label>
                 <input
                   type="tel"
                   className="input-base"
-                  placeholder={isUSD ? "+1 555 123 4567" : "+251 9xx xxx xxx"}
+                  placeholder="0911 00 00 00 or +1 202 555 0199"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  style={{ fontSize: "0.875rem" }}
-                  required
+                  style={{ padding: "8px 12px", fontSize: "0.875rem" }}
                 />
               </div>
 
-              {/* Promo code */}
-              <div style={{ background: "#FEF9C3", padding: "10px 12px", borderRadius: 8, border: "1px solid #FDE047" }}>
-                <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--gold-deep)", display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-                  <Tag size={12} /> Promo Code (Optional)
+              <div>
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "#111827", marginBottom: 4 }}>
+                  Promo Code (Optional)
                 </label>
                 <div style={{ display: "flex", gap: 6 }}>
                   <input
                     type="text"
                     className="input-base"
-                    placeholder="e.g. RIMNA2026"
+                    placeholder="e.g. WINNER10"
                     value={promoCode}
-                    onChange={(e) => {
-                      setPromoCode(e.target.value);
-                      setPromoApplied(false);
-                    }}
-                    style={{ textTransform: "uppercase", background: "#FFFFFF", fontSize: "0.8125rem", padding: "6px 10px" }}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    style={{ padding: "8px 12px", fontSize: "0.875rem" }}
                   />
                   <button
                     type="button"
                     onClick={handleApplyPromo}
-                    className="btn-base btn-secondary"
-                    style={{ fontSize: "0.75rem", padding: "6px 12px" }}
+                    className="casino-btn-dark"
+                    style={{ padding: "8px 14px", fontSize: "0.75rem" }}
                   >
                     Apply
                   </button>
                 </div>
                 {promoApplied && (
-                  <span style={{ color: "var(--teal-dark)", fontSize: "0.6875rem", fontWeight: 700, marginTop: 4, display: "block" }}>
-                    ✓ Promo applied!
+                  <span style={{ fontSize: "0.6875rem", color: "#059669", fontWeight: 700, marginTop: 4, display: "block" }}>
+                    ✓ Promo code applied successfully!
                   </span>
                 )}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ── Step 2: Number Selection Board ── */}
-        {step === 2 && (
-          <div>
-            <span className="badge badge-blue" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
-              <Ticket size={11} /> Step 3 of 4: Lucky Number
-            </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
-              Pick Number for {currentPool.label} ({currentPool.pool})
-            </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 14 }}>
-              Choose your number from #1 up to #{selectedSize.toLocaleString()}. Red numbers are taken.
-            </p>
+          {/* ── Step 2: Pick Lucky Number ── */}
+          {step === 2 && (
+            <div>
+              <p style={{ color: "#4B5563", fontSize: "0.8125rem", marginBottom: 10 }}>
+                Select your lucky number between <strong>1</strong> and <strong>{selectedSize.toLocaleString()}</strong>:
+              </p>
+              <NumberPicker
+                poolSize={selectedSize}
+                value={number}
+                onChange={(n) => setNumber(n)}
+              />
+            </div>
+          )}
 
-            <NumberPicker
-              value={number}
-              onChange={setNumber}
-              poolSize={selectedSize}
-              takenNumbers={[]}
-            />
-          </div>
-        )}
+          {/* ── Step 3: Payment & Proof ── */}
+          {step === 3 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div>
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "#111827", marginBottom: 6 }}>
+                  Select Payment Method:
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  {isUSD ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setMethod("card")}
+                        style={{
+                          padding: "8px",
+                          borderRadius: 6,
+                          border: method === "card" ? "2px solid #F59E0B" : "1px solid #E5E7EB",
+                          background: method === "card" ? "#FFFBEB" : "#FAFAFA",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          color: "#111827",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Credit / Debit Card
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMethod("wire")}
+                        style={{
+                          padding: "8px",
+                          borderRadius: 6,
+                          border: method === "wire" ? "2px solid #F59E0B" : "1px solid #E5E7EB",
+                          background: method === "wire" ? "#FFFBEB" : "#FAFAFA",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          color: "#111827",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Wire / Remittance
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setMethod("telebirr")}
+                        style={{
+                          padding: "8px",
+                          borderRadius: 6,
+                          border: method === "telebirr" ? "2px solid #F59E0B" : "1px solid #E5E7EB",
+                          background: method === "telebirr" ? "#FFFBEB" : "#FAFAFA",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          color: "#111827",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Telebirr
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMethod("cbebirr")}
+                        style={{
+                          padding: "8px",
+                          borderRadius: 6,
+                          border: method === "cbebirr" ? "2px solid #F59E0B" : "1px solid #E5E7EB",
+                          background: method === "cbebirr" ? "#FFFBEB" : "#FAFAFA",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          color: "#111827",
+                          cursor: "pointer",
+                        }}
+                      >
+                        CBE Birr / Bank
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
 
-        {/* ── Step 3: Pay & Confirm ── */}
-        {step === 3 && (
-          <div>
-            <span className="badge badge-gold" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
-              <ShieldCheck size={11} /> Step 4 of 4: Payment & Receipt
-            </span>
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
-              Pay {isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`} for Ticket #{number}
-            </h3>
+              {/* Payment Account Details */}
+              <div style={{ background: "#FAFAFA", border: "1px solid #E5E7EB", borderRadius: 8, padding: "8px 12px" }}>
+                <span className="mono" style={{ fontSize: "0.625rem", color: "#6B7280", textTransform: "uppercase", display: "block" }}>
+                  PAY TO ACCOUNT:
+                </span>
+                <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#111827" }}>
+                  {isUSD ? "Rimna Diaspora Corp (USD Account)" : (method === "telebirr" ? "Telebirr: 0911 22 33 44" : "CBE Bank: 1000456789012")}
+                </span>
+              </div>
 
-            {/* Payment Method Selector */}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", margin: "12px 0 10px" }}>
-              {isUSD ? (
-                [
-                  { id: "card", name: "Credit / Debit Card" },
-                  { id: "paypal", name: "PayPal" },
-                  { id: "wire", name: "Swift / Wire Transfer" },
-                ].map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    className="btn-base"
-                    onClick={() => setMethod(m.id)}
-                    style={{
-                      padding: "8px 12px",
-                      border: method === m.id ? "2px solid #2A65E6" : "1px solid var(--gray-line)",
-                      background: method === m.id ? "var(--blue-bg)" : "#FFFFFF",
-                      color: method === m.id ? "#2A65E6" : "#111827",
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {m.name}
-                  </button>
-                ))
-              ) : (
-                [
-                  { id: "telebirr", name: "Telebirr" },
-                  { id: "cbebirr", name: "CBE Birr" },
-                  { id: "bank", name: "Bank Transfer" },
-                ].map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    className="btn-base"
-                    onClick={() => setMethod(m.id)}
-                    style={{
-                      padding: "8px 12px",
-                      border: method === m.id ? "2px solid #2A65E6" : "1px solid var(--gray-line)",
-                      background: method === m.id ? "var(--blue-bg)" : "#FFFFFF",
-                      color: method === m.id ? "#2A65E6" : "#111827",
-                      fontSize: "0.75rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {m.name}
-                  </button>
-                ))
+              {/* Payment Proof Upload */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 800, color: "#111827", marginBottom: 4 }}>
+                  Upload Payment Screenshot / Receipt:
+                </label>
+                <PaymentProofUploader
+                  onChange={handleProof}
+                  preview={proofPreview}
+                  fileName={proofFile?.name}
+                />
+              </div>
+
+              {error && (
+                <p style={{ color: "#DC2626", background: "#FEF2F2", padding: "8px", borderRadius: 6, fontSize: "0.75rem" }}>
+                  {error}
+                </p>
               )}
             </div>
+          )}
 
-            {/* Account Details Box */}
-            <div style={{ background: "#F8FAFC", border: "1px solid var(--gray-line)", borderRadius: 8, padding: "10px 12px", marginBottom: 14 }}>
-              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block", marginBottom: 2 }}>
-                TRANSFER ACCOUNT ({method.toUpperCase()})
-              </span>
-              <p className="mono" style={{ color: "#111827", fontSize: "0.875rem", fontWeight: 800 }}>
-                {isUSD ? (
-                  method === "card" ? "Instant Stripe Card Checkout" :
-                  method === "paypal" ? "PayPal: payments@rimnalottery.com" :
-                                        "Swift: Bank of America · Acc: 9876543210"
-                ) : (
-                  method === "telebirr" ? "Telebirr: 0911 22 33 44 (Rimna Digital Lottery PLC)" :
-                  method === "cbebirr" ? "CBE Birr: 0911 22 33 44 (Rimna Digital Lottery PLC)" :
-                                         "CBE Bank: 1000456789012 (Rimna Digital Lottery PLC)"
-                )}
+          {/* ── Step 4: Confirmation Success Screen ── */}
+          {step === 4 && (
+            <div style={{ textAlign: "center", padding: "16px 6px" }}>
+              <CheckCircle2 size={40} color="#059669" style={{ margin: "0 auto 10px" }} />
+              <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900, marginBottom: 4 }}>
+                Ticket Confirmed!
+              </h3>
+              <p style={{ color: "#4B5563", fontSize: "0.8125rem", marginBottom: 16 }}>
+                Your lucky number <strong>#{number}</strong> for the <strong>{currentPool.label}</strong> pool has been submitted.
               </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="casino-btn-red"
+                style={{ width: "100%", padding: "10px", fontSize: "0.875rem" }}
+              >
+                Done & View Live Draws
+              </button>
             </div>
+          )}
+        </div>
 
-            <PaymentProofUploader
-              onChange={handleProof}
-              preview={proofPreview}
-              fileName={proofFile?.name}
-            />
-
-            {error && (
-              <p style={{ color: "var(--rust-dark)", background: "var(--rust-bg)", padding: "8px", borderRadius: 6, fontSize: "0.75rem", marginTop: 10 }}>
-                {error}
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* ── Step 4: Success Screen ── */}
-        {step === 4 && (
-          <div style={{ textAlign: "center", padding: "24px 10px" }}>
-            <CheckCircle2 size={44} color="var(--teal)" style={{ margin: "0 auto 12px" }} />
-            <h3 className="display" style={{ fontSize: "1.35rem", color: "#111827", fontWeight: 900, marginBottom: 6 }}>
-              Ticket Confirmed for {currentPool.label}!
-            </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>
-              Your ticket number <strong>#{number}</strong> for the <strong>{currentPool.pool}</strong> pool has been submitted for live broadcast verification.
-            </p>
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-base btn-primary"
-              style={{ padding: "10px 24px", fontSize: "0.875rem", fontWeight: 800 }}
-            >
-              Done & View Live Draws
-            </button>
-          </div>
-        )}
-
-        {/* Modal Wizard Navigation */}
+        {/* ── 4. Sticky Bottom Action Controls ── */}
         {step < 4 && (
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
+          <div
+            style={{
+              padding: "12px 18px",
+              borderTop: "1px solid #E5E7EB",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "#FAFAFA",
+            }}
+          >
             <button
               type="button"
               disabled={step === 0}
               onClick={() => setStep((s) => s - 1)}
-              className="btn-base btn-secondary"
-              style={{ padding: "8px 16px", fontSize: "0.8125rem", opacity: step === 0 ? 0.4 : 1 }}
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #E5E7EB",
+                borderRadius: 8,
+                padding: "8px 14px",
+                fontSize: "0.8125rem",
+                fontWeight: 800,
+                color: "#111827",
+                cursor: step === 0 ? "not-allowed" : "pointer",
+                opacity: step === 0 ? 0.35 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+              }}
             >
               <ChevronLeft size={14} /> Back
             </button>
@@ -573,7 +537,12 @@ export function BuyTicketModal({
                 disabled={!canAdvance[step]}
                 onClick={() => setStep((s) => s + 1)}
                 className="casino-btn-red"
-                style={{ padding: "8px 22px", fontSize: "0.8125rem", fontWeight: 900, opacity: !canAdvance[step] ? 0.5 : 1 }}
+                style={{
+                  padding: "8px 20px",
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  opacity: !canAdvance[step] ? 0.5 : 1,
+                }}
               >
                 Continue <ChevronRight size={14} />
               </button>
@@ -583,9 +552,14 @@ export function BuyTicketModal({
                 disabled={!canAdvance[3] || loading}
                 onClick={submit}
                 className="casino-btn-red"
-                style={{ padding: "9px 24px", fontSize: "0.875rem", fontWeight: 900, opacity: (!canAdvance[3] || loading) ? 0.5 : 1 }}
+                style={{
+                  padding: "9px 22px",
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  opacity: (!canAdvance[3] || loading) ? 0.5 : 1,
+                }}
               >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : `Submit Ticket (${currSymbol}${ticketPrice})`}
+                {loading ? <Loader2 size={15} className="animate-spin" /> : `Submit (${currSymbol}${ticketPrice})`}
               </button>
             )}
           </div>
