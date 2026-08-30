@@ -103,7 +103,7 @@ export default async function HomePage() {
           borderRight: "none",
           borderRadius: 0,
           boxShadow: "0 6px 20px rgba(0, 0, 0, 0.2)",
-          marginBottom: 28,
+          marginBottom: 36,
           overflow: "hidden",
           backgroundColor: "#0A1122",
         }}
@@ -253,19 +253,19 @@ export default async function HomePage() {
       </section>
 
       {/* ── Page Inner Container for content below full-width hero ── */}
-      <div className="page-inner-container">
+      <div className="page-inner-container" style={{ marginTop: 24 }}>
         {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 54 }}>
           <JackpotCardsSection cmsCards={cmsJackpotCards} />
         </div>
 
         {/* ── 3. Full Draws Catalog (Dedicated Full-Width Section) ── */}
-        <div style={{ marginBottom: 40 }}>
+        <div style={{ marginBottom: 60 }}>
           <DrawsExplorer initialDraws={allDraws} />
         </div>
 
         {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 48 }}>
           <TestimonialsNewsletter />
         </div>
       </div>
