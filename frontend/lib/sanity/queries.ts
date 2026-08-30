@@ -9,6 +9,7 @@ export const ALL_DRAWS_QUERY = defineQuery(`
     titleOm,
     drawId,
     status,
+    currency,
     "slug": slug.current,
     deadline,
     description,
@@ -44,6 +45,7 @@ export const ACTIVE_DRAW_QUERY = defineQuery(`
     titleAm,
     titleOm,
     drawId,
+    currency,
     "slug": slug.current,
     deadline,
     description,
@@ -71,6 +73,53 @@ export const ACTIVE_DRAW_QUERY = defineQuery(`
       name,
       accountDetail
     }
+  }
+`);
+
+/** Fetch top 3 featured jackpot cards under hero. */
+export const JACKPOT_CARDS_QUERY = defineQuery(`
+  *[_type == "jackpotCard" && isActive == true] | order(order asc) {
+    _id,
+    serial,
+    badgeTitle,
+    grandPrize,
+    currency,
+    ticketPrice,
+    drawDate,
+    poolLabels,
+    order
+  }
+`);
+
+/** Fetch published draw results and winning numbers. */
+export const LATEST_RESULTS_QUERY = defineQuery(`
+  *[_type == "drawResult" && isPublished == true] | order(drawDate desc) {
+    _id,
+    drawId,
+    drawTitle,
+    drawDate,
+    broadcastVideoUrl,
+    winningNumbers[] {
+      rank,
+      luckyNumber,
+      prizeAmount,
+      winnerName,
+      winnerLocation,
+      payoutStatus
+    },
+    auditNotes
+  }
+`);
+
+/** Fetch multilingual translations dictionary from CMS. */
+export const TRANSLATIONS_QUERY = defineQuery(`
+  *[_type == "translation"] {
+    key,
+    category,
+    en,
+    am,
+    om,
+    ti
   }
 `);
 
@@ -126,6 +175,44 @@ export const FAQS_QUERY = defineQuery(`
   }
 `);
 
+export interface CMSJackpotCard {
+  _id: string;
+  serial: string;
+  badgeTitle: string;
+  grandPrize: string;
+  currency: string;
+  ticketPrice: number;
+  drawDate: string;
+  poolLabels?: string[];
+  order?: number;
+}
+
+export interface CMSDrawResult {
+  _id: string;
+  drawId: string;
+  drawTitle: string;
+  drawDate: string;
+  broadcastVideoUrl?: string;
+  winningNumbers: {
+    rank: number;
+    luckyNumber: string;
+    prizeAmount?: string;
+    winnerName?: string;
+    winnerLocation?: string;
+    payoutStatus?: string;
+  }[];
+  auditNotes?: string;
+}
+
+export interface CMSTranslation {
+  key: string;
+  category?: string;
+  en: string;
+  am?: string;
+  om?: string;
+  ti?: string;
+}
+
 export interface CMSFAQ {
   _id: string;
   question: string;
@@ -163,6 +250,7 @@ export interface ActiveDraw {
   titleAm?: string;
   titleOm?: string;
   drawId: string;
+  currency?: string;
   slug?: string;
   deadline?: string;
   description?: string;

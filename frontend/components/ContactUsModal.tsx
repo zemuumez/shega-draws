@@ -22,9 +22,18 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
 
   if (!isOpen || !mounted) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.trim() && message.trim()) {
+      try {
+        await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, phone, message }),
+        });
+      } catch (err) {
+        console.warn("Contact submit error:", err);
+      }
       setSubmitted(true);
       setTimeout(() => {
         setSubmitted(false);
