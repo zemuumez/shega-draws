@@ -8,14 +8,14 @@ export function WhyRimnaLottery() {
     <div
       className="card-base"
       style={{
-        padding: "28px 24px",
+        padding: "20px 20px",
         background: "#FFFFFF",
         borderRadius: "14px",
         border: "1.5px solid var(--gray-line)",
-        marginBottom: 32,
+        marginBottom: 16,
       }}
     >
-      <h3 className="display" style={{ fontSize: "1.35rem", color: "#111827", fontWeight: 900, marginBottom: 12 }}>
+      <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900, marginBottom: 10 }}>
         Why Rimna Digital Lottery?
       </h3>
 

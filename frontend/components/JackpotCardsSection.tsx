@@ -15,8 +15,8 @@ function TicketOrnament() {
         justifyContent: "center",
         gap: 8,
         width: "100%",
-        maxWidth: 240,
-        margin: "6px auto 10px",
+        maxWidth: 220,
+        margin: "6px auto 8px",
       }}
     >
       <div style={{ flex: "1 1 0%", height: 0, borderTop: "1.5px dotted rgba(17, 24, 39, 0.65)" }} />
@@ -118,65 +118,51 @@ export function JackpotCardsSection() {
         initialDrawId={selectedBuyTicket.drawId}
       />
 
-      <section style={{ margin: "24px 0 32px", width: "100%" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 20, width: "100%" }}>
+      <section style={{ margin: "10px 0 20px", width: "100%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, width: "100%" }}>
           {jackpotTickets.map((ticket) => {
             const BadgeIcon = ticket.badgeIcon;
 
             return (
               <div
                 key={ticket.id}
-                className="gold-admission-ticket"
+                className="casino-ticket-card"
               >
                 {/* Inner Engraved Ticket Frame */}
-                <div className="gold-ticket-inner-frame">
+                <div className="casino-ticket-inner">
                   {/* Perfectly Centered Top Dotted Security Ornament */}
                   <TicketOrnament />
 
-                  {/* Badge Header Tag */}
-                  <span
-                    style={{
-                      background: "rgba(17, 24, 39, 0.08)",
-                      border: "1px solid rgba(17, 24, 39, 0.2)",
-                      borderRadius: "6px",
-                      padding: "2px 8px",
-                      fontSize: "0.625rem",
-                      fontWeight: 900,
-                      color: "#111827",
-                      letterSpacing: "0.5px",
-                      textTransform: "uppercase",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <BadgeIcon size={12} /> {ticket.badgeTitle}
-                  </span>
+                  {/* 3D Glossy Ruby Ribbon Badge */}
+                  <div>
+                    <span className="casino-ribbon-badge">
+                      <BadgeIcon size={12} /> {ticket.badgeTitle}
+                    </span>
+                  </div>
 
                   {/* Next Jackpot Subtitle */}
                   <span
                     style={{
-                      fontSize: "0.8125rem",
+                      fontSize: "0.75rem",
                       fontWeight: 700,
                       color: "#4B5563",
                       display: "block",
                       marginBottom: 1,
                     }}
                   >
-                    Next Jackpot
+                    Next Grand Jackpot
                   </span>
 
                   {/* Massive Bold Black Typography Amount */}
                   <div
                     className="display"
                     style={{
-                      fontSize: "clamp(1.75rem, 3.2vw, 2.3rem)",
+                      fontSize: "clamp(1.75rem, 3.2vw, 2.25rem)",
                       color: "#111827",
                       fontWeight: 900,
                       lineHeight: 1.1,
                       letterSpacing: "-0.5px",
-                      margin: "2px 0 6px",
+                      margin: "2px 0 4px",
                       textShadow: "0 1px 1px rgba(255, 255, 255, 0.8)",
                     }}
                   >
@@ -186,18 +172,18 @@ export function JackpotCardsSection() {
                   {/* Draw Release Date */}
                   <span
                     style={{
-                      fontSize: "0.8125rem",
+                      fontSize: "0.75rem",
                       fontWeight: 700,
                       color: "#374151",
                       display: "block",
-                      marginBottom: 8,
+                      marginBottom: 6,
                     }}
                   >
                     {ticket.drawDate}
                   </span>
 
                   {/* Available Pools Pills */}
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 5, marginBottom: 10, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 4, marginBottom: 8, flexWrap: "wrap" }}>
                     <span style={{ fontSize: "0.625rem", fontWeight: 800, color: "#4B5563", textTransform: "uppercase" }}>
                       Pools:
                     </span>
@@ -208,7 +194,7 @@ export function JackpotCardsSection() {
                           background: "#FFFFFF",
                           border: "1px solid rgba(17, 24, 39, 0.2)",
                           borderRadius: 4,
-                          padding: "1px 6px",
+                          padding: "1px 5px",
                           fontSize: "0.625rem",
                           fontWeight: 800,
                           color: "#111827",
@@ -219,20 +205,8 @@ export function JackpotCardsSection() {
                     ))}
                   </div>
 
-                  {/* Live Countdown Clock (Restored Previous Style) */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      background: "rgba(255, 255, 255, 0.9)",
-                      padding: "7px 10px",
-                      borderRadius: 8,
-                      border: "1px solid rgba(17, 24, 39, 0.15)",
-                      margin: "4px 0 8px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-                    }}
-                  >
+                  {/* High-Contrast Live Countdown Clock */}
+                  <div className="casino-countdown-strip">
                     <span
                       className="mono"
                       style={{
@@ -244,7 +218,7 @@ export function JackpotCardsSection() {
                         gap: 4,
                       }}
                     >
-                      <Clock size={12} color="#DC2626" /> Next Draw:
+                      <Clock size={12} color="#DC2626" /> Live Draw:
                     </span>
                     <span
                       className="mono"
@@ -264,22 +238,22 @@ export function JackpotCardsSection() {
                   {/* Perfectly Centered Bottom Dotted Security Ornament */}
                   <TicketOrnament />
 
-                  {/* Action Buttons: Dark Elegant "How to Buy" & Glossy Red "Buy Now" */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  {/* Action Buttons: Dark Elegant "How to Buy" & Glossy Ruby "Buy Now" */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                     <button
                       type="button"
                       onClick={() => setIsHowToBuyOpen(true)}
-                      className="gold-ticket-btn-dark"
+                      className="casino-btn-dark"
                     >
-                      <HelpCircle size={14} /> How to Buy
+                      <HelpCircle size={13} /> How to Buy
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleOpenBuy(ticket.currency, ticket.ticketPrice, ticket.serial)}
-                      className="gold-ticket-btn-red"
+                      className="casino-btn-red"
                     >
-                      <Ticket size={14} /> Buy Now
+                      <Ticket size={13} /> Buy Now
                     </button>
                   </div>
                 </div>

@@ -20,37 +20,22 @@ export function LiveBroadcastBanner() {
       <div
         className="card-base interactive-ticket-card lottery-guilloche-bg"
         style={{
-          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 60%, #EFF6FF 100%)",
+          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 60%, #FEF9C3 100%)",
           border: "2px solid #FDE047",
           borderRadius: "16px",
-          padding: "24px 26px",
-          boxShadow: "0 6px 20px -4px rgba(42, 101, 230, 0.12)",
-          marginBottom: 32,
+          padding: "20px 22px",
+          boxShadow: "0 6px 20px -4px rgba(234, 179, 8, 0.2)",
+          marginBottom: 20,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
           <div>
-            <span
-              style={{
-                background: "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
-                color: "#FFFFFF",
-                padding: "4px 10px",
-                borderRadius: "14px",
-                fontSize: "0.6875rem",
-                fontWeight: 900,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-                marginBottom: 8,
-              }}
-            >
-              <span className="pulse-radar" style={{ width: 8, height: 8, borderRadius: "50%", background: "#FFFFFF", display: "inline-block" }} />
+            <span className="casino-ribbon-badge">
+              <span className="pulse-radar" style={{ width: 7, height: 7, borderRadius: "50%", background: "#FFFFFF", display: "inline-block" }} />
               LIVE PUBLIC WINNER DRAWING
             </span>
 
-            <h3 className="display" style={{ fontSize: "1.35rem", color: "#111827", fontWeight: 900, lineHeight: 1.2 }}>
+            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900, lineHeight: 1.2 }}>
               Numbers Drawn Live on Video for All Participants
             </h3>
           </div>
@@ -58,10 +43,10 @@ export function LiveBroadcastBanner() {
           <button
             type="button"
             onClick={() => setIsBuyModalOpen(true)}
-            className="btn-base btn-primary"
-            style={{ padding: "10px 20px", fontSize: "0.875rem", fontWeight: 800, cursor: "pointer" }}
+            className="casino-btn-red"
+            style={{ fontSize: "0.8125rem", padding: "8px 14px" }}
           >
-            <Ticket size={16} /> Get Your Ticket
+            <Ticket size={14} /> Enter Active Draw
           </button>
         </div>
 

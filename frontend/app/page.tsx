@@ -58,14 +58,14 @@ export default async function HomePage() {
       <section
         className="hero-section-wrapper lottery-guilloche-bg reveal-item is-revealed"
         style={{
-          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 50%, #FEF9C3 100%)",
+          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 40%, #FEF9C3 100%)",
           borderTop: "2px solid #FDE047",
           borderBottom: "2px solid #FDE047",
           borderLeft: "none",
           borderRight: "none",
           borderRadius: 0,
-          boxShadow: "0 16px 36px -8px rgba(234, 179, 8, 0.25)",
-          marginBottom: 32,
+          boxShadow: "0 12px 28px -6px rgba(234, 179, 8, 0.22)",
+          marginBottom: 20,
           position: "relative",
           overflow: "hidden",
         }}
@@ -127,24 +127,12 @@ export default async function HomePage() {
 
         {/* Centered Content Container matching exact indentation of other sections */}
         <div className="page-inner-container">
-          <div className="hero-grid-layout" style={{ display: "grid", gap: 24, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
+          <div className="hero-grid-layout" style={{ display: "grid", gap: 20, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
           {/* Left Column: Headline, Active Draw Info & CTA */}
           <div style={{ width: "100%" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
-                  color: "#FFFFFF",
-                  padding: "4px 12px",
-                  borderRadius: "20px",
-                  fontSize: "0.6875rem",
-                  fontWeight: 900,
-                  letterSpacing: "0.4px",
-                  textTransform: "uppercase",
-                  boxShadow: "0 2px 6px rgba(185, 28, 28, 0.35)",
-                }}
-              >
-                OFFICIAL LIVE DRAW · {(currentApprovedDraw as any)?.draw_id || "RDL-2026-08A"}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span className="casino-ribbon-badge">
+                <Trophy size={13} /> OFFICIAL LIVE DRAW · {(currentApprovedDraw as any)?.draw_id || "RDL-2026-08A"}
               </span>
             </div>
 
@@ -157,7 +145,7 @@ export default async function HomePage() {
                 lineHeight: 1.05,
                 fontWeight: 900,
                 letterSpacing: "-1px",
-                margin: "4px 0 8px",
+                margin: "2px 0 6px",
               }}
             >
               {(currentApprovedDraw as any)?.total_prize_value || (currentApprovedDraw as any)?.prize_pool_estimate || "$1,250,000 / 1,000,000 ETB"}
@@ -170,31 +158,31 @@ export default async function HomePage() {
                 color: "#111827",
                 fontWeight: 800,
                 lineHeight: 1.25,
-                marginBottom: 10,
+                marginBottom: 8,
               }}
             >
               {currentApprovedDraw?.title || "Rimna Grand Jackpot — Multi-Pool Live Drawing"}
             </h1>
 
-            <p style={{ color: "var(--text-muted)", fontSize: "clamp(0.875rem, 1.5vw, 0.95rem)", lineHeight: 1.6, marginBottom: 20, maxWidth: 580 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "clamp(0.875rem, 1.5vw, 0.9375rem)", lineHeight: 1.55, marginBottom: 16, maxWidth: 580 }}>
               Pick your lucky numbers across 4 fixed participant pools. Watch the owner draw and display winning numbers live on broadcast with guaranteed payouts for the Top 10 winners!
             </p>
 
             {/* Hero Quick Trust Signals */}
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 24 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
                 <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
               </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                <Tv size={15} color="#2A65E6" /> Live Public Video Broadcast
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                <Tv size={15} color="#2A65E6" /> Live Public Broadcast
               </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
                 <Ticket size={15} color="var(--gold-deep)" /> Fixed Capped Pools (1K-5K)
               </span>
             </div>
 
             {/* Buy Ticket CTA Button */}
-            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <HeroBuyButton
                 drawId={(currentApprovedDraw as any)?.id || "RDL-ACTIVE"}
                 currency={activeCurrency}
@@ -204,9 +192,9 @@ export default async function HomePage() {
               <Link
                 href="#draws-catalog"
                 className="btn-base btn-secondary"
-                style={{ padding: "12px 22px", fontSize: "0.9375rem", fontWeight: 800 }}
+                style={{ padding: "11px 20px", fontSize: "0.875rem", fontWeight: 800 }}
               >
-                Browse All Draws <ArrowRight size={16} />
+                Browse All Draws <ArrowRight size={15} />
               </Link>
             </div>
           </div>
@@ -220,12 +208,12 @@ export default async function HomePage() {
                 overflow: "hidden",
                 border: "2px solid #FDE047",
                 background: "#FFFFFF",
-                boxShadow: "0 12px 28px -4px rgba(234, 179, 8, 0.35)",
-                maxWidth: 420,
+                boxShadow: "0 10px 24px -4px rgba(234, 179, 8, 0.3)",
+                maxWidth: 400,
                 width: "100%",
               }}
             >
-              <div style={{ position: "relative", width: "100%", height: 240 }}>
+              <div style={{ position: "relative", width: "100%", height: 210 }}>
                 <Image
                   src="/images/hero-lottery.jpg"
                   alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
@@ -240,7 +228,7 @@ export default async function HomePage() {
                     background: "linear-gradient(180deg, rgba(12, 38, 102, 0.1) 0%, rgba(12, 38, 102, 0.65) 100%)",
                   }}
                 />
-                <div style={{ position: "absolute", bottom: 10, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
+                <div style={{ position: "absolute", bottom: 8, left: 10, right: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
                   <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "#111827", fontWeight: 800, fontSize: "0.6875rem" }}>
                     <Trophy size={12} color="var(--gold-dark)" /> 100% Guaranteed Payouts
                   </span>
@@ -251,7 +239,7 @@ export default async function HomePage() {
               </div>
 
               {/* Countdown Strip */}
-              <div style={{ padding: "12px 14px", background: "#FFFFFF", borderTop: "1px solid var(--gray-line)" }}>
+              <div style={{ padding: "10px 12px", background: "#FFFFFF", borderTop: "1px solid var(--gray-line)" }}>
                 <CountdownTimer target={deadline} />
               </div>
             </div>
@@ -263,7 +251,7 @@ export default async function HomePage() {
       {/* ── Page Inner Container for content below full-width hero ── */}
       <div className="page-inner-container">
         {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
-        <div className="reveal-item">
+        <div className="reveal-item" style={{ marginBottom: 20 }}>
           <JackpotCardsSection />
         </div>
 
@@ -272,7 +260,7 @@ export default async function HomePage() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 340px",
-            gap: 28,
+            gap: 20,
             alignItems: "start",
             width: "100%",
           }}

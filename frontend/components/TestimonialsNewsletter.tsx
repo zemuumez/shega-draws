@@ -51,8 +51,8 @@ export function TestimonialsNewsletter() {
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        gap: 20,
-        margin: "32px 0 40px",
+        gap: 16,
+        margin: "20px 0 24px",
       }}
     >
       {/* ── Testimonials Box ──────────────────────────────────── */}

@@ -29,7 +29,7 @@ export function SidebarWidgets() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* ── Widget 1: Winning Number Results (Classic Red Header) ── */}
       <div
         className="card-base"
