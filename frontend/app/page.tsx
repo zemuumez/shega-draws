@@ -6,7 +6,7 @@ import { sanityClient } from "@/lib/sanity/client";
 import { ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, type CMSJackpotCard } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
-import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award } from "lucide-react";
+import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award, Sparkles } from "lucide-react";
 import { JackpotCardsSection } from "@/components/JackpotCardsSection";
 import { DrawsExplorer } from "@/components/DrawsExplorer";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
@@ -91,31 +91,52 @@ export default async function HomePage() {
 
   return (
     <div style={{ paddingBottom: 60, width: "100%", overflowX: "hidden" }}>
-      {/* ── 1. Current Active Admin-Approved Draw Hero Banner ── */}
+      {/* ── 1. Full-Width Hero Section with Rich Full-Bleed Background Image ── */}
       <section
-        className="hero-section-wrapper lottery-guilloche-bg reveal-item is-revealed"
+        className="hero-section-wrapper"
         style={{
-          background: "#FFFBEB",
+          position: "relative",
+          width: "100%",
           borderTop: "2px solid #F59E0B",
           borderBottom: "2px solid #F59E0B",
           borderLeft: "none",
           borderRight: "none",
           borderRadius: 0,
-          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.2)",
           marginBottom: 28,
-          position: "relative",
           overflow: "hidden",
+          backgroundColor: "#0A1122",
         }}
       >
-        <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 clamp(16px, 4vw, 32px)", boxSizing: "border-box" }}>
+        {/* Full Section Background Image */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+          <Image
+            src="/images/hero-lottery.jpg"
+            alt="Rimna Digital Lottery Background Banner"
+            fill
+            priority
+            style={{ objectFit: "cover", objectPosition: "center center" }}
+          />
+        </div>
+
+        {/* Dark Luxury Gradient Overlay for Crisp Text Legibility */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(90deg, rgba(10, 17, 34, 0.95) 0%, rgba(10, 17, 34, 0.88) 52%, rgba(10, 17, 34, 0.68) 100%)",
+            zIndex: 2,
+          }}
+        />
+
+        {/* Hero Content Container */}
+        <div style={{ position: "relative", zIndex: 3, maxWidth: 1140, margin: "0 auto", padding: "0 clamp(16px, 4vw, 32px)", boxSizing: "border-box" }}>
           <div
             className="hero-grid-layout"
             style={{
               display: "grid",
               gap: 32,
               alignItems: "center",
-              position: "relative",
-              zIndex: 2,
             }}
           >
             {/* Left Column: Live Jackpot Status & Quick Buy CTA */}
@@ -125,8 +146,8 @@ export default async function HomePage() {
                 <span className="badge badge-gold">
                   <Trophy size={13} color="#D97706" /> 10 GUARANTEED WINNERS PER DRAW
                 </span>
-                <span className="badge badge-green">
-                  <CheckCircle2 size={13} color="#059669" /> PUBLIC VIDEO BROADCAST
+                <span className="badge" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34D399", border: "1px solid #059669", fontWeight: 800 }}>
+                  <CheckCircle2 size={13} color="#34D399" /> PUBLIC VIDEO BROADCAST
                 </span>
               </div>
 
@@ -136,9 +157,10 @@ export default async function HomePage() {
                 style={{
                   fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
                   fontWeight: 900,
-                  color: "#111827",
+                  color: "#FFFFFF",
                   lineHeight: 1.12,
                   marginBottom: 12,
+                  textShadow: "0 2px 8px rgba(0,0,0,0.5)",
                 }}
               >
                 {currentApprovedDraw?.title || "100 Birr Classic Multi-Pool Draw"}
@@ -147,10 +169,11 @@ export default async function HomePage() {
               <p
                 style={{
                   fontSize: "clamp(0.875rem, 2vw, 1rem)",
-                  color: "#4B5563",
+                  color: "#E2E8F0",
                   lineHeight: 1.5,
                   maxWidth: 540,
-                  marginBottom: 20,
+                  marginBottom: 22,
+                  textShadow: "0 1px 4px rgba(0,0,0,0.4)",
                 }}
               >
                 Pick your lucky number, choose your pool capacity, and watch our founders draw the 10 winning numbers live on video stream.
@@ -167,29 +190,37 @@ export default async function HomePage() {
                 <Link
                   href="/results"
                   className="casino-btn-dark"
-                  style={{ padding: "12px 20px", fontSize: "0.875rem", textDecoration: "none" }}
+                  style={{
+                    padding: "12px 20px",
+                    fontSize: "0.875rem",
+                    textDecoration: "none",
+                    border: "1.5px solid #F59E0B",
+                    background: "rgba(17, 24, 39, 0.85)",
+                    backdropFilter: "blur(6px)",
+                  }}
                 >
                   <Award size={16} color="#F59E0B" /> View Results & Live Stream
                 </Link>
               </div>
             </div>
 
-            {/* Right Column: Promotional Visual & Live Countdown */}
+            {/* Right Column: Mini Box with New 3D Gold Tumbler Image & Countdown */}
             <div>
               <div
                 className="card-base"
                 style={{
                   borderRadius: "16px",
                   overflow: "hidden",
-                  border: "2px solid #F59E0B",
-                  background: "#FFFFFF",
-                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  border: "2.5px solid #F59E0B",
+                  background: "#111827",
+                  boxShadow: "0 14px 32px rgba(0, 0, 0, 0.45)",
                 }}
               >
-                <div style={{ position: "relative", width: "100%", height: 210 }}>
+                {/* Dedicated Mini Card Graphic */}
+                <div style={{ position: "relative", width: "100%", height: 215 }}>
                   <Image
-                    src="/images/hero-lottery.jpg"
-                    alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
+                    src="/images/hero-mini-card.jpg"
+                    alt="Golden Jackpot Raffle Tumbler Machine"
                     fill
                     priority
                     style={{ objectFit: "cover" }}
@@ -198,21 +229,21 @@ export default async function HomePage() {
                     style={{
                       position: "absolute",
                       inset: 0,
-                      background: "rgba(17, 24, 39, 0.35)",
+                      background: "linear-gradient(180deg, rgba(17, 24, 39, 0.1) 0%, rgba(17, 24, 39, 0.65) 100%)",
                     }}
                   />
                   <div style={{ position: "absolute", bottom: 8, left: 10, right: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
-                    <span className="badge" style={{ background: "#FFFFFF", color: "#111827", fontWeight: 800, fontSize: "0.6875rem" }}>
-                      <Trophy size={12} color="#D97706" /> 100% Guaranteed Payouts
+                    <span className="badge" style={{ background: "#FEF08A", color: "#854D0E", border: "1px solid #FACC15", fontWeight: 900, fontSize: "0.6875rem" }}>
+                      <Trophy size={12} color="#D97706" /> 10 Guaranteed Winners
                     </span>
-                    <span className="mono" style={{ fontSize: "0.6875rem", color: "#FFFFFF", fontWeight: 700 }}>
+                    <span className="mono" style={{ fontSize: "0.6875rem", color: "#FFFFFF", fontWeight: 800, textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
                       Live Video Draw
                     </span>
                   </div>
                 </div>
 
                 {/* Countdown Strip */}
-                <div style={{ padding: "10px 12px", background: "#FFFFFF", borderTop: "1px solid var(--gray-line)" }}>
+                <div style={{ padding: "10px 12px", background: "#FFFFFF", borderTop: "2px solid #F59E0B" }}>
                   <CountdownTimer target={deadline} />
                 </div>
               </div>
