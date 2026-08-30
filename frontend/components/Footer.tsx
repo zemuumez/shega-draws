@@ -4,9 +4,28 @@ import React from "react";
 import Link from "next/link";
 import { Ticket, ShieldCheck, Phone, Mail, Send, Award, Users } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
+import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
-export function Footer() {
-  const { t } = useLanguage();
+interface FooterProps {
+  siteSettings?: CMSSiteSettings | null;
+}
+
+export function Footer({ siteSettings }: FooterProps) {
+  const { language, t } = useLanguage();
+
+  // CMS values with hardcoded fallbacks
+  const siteName = siteSettings?.siteName || t.appName;
+  const footerDesc =
+    (language === "am" && siteSettings?.footerDescriptionAm) ||
+    (language === "om" && siteSettings?.footerDescriptionOm) ||
+    siteSettings?.footerDescription ||
+    t.footer.description;
+  const phone1 = siteSettings?.contactPhone || "+251 911 000 000";
+  const phone2 = siteSettings?.contactPhoneSecondary || "0912 345 678";
+  const email = siteSettings?.supportEmail || "support@rimnalottery.com";
+  const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
+  const copyrightText = siteSettings?.copyrightText || t.footer.rights;
+  const complianceText = siteSettings?.complianceText || t.footer.compliance;
 
   return (
     <footer
@@ -37,12 +56,12 @@ export function Footer() {
                 <Ticket size={18} color="#1E3A8A" />
               </div>
               <span className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800 }}>
-                {t.appName}
+                {siteName}
               </span>
             </div>
 
             <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", lineHeight: 1.6, marginBottom: 18 }}>
-              {t.footer.description}
+              {footerDesc}
             </p>
 
             <LanguageSwitcher />
@@ -87,13 +106,13 @@ export function Footer() {
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Phone size={14} color="var(--blue-navy)" /> +251 911 000 000 / 0912 345 678
+                <Phone size={14} color="var(--blue-navy)" /> {phone1} / {phone2}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Mail size={14} color="var(--blue-navy)" /> support@rimnalottery.com
+                <Mail size={14} color="var(--blue-navy)" /> {email}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Send size={14} color="#2A65E6" /> Official Telegram: @RimnaLotteryOfficial
+                <Send size={14} color="#2A65E6" /> Official Telegram: {telegramHandle}
               </div>
             </div>
           </div>
@@ -114,10 +133,10 @@ export function Footer() {
           }}
         >
           <div>
-            © {new Date().getFullYear()} {t.appName}. {t.footer.rights}
+            © {new Date().getFullYear()} {siteName}. {copyrightText}
           </div>
           <div>
-            {t.footer.compliance}
+            {complianceText}
           </div>
         </div>
       </div>

@@ -8,15 +8,27 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: Translations;
+  /** Get a CMS translation by key, with fallback to hardcoded translations. */
+  tc: (key: string) => string;
 }
+
+// CMS translation cache (populated on mount)
+let _cmsTranslations: Record<string, Record<string, string>> = {};
 
 const LanguageContext = createContext<LanguageContextType>({
   language: "en",
   setLanguage: () => {},
   t: translations.en,
+  tc: () => "",
 });
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+export function LanguageProvider({
+  children,
+  cmsTranslations,
+}: {
+  children: React.ReactNode;
+  cmsTranslations?: { key: string; en: string; am?: string; om?: string; ti?: string }[];
+}) {
   const [language, setLangState] = useState<Language>("en");
 
   useEffect(() => {
@@ -26,6 +38,22 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Build CMS lookup map once
+  useEffect(() => {
+    if (cmsTranslations && cmsTranslations.length > 0) {
+      const map: Record<string, Record<string, string>> = {};
+      for (const t of cmsTranslations) {
+        map[t.key] = {
+          en: t.en,
+          ...(t.am ? { am: t.am } : {}),
+          ...(t.om ? { om: t.om } : {}),
+          ...(t.ti ? { ti: t.ti } : {}),
+        };
+      }
+      _cmsTranslations = map;
+    }
+  }, [cmsTranslations]);
+
   const setLanguage = (lang: Language) => {
     setLangState(lang);
     localStorage.setItem("rimnalottery_lang", lang);
@@ -33,8 +61,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = translations[language] ?? translations.en;
 
+  /** Look up CMS translation by dot-path key, falling back to empty string. */
+  const tc = (key: string): string => {
+    const cmsEntry = _cmsTranslations[key];
+    if (cmsEntry) {
+      return cmsEntry[language] || cmsEntry["en"] || "";
+    }
+    return "";
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, tc }}>
       {children}
     </LanguageContext.Provider>
   );

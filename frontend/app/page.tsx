@@ -3,7 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { getActiveDraw, listDraws, type DrawState, type Currency, type PoolOption } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, type CMSJackpotCard } from "@/lib/sanity/queries";
+import {
+  ALL_DRAWS_QUERY,
+  JACKPOT_CARDS_QUERY,
+  HERO_CONTENT_QUERY,
+  SECTION_CONTENT_QUERY,
+  TESTIMONIALS_QUERY,
+  type CMSJackpotCard,
+  type CMSHeroContent,
+  type CMSSectionContent,
+  type CMSTestimonial,
+} from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
 import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award, Sparkles } from "lucide-react";
@@ -51,17 +61,23 @@ function mapSanityDraw(s: any): DrawState {
 }
 
 export default async function HomePage() {
-  const [cmsDrawsRes, cmsJackpotCardsRes, activeDrawState, fallbackDrawsRes] = await Promise.allSettled([
+  const [cmsDrawsRes, cmsJackpotCardsRes, activeDrawState, fallbackDrawsRes, heroContentRes, sectionContentRes, testimonialsRes] = await Promise.allSettled([
     sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => null),
     sanityClient.fetch<CMSJackpotCard[]>(JACKPOT_CARDS_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
+    sanityClient.fetch<CMSHeroContent>(HERO_CONTENT_QUERY).catch(() => null),
+    sanityClient.fetch<CMSSectionContent[]>(SECTION_CONTENT_QUERY).catch(() => null),
+    sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => null),
   ]);
 
   const rawCmsDraws = cmsDrawsRes.status === "fulfilled" ? cmsDrawsRes.value : null;
   const cmsJackpotCards = cmsJackpotCardsRes.status === "fulfilled" ? cmsJackpotCardsRes.value : null;
   const drawState = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
   const fallbackDraws = fallbackDrawsRes.status === "fulfilled" ? fallbackDrawsRes.value : [];
+  const heroContent = heroContentRes.status === "fulfilled" ? heroContentRes.value : null;
+  const sectionContents = sectionContentRes.status === "fulfilled" ? sectionContentRes.value : null;
+  const testimonials = testimonialsRes.status === "fulfilled" ? testimonialsRes.value : null;
 
   // Convert CMS draws to DrawState
   const mappedCmsDraws = rawCmsDraws && rawCmsDraws.length > 0
@@ -176,7 +192,7 @@ export default async function HomePage() {
                   textShadow: "0 1px 4px rgba(0,0,0,0.4)",
                 }}
               >
-                Pick your lucky number, choose your pool capacity, and watch our founders draw the 10 winning numbers live on video stream.
+                {heroContent?.subtitle || "Pick your lucky number, choose your pool capacity, and watch our founders draw the 10 winning numbers live on video stream."}
               </p>
 
               {/* High-Impact Quick Buy Action */}
@@ -266,7 +282,7 @@ export default async function HomePage() {
 
         {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
         <div style={{ marginBottom: 48 }}>
-          <TestimonialsNewsletter />
+          <TestimonialsNewsletter cmsTestimonials={testimonials} />
         </div>
       </div>
     </div>

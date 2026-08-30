@@ -4,6 +4,8 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
+import { sanityClient } from "@/lib/sanity/client";
+import { TRANSLATIONS_QUERY, SITE_SETTINGS_QUERY, type CMSSiteSettings, type CMSTranslation } from "@/lib/sanity/queries";
 
 export const metadata: Metadata = {
   title: { default: "Rimna Digital Lottery — Cryptographic Digital Lottery & Raffles", template: "%s · Rimna Digital Lottery" },
@@ -17,7 +19,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const revalidate = 60; // Revalidate layout data every 60 seconds
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Fetch CMS translations and site settings at the layout level
+  const [cmsTranslationsRes, siteSettingsRes] = await Promise.allSettled([
+    sanityClient.fetch<CMSTranslation[]>(TRANSLATIONS_QUERY).catch(() => null),
+    sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
+  ]);
+
+  const cmsTranslations = cmsTranslationsRes.status === "fulfilled" ? cmsTranslationsRes.value : null;
+  const siteSettings = siteSettingsRes.status === "fulfilled" ? siteSettingsRes.value : null;
+
   return (
     <html lang="en">
       <head>
@@ -26,13 +39,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="bg-subtle-mesh">
-        <LanguageProvider>
+        <LanguageProvider cmsTranslations={cmsTranslations ?? undefined}>
           <ScrollProgressBar />
           <Nav />
           <main id="main-content" className="page-content">
             {children}
           </main>
-          <Footer />
+          <Footer siteSettings={siteSettings} />
         </LanguageProvider>
       </body>
     </html>

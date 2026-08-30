@@ -116,6 +116,7 @@ export const TRANSLATIONS_QUERY = defineQuery(`
   *[_type == "translation"] {
     key,
     category,
+    description,
     en,
     am,
     om,
@@ -147,15 +148,29 @@ export const PROMOTIONS_QUERY = defineQuery(`
   }
 `);
 
-/** Global site settings singleton. */
+/** Global site settings singleton (enhanced). */
 export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0] {
     siteName,
     tagline,
+    taglineAm,
+    taglineOm,
     contactPhone,
+    contactPhoneSecondary,
     supportEmail,
     telegramUrl,
+    telegramHandle,
     whatsappUrl,
+    youtubeUrl,
+    facebookUrl,
+    tiktokUrl,
+    footerDescription,
+    footerDescriptionAm,
+    footerDescriptionOm,
+    copyrightText,
+    complianceText,
+    metaTitle,
+    metaDescription,
     "logoUrl": logo.asset->url
   }
 `);
@@ -174,6 +189,112 @@ export const FAQS_QUERY = defineQuery(`
     order
   }
 `);
+
+/** Fetch hero banner content singleton. */
+export const HERO_CONTENT_QUERY = defineQuery(`
+  *[_type == "heroContent"][0] {
+    title,
+    titleAm,
+    titleOm,
+    titleTi,
+    subtitle,
+    subtitleAm,
+    subtitleOm,
+    subtitleTi,
+    ctaPrimaryText,
+    ctaSecondaryText,
+    trustBadges[] {
+      text,
+      textAm,
+      textOm,
+      color
+    },
+    "backgroundImage": backgroundImage.asset->url,
+    "miniCardImage": miniCardImage.asset->url
+  }
+`);
+
+/** Fetch all page section content documents. */
+export const SECTION_CONTENT_QUERY = defineQuery(`
+  *[_type == "sectionContent" && isActive == true] {
+    _id,
+    sectionKey,
+    title,
+    titleAm,
+    titleOm,
+    titleTi,
+    subtitle,
+    subtitleAm,
+    subtitleOm,
+    subtitleTi,
+    body,
+    bodyAm,
+    bodyOm,
+    ctaText,
+    ctaLink,
+    features[] {
+      icon,
+      title,
+      titleAm,
+      titleOm,
+      description,
+      descriptionAm,
+      descriptionOm,
+      color
+    }
+  }
+`);
+
+/** Fetch a specific section by key. */
+export const SECTION_BY_KEY_QUERY = defineQuery(`
+  *[_type == "sectionContent" && sectionKey == $key && isActive == true][0] {
+    _id,
+    sectionKey,
+    title,
+    titleAm,
+    titleOm,
+    titleTi,
+    subtitle,
+    subtitleAm,
+    subtitleOm,
+    subtitleTi,
+    body,
+    bodyAm,
+    bodyOm,
+    ctaText,
+    ctaLink,
+    features[] {
+      icon,
+      title,
+      titleAm,
+      titleOm,
+      description,
+      descriptionAm,
+      descriptionOm,
+      color
+    }
+  }
+`);
+
+/** Fetch active customer testimonials. */
+export const TESTIMONIALS_QUERY = defineQuery(`
+  *[_type == "testimonial" && isActive == true] | order(order asc) {
+    _id,
+    name,
+    location,
+    quote,
+    quoteAm,
+    quoteOm,
+    drawTitle,
+    prizeWon,
+    rating,
+    "avatarUrl": avatar.asset->url
+  }
+`);
+
+// ══════════════════════════════════════════════════════════════════════
+// TypeScript Interfaces
+// ══════════════════════════════════════════════════════════════════════
 
 export interface CMSJackpotCard {
   _id: string;
@@ -207,6 +328,7 @@ export interface CMSDrawResult {
 export interface CMSTranslation {
   key: string;
   category?: string;
+  description?: string;
   en: string;
   am?: string;
   om?: string;
@@ -284,4 +406,92 @@ export interface CMSPromotion {
   highlightColor?: string;
   validUntil?: string;
   isSponsored?: boolean;
+}
+
+export interface CMSSiteSettings {
+  siteName: string;
+  tagline?: string;
+  taglineAm?: string;
+  taglineOm?: string;
+  contactPhone?: string;
+  contactPhoneSecondary?: string;
+  supportEmail?: string;
+  telegramUrl?: string;
+  telegramHandle?: string;
+  whatsappUrl?: string;
+  youtubeUrl?: string;
+  facebookUrl?: string;
+  tiktokUrl?: string;
+  footerDescription?: string;
+  footerDescriptionAm?: string;
+  footerDescriptionOm?: string;
+  copyrightText?: string;
+  complianceText?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  logoUrl?: string;
+}
+
+export interface CMSHeroContent {
+  title?: string;
+  titleAm?: string;
+  titleOm?: string;
+  titleTi?: string;
+  subtitle?: string;
+  subtitleAm?: string;
+  subtitleOm?: string;
+  subtitleTi?: string;
+  ctaPrimaryText?: string;
+  ctaSecondaryText?: string;
+  trustBadges?: {
+    text: string;
+    textAm?: string;
+    textOm?: string;
+    color?: string;
+  }[];
+  backgroundImage?: string;
+  miniCardImage?: string;
+}
+
+export interface CMSSectionFeature {
+  icon?: string;
+  title: string;
+  titleAm?: string;
+  titleOm?: string;
+  description?: string;
+  descriptionAm?: string;
+  descriptionOm?: string;
+  color?: string;
+}
+
+export interface CMSSectionContent {
+  _id: string;
+  sectionKey: string;
+  title: string;
+  titleAm?: string;
+  titleOm?: string;
+  titleTi?: string;
+  subtitle?: string;
+  subtitleAm?: string;
+  subtitleOm?: string;
+  subtitleTi?: string;
+  body?: string;
+  bodyAm?: string;
+  bodyOm?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  features?: CMSSectionFeature[];
+}
+
+export interface CMSTestimonial {
+  _id: string;
+  name: string;
+  location?: string;
+  quote: string;
+  quoteAm?: string;
+  quoteOm?: string;
+  drawTitle?: string;
+  prizeWon?: string;
+  rating?: number;
+  avatarUrl?: string;
 }

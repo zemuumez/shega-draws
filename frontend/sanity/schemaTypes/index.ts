@@ -10,6 +10,9 @@ import { translationType } from "./translation";
 import { promotionType } from "./promotion";
 import { siteSettingsType } from "./siteSettings";
 import { faqType } from "./faq";
+import { heroContentType } from "./heroContent";
+import { sectionContentType } from "./sectionContent";
+import { testimonialType } from "./testimonial";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -23,6 +26,9 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     promotionType,
     siteSettingsType,
     faqType,
+    heroContentType,
+    sectionContentType,
+    testimonialType,
 
     // Object types
     prizeType,

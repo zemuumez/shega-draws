@@ -2,32 +2,48 @@
 
 import React, { useState } from "react";
 import { Star, Send, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import type { CMSTestimonial } from "@/lib/sanity/queries";
 
-export function TestimonialsNewsletter() {
+interface TestimonialsNewsletterProps {
+  cmsTestimonials?: CMSTestimonial[] | null;
+}
+
+export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewsletterProps) {
+  const { language } = useLanguage();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
-  const testimonials = [
+  // Fallback hardcoded testimonials
+  const fallbackTestimonials: CMSTestimonial[] = [
     {
+      _id: "fb1",
       name: "Tewodros Kassahun",
       location: "Addis Ababa",
-      prize: "80,000 ETB (1st Place Winner)",
+      prizeWon: "80,000 ETB (1st Place Winner)",
       quote: "I watched the live video broadcast when my number was drawn! The CBE transfer arrived in my account in less than 20 minutes!",
+      rating: 5,
     },
     {
+      _id: "fb2",
       name: "Helen Mengistu",
       location: "Washington, DC (Diaspora)",
-      prize: "$15,000 USD (1st Place Winner)",
+      prizeWon: "$15,000 USD (1st Place Winner)",
       quote: "Playing from the USA was so seamless with my card. The 10 guaranteed winners structure gives real winning chances!",
+      rating: 5,
     },
     {
+      _id: "fb3",
       name: "Yonas Birhane",
       location: "Hawassa",
-      prize: "65,000 ETB (2nd Place Winner)",
+      prizeWon: "65,000 ETB (2nd Place Winner)",
       quote: "Rimna is truly the most transparent lottery platform. You see your ticket number on the board and verify the outcome yourself.",
+      rating: 5,
     },
   ];
+
+  const testimonials = cmsTestimonials && cmsTestimonials.length > 0 ? cmsTestimonials : fallbackTestimonials;
 
   const handleNext = () => {
     setTestimonialIdx((prev) => (prev + 1) % testimonials.length);
@@ -38,6 +54,10 @@ export function TestimonialsNewsletter() {
   };
 
   const current = testimonials[testimonialIdx];
+  const currentQuote =
+    (language === "am" && current.quoteAm) ||
+    (language === "om" && current.quoteOm) ||
+    current.quote;
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,13 +134,13 @@ export function TestimonialsNewsletter() {
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div style={{ display: "flex", gap: 3, marginBottom: 8 }}>
-            {[...Array(5)].map((_, i) => (
+            {[...Array(current.rating || 5)].map((_, i) => (
               <Star key={i} size={14} fill="#EAB308" color="#EAB308" />
             ))}
           </div>
 
           <p style={{ fontStyle: "italic", color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: 12 }}>
-            &ldquo;{current.quote}&rdquo;
+            &ldquo;{currentQuote}&rdquo;
           </p>
 
           <div>
@@ -128,7 +148,8 @@ export function TestimonialsNewsletter() {
               {current.name} · {current.location}
             </strong>
             <span className="mono" style={{ fontSize: "0.75rem", color: "var(--gold-deep)", fontWeight: 700 }}>
-              Won {current.prize}
+              Won {current.prizeWon}
+              {current.drawTitle ? ` — ${current.drawTitle}` : ""}
             </span>
           </div>
         </div>
