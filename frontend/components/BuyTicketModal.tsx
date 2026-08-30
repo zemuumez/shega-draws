@@ -101,13 +101,16 @@ export function BuyTicketModal({
       await registerPlayer({ name: name.trim(), phone: phone.trim() });
 
       const form = new FormData();
+      form.append("name", name.trim());
+      form.append("phone", phone.trim());
       form.append("draw_id", drawId);
       form.append("number", number);
       form.append("amount", String(ticketPrice));
       form.append("currency", currency);
+      form.append("pool_capacity", currentPool.label);
       form.append("method", method);
       if (promoCode.trim()) form.append("promo_code", promoCode.trim());
-      form.append("proof", proofFile!);
+      if (proofFile) form.append("proof", proofFile);
 
       await submitEntry(form);
       setStep(4);

@@ -51,7 +51,40 @@ export default defineConfig({
                   ])
               ),
 
-            // ── Section 2: Featured Jackpot Cards & Ad Banners ──────
+            // ── Section 2: Ticket Entries & Payment Proofs ──────────
+            S.listItem()
+              .title("💳 Ticket Entries & Payment Screenshots")
+              .child(
+                S.list()
+                  .title("Payment Proof Verifications")
+                  .items([
+                    S.listItem()
+                      .title("🟡 Pending Approval (Needs Verification)")
+                      .child(
+                        S.documentList()
+                          .title("Unverified Payment Screenshots")
+                          .filter('_type == "playerEntry" && status == "pending"')
+                      ),
+                    S.listItem()
+                      .title("🟢 Confirmed & Approved Entries")
+                      .child(
+                        S.documentList()
+                          .title("Approved Ticket Purchases")
+                          .filter('_type == "playerEntry" && status == "confirmed"')
+                      ),
+                    S.listItem()
+                      .title("🔴 Rejected Entries (Invalid Proof)")
+                      .child(
+                        S.documentList()
+                          .title("Rejected Submissions")
+                          .filter('_type == "playerEntry" && status == "rejected"')
+                      ),
+                    S.divider(),
+                    S.documentTypeListItem("playerEntry").title("📁 All Player Entries & Screenshots"),
+                  ])
+              ),
+
+            // ── Section 3: Featured Jackpot Cards & Ad Banners ──────
             S.listItem()
               .title("📢 Jackpot Cards & Ad Banners")
               .child(
@@ -63,7 +96,7 @@ export default defineConfig({
                   ])
               ),
 
-            // ── Section 3: Results & Payout Audits ───────────────────
+            // ── Section 4: Results & Payout Audits ───────────────────
             S.listItem()
               .title("🏆 Results & Winning Numbers")
               .child(
@@ -74,7 +107,7 @@ export default defineConfig({
                   ])
               ),
 
-            // ── Section 4: Customer Care & Inbox ─────────────────────
+            // ── Section 5: Customer Care & Inbox ─────────────────────
             S.listItem()
               .title("📬 Customer Care & Inbox")
               .child(
@@ -109,7 +142,7 @@ export default defineConfig({
 
             S.divider(),
 
-            // ── Section 5: Platform Settings & Translations ─────────
+            // ── Section 6: Platform Settings & Translations ─────────
             S.listItem()
               .title("🌐 Platform & Multilingual Config")
               .child(

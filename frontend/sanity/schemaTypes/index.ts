@@ -2,6 +2,7 @@ import { type SchemaTypeDefinition } from "sanity";
 import { prizeType } from "./prize";
 import { paymentMethodType } from "./paymentMethod";
 import { drawType } from "./draw";
+import { playerEntryType } from "./playerEntry";
 import { jackpotCardType } from "./jackpotCard";
 import { drawResultType } from "./drawResult";
 import { contactMessageType } from "./contactMessage";
@@ -14,6 +15,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
     // Documents
     drawType,
+    playerEntryType,
     jackpotCardType,
     drawResultType,
     contactMessageType,
