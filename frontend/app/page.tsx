@@ -70,61 +70,6 @@ export default async function HomePage() {
           overflow: "hidden",
         }}
       >
-        {/* Floating Ambient Lottery Spheres */}
-        <div
-          className="float-slow"
-          style={{
-            position: "absolute",
-            top: -15,
-            right: "25%",
-            width: 48,
-            height: 48,
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #FEF08A 0%, #EAB308 100%)",
-            border: "2px solid #FFFFFF",
-            boxShadow: "0 6px 14px rgba(234, 179, 8, 0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#111827",
-            fontWeight: 900,
-            fontSize: "0.875rem",
-            fontFamily: "var(--font-mono)",
-            pointerEvents: "none",
-            zIndex: 2,
-            opacity: 0.85,
-          }}
-        >
-          #7
-        </div>
-
-        <div
-          className="float-reverse"
-          style={{
-            position: "absolute",
-            bottom: 20,
-            left: "48%",
-            width: 38,
-            height: 38,
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #DBEAFE 0%, #2A65E6 100%)",
-            border: "2px solid #FFFFFF",
-            boxShadow: "0 4px 12px rgba(42, 101, 230, 0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#FFFFFF",
-            fontWeight: 900,
-            fontSize: "0.75rem",
-            fontFamily: "var(--font-mono)",
-            pointerEvents: "none",
-            zIndex: 2,
-            opacity: 0.8,
-          }}
-        >
-          #77
-        </div>
-
         {/* Centered Content Container matching exact indentation of other sections */}
         <div className="page-inner-container">
           <div className="hero-grid-layout" style={{ display: "grid", gap: 20, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
