@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Ticket, Trophy, Calendar, Users, ShieldCheck, ChevronDown, ChevronUp, Sparkles, Globe } from "lucide-react";
+import { Ticket, Trophy, Calendar, Users, ShieldCheck, ChevronDown, ChevronUp, Globe } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { type DrawState, type Currency, USD_TICKET_CONFIGS, ETB_TICKET_CONFIGS } from "@/lib/api";
 import { BuyTicketModal } from "./BuyTicketModal";
@@ -59,73 +59,76 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
     <div
       className="physical-lottery-ticket ticket-card-container interactive-ticket-card lottery-watermark animate-fade"
       style={{
-        margin: "0 0 24px 0",
+        margin: "0 0 16px 0",
         position: "relative",
         background: "#FFFDF7",
         border: "1.5px solid #FDE047",
+        borderRadius: "14px",
       }}
     >
       {/* ── Left / Main Ticket Body ───────────────────────────────────── */}
       <div className="ticket-body-padding" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
           {/* Top Bar: Currency, Serial & Status */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
               <span
                 className="badge"
                 style={{
                   background: isOpen ? "var(--teal-bg)" : isUpcoming ? "var(--gold-bg)" : "#F1F5F9",
                   color: isOpen ? "var(--teal-dark)" : isUpcoming ? "var(--gold-dark)" : "var(--text-muted)",
                   border: `1px solid ${isOpen ? "var(--teal-border)" : isUpcoming ? "var(--gold-border)" : "var(--gray-line)"}`,
+                  fontSize: "0.6875rem",
+                  fontWeight: 900,
                 }}
               >
                 {isOpen ? "ACTIVE DRAW" : isUpcoming ? "SCHEDULED" : "COMPLETED"}
               </span>
 
               {/* Currency Tag */}
-              <span className={isUSD ? "badge badge-blue" : "badge badge-gold"} style={{ fontSize: "0.75rem", fontWeight: 800 }}>
-                {isUSD ? <Globe size={12} /> : null}
+              <span className={isUSD ? "badge badge-blue" : "badge badge-gold"} style={{ fontSize: "0.6875rem", fontWeight: 800 }}>
+                {isUSD ? <Globe size={11} /> : null}
                 {isUSD ? `$${ticketPrice} USD Diaspora Ticket` : `${ticketPrice} ETB Fixed Price`}
               </span>
 
-              <span className="mono" style={{ fontSize: "0.75rem", color: "var(--text-subtle)", fontWeight: 700 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", fontWeight: 700 }}>
                 #{draw.draw_id}
               </span>
             </div>
 
-            <div className="mono" style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
-              <Calendar size={13} color="#2A65E6" />
+            <div className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 5 }}>
+              <Calendar size={12} color="#2A65E6" />
               <span>{new Date(draw.deadline).toLocaleDateString(language === "am" ? "am-ET" : "en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
             </div>
           </div>
 
           {/* Title & Pool Options Display */}
-          <div style={{ marginBottom: 14 }}>
-            <h3 className="display" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.45rem)", color: "#111827", lineHeight: 1.2, fontWeight: 800, marginBottom: 4 }}>
+          <div style={{ marginBottom: 10 }}>
+            <h3 className="display" style={{ fontSize: "clamp(1.15rem, 2.2vw, 1.35rem)", color: "#111827", lineHeight: 1.2, fontWeight: 800, marginBottom: 4 }}>
               {draw.title || (isUSD ? `$${ticketPrice} USD International Draw` : `${ticketPrice} Birr Multi-Pool Jackpot Draw`)}
             </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 10 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginBottom: 8 }}>
               Available participant pools (Select pool capacity after clicking Buy Ticket):
             </p>
 
             {/* Non-choosable Info Cards for Pool Sizes */}
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(110px, 1fr))`, gap: 8, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(100px, 1fr))`, gap: 6, marginBottom: 10 }}>
               {pools.map((pool) => (
                 <div
                   key={pool.size}
                   style={{
-                    padding: "8px 8px",
-                    borderRadius: 8,
-                    border: "1.5px solid #E2E8F0",
+                    padding: "6px 6px",
+                    borderRadius: 6,
+                    border: "1px solid #E2E8F0",
                     background: "#FFFFFF",
                     textAlign: "center",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
                   }}
                 >
-                  <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "#111827", display: "block" }}>
+                  <span className="mono" style={{ fontSize: "0.6875rem", fontWeight: 800, color: "#111827", display: "block" }}>
                     {pool.label}
                   </span>
-                  <span className="display" style={{ fontSize: "0.875rem", fontWeight: 800, color: "var(--gold-deep)", display: "block", marginTop: 2 }}>
+                  <span className="display" style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--gold-deep)", display: "block", marginTop: 1 }}>
                     {pool.pool}
                   </span>
                 </div>
@@ -134,13 +137,12 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
           </div>
 
           {/* ── Guaranteed Top 10 Winner Prizes ────────────────────────── */}
-          <div style={{ background: "#FFFFFF", border: "1px solid var(--gray-line)", borderRadius: 12, padding: "14px 16px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 6 }}>
-              <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "#111827", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
-                <Trophy size={15} color="var(--gold-dark)" /> Guaranteed 10 Winner Prizes ({basePool.pool} Pool)
+          <div style={{ background: "#FFFFFF", border: "1px solid var(--gray-line)", borderRadius: 10, padding: "10px 12px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 6 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", fontWeight: 800, color: "#111827", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 5 }}>
+                <Trophy size={13} color="var(--gold-dark)" /> Guaranteed 10 Winner Prizes ({basePool.pool} Pool)
               </span>
               
-              {/* Interactive Toggle Button */}
               <button
                 type="button"
                 onClick={() => setShowAllPrizes((prev) => !prev)}
@@ -148,119 +150,85 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
                   background: showAllPrizes ? "var(--blue-bg)" : "#FEF9C3",
                   border: showAllPrizes ? "1px solid var(--blue-border)" : "1px solid #FDE047",
                   color: showAllPrizes ? "#2A65E6" : "var(--gold-deep)",
-                  fontSize: "0.75rem",
+                  fontSize: "0.6875rem",
                   fontWeight: 800,
-                  padding: "5px 12px",
+                  padding: "2px 8px",
                   borderRadius: 6,
                   cursor: "pointer",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 4,
-                  transition: "all var(--transition-fast)",
+                  gap: 3,
                 }}
               >
-                {showAllPrizes ? "Collapse to Top 3" : "View All 10 Prizes"}
-                {showAllPrizes ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {showAllPrizes ? "Top 3" : "All 10 Prizes"}
+                {showAllPrizes ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
               </button>
             </div>
 
-            {/* Prize list grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 8 }}>
-              {displayedPrizes.map((p) => {
-                const isRank1 = p.rank === 1;
-                const isRank2 = p.rank === 2;
-                const isRank3 = p.rank === 3;
-
-                return (
-                  <div
-                    key={p.rank}
-                    style={{
-                      background: isRank1 ? "#FEF9C3" : isRank2 ? "#EFF5FF" : isRank3 ? "#ECFDF5" : "#F8FAFC",
-                      border: isRank1 ? "1.5px solid #FDE047" : isRank2 ? "1px solid #C3DAFE" : "1px solid var(--gray-line)",
-                      borderRadius: 8,
-                      padding: "8px 12px",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span
-                      className="mono"
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: 800,
-                        color: isRank1 ? "var(--gold-deep)" : isRank2 ? "var(--blue-navy)" : "var(--text-subtle)",
-                      }}
-                    >
-                      {isRank1 ? "🥇 1st" : isRank2 ? "🥈 2nd" : isRank3 ? "🥉 3rd" : `#${p.rank}`}
-                    </span>
-
-                    <strong className="mono" style={{ fontSize: "0.8125rem", color: isRank1 ? "var(--gold-deep)" : "var(--text-main)" }}>
-                      {p.valueAmount}
-                    </strong>
-                  </div>
-                );
-              })}
+            {/* Prize Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 5 }}>
+              {displayedPrizes.map((p) => (
+                <div
+                  key={p.rank}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "4px 8px",
+                    background: p.rank === 1 ? "#FEF9C3" : "#F8FAFC",
+                    border: `1px solid ${p.rank === 1 ? "#FDE047" : "#E2E8F0"}`,
+                    borderRadius: 6,
+                  }}
+                >
+                  <span style={{ fontSize: "0.6875rem", fontWeight: p.rank === 1 ? 800 : 600, color: p.rank === 1 ? "var(--gold-deep)" : "#374151" }}>
+                    #{p.rank}
+                  </span>
+                  <span className="mono" style={{ fontSize: "0.6875rem", fontWeight: 800, color: p.rank === 1 ? "#DC2626" : "#111827" }}>
+                    {p.valueAmount}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Revealed Winning Numbers Pill */}
-        {isRevealed && draw.winning_numbers && (
-          <div
-            style={{
-              background: "#EFF5FF",
-              border: "1.5px dashed #C3DAFE",
-              borderRadius: "var(--radius-sm)",
-              padding: "12px 16px",
-              marginTop: 16,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 8,
-            }}
-          >
-            <div>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--blue-navy)", textTransform: "uppercase", display: "block", fontWeight: 700 }}>
-                🏆 1st Place Winning Number
-              </span>
-              <span className="display" style={{ fontSize: "1.875rem", color: "#2A65E6", fontWeight: 800 }}>
-                #{draw.winning_numbers[1] || "42"}
-              </span>
-            </div>
-            <Link
-              href="/results"
-              className="btn-base btn-secondary"
-              style={{ fontSize: "0.75rem", padding: "8px 12px" }}
-            >
-              <ShieldCheck size={14} /> Audit All Numbers
-            </Link>
+        {/* Bottom Pool Progress Bar */}
+        <div style={{ marginTop: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.6875rem", marginBottom: 3 }}>
+            <span style={{ color: "var(--text-subtle)", fontWeight: 700 }}>
+              Pool Capacity Sold:
+            </span>
+            <span className="mono" style={{ color: "#111827", fontWeight: 800 }}>
+              {totalEntries.toLocaleString()} / {maxCapacity.toLocaleString()} Tickets ({percentageSold}%)
+            </span>
           </div>
-        )}
+          <div style={{ width: "100%", height: 6, background: "#E2E8F0", borderRadius: 4, overflow: "hidden" }}>
+            <div
+              style={{
+                width: `${percentageSold}%`,
+                height: "100%",
+                background: "linear-gradient(90deg, #FDE047 0%, #EAB308 100%)",
+                borderRadius: 4,
+                transition: "width 0.4s ease",
+              }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* ── Perforated Tear-off Ticket Stub ──────────────────────────── */}
+      {/* ── Right Stub / Tear-off Ticket Stub ─────────────────────────── */}
       <div className="ticket-stub-container">
-        {/* Cutout punch notches (Desktop) */}
-        <div className="ticket-punch-top desk-punch" style={{ top: -11, left: -11 }} />
-        <div className="ticket-punch-bottom desk-punch" style={{ bottom: -11, left: -11 }} />
-        
-        {/* Cutout punch notches (Mobile) */}
-        <div className="ticket-punch-left mob-punch" style={{ top: -11, left: -11 }} />
-        <div className="ticket-punch-right mob-punch" style={{ top: -11, right: -11 }} />
-
         {/* Stub Header & Brand */}
         <div style={{ width: "100%" }}>
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "#2A65E6", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 800 }}>
+          <span className="mono" style={{ fontSize: "0.625rem", color: "#D97706", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 900 }}>
             {isUSD ? "DIASPORA USD TICKET" : "OFFICIAL RAFFLE TICKET"}
           </span>
-          <div className="display" style={{ fontSize: "1.125rem", color: "#111827", fontWeight: 800, margin: "2px 0 10px" }}>
+          <div className="display" style={{ fontSize: "1rem", color: "#111827", fontWeight: 800, margin: "1px 0 6px" }}>
             Rimna Lottery
           </div>
 
           {/* Multi-Pool Tag on Stub */}
-          <div className="badge badge-blue" style={{ marginBottom: 12, fontSize: "0.75rem", fontWeight: 800 }}>
+          <div className="badge badge-gold" style={{ marginBottom: 8, fontSize: "0.6875rem", fontWeight: 800 }}>
             {pools.length} Pools Available
           </div>
 
@@ -269,37 +237,37 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             style={{
               background: "#FFFFFF",
               border: "1.5px solid #FDE047",
-              borderRadius: "var(--radius-md)",
-              padding: "10px 12px",
-              boxShadow: "0 2px 6px rgba(234, 179, 8, 0.15)",
-              marginBottom: 14,
+              borderRadius: "8px",
+              padding: "6px 8px",
+              boxShadow: "0 2px 5px rgba(234, 179, 8, 0.15)",
+              marginBottom: 8,
             }}
           >
-            <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block" }}>
+            <span className="mono" style={{ fontSize: "0.5625rem", color: "var(--text-subtle)", textTransform: "uppercase", display: "block" }}>
               TICKET PRICE
             </span>
-            <span className="display" style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--gold-deep)", lineHeight: 1 }}>
-              {isUSD ? `$${ticketPrice}` : `${ticketPrice}`} <span style={{ fontSize: "0.875rem" }}>{currSymbol}</span>
+            <span className="display" style={{ fontSize: "1.35rem", fontWeight: 900, color: "var(--gold-deep)", lineHeight: 1 }}>
+              {isUSD ? `$${ticketPrice}` : `${ticketPrice}`} <span style={{ fontSize: "0.75rem" }}>{currSymbol}</span>
             </span>
           </div>
 
           {/* Barcode Graphic */}
-          <div className="barcode-pattern" style={{ marginBottom: 6 }} />
-          <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)" }}>
+          <div className="barcode-pattern" style={{ marginBottom: 4 }} />
+          <span className="mono" style={{ fontSize: "0.5625rem", color: "var(--text-subtle)" }}>
             RDL-{draw.draw_id}
           </span>
         </div>
 
         {/* Action Button on the Stub */}
-        <div style={{ width: "100%", marginTop: 12 }}>
+        <div style={{ width: "100%", marginTop: 8 }}>
           {isOpen && (
             <button
               type="button"
               onClick={() => setIsBuyModalOpen(true)}
-              className="btn-base btn-primary"
-              style={{ width: "100%", padding: "13px 14px", fontSize: "0.9375rem", cursor: "pointer" }}
+              className="casino-btn-red"
+              style={{ width: "100%", padding: "10px 12px", fontSize: "0.8125rem", cursor: "pointer" }}
             >
-              <Ticket size={16} /> Buy Ticket ({isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`})
+              <Ticket size={14} /> Buy ({isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`})
             </button>
           )}
 
@@ -315,10 +283,10 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             <button
               type="button"
               className="btn-base btn-secondary"
-              style={{ width: "100%", fontSize: "0.8125rem", padding: "11px" }}
+              style={{ width: "100%", fontSize: "0.75rem", padding: "8px" }}
               onClick={() => alert(`Draw #${draw.draw_id} opens soon!`)}
             >
-              <Calendar size={14} /> Scheduled Soon
+              <Calendar size={13} /> Scheduled Soon
             </button>
           )}
 
@@ -326,9 +294,9 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
             <Link
               href="/results"
               className="btn-base btn-secondary"
-              style={{ width: "100%", fontSize: "0.8125rem", padding: "11px" }}
+              style={{ width: "100%", fontSize: "0.75rem", padding: "8px" }}
             >
-              <ShieldCheck size={15} /> Audit Outcomes
+              <ShieldCheck size={13} /> Audit Outcomes
             </Link>
           )}
         </div>

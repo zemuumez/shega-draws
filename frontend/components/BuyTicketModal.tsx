@@ -230,7 +230,7 @@ export function BuyTicketModal({
                   style={{
                     height: 4,
                     borderRadius: 4,
-                    background: i <= step ? "#2A65E6" : "#E2E8F0",
+                    background: i <= step ? "linear-gradient(90deg, #F59E0B, #DC2626)" : "#E2E8F0",
                     transition: "all 300ms ease",
                   }}
                 />
@@ -239,7 +239,7 @@ export function BuyTicketModal({
                   style={{
                     fontSize: "0.5625rem",
                     color: i === step ? "#111827" : "var(--text-subtle)",
-                    fontWeight: i === step ? 800 : 600,
+                    fontWeight: i === step ? 900 : 600,
                     display: "block",
                     marginTop: 4,
                     whiteSpace: "nowrap",
@@ -558,8 +558,8 @@ export function BuyTicketModal({
                 type="button"
                 disabled={!canAdvance[step]}
                 onClick={() => setStep((s) => s + 1)}
-                className="btn-base btn-primary"
-                style={{ padding: "8px 20px", fontSize: "0.8125rem", fontWeight: 800 }}
+                className="casino-btn-red"
+                style={{ padding: "8px 22px", fontSize: "0.8125rem", fontWeight: 900, opacity: !canAdvance[step] ? 0.5 : 1 }}
               >
                 Continue <ChevronRight size={14} />
               </button>
@@ -568,8 +568,8 @@ export function BuyTicketModal({
                 type="button"
                 disabled={!canAdvance[3] || loading}
                 onClick={submit}
-                className="btn-base btn-primary"
-                style={{ padding: "8px 20px", fontSize: "0.8125rem", fontWeight: 800 }}
+                className="casino-btn-red"
+                style={{ padding: "9px 24px", fontSize: "0.875rem", fontWeight: 900, opacity: (!canAdvance[3] || loading) ? 0.5 : 1 }}
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : `Submit Ticket (${currSymbol}${ticketPrice})`}
               </button>

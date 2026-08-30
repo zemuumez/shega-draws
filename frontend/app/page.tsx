@@ -196,41 +196,32 @@ export default async function HomePage() {
       {/* ── Page Inner Container for content below full-width hero ── */}
       <div className="page-inner-container">
         {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
-        <div className="reveal-item" style={{ marginBottom: 20 }}>
+        <div className="reveal-item" style={{ marginBottom: 32 }}>
           <JackpotCardsSection />
         </div>
 
-        {/* ── 3. Main 2-Column Portal Section (Live Broadcast & Draws) ── */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 340px",
-            gap: 20,
-            alignItems: "start",
-            width: "100%",
-          }}
-          className="portal-grid-container reveal-item"
-        >
-          {/* Left Column: Live Stream Banner + Draws Catalog + Why Rimna */}
-          <div style={{ width: "100%", minWidth: 0 }}>
-            {/* Live Broadcast & Stream Information */}
-            <LiveBroadcastBanner />
-
-            {/* Full Draws Catalog (with ETB / USD Currency Switcher) */}
-            <DrawsExplorer initialDraws={allDraws} />
-
-            {/* Why Rimna Lottery Public Transparency Section */}
-            <WhyRimnaLottery />
-          </div>
-
-          {/* Right Column: Sidebar Widgets (Results, 24/7 Support, Promos) */}
-          <div style={{ width: "100%", minWidth: 0 }}>
-            <SidebarWidgets />
-          </div>
+        {/* ── 3. Live Broadcast & Stream Information (Full Width) ── */}
+        <div className="reveal-item" style={{ marginBottom: 32 }}>
+          <LiveBroadcastBanner />
         </div>
 
-        {/* ── 4. Bottom Testimonials & Newsletter Section ────────── */}
-        <div className="reveal-item">
+        {/* ── 4. Full Draws Catalog (Dedicated Full-Width Section) ── */}
+        <div className="reveal-item" style={{ marginBottom: 36 }}>
+          <DrawsExplorer initialDraws={allDraws} />
+        </div>
+
+        {/* ── 5. Showcase & Support Grid (Results, Mega Event, 24/7 Support) ── */}
+        <div className="reveal-item" style={{ marginBottom: 32 }}>
+          <SidebarWidgets />
+        </div>
+
+        {/* ── 6. Why Rimna Lottery Public Transparency Section ── */}
+        <div className="reveal-item" style={{ marginBottom: 32 }}>
+          <WhyRimnaLottery />
+        </div>
+
+        {/* ── 7. Bottom Testimonials & Newsletter Section ── */}
+        <div className="reveal-item" style={{ marginBottom: 40 }}>
           <TestimonialsNewsletter />
         </div>
       </div>
