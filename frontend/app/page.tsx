@@ -58,14 +58,14 @@ export default async function HomePage() {
       <section
         className="hero-section-wrapper lottery-guilloche-bg reveal-item is-revealed"
         style={{
-          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 40%, #FEF9C3 100%)",
-          borderTop: "2px solid #FDE047",
-          borderBottom: "2px solid #FDE047",
+          background: "#FFFBEB",
+          borderTop: "2px solid #F59E0B",
+          borderBottom: "2px solid #F59E0B",
           borderLeft: "none",
           borderRight: "none",
           borderRadius: 0,
-          boxShadow: "0 12px 28px -6px rgba(234, 179, 8, 0.22)",
-          marginBottom: 20,
+          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
+          marginBottom: 24,
           position: "relative",
           overflow: "hidden",
         }}

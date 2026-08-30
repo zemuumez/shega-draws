@@ -20,11 +20,11 @@ export function LiveBroadcastBanner() {
       <div
         className="card-base interactive-ticket-card lottery-guilloche-bg"
         style={{
-          background: "linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 60%, #FEF9C3 100%)",
-          border: "2px solid #FDE047",
-          borderRadius: "16px",
+          background: "#FFFFFF",
+          border: "2px solid #F59E0B",
+          borderRadius: "14px",
           padding: "20px 22px",
-          boxShadow: "0 6px 20px -4px rgba(234, 179, 8, 0.2)",
+          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
           marginBottom: 20,
         }}
       >

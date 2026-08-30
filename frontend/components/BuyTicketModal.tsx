@@ -180,14 +180,14 @@ export function BuyTicketModal({
         {/* ── Pre-populated Ticket Header Ribbon ── */}
         <div
           style={{
-            background: "linear-gradient(135deg, #FFFDF5 0%, #EFF6FF 100%)",
-            border: "1.5px solid #C3DAFE",
-            borderRadius: 12,
-            padding: "10px 14px",
+            background: "#FEF9C3",
+            border: "1.5px solid #FDE047",
+            borderRadius: 10,
+            padding: "8px 12px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 16,
+            marginBottom: 14,
             flexWrap: "wrap",
             gap: 8,
           }}
@@ -195,10 +195,10 @@ export function BuyTicketModal({
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span
               style={{
-                background: isUSD ? "var(--blue-bg)" : "#FEF9C3",
-                color: isUSD ? "#2A65E6" : "var(--gold-deep)",
-                border: `1px solid ${isUSD ? "var(--blue-border)" : "#FDE047"}`,
-                padding: "3px 8px",
+                background: "#FFFFFF",
+                color: "#854D0E",
+                border: "1px solid #FDE047",
+                padding: "2px 8px",
                 borderRadius: 6,
                 fontSize: "0.6875rem",
                 fontWeight: 800,
@@ -216,8 +216,8 @@ export function BuyTicketModal({
             </span>
           </div>
 
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", fontWeight: 800, display: "flex", alignItems: "center", gap: 4 }}>
-            <Trophy size={12} color="var(--gold-dark)" /> 10 Guaranteed Winners
+          <span className="mono" style={{ fontSize: "0.6875rem", color: "#059669", fontWeight: 800, display: "flex", alignItems: "center", gap: 4 }}>
+            <Trophy size={12} color="#D97706" /> 10 Guaranteed Winners
           </span>
         </div>
 
@@ -230,7 +230,7 @@ export function BuyTicketModal({
                   style={{
                     height: 4,
                     borderRadius: 4,
-                    background: i <= step ? "linear-gradient(90deg, #F59E0B, #DC2626)" : "#E2E8F0",
+                    background: i <= step ? "#DC2626" : "#E5E7EB",
                     transition: "all 300ms ease",
                   }}
                 />
@@ -238,7 +238,7 @@ export function BuyTicketModal({
                   className="mono"
                   style={{
                     fontSize: "0.5625rem",
-                    color: i === step ? "#111827" : "var(--text-subtle)",
+                    color: i === step ? "#111827" : "#9CA3AF",
                     fontWeight: i === step ? 900 : 600,
                     display: "block",
                     marginTop: 4,
@@ -257,13 +257,27 @@ export function BuyTicketModal({
         {/* ── Step 0: Choose Pool Capacity ── */}
         {step === 0 && (
           <div>
-            <span className="badge badge-blue" style={{ marginBottom: 6, fontSize: "0.6875rem" }}>
+            <span
+              style={{
+                background: "#FEF9C3",
+                color: "#854D0E",
+                border: "1px solid #FDE047",
+                borderRadius: "6px",
+                padding: "2px 8px",
+                fontSize: "0.6875rem",
+                fontWeight: 800,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                marginBottom: 6,
+              }}
+            >
               <Users size={11} /> Step 1 of 4: Pool Size
             </span>
             <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 800, marginBottom: 2 }}>
               Choose Participant Pool
             </h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", marginBottom: 14 }}>
+            <p style={{ color: "#6B7280", fontSize: "0.8125rem", marginBottom: 14 }}>
               Select pool capacity for this {isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`} ticket.
             </p>
 
@@ -279,20 +293,20 @@ export function BuyTicketModal({
                     style={{
                       padding: "12px 8px",
                       borderRadius: 8,
-                      border: isSelected ? "2px solid #2A65E6" : "1.5px solid var(--gray-line)",
-                      background: isSelected ? "var(--blue-bg)" : "#FFFFFF",
+                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid #E5E7EB",
+                      background: isSelected ? "#FEF9C3" : "#FAFAFA",
                       textAlign: "center",
                       cursor: "pointer",
                       transition: "all var(--transition-fast)",
                     }}
                   >
-                    <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "#2A65E6" : "#111827", display: "block" }}>
+                    <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: isSelected ? "#D97706" : "#111827", display: "block" }}>
                       {p.label}
                     </span>
-                    <span className="display" style={{ fontSize: "1.1rem", fontWeight: 800, color: isSelected ? "var(--gold-deep)" : "#111827", margin: "2px 0", display: "block" }}>
+                    <span className="display" style={{ fontSize: "1.1rem", fontWeight: 800, color: isSelected ? "#854D0E" : "#111827", margin: "2px 0", display: "block" }}>
                       {p.pool}
                     </span>
-                    <span className="mono" style={{ fontSize: "0.625rem", color: "var(--teal-dark)", fontWeight: 700, display: "block" }}>
+                    <span className="mono" style={{ fontSize: "0.625rem", color: "#059669", fontWeight: 700, display: "block" }}>
                       1st: {p.jackpot}
                     </span>
                   </button>
@@ -301,22 +315,22 @@ export function BuyTicketModal({
             </div>
 
             {/* Live Tickets Confirmed Progress Bar */}
-            <div style={{ background: "#F8FAFC", border: "1px solid var(--gray-line)", borderRadius: 10, padding: "10px 12px", marginBottom: 12 }}>
+            <div style={{ background: "#F8FAFC", border: "1px solid #E5E7EB", borderRadius: 8, padding: "10px 12px", marginBottom: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, flexWrap: "wrap", gap: 4 }}>
-                <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", textTransform: "uppercase", fontWeight: 700 }}>
-                  TICKETS CONFIRMED ({currentPool.label})
+                <span className="mono" style={{ fontSize: "0.6875rem", color: "#6B7280", textTransform: "uppercase", fontWeight: 700 }}>
+                  POOL CAPACITY SOLD ({currentPool.label})
                 </span>
                 <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 800 }}>
                   {Math.round(selectedSize * 0.72).toLocaleString()} / {selectedSize.toLocaleString()} Tickets (72%)
                 </span>
               </div>
-              <div className="progress-bar-track" style={{ height: 6, borderRadius: 4, background: "#E2E8F0", overflow: "hidden" }}>
+              <div className="progress-bar-track" style={{ height: 6, borderRadius: 4, background: "#E5E7EB", overflow: "hidden" }}>
                 <div
                   style={{
                     height: "100%",
                     width: "72%",
                     borderRadius: 4,
-                    background: "linear-gradient(90deg, #EAB308 0%, #2A65E6 100%)",
+                    background: "#F59E0B",
                   }}
                 />
               </div>
