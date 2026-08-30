@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getActiveDraw, listDraws } from "@/lib/api";
+import { getActiveDraw, listDraws, type DrawState, type Currency } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY, type ActiveDraw } from "@/lib/sanity/queries";
+import { ACTIVE_DRAW_QUERY, ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, type ActiveDraw, type CMSJackpotCard } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
 import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award } from "lucide-react";
@@ -17,18 +17,71 @@ export const metadata: Metadata = {
     "Ethiopia & Diaspora's premier transparent digital lottery. Real cash prizes drawn live on video by company founders. Top 10 guaranteed winners per draw.",
 };
 
-export const revalidate = 15;
+export const revalidate = 10;
+
+function mapCmsDrawToDrawState(doc: any): DrawState {
+  const currency: Currency = doc.currency === "USD" ? "USD" : "ETB";
+  const ticketPrice = doc.ticketPrice || 100;
+  return {
+    id: doc._id || doc.drawId,
+    draw_id: doc.drawId || doc.title || "RDL-001",
+    commitment: doc.commitment || "sha256-verified-draw-seed",
+    status: (doc.status as any) || "open",
+    title: doc.title || "Raffle Draw",
+    currency: currency,
+    ticket_price: ticketPrice,
+    deadline: doc.deadline || new Date(Date.now() + 3 * 86400000).toISOString(),
+    winning_numbers: doc.winningNumbers || {},
+    prizes: (doc.prizes || []).map((p: any) => ({
+      rank: p.rank,
+      label: p.label || `Rank #${p.rank}`,
+      prizeTitle: p.prizeTitle || p.label || `Rank #${p.rank}`,
+      valueAmount: p.valueAmount || "",
+      description: p.description || "",
+    })),
+    description: doc.description || "",
+  };
+}
 
 export default async function HomePage() {
-  const [cms, activeDrawState, allDrawsRes] = await Promise.allSettled([
+  const [cmsActive, cmsAllDrawsRes, cmsCardsRes, activeDrawState, allDrawsRes] = await Promise.allSettled([
     sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
+    sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => []),
+    sanityClient.fetch<CMSJackpotCard[]>(JACKPOT_CARDS_QUERY).catch(() => []),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
   ]);
 
-  const cmsData = cms.status === "fulfilled" ? cms.value : null;
-  const drawState = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
-  const allDraws = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+  const cmsData      = cmsActive.status === "fulfilled" ? cmsActive.value : null;
+  const cmsAllDraws  = (cmsAllDrawsRes.status === "fulfilled" && cmsAllDrawsRes.value) ? cmsAllDrawsRes.value : [];
+  const cmsCards     = (cmsCardsRes.status === "fulfilled" && cmsCardsRes.value) ? cmsCardsRes.value : [];
+  const drawState    = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
+  const backendDraws = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+
+  // Convert CMS documents to DrawState
+  const mappedCmsDraws = cmsAllDraws.map(mapCmsDrawToDrawState);
+
+  // Combine draws: CMS draws take priority at the top, followed by backend/fallback draws
+  const allDrawsMap = new Set<string>();
+  const combinedDraws: DrawState[] = [];
+
+  for (const d of mappedCmsDraws) {
+    if (!allDrawsMap.has(d.id) && !allDrawsMap.has(d.draw_id)) {
+      allDrawsMap.add(d.id);
+      allDrawsMap.add(d.draw_id);
+      combinedDraws.push(d);
+    }
+  }
+
+  for (const d of backendDraws) {
+    if (!allDrawsMap.has(d.id) && !allDrawsMap.has(d.draw_id)) {
+      allDrawsMap.add(d.id);
+      allDrawsMap.add(d.draw_id);
+      combinedDraws.push(d);
+    }
+  }
+
+  const allDraws = combinedDraws.length > 0 ? combinedDraws : backendDraws;
 
   // Filter approved open draws or fallback to the latest active state
   const approvedOpenDraws = allDraws.filter((d) => d.status === "open");
@@ -187,7 +240,7 @@ export default async function HomePage() {
       <div className="page-inner-container">
         {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
         <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <JackpotCardsSection />
+          <JackpotCardsSection cmsCards={cmsCards} />
         </div>
 
         {/* ── 3. Full Draws Catalog (Dedicated Full-Width Section) ── */}

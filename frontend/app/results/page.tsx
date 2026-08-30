@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getActiveDraw, listDraws } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY, type ActiveDraw } from "@/lib/sanity/queries";
+import { ACTIVE_DRAW_QUERY, LATEST_RESULTS_QUERY, type ActiveDraw, type CMSDrawResult } from "@/lib/sanity/queries";
 import { Card } from "@/components/ui/Card";
 import { Trophy, Tv, CheckCircle2, Award, Calendar, Phone, Send, ShieldCheck, Sparkles } from "lucide-react";
 import { LiveBroadcastBanner } from "@/components/LiveBroadcastBanner";
@@ -11,22 +11,37 @@ export const metadata: Metadata = {
   description: "Official audited live draw winning numbers announced on public broadcast stream.",
 };
 
-export const revalidate = 30;
+export const revalidate = 10;
 
 export default async function ResultsPage() {
-  const [cms, draw, allDrawsRes] = await Promise.allSettled([
+  const [cms, cmsResultsRes, draw, allDrawsRes] = await Promise.allSettled([
     sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
+    sanityClient.fetch<CMSDrawResult[]>(LATEST_RESULTS_QUERY).catch(() => []),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
   ]);
 
-  const cmsData   = cms.status === "fulfilled"  ? cms.value  : null;
-  const drawState = draw.status === "fulfilled"  ? draw.value : null;
-  const allDraws  = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+  const cmsData    = cms.status === "fulfilled" ? cms.value : null;
+  const cmsResults = (cmsResultsRes.status === "fulfilled" && cmsResultsRes.value) ? cmsResultsRes.value : [];
+  const drawState  = draw.status === "fulfilled" ? draw.value : null;
+  const allDraws   = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+
+  const latestCmsResult = cmsResults[0];
 
   const pastDraws = allDraws.filter((d) => d.status === "revealed");
   const prizes    = cmsData?.prizes ?? [];
-  const winningNumbers = drawState?.winning_numbers ?? { 1: "42", 2: "89", 3: "07", 4: "15", 5: "63", 6: "77", 7: "21", 8: "94", 9: "38", 10: "50" };
+
+  // If CMS result exists with winningNumbers, map it; otherwise use drawState or defaults
+  const winningNumbers: Record<string, string> = {};
+  if (latestCmsResult && latestCmsResult.winningNumbers && latestCmsResult.winningNumbers.length > 0) {
+    latestCmsResult.winningNumbers.forEach((w) => {
+      winningNumbers[String(w.rank)] = w.luckyNumber;
+    });
+  } else {
+    Object.assign(winningNumbers, drawState?.winning_numbers ?? { 1: "42", 2: "89", 3: "07", 4: "15", 5: "63", 6: "77", 7: "21", 8: "94", 9: "38", 10: "50" });
+  }
+
+  const latestDrawId = latestCmsResult?.drawId || drawState?.draw_id || "RDL-2026-07";
 
   return (
     <div className="page-inner-container" style={{ padding: "32px clamp(14px, 3vw, 24px)", maxWidth: 1040, margin: "0 auto" }}>
@@ -79,7 +94,7 @@ export default async function ResultsPage() {
               LATEST COMPLETED DRAW
             </span>
             <h2 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900 }}>
-              Top 10 Winning Numbers (#{drawState?.draw_id || "RDL-2026-07"})
+              Top 10 Winning Numbers (#{latestDrawId})
             </h2>
           </div>
           <span className="badge badge-gold">

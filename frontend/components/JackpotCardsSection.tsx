@@ -5,6 +5,11 @@ import { Clock, Globe, Trophy, Sparkles, HelpCircle, Ticket } from "lucide-react
 import { HowToBuyModal } from "./HowToBuyModal";
 import { BuyTicketModal } from "./BuyTicketModal";
 import { type Currency } from "@/lib/api";
+import { type CMSJackpotCard } from "@/lib/sanity/queries";
+
+interface JackpotCardsSectionProps {
+  cmsCards?: CMSJackpotCard[];
+}
 
 function TicketOrnament() {
   return (
@@ -28,7 +33,7 @@ function TicketOrnament() {
   );
 }
 
-export function JackpotCardsSection() {
+export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
   const [mounted, setMounted] = useState(false);
   const [isHowToBuyOpen, setIsHowToBuyOpen] = useState(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
@@ -59,7 +64,7 @@ export function JackpotCardsSection() {
     return () => clearInterval(timer);
   }, []);
 
-  const jackpotTickets = [
+  const defaultJackpotTickets = [
     {
       id: "usd-250",
       serial: "RDL-USD-250",
@@ -97,6 +102,21 @@ export function JackpotCardsSection() {
       poolLabels: ["1K", "2K", "3K", "5K"],
     },
   ];
+
+  const jackpotTickets = (cmsCards && cmsCards.length > 0)
+    ? cmsCards.map((c, idx) => ({
+        id: c._id || `cms-${idx}`,
+        serial: c.serial || `RDL-${c.currency || "ETB"}-${c.ticketPrice || 100}`,
+        badgeTitle: c.badgeTitle || "SPECIAL JACKPOT",
+        badgeIcon: c.currency === "USD" ? Globe : idx === 1 ? Trophy : Sparkles,
+        ticketPrice: c.ticketPrice || 100,
+        currency: (c.currency === "USD" ? "USD" : "ETB") as Currency,
+        currSymbol: c.currency === "USD" ? "$" : "ETB",
+        grandPrize: c.grandPrize || "500,000 ETB",
+        drawDate: c.drawDate || "Friday 18th July",
+        poolLabels: c.poolLabels && c.poolLabels.length > 0 ? c.poolLabels : ["1K", "2K", "3K", "5K"],
+      }))
+    : defaultJackpotTickets;
 
   const handleOpenBuy = (currency: Currency, price: number, drawId: string) => {
     setSelectedBuyTicket({ currency, price, drawId });
