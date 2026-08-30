@@ -659,27 +659,74 @@ h1, h2, h3, h4, h5 {
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
-   CASINO & CARNIVAL GOLD DESIGN SYSTEM (Clean Modern Flat Solid Palette)
+   CASINO & CARNIVAL GOLD DESIGN SYSTEM
 ═════════════════════════════════════════════════════════════════════════ */
 
-/* Authentic Raffle Physical Ticket Box (Solid Frame) */
+/* Authentic Gold Raffle Physical Ticket Box (Rich Golden Color) */
 .casino-ticket-card {
-  background: #FFFFFF;
-  border: 2px solid #F59E0B;
+  background: #FEF08A;
+  border: 2.5px solid #F59E0B;
   border-radius: 14px;
   padding: 8px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.22);
   box-sizing: border-box;
 }
 
-/* Inner Engraved Ticket Frame */
+/* Inner Golden Ticket Surface */
 .casino-ticket-inner {
-  background: #FAFAFA;
-  border: 1.5px solid #E5E7EB;
+  background: #FEF9C3;
+  border: 1.5px solid #FDE047;
   border-radius: 10px;
   padding: 14px 14px 12px;
   text-align: center;
   box-sizing: border-box;
+}
+
+/* Authentic Rough Paper Texture for Physical Draw Tickets */
+.rough-paper-ticket {
+  background-color: #FAF8F2;
+  background-image: 
+    radial-gradient(#D6D0C4 0.75px, transparent 0.75px), 
+    radial-gradient(#D6D0C4 0.75px, #FAF8F2 0.75px);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  position: relative;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ticket-notch-top {
+  position: absolute;
+  top: -11px;
+  right: 259px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border-bottom: 1.5px solid #D1D5DB;
+  z-index: 5;
+}
+
+.ticket-notch-bottom {
+  position: absolute;
+  bottom: -11px;
+  right: 259px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border-top: 1.5px solid #D1D5DB;
+  z-index: 5;
+}
+
+@media (max-width: 768px) {
+  .ticket-notch-top {
+    display: none !important;
+  }
+  .ticket-notch-bottom {
+    display: none !important;
+  }
 }
 
 /* Solid Ruby Ribbon Badge */

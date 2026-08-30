@@ -53,16 +53,16 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
 
   return (
     <div
-      className="physical-lottery-ticket ticket-card-container interactive-ticket-card animate-fade"
+      className="physical-lottery-ticket ticket-card-container interactive-ticket-card rough-paper-ticket animate-fade"
       style={{
-        margin: "0 0 16px 0",
+        margin: "0 0 20px 0",
         position: "relative",
-        background: "#FFFFFF",
-        border: "1.5px solid #E5E7EB",
-        borderRadius: "12px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
       }}
     >
+      {/* Authentic Semi-Circle Ticket Punch Notches on Perforation */}
+      <div className="ticket-notch-top" />
+      <div className="ticket-notch-bottom" />
+
       {/* ── Left / Main Ticket Body ───────────────────────────────────── */}
       <div className="ticket-body-padding" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
@@ -203,7 +203,7 @@ export function PhysicalDrawTicket({ draw }: PhysicalDrawTicketProps) {
       </div>
 
       {/* ── Right Stub / Tear-off Ticket Stub ─────────────────────────── */}
-      <div className="ticket-stub-container" style={{ background: "#FAFAFA", borderLeft: "2px dashed #CBD5E1" }}>
+      <div className="ticket-stub-container" style={{ background: "#F4EFE4", borderLeft: "2px dashed #9CA3AF" }}>
         {/* Stub Header & Brand */}
         <div style={{ width: "100%" }}>
           <span className="mono" style={{ fontSize: "0.625rem", color: "#D97706", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 900 }}>
