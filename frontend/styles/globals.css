@@ -698,26 +698,30 @@ h1, h2, h3, h4, h5 {
 
 .ticket-notch-top {
   position: absolute;
-  top: -11px;
-  right: 259px;
-  width: 22px;
-  height: 22px;
+  top: -13px;
+  right: 257px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: #FFFFFF;
-  border-bottom: 1.5px solid #D1D5DB;
-  z-index: 5;
+  background-color: var(--bg-page, #FFFFFF);
+  border: 1.5px solid #D1D5DB;
+  border-top-color: transparent !important;
+  box-shadow: 0 0 0 2px var(--bg-page, #FFFFFF);
+  z-index: 25;
 }
 
 .ticket-notch-bottom {
   position: absolute;
-  bottom: -11px;
-  right: 259px;
-  width: 22px;
-  height: 22px;
+  bottom: -13px;
+  right: 257px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: #FFFFFF;
-  border-top: 1.5px solid #D1D5DB;
-  z-index: 5;
+  background-color: var(--bg-page, #FFFFFF);
+  border: 1.5px solid #D1D5DB;
+  border-bottom-color: transparent !important;
+  box-shadow: 0 0 0 2px var(--bg-page, #FFFFFF);
+  z-index: 25;
 }
 
 @media (max-width: 768px) {
