@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getActiveDraw, listDraws, type DrawState, type Currency } from "@/lib/api";
+import { getActiveDraw, listDraws, type DrawState, type Currency, type PoolOption } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY, ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, TESTIMONIALS_QUERY, type ActiveDraw, type CMSJackpotCard, type CMSTestimonial } from "@/lib/sanity/queries";
+import { ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, type CMSJackpotCard } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
 import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award } from "lucide-react";
@@ -17,73 +17,65 @@ export const metadata: Metadata = {
     "Ethiopia & Diaspora's premier transparent digital lottery. Real cash prizes drawn live on video by company founders. Top 10 guaranteed winners per draw.",
 };
 
-export const revalidate = 10;
+export const revalidate = 0;
 
-function mapCmsDrawToDrawState(doc: any): DrawState {
-  const currency: Currency = doc.currency === "USD" ? "USD" : "ETB";
-  const ticketPrice = doc.ticketPrice || 100;
+function mapSanityDraw(s: any): DrawState {
+  const price = s.ticketPrice || 100;
+  const curr = (s.currency === "USD" ? "USD" : "ETB") as Currency;
+  const isUSD = curr === "USD";
+
+  const pools: PoolOption[] = [
+    { size: 1000, label: "1,000 (1K)", pool: isUSD ? `$${price * 1000}` : `${(price * 1000).toLocaleString()} ETB`, jackpot: isUSD ? `$${Math.round(price * 1000 * 0.35)} (1st)` : `${Math.round(price * 1000 * 0.35).toLocaleString()} ETB (1st)`, totalSum: price * 1000 },
+    { size: 2000, label: "2,000 (2K)", pool: isUSD ? `$${price * 2000}` : `${(price * 2000).toLocaleString()} ETB`, jackpot: isUSD ? `$${Math.round(price * 2000 * 0.35)} (1st)` : `${Math.round(price * 2000 * 0.35).toLocaleString()} ETB (1st)`, totalSum: price * 2000 },
+    { size: 3000, label: "3,000 (3K)", pool: isUSD ? `$${price * 3000}` : `${(price * 3000).toLocaleString()} ETB`, jackpot: isUSD ? `$${Math.round(price * 3000 * 0.35)} (1st)` : `${Math.round(price * 3000 * 0.35).toLocaleString()} ETB (1st)`, totalSum: price * 3000 },
+    { size: 5000, label: "5,000 (5K)", pool: isUSD ? `$${price * 5000}` : `${(price * 5000).toLocaleString()} ETB`, jackpot: isUSD ? `$${Math.round(price * 5000 * 0.35)} (1st)` : `${Math.round(price * 5000 * 0.35).toLocaleString()} ETB (1st)`, totalSum: price * 5000 },
+  ];
+
   return {
-    id: doc._id || doc.drawId,
-    draw_id: doc.drawId || doc.title || "RDL-001",
-    commitment: doc.commitment || "sha256-verified-draw-seed",
-    status: (doc.status as any) || "open",
-    title: doc.title || "Raffle Draw",
-    currency: currency,
-    ticket_price: ticketPrice,
-    deadline: doc.deadline || new Date(Date.now() + 3 * 86400000).toISOString(),
-    winning_numbers: doc.winningNumbers || {},
-    prizes: (doc.prizes || []).map((p: any) => ({
-      rank: p.rank,
-      label: p.label || `Rank #${p.rank}`,
-      prizeTitle: p.prizeTitle || p.label || `Rank #${p.rank}`,
-      valueAmount: p.valueAmount || "",
-      description: p.description || "",
-    })),
-    description: doc.description || "",
+    id: s._id || s.drawId,
+    draw_id: s.drawId || "RDL-CMS",
+    sanity_id: s._id,
+    title: s.title,
+    description: s.description,
+    status: s.status || "open",
+    deadline: s.deadline || new Date(Date.now() + 7 * 86400000).toISOString(),
+    ticket_price: price,
+    currency: curr,
+    total_prize_value: s.totalPrizeValue || `${pools[pools.length - 1].pool}`,
+    commitment: s.commitment || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    prizes: s.prizes || [],
+    custom_pools: pools,
+    winning_numbers: s.winningNumbers,
+    seed: s.seed,
   };
 }
 
 export default async function HomePage() {
-  const [cmsActive, cmsAllDrawsRes, cmsCardsRes, cmsTestimonialsRes, activeDrawState, allDrawsRes] = await Promise.allSettled([
-    sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
-    sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => []),
-    sanityClient.fetch<CMSJackpotCard[]>(JACKPOT_CARDS_QUERY).catch(() => []),
-    sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => []),
+  const [cmsDrawsRes, cmsJackpotCardsRes, activeDrawState, fallbackDrawsRes] = await Promise.allSettled([
+    sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => null),
+    sanityClient.fetch<CMSJackpotCard[]>(JACKPOT_CARDS_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
   ]);
 
-  const cmsData         = cmsActive.status === "fulfilled" ? cmsActive.value : null;
-  const cmsAllDraws     = (cmsAllDrawsRes.status === "fulfilled" && cmsAllDrawsRes.value) ? cmsAllDrawsRes.value : [];
-  const cmsCards        = (cmsCardsRes.status === "fulfilled" && cmsCardsRes.value) ? cmsCardsRes.value : [];
-  const cmsTestimonials = (cmsTestimonialsRes.status === "fulfilled" && cmsTestimonialsRes.value) ? cmsTestimonialsRes.value : [];
-  const drawState       = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
-  const backendDraws    = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+  const rawCmsDraws = cmsDrawsRes.status === "fulfilled" ? cmsDrawsRes.value : null;
+  const cmsJackpotCards = cmsJackpotCardsRes.status === "fulfilled" ? cmsJackpotCardsRes.value : null;
+  const drawState = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
+  const fallbackDraws = fallbackDrawsRes.status === "fulfilled" ? fallbackDrawsRes.value : [];
 
-  // Convert CMS documents to DrawState
-  const mappedCmsDraws = cmsAllDraws.map(mapCmsDrawToDrawState);
+  // Convert CMS draws to DrawState
+  const mappedCmsDraws = rawCmsDraws && rawCmsDraws.length > 0
+    ? rawCmsDraws.map(mapSanityDraw)
+    : [];
 
-  // Combine draws: CMS draws take priority at the top, followed by backend/fallback draws
-  const allDrawsMap = new Set<string>();
-  const combinedDraws: DrawState[] = [];
+  // CMS draws take highest priority!
+  const cmsIds = new Set(mappedCmsDraws.map((d) => d.draw_id));
+  const combinedDraws = [
+    ...mappedCmsDraws,
+    ...fallbackDraws.filter((d) => !cmsIds.has(d.draw_id)),
+  ];
 
-  for (const d of mappedCmsDraws) {
-    if (!allDrawsMap.has(d.id) && !allDrawsMap.has(d.draw_id)) {
-      allDrawsMap.add(d.id);
-      allDrawsMap.add(d.draw_id);
-      combinedDraws.push(d);
-    }
-  }
-
-  for (const d of backendDraws) {
-    if (!allDrawsMap.has(d.id) && !allDrawsMap.has(d.draw_id)) {
-      allDrawsMap.add(d.id);
-      allDrawsMap.add(d.draw_id);
-      combinedDraws.push(d);
-    }
-  }
-
-  const allDraws = combinedDraws.length > 0 ? combinedDraws : backendDraws;
+  const allDraws = combinedDraws.length > 0 ? combinedDraws : fallbackDraws;
 
   // Filter approved open draws or fallback to the latest active state
   const approvedOpenDraws = allDraws.filter((d) => d.status === "open");
@@ -99,7 +91,7 @@ export default async function HomePage() {
 
   return (
     <div style={{ paddingBottom: 60, width: "100%", overflowX: "hidden" }}>
-      {/* ── 1. Current Active Admin-Approved Draw Hero Banner (Full Viewport Width & 0 Border Radius) ── */}
+      {/* ── 1. Current Active Admin-Approved Draw Hero Banner ── */}
       <section
         className="hero-section-wrapper lottery-guilloche-bg reveal-item is-revealed"
         style={{
@@ -115,92 +107,83 @@ export default async function HomePage() {
           overflow: "hidden",
         }}
       >
-        {/* Centered Content Container matching exact indentation of other sections */}
-        <div className="page-inner-container">
-          <div className="hero-grid-layout" style={{ display: "grid", gap: 20, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
-            {/* Left Column: Headline, Active Draw Info & CTA */}
-            <div style={{ width: "100%" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <span className="casino-ribbon-badge">
-                  <Trophy size={13} /> OFFICIAL LIVE DRAW · {(currentApprovedDraw as any)?.draw_id || "RDL-2026-08A"}
+        <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 clamp(16px, 4vw, 32px)", boxSizing: "border-box" }}>
+          <div
+            className="hero-grid-layout"
+            style={{
+              display: "grid",
+              gap: 32,
+              alignItems: "center",
+              position: "relative",
+              zIndex: 2,
+            }}
+          >
+            {/* Left Column: Live Jackpot Status & Quick Buy CTA */}
+            <div>
+              {/* Trust Badges */}
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
+                <span className="badge badge-gold">
+                  <Trophy size={13} color="#D97706" /> 10 GUARANTEED WINNERS PER DRAW
+                </span>
+                <span className="badge badge-green">
+                  <CheckCircle2 size={13} color="#059669" /> PUBLIC VIDEO BROADCAST
                 </span>
               </div>
 
-              {/* Huge Jackpot Display */}
-              <div
-                className="display"
-                style={{
-                  fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                  color: "#DC2626",
-                  lineHeight: 1.05,
-                  fontWeight: 900,
-                  letterSpacing: "-1px",
-                  margin: "2px 0 6px",
-                }}
-              >
-                {(currentApprovedDraw as any)?.total_prize_value || (currentApprovedDraw as any)?.prize_pool_estimate || "$1,250,000 / 1,000,000 ETB"}
-              </div>
-
+              {/* Title */}
               <h1
                 className="display"
                 style={{
-                  fontSize: "clamp(1.125rem, 2.5vw, 1.5rem)",
+                  fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
+                  fontWeight: 900,
                   color: "#111827",
-                  fontWeight: 800,
-                  lineHeight: 1.25,
-                  marginBottom: 8,
+                  lineHeight: 1.12,
+                  marginBottom: 12,
                 }}
               >
-                {currentApprovedDraw?.title || "Rimna Grand Jackpot — Multi-Pool Live Drawing"}
+                {currentApprovedDraw?.title || "100 Birr Classic Multi-Pool Draw"}
               </h1>
 
-              <p style={{ color: "var(--text-muted)", fontSize: "clamp(0.875rem, 1.5vw, 0.9375rem)", lineHeight: 1.55, marginBottom: 16, maxWidth: 580 }}>
-                Pick your lucky numbers across 4 fixed participant pools. Watch the owner draw and display winning numbers live on broadcast with guaranteed payouts for the Top 10 winners!
+              <p
+                style={{
+                  fontSize: "clamp(0.875rem, 2vw, 1rem)",
+                  color: "#4B5563",
+                  lineHeight: 1.5,
+                  maxWidth: 540,
+                  marginBottom: 20,
+                }}
+              >
+                Pick your lucky number, choose your pool capacity, and watch our founders draw the 10 winning numbers live on video stream.
               </p>
 
-              {/* Hero Quick Trust Signals */}
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                  <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
-                </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                  <ShieldCheck size={15} color="var(--blue-navy)" /> 100% Live Video Draw
-                </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                  <Award size={15} color="var(--gold-deep)" /> Transparent Capped Pools
-                </span>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              {/* High-Impact Quick Buy Action */}
+              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <HeroBuyButton
-                  drawId={(currentApprovedDraw as any)?.id || "RDL-ACTIVE"}
+                  drawId={currentApprovedDraw?.draw_id || "RDL-2026-08A"}
                   currency={activeCurrency}
                   price={activeTicketPrice}
                 />
 
                 <Link
-                  href="#draws-catalog"
-                  className="btn-base btn-secondary"
-                  style={{ padding: "11px 20px", fontSize: "0.875rem", fontWeight: 800 }}
+                  href="/results"
+                  className="casino-btn-dark"
+                  style={{ padding: "12px 20px", fontSize: "0.875rem", textDecoration: "none" }}
                 >
-                  Browse All Draws <ArrowRight size={15} />
+                  <Award size={16} color="#F59E0B" /> View Results & Live Stream
                 </Link>
               </div>
             </div>
 
-            {/* Right Column: Hero Visual Ticket Card with Countdown */}
-            <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            {/* Right Column: Promotional Visual & Live Countdown */}
+            <div>
               <div
-                className="card-base interactive-ticket-card"
+                className="card-base"
                 style={{
                   borderRadius: "16px",
                   overflow: "hidden",
                   border: "2px solid #F59E0B",
                   background: "#FFFFFF",
-                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.06)",
-                  maxWidth: 400,
-                  width: "100%",
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
                 }}
               >
                 <div style={{ position: "relative", width: "100%", height: 210 }}>
@@ -242,7 +225,7 @@ export default async function HomePage() {
       <div className="page-inner-container">
         {/* ── 2. Triple Physical Ticket Cards (Diaspora & Local) ── */}
         <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <JackpotCardsSection cmsCards={cmsCards} />
+          <JackpotCardsSection cmsCards={cmsJackpotCards} />
         </div>
 
         {/* ── 3. Full Draws Catalog (Dedicated Full-Width Section) ── */}
@@ -252,7 +235,7 @@ export default async function HomePage() {
 
         {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
         <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <TestimonialsNewsletter cmsTestimonials={cmsTestimonials} />
+          <TestimonialsNewsletter />
         </div>
       </div>
     </div>

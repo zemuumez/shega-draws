@@ -5,11 +5,6 @@ import { Clock, Globe, Trophy, Sparkles, HelpCircle, Ticket } from "lucide-react
 import { HowToBuyModal } from "./HowToBuyModal";
 import { BuyTicketModal } from "./BuyTicketModal";
 import { type Currency } from "@/lib/api";
-import { type CMSJackpotCard } from "@/lib/sanity/queries";
-
-interface JackpotCardsSectionProps {
-  cmsCards?: CMSJackpotCard[];
-}
 
 function TicketOrnament() {
   return (
@@ -33,7 +28,9 @@ function TicketOrnament() {
   );
 }
 
-export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
+import { type CMSJackpotCard } from "@/lib/sanity/queries";
+
+export function JackpotCardsSection({ cmsCards }: { cmsCards?: CMSJackpotCard[] | null }) {
   const [mounted, setMounted] = useState(false);
   const [isHowToBuyOpen, setIsHowToBuyOpen] = useState(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
@@ -69,7 +66,6 @@ export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
       id: "usd-250",
       serial: "RDL-USD-250",
       badgeTitle: "DIASPORA USD JACKPOT",
-      badgeIcon: Globe,
       ticketPrice: 250,
       currency: "USD" as Currency,
       currSymbol: "$",
@@ -81,7 +77,6 @@ export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
       id: "etb-200",
       serial: "RDL-ETB-200",
       badgeTitle: "200 BIRR HOLIDAY JACKPOT",
-      badgeIcon: Trophy,
       ticketPrice: 200,
       currency: "ETB" as Currency,
       currSymbol: "ETB",
@@ -93,7 +88,6 @@ export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
       id: "etb-100",
       serial: "RDL-ETB-100",
       badgeTitle: "100 BIRR CLASSIC MULTI-POOL",
-      badgeIcon: Sparkles,
       ticketPrice: 100,
       currency: "ETB" as Currency,
       currSymbol: "ETB",
@@ -104,17 +98,16 @@ export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
   ];
 
   const jackpotTickets = (cmsCards && cmsCards.length > 0)
-    ? cmsCards.map((c, idx) => ({
-        id: c._id || `cms-${idx}`,
-        serial: c.serial || `RDL-${c.currency || "ETB"}-${c.ticketPrice || 100}`,
-        badgeTitle: c.badgeTitle || "SPECIAL JACKPOT",
-        badgeIcon: c.currency === "USD" ? Globe : idx === 1 ? Trophy : Sparkles,
-        ticketPrice: c.ticketPrice || 100,
+    ? cmsCards.map((c) => ({
+        id: c._id || c.serial,
+        serial: c.serial,
+        badgeTitle: c.badgeTitle,
+        ticketPrice: c.ticketPrice,
         currency: (c.currency === "USD" ? "USD" : "ETB") as Currency,
         currSymbol: c.currency === "USD" ? "$" : "ETB",
-        grandPrize: c.grandPrize || "500,000 ETB",
-        drawDate: c.drawDate || "Friday 18th July",
-        poolLabels: c.poolLabels && c.poolLabels.length > 0 ? c.poolLabels : ["1K", "2K", "3K", "5K"],
+        grandPrize: c.grandPrize,
+        drawDate: c.drawDate,
+        poolLabels: c.poolLabels || ["1K", "2K", "3K", "5K"],
       }))
     : defaultJackpotTickets;
 
@@ -141,7 +134,7 @@ export function JackpotCardsSection({ cmsCards }: JackpotCardsSectionProps) {
       <section style={{ margin: "10px 0 20px", width: "100%" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, width: "100%" }}>
           {jackpotTickets.map((ticket) => {
-            const BadgeIcon = ticket.badgeIcon;
+            const BadgeIcon = ticket.currency === "USD" ? Globe : Trophy;
 
             return (
               <div

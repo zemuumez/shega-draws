@@ -3,14 +3,14 @@
     "_id": "siteSettings",
     "_type": "siteSettings",
     "siteName": "Rimna Digital Lottery",
-    "tagline": "Transparent, 100% Live Video Draws & Guaranteed Instant Payouts",
+    "tagline": "Ethiopia and Diaspora's Premier Transparent Digital Lottery",
     "contactPhone": "+251 911 000 000",
-    "supportEmail": "support@rimnalottery.et",
+    "supportEmail": "support@rimnalottery.com",
     "telegramUrl": "https://t.me/RimnaLotteryOfficial",
     "whatsappUrl": "https://wa.me/251911000000"
   },
   {
-    "_id": "jackpot-card-usd-250",
+    "_id": "card-usd-250",
     "_type": "jackpotCard",
     "serial": "RDL-USD-250",
     "badgeTitle": "DIASPORA USD JACKPOT",
@@ -23,7 +23,7 @@
     "isActive": true
   },
   {
-    "_id": "jackpot-card-etb-200",
+    "_id": "card-etb-200",
     "_type": "jackpotCard",
     "serial": "RDL-ETB-200",
     "badgeTitle": "200 BIRR HOLIDAY JACKPOT",
@@ -36,7 +36,7 @@
     "isActive": true
   },
   {
-    "_id": "jackpot-card-etb-100",
+    "_id": "card-etb-100",
     "_type": "jackpotCard",
     "serial": "RDL-ETB-100",
     "badgeTitle": "100 BIRR CLASSIC MULTI-POOL",
@@ -49,180 +49,85 @@
     "isActive": true
   },
   {
-    "_id": "draw-etb-100-classic",
+    "_id": "draw-etb-100",
     "_type": "draw",
     "drawId": "RDL-2026-08A",
     "title": "100 Birr Classic Multi-Pool Draw",
-    "titleAm": "የ 100 ብር ክላሲክ ባለብዙ-ፑል ዕጣ",
-    "slug": { "_type": "slug", "current": "100-birr-classic-draw" },
+    "titleAm": "የ 100 ብር ክላሲክ መልቲ-ፑል እጣ",
+    "titleOm": "Badhaasa Qarshii 100",
+    "slug": { "_type": "slug", "current": "100-birr-classic-multi-pool-draw" },
     "status": "open",
     "currency": "ETB",
     "ticketPrice": 100,
     "totalPrizeValue": "500,000 ETB",
     "deadline": "2026-09-02T18:00:00.000Z",
-    "description": "Pick your 2-digit lucky number (00–99). 10 guaranteed winners drawn live on public video stream.",
-    "prizes": [
-      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "60,000 ETB Cash", "valueAmount": "60,000 ETB" },
-      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "40,000 ETB Cash", "valueAmount": "40,000 ETB" },
-      { "_key": "p3", "rank": 3, "label": "3rd Prize", "prizeTitle": "30,000 ETB Cash", "valueAmount": "30,000 ETB" },
-      { "_key": "p4", "rank": 4, "label": "4th Prize", "prizeTitle": "20,000 ETB Cash", "valueAmount": "20,000 ETB" },
-      { "_key": "p5", "rank": 5, "label": "5th Prize", "prizeTitle": "15,000 ETB Cash", "valueAmount": "15,000 ETB" },
-      { "_key": "p6", "rank": 6, "label": "6th Prize", "prizeTitle": "10,000 ETB Cash", "valueAmount": "10,000 ETB" },
-      { "_key": "p7", "rank": 7, "label": "7th Prize", "prizeTitle": "8,000 ETB Cash", "valueAmount": "8,000 ETB" },
-      { "_key": "p8", "rank": 8, "label": "8th Prize", "prizeTitle": "7,000 ETB Cash", "valueAmount": "7,000 ETB" },
-      { "_key": "p9", "rank": 9, "label": "9th Prize", "prizeTitle": "5,000 ETB Cash", "valueAmount": "5,000 ETB" },
-      { "_key": "p10", "rank": 10, "label": "10th Prize", "prizeTitle": "5,000 ETB Cash", "valueAmount": "5,000 ETB" }
-    ]
+    "description": "Select your participant pool capacity (1K, 2K, 3K, 5K) and pick your 2-digit lucky number. 10 guaranteed winners drawn live on video stream."
   },
   {
-    "_id": "draw-etb-200-holiday",
+    "_id": "draw-usd-250",
     "_type": "draw",
-    "drawId": "RDL-2026-08B",
+    "drawId": "RDL-USD-250",
+    "title": "$250 Diamond Global Diaspora Draw",
+    "titleAm": "የ $250 ዳያስፖራ ዳይመንድ እጣ",
+    "titleOm": "Badhaasa Daayimondii $250",
+    "slug": { "_type": "slug", "current": "250-diamond-global-diaspora-draw" },
+    "status": "open",
+    "currency": "USD",
+    "ticketPrice": 250,
+    "totalPrizeValue": "$1,250,000",
+    "deadline": "2026-09-10T18:00:00.000Z",
+    "description": "International diaspora flagship draw. 10 guaranteed winners with instant global wire and CBE remittances."
+  },
+  {
+    "_id": "draw-etb-200",
+    "_type": "draw",
+    "drawId": "RDL-2026-09B",
     "title": "200 Birr Grand Holiday Jackpot",
     "titleAm": "የ 200 ብር የበዓል ታላቅ ጃክፖት",
-    "slug": { "_type": "slug", "current": "200-birr-holiday-jackpot" },
+    "titleOm": "Badhaasa Guddaa Ayyaanaa Qarshii 200",
+    "slug": { "_type": "slug", "current": "200-birr-grand-holiday-jackpot" },
     "status": "open",
     "currency": "ETB",
     "ticketPrice": 200,
     "totalPrizeValue": "1,000,000 ETB",
-    "deadline": "2026-09-08T18:00:00.000Z",
-    "description": "Special celebration holiday pool with doubled payouts for all 10 winners.",
-    "prizes": [
-      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "120,000 ETB Cash", "valueAmount": "120,000 ETB" },
-      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "80,000 ETB Cash", "valueAmount": "80,000 ETB" },
-      { "_key": "p3", "rank": 3, "label": "3rd Prize", "prizeTitle": "60,000 ETB Cash", "valueAmount": "60,000 ETB" },
-      { "_key": "p4", "rank": 4, "label": "4th Prize", "prizeTitle": "40,000 ETB Cash", "valueAmount": "40,000 ETB" }
-    ]
+    "deadline": "2026-09-15T18:00:00.000Z",
+    "description": "Holiday celebration jackpot with 1 Million ETB maximum prize pool and 10 guaranteed rank payouts."
   },
   {
-    "_id": "draw-etb-025-flash",
+    "_id": "draw-usd-50",
     "_type": "draw",
-    "drawId": "RDL-2026-08C",
-    "title": "25 Birr Daily Flash Community Draw",
-    "slug": { "_type": "slug", "current": "25-birr-daily-flash-draw" },
-    "status": "open",
-    "currency": "ETB",
-    "ticketPrice": 25,
-    "totalPrizeValue": "125,000 ETB",
-    "deadline": "2026-09-04T18:00:00.000Z",
-    "description": "Fast-paced daily entry with instant results announced every 24 hours.",
-    "prizes": [
-      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "15,000 ETB Cash", "valueAmount": "15,000 ETB" },
-      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "10,000 ETB Cash", "valueAmount": "10,000 ETB" }
-    ]
-  },
-  {
-    "_id": "draw-usd-025-diaspora",
-    "_type": "draw",
-    "drawId": "RDL-USD-025",
-    "title": "$25 International Diaspora Raffle",
-    "slug": { "_type": "slug", "current": "25-usd-diaspora-raffle" },
+    "drawId": "RDL-USD-050",
+    "title": "$50 Global Tier Jackpot",
+    "titleAm": "የ $50 ግሎባል ጃክፖት",
+    "titleOm": "Badhaasa Gloobaalaa $50",
+    "slug": { "_type": "slug", "current": "50-global-tier-jackpot" },
     "status": "open",
     "currency": "USD",
-    "ticketPrice": 25,
-    "totalPrizeValue": "$125,000",
-    "deadline": "2026-09-12T18:00:00.000Z",
-    "description": "Diaspora players worldwide can enter using Visa, Mastercard, or Crypto. 10 guaranteed USD winners.",
-    "prizes": [
-      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "$40,000 USD", "valueAmount": "$40,000" },
-      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "$25,000 USD", "valueAmount": "$25,000" },
-      { "_key": "p3", "rank": 3, "label": "3rd Prize", "prizeTitle": "$15,000 USD", "valueAmount": "$15,000" }
-    ]
-  },
-  {
-    "_id": "draw-usd-100-elite",
-    "_type": "draw",
-    "drawId": "RDL-USD-100",
-    "title": "$100 Elite Global Jackpot",
-    "slug": { "_type": "slug", "current": "100-usd-elite-global-jackpot" },
-    "status": "upcoming",
-    "currency": "USD",
-    "ticketPrice": 100,
-    "totalPrizeValue": "$500,000",
+    "ticketPrice": 50,
+    "totalPrizeValue": "$250,000",
     "deadline": "2026-09-20T18:00:00.000Z",
-    "description": "Elite international draw with $160,000 grand first prize and 10 audited winners.",
-    "prizes": [
-      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "$160,000 USD", "valueAmount": "$160,000" },
-      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "$90,000 USD", "valueAmount": "$90,000" }
-    ]
+    "description": "Affordable global diaspora lottery with capped participant pools and 10 audited winners."
   },
   {
-    "_id": "draw-result-rdl-2026-07",
+    "_id": "draw-result-latest",
     "_type": "drawResult",
     "drawId": "RDL-2026-07",
-    "drawTitle": "100 ETB Classic Multi-Pool Draw",
+    "drawTitle": "100 Birr Classic Multi-Pool Draw",
     "drawDate": "2026-08-25",
-    "broadcastVideoUrl": "https://t.me/RimnaLotteryOfficial",
-    "auditNotes": "All 10 winning numbers drawn on live video stream by founders. Payouts transferred via Telebirr & CBE.",
+    "broadcastVideoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     "isPublished": true,
+    "auditNotes": "Public broadcast live video draw verified. All 10 prize winners received instant payout via CBE and Telebirr.",
     "winningNumbers": [
-      { "_key": "w1", "rank": 1, "luckyNumber": "42", "prizeAmount": "60,000 ETB", "winnerName": "Dawit A.", "winnerLocation": "Addis Ababa", "payoutStatus": "paid_telebirr" },
-      { "_key": "w2", "rank": 2, "luckyNumber": "89", "prizeAmount": "40,000 ETB", "winnerName": "Sara M.", "winnerLocation": "Hawassa", "payoutStatus": "paid_cbe" },
-      { "_key": "w3", "rank": 3, "luckyNumber": "07", "prizeAmount": "30,000 ETB", "winnerName": "Yohannes B.", "winnerLocation": "Adama", "payoutStatus": "paid_telebirr" },
-      { "_key": "w4", "rank": 4, "luckyNumber": "15", "prizeAmount": "20,000 ETB", "winnerName": "Tigist G.", "winnerLocation": "Bahir Dar", "payoutStatus": "paid_cbe" },
-      { "_key": "w5", "rank": 5, "luckyNumber": "63", "prizeAmount": "15,000 ETB", "winnerName": "Henok K.", "winnerLocation": "Dire Dawa", "payoutStatus": "paid_telebirr" },
-      { "_key": "w6", "rank": 6, "luckyNumber": "77", "prizeAmount": "10,000 ETB", "winnerName": "Marta T.", "winnerLocation": "Mekelle", "payoutStatus": "paid_telebirr" },
-      { "_key": "w7", "rank": 7, "luckyNumber": "21", "prizeAmount": "8,000 ETB", "winnerName": "Abel W.", "winnerLocation": "Jimma", "payoutStatus": "paid_cbe" },
-      { "_key": "w8", "rank": 8, "luckyNumber": "94", "prizeAmount": "7,000 ETB", "winnerName": "Bethlehem S.", "winnerLocation": "Addis Ababa", "payoutStatus": "paid_telebirr" },
-      { "_key": "w9", "rank": 9, "luckyNumber": "38", "prizeAmount": "5,000 ETB", "winnerName": "Kidus N.", "winnerLocation": "Gondar", "payoutStatus": "paid_telebirr" },
-      { "_key": "w10", "rank": 10, "luckyNumber": "50", "prizeAmount": "5,000 ETB", "winnerName": "Selamawit D.", "winnerLocation": "Bishoftu", "payoutStatus": "paid_cbe" }
+      { "_key": "w1", "rank": 1, "luckyNumber": "42", "prizeAmount": "60,000 ETB", "winnerName": "Dawit T.", "winnerLocation": "Addis Ababa", "payoutStatus": "paid_cbe" },
+      { "_key": "w2", "rank": 2, "luckyNumber": "89", "prizeAmount": "40,000 ETB", "winnerName": "Sara M.", "winnerLocation": "Hawassa", "payoutStatus": "paid_telebirr" },
+      { "_key": "w3", "rank": 3, "luckyNumber": "07", "prizeAmount": "30,000 ETB", "winnerName": "Yohannes B.", "winnerLocation": "Adama", "payoutStatus": "paid_cbe" },
+      { "_key": "w4", "rank": 4, "luckyNumber": "15", "prizeAmount": "18,000 ETB", "winnerName": "Helen K.", "winnerLocation": "Bahir Dar", "payoutStatus": "paid_telebirr" },
+      { "_key": "w5", "rank": 5, "luckyNumber": "63", "prizeAmount": "14,000 ETB", "winnerName": "Amanuel G.", "winnerLocation": "Mekelle", "payoutStatus": "paid_cbe" },
+      { "_key": "w6", "rank": 6, "luckyNumber": "77", "prizeAmount": "10,000 ETB", "winnerName": "Kidus N.", "winnerLocation": "Dire Dawa", "payoutStatus": "paid_telebirr" },
+      { "_key": "w7", "rank": 7, "luckyNumber": "21", "prizeAmount": "8,000 ETB", "winnerName": "Bethlehem T.", "winnerLocation": "Gondar", "payoutStatus": "paid_cbe" },
+      { "_key": "w8", "rank": 8, "luckyNumber": "94", "prizeAmount": "7,000 ETB", "winnerName": "Abel W.", "winnerLocation": "Addis Ababa", "payoutStatus": "paid_telebirr" },
+      { "_key": "w9", "rank": 9, "luckyNumber": "38", "prizeAmount": "7,000 ETB", "winnerName": "Tigist M.", "winnerLocation": "Jimma", "payoutStatus": "paid_cbe" },
+      { "_key": "w10", "rank": 10, "luckyNumber": "50", "prizeAmount": "6,000 ETB", "winnerName": "Daniel S.", "winnerLocation": "Addis Ababa", "payoutStatus": "paid_telebirr" }
     ]
-  },
-  {
-    "_id": "testimonial-tewodros",
-    "_type": "testimonial",
-    "name": "Tewodros Kassahun",
-    "location": "Addis Ababa",
-    "prize": "80,000 ETB (1st Place Winner)",
-    "quote": "I watched the live video broadcast when my number was drawn! The CBE transfer arrived in my account in less than 20 minutes!",
-    "rating": 5,
-    "order": 1,
-    "isActive": true
-  },
-  {
-    "_id": "testimonial-helen",
-    "_type": "testimonial",
-    "name": "Helen Mengistu",
-    "location": "Washington, DC (Diaspora)",
-    "prize": "$15,000 USD (1st Place Winner)",
-    "quote": "Playing from the USA was so seamless with my card. The 10 guaranteed winners structure gives real winning chances!",
-    "rating": 5,
-    "order": 2,
-    "isActive": true
-  },
-  {
-    "_id": "testimonial-yonas",
-    "_type": "testimonial",
-    "name": "Yonas Birhane",
-    "location": "Hawassa",
-    "prize": "65,000 ETB (2nd Place Winner)",
-    "quote": "Rimna is truly the most transparent lottery platform. You see your ticket number on the board and verify the outcome yourself.",
-    "rating": 5,
-    "order": 3,
-    "isActive": true
-  },
-  {
-    "_id": "faq-live-draw",
-    "_type": "faq",
-    "question": "How are the winning numbers selected and verified?",
-    "answer": "All winning numbers are drawn live on video broadcast by the lottery founders. Each number is drawn from physical transparent capsules on camera and immediately published.",
-    "category": "fairness",
-    "order": 1
-  },
-  {
-    "_id": "faq-payout-speed",
-    "_type": "faq",
-    "question": "How quickly are cash prizes transferred to winners?",
-    "answer": "Prizes for Ethiopian winners are sent directly to their CBE bank account or Telebirr within 30 minutes of draw completion. Diaspora winners receive funds via bank wire or crypto.",
-    "category": "payouts",
-    "order": 2
-  },
-  {
-    "_id": "faq-diaspora",
-    "_type": "faq",
-    "question": "Can Diaspora Ethiopians participate from abroad?",
-    "answer": "Yes! We offer dedicated USD ticket pools ($25, $50, $100, $250) payable via international Visa, Mastercard, or Crypto with guaranteed USD cash prize transfers.",
-    "category": "general",
-    "order": 3
   }
 ]

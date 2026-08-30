@@ -175,27 +175,6 @@ export const FAQS_QUERY = defineQuery(`
   }
 `);
 
-/** Fetch winner testimonials from CMS. */
-export const TESTIMONIALS_QUERY = defineQuery(`
-  *[_type == "testimonial" && isActive == true] | order(order asc) {
-    _id,
-    name,
-    location,
-    prize,
-    quote,
-    rating
-  }
-`);
-
-export interface CMSTestimonial {
-  _id: string;
-  name: string;
-  location: string;
-  prize: string;
-  quote: string;
-  rating?: number;
-}
-
 export interface CMSJackpotCard {
   _id: string;
   serial: string;

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { getActiveDraw, listDraws } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY, LATEST_RESULTS_QUERY, type ActiveDraw, type CMSDrawResult } from "@/lib/sanity/queries";
-import { Card } from "@/components/ui/Card";
-import { Trophy, Tv, CheckCircle2, Award, Calendar, Phone, Send, ShieldCheck, Sparkles } from "lucide-react";
+import { LATEST_RESULTS_QUERY, type CMSDrawResult } from "@/lib/sanity/queries";
+import { Trophy, CheckCircle2, Phone, Send, ShieldCheck } from "lucide-react";
 import { LiveBroadcastBanner } from "@/components/LiveBroadcastBanner";
 
 export const metadata: Metadata = {
@@ -11,37 +10,35 @@ export const metadata: Metadata = {
   description: "Official audited live draw winning numbers announced on public broadcast stream.",
 };
 
-export const revalidate = 10;
+export const revalidate = 0;
 
 export default async function ResultsPage() {
-  const [cms, cmsResultsRes, draw, allDrawsRes] = await Promise.allSettled([
-    sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
-    sanityClient.fetch<CMSDrawResult[]>(LATEST_RESULTS_QUERY).catch(() => []),
+  const [cmsResultsRes, draw, allDrawsRes] = await Promise.allSettled([
+    sanityClient.fetch<CMSDrawResult[]>(LATEST_RESULTS_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
   ]);
 
-  const cmsData    = cms.status === "fulfilled" ? cms.value : null;
-  const cmsResults = (cmsResultsRes.status === "fulfilled" && cmsResultsRes.value) ? cmsResultsRes.value : [];
-  const drawState  = draw.status === "fulfilled" ? draw.value : null;
-  const allDraws   = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+  const cmsResults = cmsResultsRes.status === "fulfilled" ? cmsResultsRes.value : null;
+  const drawState = draw.status === "fulfilled" ? draw.value : null;
 
-  const latestCmsResult = cmsResults[0];
+  const latestResult = (cmsResults && cmsResults.length > 0) ? cmsResults[0] : null;
 
-  const pastDraws = allDraws.filter((d) => d.status === "revealed");
-  const prizes    = cmsData?.prizes ?? [];
+  const defaultWinningNumbers = { 1: "42", 2: "89", 3: "07", 4: "15", 5: "63", 6: "77", 7: "21", 8: "94", 9: "38", 10: "50" };
 
-  // If CMS result exists with winningNumbers, map it; otherwise use drawState or defaults
-  const winningNumbers: Record<string, string> = {};
-  if (latestCmsResult && latestCmsResult.winningNumbers && latestCmsResult.winningNumbers.length > 0) {
-    latestCmsResult.winningNumbers.forEach((w) => {
-      winningNumbers[String(w.rank)] = w.luckyNumber;
-    });
-  } else {
-    Object.assign(winningNumbers, drawState?.winning_numbers ?? { 1: "42", 2: "89", 3: "07", 4: "15", 5: "63", 6: "77", 7: "21", 8: "94", 9: "38", 10: "50" });
-  }
-
-  const latestDrawId = latestCmsResult?.drawId || drawState?.draw_id || "RDL-2026-07";
+  const winningNumbersList = latestResult?.winningNumbers?.length
+    ? latestResult.winningNumbers.map((w) => ({
+        rank: String(w.rank),
+        num: w.luckyNumber,
+        prize: w.prizeAmount,
+        winner: w.winnerName,
+      }))
+    : Object.entries(drawState?.winning_numbers ?? defaultWinningNumbers).map(([rank, num]) => ({
+        rank,
+        num: String(num),
+        prize: rank === "1" ? "Jackpot" : `Rank #${rank}`,
+        winner: undefined,
+      }));
 
   return (
     <div className="page-inner-container" style={{ padding: "32px clamp(14px, 3vw, 24px)", maxWidth: 1040, margin: "0 auto" }}>
@@ -94,7 +91,7 @@ export default async function ResultsPage() {
               LATEST COMPLETED DRAW
             </span>
             <h2 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900 }}>
-              Top 10 Winning Numbers (#{latestDrawId})
+              Top 10 Winning Numbers (#{latestResult?.drawId || drawState?.draw_id || "RDL-2026-07"})
             </h2>
           </div>
           <span className="badge badge-gold">
@@ -103,25 +100,25 @@ export default async function ResultsPage() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8, marginBottom: 16 }}>
-          {Object.entries(winningNumbers).map(([rank, num]) => (
+          {winningNumbersList.map((item) => (
             <div
-              key={rank}
+              key={item.rank}
               style={{
-                background: rank === "1" ? "#FEF9C3" : "#FAFAFA",
-                border: rank === "1" ? "1.5px solid #F59E0B" : "1px solid #E5E7EB",
+                background: item.rank === "1" ? "#FEF9C3" : "#FAFAFA",
+                border: item.rank === "1" ? "1.5px solid #F59E0B" : "1px solid #E5E7EB",
                 borderRadius: 8,
                 padding: "10px 8px",
                 textAlign: "center",
               }}
             >
-              <span className="mono" style={{ fontSize: "0.6875rem", color: rank === "1" ? "#D97706" : "#6B7280", fontWeight: 800, textTransform: "uppercase", display: "block" }}>
-                {rank === "1" ? "🥇 1st Place" : rank === "2" ? "🥈 2nd Place" : rank === "3" ? "🥉 3rd Place" : `Rank ${rank}`}
+              <span className="mono" style={{ fontSize: "0.6875rem", color: item.rank === "1" ? "#D97706" : "#6B7280", fontWeight: 800, textTransform: "uppercase", display: "block" }}>
+                {item.rank === "1" ? "🥇 1st Place" : item.rank === "2" ? "🥈 2nd Place" : item.rank === "3" ? "🥉 3rd Place" : `Rank ${item.rank}`}
               </span>
               <span className="display" style={{ fontSize: "1.35rem", fontWeight: 900, color: "#DC2626", margin: "2px 0", display: "block" }}>
-                #{String(num)}
+                #{item.num}
               </span>
               <span className="mono" style={{ fontSize: "0.625rem", color: "#4B5563", fontWeight: 700 }}>
-                {rank === "1" ? "Jackpot" : `Rank #${rank}`}
+                {item.prize || `Rank #${item.rank}`}
               </span>
             </div>
           ))}
