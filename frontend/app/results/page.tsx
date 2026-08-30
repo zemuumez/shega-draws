@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { getActiveDraw, listDraws } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
 import { ACTIVE_DRAW_QUERY, type ActiveDraw } from "@/lib/sanity/queries";
-import { PrizeTable } from "@/components/PrizeTable";
 import { Card } from "@/components/ui/Card";
-import { Trophy, Tv, CheckCircle2, Award, Calendar } from "lucide-react";
+import { Trophy, Tv, CheckCircle2, Award, Calendar, Phone, Send, ShieldCheck, Sparkles } from "lucide-react";
+import { LiveBroadcastBanner } from "@/components/LiveBroadcastBanner";
 
 export const metadata: Metadata = {
-  title: "Draw Results & Live Winning Numbers",
+  title: "Draw Results & Live Broadcast — Rimna Digital Lottery",
   description: "Official audited live draw winning numbers announced on public broadcast stream.",
 };
 
@@ -29,102 +29,141 @@ export default async function ResultsPage() {
   const winningNumbers = drawState?.winning_numbers ?? { 1: "42", 2: "89", 3: "07", 4: "15", 5: "63", 6: "77", 7: "21", 8: "94", 9: "38", 10: "50" };
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: "32px 20px" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
+    <div className="page-inner-container" style={{ padding: "32px clamp(14px, 3vw, 24px)", maxWidth: 1040, margin: "0 auto" }}>
+      {/* ── Header ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
         <div
           style={{
-            width: 46,
-            height: 46,
-            borderRadius: "50%",
-            background: "linear-gradient(135deg, #FDE047 0%, #EAB308 100%)",
+            width: 44,
+            height: 44,
+            borderRadius: "10px",
+            background: "#FEF9C3",
+            border: "1.5px solid #FDE047",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            boxShadow: "0 2px 8px rgba(234, 179, 8, 0.35)",
-            border: "1px solid #FEF08A",
           }}
         >
-          <Trophy size={24} color="#0C2666" />
+          <Trophy size={22} color="#D97706" />
         </div>
         <div>
-          <h1 className="display" style={{ fontSize: "1.625rem", color: "var(--blue-navy)", fontWeight: 900, lineHeight: 1.1 }}>
-            Official Live Draw Results
+          <h1 className="display" style={{ fontSize: "clamp(1.35rem, 3vw, 1.85rem)", color: "#111827", fontWeight: 900, lineHeight: 1.15 }}>
+            Official Live Draw Results & Broadcast
           </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 4 }}>
-            All winning numbers are drawn live on video stream by the lottery founders during the scheduled broadcast.
+          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 2 }}>
+            All winning numbers are drawn live on video stream by the lottery founders during our scheduled public broadcast.
           </p>
         </div>
       </div>
 
-      {/* Live Stream Broadcast Notice Card */}
-      <Card style={{ marginBottom: 24, background: "linear-gradient(135deg, #FFFDF5 0%, #FEF9C3 100%)", border: "1.5px solid #FDE047" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#DC2626" }} />
-          <strong className="mono" style={{ color: "var(--blue-navy)", fontSize: "0.875rem", textTransform: "uppercase" }}>
-            Live Stream Winner Selection
-          </strong>
-        </div>
-        <p style={{ fontSize: "0.875rem", color: "var(--text-main)", lineHeight: 1.6 }}>
-          During every scheduled draw, the winning balls are drawn in real time on our official YouTube and Telegram live streams. Winning tickets are displayed on camera for public verification and instant payout distribution.
-        </p>
-      </Card>
+      {/* ── 1. Live Public Winner Drawing Section ── */}
+      <div style={{ marginBottom: 28 }}>
+        <LiveBroadcastBanner />
+      </div>
 
-      {/* Results / prize table */}
-      <Card style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h2 className="display" style={{ fontSize: "1.15rem", color: "var(--blue-navy)", fontWeight: 800 }}>
-            Top 10 Winning Numbers
-          </h2>
+      {/* ── 2. Top 10 Winning Numbers Audited Grid ── */}
+      <div
+        className="card-base"
+        style={{
+          background: "#FFFFFF",
+          border: "1.5px solid #E5E7EB",
+          borderRadius: "14px",
+          padding: "20px",
+          marginBottom: 28,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+          <div>
+            <span style={{ fontSize: "0.6875rem", fontWeight: 800, color: "#D97706", textTransform: "uppercase", display: "block" }}>
+              LATEST COMPLETED DRAW
+            </span>
+            <h2 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900 }}>
+              Top 10 Winning Numbers (#{drawState?.draw_id || "RDL-2026-07"})
+            </h2>
+          </div>
           <span className="badge badge-gold">
-            10 Guaranteed Winners
+            <CheckCircle2 size={13} /> 10 Guaranteed Winners Audited
           </span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8, marginBottom: 16 }}>
           {Object.entries(winningNumbers).map(([rank, num]) => (
             <div
               key={rank}
               style={{
-                background: rank === "1" ? "#FEF9C3" : "#F8FAFC",
-                border: rank === "1" ? "2px solid #FDE047" : "1px solid #E2E8F0",
-                borderRadius: 10,
-                padding: "10px 12px",
+                background: rank === "1" ? "#FEF9C3" : "#FAFAFA",
+                border: rank === "1" ? "1.5px solid #F59E0B" : "1px solid #E5E7EB",
+                borderRadius: 8,
+                padding: "10px 8px",
                 textAlign: "center",
               }}
             >
-              <span className="mono" style={{ fontSize: "0.6875rem", color: rank === "1" ? "var(--gold-deep)" : "var(--text-subtle)", fontWeight: 800, textTransform: "uppercase", display: "block" }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: rank === "1" ? "#D97706" : "#6B7280", fontWeight: 800, textTransform: "uppercase", display: "block" }}>
                 {rank === "1" ? "🥇 1st Place" : rank === "2" ? "🥈 2nd Place" : rank === "3" ? "🥉 3rd Place" : `Rank ${rank}`}
               </span>
-              <span className="display" style={{ fontSize: "1.5rem", fontWeight: 900, color: "#DC2626", margin: "2px 0", display: "block" }}>
+              <span className="display" style={{ fontSize: "1.35rem", fontWeight: 900, color: "#DC2626", margin: "2px 0", display: "block" }}>
                 #{String(num)}
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "var(--teal-dark)", fontWeight: 700 }}>
-                ✓ Payout Sent
+              <span className="mono" style={{ fontSize: "0.625rem", color: "#4B5563", fontWeight: 700 }}>
+                {rank === "1" ? "Jackpot" : `Rank #${rank}`}
               </span>
             </div>
           ))}
         </div>
-      </Card>
 
-      {/* Payout & Claiming Guide */}
-      <Card>
-        <h3 className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 800, marginBottom: 8 }}>
-          How Cash Prizes are Paid
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
-          <p>
-            1. All verified winning ticket holders receive an instant SMS notification after the live stream concludes.
-          </p>
-          <p>
-            2. Local Ethiopian winners receive payouts directly into their registered <strong>Telebirr</strong>, <strong>CBE Birr</strong>, or <strong>Bank Account</strong> within 2 hours.
-          </p>
-          <p>
-            3. International diaspora winners receive payouts via <strong>International Wire / Bank Transfer</strong> or <strong>PayPal</strong> within 24 hours.
+        <div style={{ padding: "10px 14px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #E5E7EB", display: "flex", alignItems: "center", gap: 8, fontSize: "0.75rem", color: "#4B5563" }}>
+          <ShieldCheck size={16} color="#059669" />
+          <span>All payouts are transferred within 30 minutes of live draw completion to the winner&apos;s CBE or Telebirr account.</span>
+        </div>
+      </div>
+
+      {/* ── 3. Live Support 24/7 & Direct Helpline ── */}
+      <div
+        className="card-base"
+        style={{
+          borderRadius: "14px",
+          border: "2px solid #F59E0B",
+          background: "#FFFBEB",
+          padding: "20px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 16,
+        }}
+      >
+        <div>
+          <span style={{ fontSize: "0.6875rem", color: "#D97706", textTransform: "uppercase", fontWeight: 800, display: "block" }}>
+            NEED ASSISTANCE WITH WINNING CLAIMS?
+          </span>
+          <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900 }}>
+            Live Support 24/7 Hotline
+          </h3>
+          <p style={{ fontSize: "0.8125rem", color: "#4B5563", marginTop: 2 }}>
+            Our customer care team verifies winning tickets and assists with Telebirr and CBE bank payouts around the clock.
           </p>
         </div>
-      </Card>
+
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <a
+            href="tel:+251911000000"
+            className="casino-btn-dark"
+            style={{ padding: "9px 16px", textDecoration: "none" }}
+          >
+            <Phone size={14} color="#10B981" /> Call +251 911 000 000
+          </a>
+          <a
+            href="https://t.me/RimnaLotteryOfficial"
+            target="_blank"
+            rel="noreferrer"
+            className="casino-btn-red"
+            style={{ padding: "9px 16px", textDecoration: "none" }}
+          >
+            <Send size={14} /> Telegram @RimnaLottery
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

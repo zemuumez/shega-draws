@@ -1,52 +1,42 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
-import { Ticket, Tv, Sparkles, Trophy, Clock, CheckCircle2, ArrowRight, Zap, Users, Gift, Globe } from "lucide-react";
-import { sanityClient } from "@/lib/sanity/client";
-import {
-  ACTIVE_DRAW_QUERY,
-  ALL_DRAWS_QUERY,
-  PROMOTIONS_QUERY,
-  type ActiveDraw,
-  type CMSPromotion,
-} from "@/lib/sanity/queries";
+import Link from "next/link";
 import { getActiveDraw, listDraws } from "@/lib/api";
+import { sanityClient } from "@/lib/sanity/client";
+import { ACTIVE_DRAW_QUERY, type ActiveDraw } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
-import { JackpotCardsSection } from "@/components/JackpotCardsSection";
-import { LiveBroadcastBanner } from "@/components/LiveBroadcastBanner";
-import { DrawsExplorer } from "@/components/DrawsExplorer";
-import { SidebarWidgets } from "@/components/SidebarWidgets";
-import { WhyRimnaLottery } from "@/components/WhyRimnaLottery";
-import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
+import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award } from "lucide-react";
+import { JackpotCardsSection } from "@/components/JackpotCardsSection";
+import { DrawsExplorer } from "@/components/DrawsExplorer";
+import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 
 export const metadata: Metadata = {
-  title: "Rimna Digital Lottery — Transparent Live Digital Raffle & Lottery",
-  description: "Official verified multi-pool digital raffle tickets. Pick your lucky number, win guaranteed top 10 cash prizes, and watch winning numbers drawn live on broadcast.",
+  title: "Rimna Digital Lottery — Transparent Live Video Draws & Real Payouts",
+  description:
+    "Ethiopia & Diaspora's premier transparent digital lottery. Real cash prizes drawn live on video by company founders. Top 10 guaranteed winners per draw.",
 };
 
-export const revalidate = 0; // Dynamic server render
+export const revalidate = 15;
 
 export default async function HomePage() {
-  // Fetch active approved draw from Sanity or fallback API
-  const [sanityActive, sanityAll, apiActive, apiAll] = await Promise.allSettled([
-    sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY),
-    sanityClient.fetch<any[]>(ALL_DRAWS_QUERY),
-    getActiveDraw(),
-    listDraws(),
+  const [cms, activeDrawState, allDrawsRes] = await Promise.allSettled([
+    sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
+    getActiveDraw().catch(() => null),
+    listDraws().catch(() => []),
   ]);
 
-  const currentApprovedDraw =
-    sanityActive.status === "fulfilled" && sanityActive.value
-      ? sanityActive.value
-      : apiActive.status === "fulfilled"
-      ? apiActive.value
-      : null;
+  const cmsData = cms.status === "fulfilled" ? cms.value : null;
+  const drawState = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
+  const allDraws = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
 
-  const allDraws =
-    apiAll.status === "fulfilled" && apiAll.value?.length > 0
-      ? apiAll.value
-      : [];
+  // Filter approved open draws or fallback to the latest active state
+  const approvedOpenDraws = allDraws.filter((d) => d.status === "open");
+  const currentApprovedDraw =
+    approvedOpenDraws.find((d) => d.id === drawState?.id) ||
+    approvedOpenDraws[0] ||
+    drawState ||
+    allDraws[0];
 
   const deadline = currentApprovedDraw?.deadline || new Date(Date.now() + 3 * 86400000).toISOString();
   const activeCurrency = ((currentApprovedDraw as any)?.currency || "ETB") as any;
@@ -65,7 +55,7 @@ export default async function HomePage() {
           borderRight: "none",
           borderRadius: 0,
           boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
-          marginBottom: 24,
+          marginBottom: 28,
           position: "relative",
           overflow: "hidden",
         }}
@@ -73,125 +63,125 @@ export default async function HomePage() {
         {/* Centered Content Container matching exact indentation of other sections */}
         <div className="page-inner-container">
           <div className="hero-grid-layout" style={{ display: "grid", gap: 20, alignItems: "center", width: "100%", position: "relative", zIndex: 3 }}>
-          {/* Left Column: Headline, Active Draw Info & CTA */}
-          <div style={{ width: "100%" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span className="casino-ribbon-badge">
-                <Trophy size={13} /> OFFICIAL LIVE DRAW · {(currentApprovedDraw as any)?.draw_id || "RDL-2026-08A"}
-              </span>
-            </div>
-
-            {/* Huge Jackpot Display */}
-            <div
-              className="display"
-              style={{
-                fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                color: "#DC2626",
-                lineHeight: 1.05,
-                fontWeight: 900,
-                letterSpacing: "-1px",
-                margin: "2px 0 6px",
-              }}
-            >
-              {(currentApprovedDraw as any)?.total_prize_value || (currentApprovedDraw as any)?.prize_pool_estimate || "$1,250,000 / 1,000,000 ETB"}
-            </div>
-
-            <h1
-              className="display"
-              style={{
-                fontSize: "clamp(1.125rem, 2.5vw, 1.5rem)",
-                color: "#111827",
-                fontWeight: 800,
-                lineHeight: 1.25,
-                marginBottom: 8,
-              }}
-            >
-              {currentApprovedDraw?.title || "Rimna Grand Jackpot — Multi-Pool Live Drawing"}
-            </h1>
-
-            <p style={{ color: "var(--text-muted)", fontSize: "clamp(0.875rem, 1.5vw, 0.9375rem)", lineHeight: 1.55, marginBottom: 16, maxWidth: 580 }}>
-              Pick your lucky numbers across 4 fixed participant pools. Watch the owner draw and display winning numbers live on broadcast with guaranteed payouts for the Top 10 winners!
-            </p>
-
-            {/* Hero Quick Trust Signals */}
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
-              </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                <Tv size={15} color="#2A65E6" /> Live Public Broadcast
-              </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
-                <Ticket size={15} color="var(--gold-deep)" /> Fixed Capped Pools (1K-5K)
-              </span>
-            </div>
-
-            {/* Buy Ticket CTA Button */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <HeroBuyButton
-                drawId={(currentApprovedDraw as any)?.id || "RDL-ACTIVE"}
-                currency={activeCurrency}
-                price={activeTicketPrice}
-              />
-
-              <Link
-                href="#draws-catalog"
-                className="btn-base btn-secondary"
-                style={{ padding: "11px 20px", fontSize: "0.875rem", fontWeight: 800 }}
-              >
-                Browse All Draws <ArrowRight size={15} />
-              </Link>
-            </div>
-          </div>
-
-          {/* Right Column: Hero Visual Ticket Card with Countdown */}
-          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-            <div
-              className="card-base interactive-ticket-card"
-              style={{
-                borderRadius: "16px",
-                overflow: "hidden",
-                border: "2px solid #FDE047",
-                background: "#FFFFFF",
-                boxShadow: "0 10px 24px -4px rgba(234, 179, 8, 0.3)",
-                maxWidth: 400,
-                width: "100%",
-              }}
-            >
-              <div style={{ position: "relative", width: "100%", height: 210 }}>
-                <Image
-                  src="/images/hero-lottery.jpg"
-                  alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
-                  fill
-                  priority
-                  style={{ objectFit: "cover" }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(180deg, rgba(12, 38, 102, 0.1) 0%, rgba(12, 38, 102, 0.65) 100%)",
-                  }}
-                />
-                <div style={{ position: "absolute", bottom: 8, left: 10, right: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
-                  <span className="badge" style={{ background: "rgba(255, 255, 255, 0.95)", color: "#111827", fontWeight: 800, fontSize: "0.6875rem" }}>
-                    <Trophy size={12} color="var(--gold-dark)" /> 100% Guaranteed Payouts
-                  </span>
-                  <span className="mono" style={{ fontSize: "0.6875rem", color: "#FFFFFF", fontWeight: 700 }}>
-                    Live Video Draw
-                  </span>
-                </div>
+            {/* Left Column: Headline, Active Draw Info & CTA */}
+            <div style={{ width: "100%" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span className="casino-ribbon-badge">
+                  <Trophy size={13} /> OFFICIAL LIVE DRAW · {(currentApprovedDraw as any)?.draw_id || "RDL-2026-08A"}
+                </span>
               </div>
 
-              {/* Countdown Strip */}
-              <div style={{ padding: "10px 12px", background: "#FFFFFF", borderTop: "1px solid var(--gray-line)" }}>
-                <CountdownTimer target={deadline} />
+              {/* Huge Jackpot Display */}
+              <div
+                className="display"
+                style={{
+                  fontSize: "clamp(2rem, 5vw, 3.5rem)",
+                  color: "#DC2626",
+                  lineHeight: 1.05,
+                  fontWeight: 900,
+                  letterSpacing: "-1px",
+                  margin: "2px 0 6px",
+                }}
+              >
+                {(currentApprovedDraw as any)?.total_prize_value || (currentApprovedDraw as any)?.prize_pool_estimate || "$1,250,000 / 1,000,000 ETB"}
+              </div>
+
+              <h1
+                className="display"
+                style={{
+                  fontSize: "clamp(1.125rem, 2.5vw, 1.5rem)",
+                  color: "#111827",
+                  fontWeight: 800,
+                  lineHeight: 1.25,
+                  marginBottom: 8,
+                }}
+              >
+                {currentApprovedDraw?.title || "Rimna Grand Jackpot — Multi-Pool Live Drawing"}
+              </h1>
+
+              <p style={{ color: "var(--text-muted)", fontSize: "clamp(0.875rem, 1.5vw, 0.9375rem)", lineHeight: 1.55, marginBottom: 16, maxWidth: 580 }}>
+                Pick your lucky numbers across 4 fixed participant pools. Watch the owner draw and display winning numbers live on broadcast with guaranteed payouts for the Top 10 winners!
+              </p>
+
+              {/* Hero Quick Trust Signals */}
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                  <CheckCircle2 size={15} color="var(--teal)" /> 10 Guaranteed Winners
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                  <ShieldCheck size={15} color="var(--blue-navy)" /> 100% Live Video Draw
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8125rem", color: "#111827", fontWeight: 700 }}>
+                  <Award size={15} color="var(--gold-deep)" /> Transparent Capped Pools
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <HeroBuyButton
+                  drawId={(currentApprovedDraw as any)?.id || "RDL-ACTIVE"}
+                  currency={activeCurrency}
+                  price={activeTicketPrice}
+                />
+
+                <Link
+                  href="#draws-catalog"
+                  className="btn-base btn-secondary"
+                  style={{ padding: "11px 20px", fontSize: "0.875rem", fontWeight: 800 }}
+                >
+                  Browse All Draws <ArrowRight size={15} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Column: Hero Visual Ticket Card with Countdown */}
+            <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+              <div
+                className="card-base interactive-ticket-card"
+                style={{
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  border: "2px solid #F59E0B",
+                  background: "#FFFFFF",
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.06)",
+                  maxWidth: 400,
+                  width: "100%",
+                }}
+              >
+                <div style={{ position: "relative", width: "100%", height: 210 }}>
+                  <Image
+                    src="/images/hero-lottery.jpg"
+                    alt="Rimna Digital Lottery Gold and Blue Lottery Banner"
+                    fill
+                    priority
+                    style={{ objectFit: "cover" }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(17, 24, 39, 0.35)",
+                    }}
+                  />
+                  <div style={{ position: "absolute", bottom: 8, left: 10, right: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
+                    <span className="badge" style={{ background: "#FFFFFF", color: "#111827", fontWeight: 800, fontSize: "0.6875rem" }}>
+                      <Trophy size={12} color="#D97706" /> 100% Guaranteed Payouts
+                    </span>
+                    <span className="mono" style={{ fontSize: "0.6875rem", color: "#FFFFFF", fontWeight: 700 }}>
+                      Live Video Draw
+                    </span>
+                  </div>
+                </div>
+
+                {/* Countdown Strip */}
+                <div style={{ padding: "10px 12px", background: "#FFFFFF", borderTop: "1px solid var(--gray-line)" }}>
+                  <CountdownTimer target={deadline} />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
       {/* ── Page Inner Container for content below full-width hero ── */}
       <div className="page-inner-container">
@@ -200,28 +190,13 @@ export default async function HomePage() {
           <JackpotCardsSection />
         </div>
 
-        {/* ── 3. Live Broadcast & Stream Information (Full Width) ── */}
-        <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <LiveBroadcastBanner />
-        </div>
-
-        {/* ── 4. Full Draws Catalog (Dedicated Full-Width Section) ── */}
-        <div className="reveal-item" style={{ marginBottom: 36 }}>
+        {/* ── 3. Full Draws Catalog (Dedicated Full-Width Section) ── */}
+        <div className="reveal-item" style={{ marginBottom: 40 }}>
           <DrawsExplorer initialDraws={allDraws} />
         </div>
 
-        {/* ── 5. Showcase & Support Grid (Results, Mega Event, 24/7 Support) ── */}
+        {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
         <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <SidebarWidgets />
-        </div>
-
-        {/* ── 6. Why Rimna Lottery Public Transparency Section ── */}
-        <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <WhyRimnaLottery />
-        </div>
-
-        {/* ── 7. Bottom Testimonials & Newsletter Section ── */}
-        <div className="reveal-item" style={{ marginBottom: 40 }}>
           <TestimonialsNewsletter />
         </div>
       </div>
