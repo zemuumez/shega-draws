@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "seed:cms": "node scripts/seed-sanity.mjs",
-    "seed:cms:clear": "node scripts/seed-sanity.mjs --clear"
+    "seed:cms:clear": "node scripts/seed-sanity.mjs --clear",
+    "migrate:cms": "node scripts/migrate-to-sanity.mjs"
   },
   "dependencies": {
     "@sanity/client": "^6.21.3",

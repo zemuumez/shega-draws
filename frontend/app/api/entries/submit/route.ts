@@ -17,28 +17,30 @@ export async function POST(request: Request) {
     let imageAssetRef = undefined;
 
     const writeClient = getSanityWriteClient();
-    if (writeClient && proofFile && typeof proofFile.arrayBuffer === "function") {
-      try {
-        const buffer = Buffer.from(await proofFile.arrayBuffer());
-        const asset = await writeClient.assets.upload("image", buffer, {
-          filename: proofFile.name || "payment_proof.jpg",
-          contentType: proofFile.type || "image/jpeg",
-        });
-        imageAssetRef = {
-          _type: "image",
-          asset: {
-            _type: "reference",
-            _ref: asset._id,
-          },
-        };
-      } catch (assetErr) {
-        console.warn("Screenshot upload warning:", assetErr);
+    if (!writeClient) {
+      console.warn("⚠️  [CMS Upload] SANITY_API_TOKEN is not set in .env.local. Add your Sanity Write Token to automatically view uploaded screenshots in Sanity Studio (/studio).");
+    } else {
+      if (proofFile && typeof proofFile.arrayBuffer === "function") {
+        try {
+          const buffer = Buffer.from(await proofFile.arrayBuffer());
+          const asset = await writeClient.assets.upload("image", buffer, {
+            filename: proofFile.name || "payment_proof.jpg",
+            contentType: proofFile.type || "image/jpeg",
+          });
+          imageAssetRef = {
+            _type: "image",
+            asset: {
+              _type: "reference",
+              _ref: asset._id,
+            },
+          };
+        } catch (assetErr: any) {
+          console.error("❌ Screenshot upload error to Sanity:", assetErr.message);
+        }
       }
-    }
 
-    if (writeClient) {
       try {
-        await writeClient.create({
+        const createdDoc = await writeClient.create({
           _type: "playerEntry",
           playerName,
           playerPhone,
@@ -52,8 +54,9 @@ export async function POST(request: Request) {
           submittedAt: new Date().toISOString(),
           status: "pending",
         });
-      } catch (docErr) {
-        console.warn("playerEntry doc creation warning:", docErr);
+        console.log(`✅ [CMS Upload] Ticket entry & screenshot created in Sanity: ${createdDoc._id}`);
+      } catch (docErr: any) {
+        console.error("❌ playerEntry creation error in Sanity:", docErr.message);
       }
     }
 
