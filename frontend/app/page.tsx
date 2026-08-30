@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getActiveDraw, listDraws, type DrawState, type Currency } from "@/lib/api";
 import { sanityClient } from "@/lib/sanity/client";
-import { ACTIVE_DRAW_QUERY, ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, type ActiveDraw, type CMSJackpotCard } from "@/lib/sanity/queries";
+import { ACTIVE_DRAW_QUERY, ALL_DRAWS_QUERY, JACKPOT_CARDS_QUERY, TESTIMONIALS_QUERY, type ActiveDraw, type CMSJackpotCard, type CMSTestimonial } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
 import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award } from "lucide-react";
@@ -44,19 +44,21 @@ function mapCmsDrawToDrawState(doc: any): DrawState {
 }
 
 export default async function HomePage() {
-  const [cmsActive, cmsAllDrawsRes, cmsCardsRes, activeDrawState, allDrawsRes] = await Promise.allSettled([
+  const [cmsActive, cmsAllDrawsRes, cmsCardsRes, cmsTestimonialsRes, activeDrawState, allDrawsRes] = await Promise.allSettled([
     sanityClient.fetch<ActiveDraw>(ACTIVE_DRAW_QUERY).catch(() => null),
     sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => []),
     sanityClient.fetch<CMSJackpotCard[]>(JACKPOT_CARDS_QUERY).catch(() => []),
+    sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => []),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
   ]);
 
-  const cmsData      = cmsActive.status === "fulfilled" ? cmsActive.value : null;
-  const cmsAllDraws  = (cmsAllDrawsRes.status === "fulfilled" && cmsAllDrawsRes.value) ? cmsAllDrawsRes.value : [];
-  const cmsCards     = (cmsCardsRes.status === "fulfilled" && cmsCardsRes.value) ? cmsCardsRes.value : [];
-  const drawState    = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
-  const backendDraws = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
+  const cmsData         = cmsActive.status === "fulfilled" ? cmsActive.value : null;
+  const cmsAllDraws     = (cmsAllDrawsRes.status === "fulfilled" && cmsAllDrawsRes.value) ? cmsAllDrawsRes.value : [];
+  const cmsCards        = (cmsCardsRes.status === "fulfilled" && cmsCardsRes.value) ? cmsCardsRes.value : [];
+  const cmsTestimonials = (cmsTestimonialsRes.status === "fulfilled" && cmsTestimonialsRes.value) ? cmsTestimonialsRes.value : [];
+  const drawState       = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
+  const backendDraws    = allDrawsRes.status === "fulfilled" ? allDrawsRes.value : [];
 
   // Convert CMS documents to DrawState
   const mappedCmsDraws = cmsAllDraws.map(mapCmsDrawToDrawState);
@@ -250,7 +252,7 @@ export default async function HomePage() {
 
         {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
         <div className="reveal-item" style={{ marginBottom: 32 }}>
-          <TestimonialsNewsletter />
+          <TestimonialsNewsletter cmsTestimonials={cmsTestimonials} />
         </div>
       </div>
     </div>

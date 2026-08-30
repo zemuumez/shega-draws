@@ -6,6 +6,7 @@ import { jackpotCardType } from "./jackpotCard";
 import { drawResultType } from "./drawResult";
 import { contactMessageType } from "./contactMessage";
 import { translationType } from "./translation";
+import { testimonialType } from "./testimonial";
 import { promotionType } from "./promotion";
 import { siteSettingsType } from "./siteSettings";
 import { faqType } from "./faq";
@@ -18,6 +19,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     drawResultType,
     contactMessageType,
     translationType,
+    testimonialType,
     promotionType,
     siteSettingsType,
     faqType,

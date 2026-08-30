@@ -95,6 +95,23 @@
     ]
   },
   {
+    "_id": "draw-etb-025-flash",
+    "_type": "draw",
+    "drawId": "RDL-2026-08C",
+    "title": "25 Birr Daily Flash Community Draw",
+    "slug": { "_type": "slug", "current": "25-birr-daily-flash-draw" },
+    "status": "open",
+    "currency": "ETB",
+    "ticketPrice": 25,
+    "totalPrizeValue": "125,000 ETB",
+    "deadline": "2026-09-04T18:00:00.000Z",
+    "description": "Fast-paced daily entry with instant results announced every 24 hours.",
+    "prizes": [
+      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "15,000 ETB Cash", "valueAmount": "15,000 ETB" },
+      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "10,000 ETB Cash", "valueAmount": "10,000 ETB" }
+    ]
+  },
+  {
     "_id": "draw-usd-025-diaspora",
     "_type": "draw",
     "drawId": "RDL-USD-025",
@@ -110,6 +127,23 @@
       { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "$40,000 USD", "valueAmount": "$40,000" },
       { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "$25,000 USD", "valueAmount": "$25,000" },
       { "_key": "p3", "rank": 3, "label": "3rd Prize", "prizeTitle": "$15,000 USD", "valueAmount": "$15,000" }
+    ]
+  },
+  {
+    "_id": "draw-usd-100-elite",
+    "_type": "draw",
+    "drawId": "RDL-USD-100",
+    "title": "$100 Elite Global Jackpot",
+    "slug": { "_type": "slug", "current": "100-usd-elite-global-jackpot" },
+    "status": "upcoming",
+    "currency": "USD",
+    "ticketPrice": 100,
+    "totalPrizeValue": "$500,000",
+    "deadline": "2026-09-20T18:00:00.000Z",
+    "description": "Elite international draw with $160,000 grand first prize and 10 audited winners.",
+    "prizes": [
+      { "_key": "p1", "rank": 1, "label": "1st Prize", "prizeTitle": "$160,000 USD", "valueAmount": "$160,000" },
+      { "_key": "p2", "rank": 2, "label": "2nd Prize", "prizeTitle": "$90,000 USD", "valueAmount": "$90,000" }
     ]
   },
   {
@@ -135,23 +169,60 @@
     ]
   },
   {
-    "_id": "translation-nav-draws",
-    "_type": "translation",
-    "key": "nav.draws",
-    "category": "nav",
-    "en": "Draws",
-    "am": "ዕጣዎች",
-    "om": "Carraawwan",
-    "ti": "ዕጫታት"
+    "_id": "testimonial-tewodros",
+    "_type": "testimonial",
+    "name": "Tewodros Kassahun",
+    "location": "Addis Ababa",
+    "prize": "80,000 ETB (1st Place Winner)",
+    "quote": "I watched the live video broadcast when my number was drawn! The CBE transfer arrived in my account in less than 20 minutes!",
+    "rating": 5,
+    "order": 1,
+    "isActive": true
   },
   {
-    "_id": "translation-nav-results",
-    "_type": "translation",
-    "key": "nav.results",
-    "category": "nav",
-    "en": "Results & Live Stream",
-    "am": "ውጤቶች እና የቀጥታ ስርጭት",
-    "om": "Bu'aawwan & Tamsaasa Kallattii",
-    "ti": "ውፅኢታት"
+    "_id": "testimonial-helen",
+    "_type": "testimonial",
+    "name": "Helen Mengistu",
+    "location": "Washington, DC (Diaspora)",
+    "prize": "$15,000 USD (1st Place Winner)",
+    "quote": "Playing from the USA was so seamless with my card. The 10 guaranteed winners structure gives real winning chances!",
+    "rating": 5,
+    "order": 2,
+    "isActive": true
+  },
+  {
+    "_id": "testimonial-yonas",
+    "_type": "testimonial",
+    "name": "Yonas Birhane",
+    "location": "Hawassa",
+    "prize": "65,000 ETB (2nd Place Winner)",
+    "quote": "Rimna is truly the most transparent lottery platform. You see your ticket number on the board and verify the outcome yourself.",
+    "rating": 5,
+    "order": 3,
+    "isActive": true
+  },
+  {
+    "_id": "faq-live-draw",
+    "_type": "faq",
+    "question": "How are the winning numbers selected and verified?",
+    "answer": "All winning numbers are drawn live on video broadcast by the lottery founders. Each number is drawn from physical transparent capsules on camera and immediately published.",
+    "category": "fairness",
+    "order": 1
+  },
+  {
+    "_id": "faq-payout-speed",
+    "_type": "faq",
+    "question": "How quickly are cash prizes transferred to winners?",
+    "answer": "Prizes for Ethiopian winners are sent directly to their CBE bank account or Telebirr within 30 minutes of draw completion. Diaspora winners receive funds via bank wire or crypto.",
+    "category": "payouts",
+    "order": 2
+  },
+  {
+    "_id": "faq-diaspora",
+    "_type": "faq",
+    "question": "Can Diaspora Ethiopians participate from abroad?",
+    "answer": "Yes! We offer dedicated USD ticket pools ($25, $50, $100, $250) payable via international Visa, Mastercard, or Crypto with guaranteed USD cash prize transfers.",
+    "category": "general",
+    "order": 3
   }
 ]

@@ -3,12 +3,18 @@
 import React, { useState } from "react";
 import { Star, Send, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 
-export function TestimonialsNewsletter() {
+import { type CMSTestimonial } from "@/lib/sanity/queries";
+
+interface TestimonialsNewsletterProps {
+  cmsTestimonials?: CMSTestimonial[];
+}
+
+export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewsletterProps) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
-  const testimonials = [
+  const defaultTestimonials = [
     {
       name: "Tewodros Kassahun",
       location: "Addis Ababa",
@@ -29,6 +35,15 @@ export function TestimonialsNewsletter() {
     },
   ];
 
+  const testimonials = (cmsTestimonials && cmsTestimonials.length > 0)
+    ? cmsTestimonials.map((t) => ({
+        name: t.name,
+        location: t.location,
+        prize: t.prize,
+        quote: t.quote,
+      }))
+    : defaultTestimonials;
+
   const handleNext = () => {
     setTestimonialIdx((prev) => (prev + 1) % testimonials.length);
   };
@@ -37,7 +52,7 @@ export function TestimonialsNewsletter() {
     setTestimonialIdx((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  const current = testimonials[testimonialIdx];
+  const current = testimonials[testimonialIdx] || testimonials[0];
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();

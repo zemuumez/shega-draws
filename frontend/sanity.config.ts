@@ -53,13 +53,14 @@ export default defineConfig({
 
             // ── Section 2: Featured Jackpot Cards & Ad Banners ──────
             S.listItem()
-              .title("📢 Jackpot Cards & Ad Banners")
+              .title("📢 Jackpot Cards & Promos")
               .child(
                 S.list()
-                  .title("Banners & Ad Management")
+                  .title("Banners & Content")
                   .items([
                     S.documentTypeListItem("jackpotCard").title("🌟 Top 3 Hero Jackpot Cards"),
                     S.documentTypeListItem("promotion").title("✨ Special Holiday & Promos"),
+                    S.documentTypeListItem("testimonial").title("⭐ Winner Reviews & Testimonials"),
                   ])
               ),
 
