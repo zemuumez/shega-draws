@@ -28,41 +28,67 @@ export const metadata: Metadata = {
 export default function HowItWorksPage() {
   return (
     <div style={{ paddingBottom: 80, width: "100%", overflowX: "hidden" }}>
-      {/* ── 1. Hero Header Banner ────────────────────────────────────── */}
+      {/* ── 1. Bright & Warm Hero Header Banner ──────────────────────── */}
       <section
         style={{
           position: "relative",
           width: "100%",
-          background: "linear-gradient(135deg, #0A1122 0%, #1E293B 100%)",
+          background: "linear-gradient(135deg, #FFFDF5 0%, #FEF9C3 50%, #FEF08A 100%)",
           borderTop: "2px solid #F59E0B",
           borderBottom: "2px solid #F59E0B",
-          color: "#FFFFFF",
-          padding: "clamp(36px, 5vw, 60px) 0",
+          color: "#111827",
+          padding: "clamp(36px, 5vw, 56px) 0",
           marginBottom: 40,
+          boxShadow: "0 6px 20px rgba(245, 158, 11, 0.12)",
         }}
       >
         <div style={{ maxWidth: 1140, margin: "0 auto", padding: "0 clamp(16px, 4vw, 32px)" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245, 158, 11, 0.2)", border: "1px solid #F59E0B", borderRadius: "20px", padding: "4px 12px", marginBottom: 14 }}>
-            <Sparkles size={14} color="#F59E0B" />
-            <span className="mono" style={{ fontSize: "0.75rem", color: "#FDE047", fontWeight: 800 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#FEF08A", border: "1.5px solid #F59E0B", borderRadius: "20px", padding: "5px 14px", marginBottom: 14, boxShadow: "0 2px 6px rgba(245, 158, 11, 0.2)" }}>
+            <Sparkles size={14} color="#B45309" />
+            <span className="mono" style={{ fontSize: "0.75rem", color: "#854D0E", fontWeight: 900, textTransform: "uppercase" }}>
               COMPLETE PLATFORM GUIDE
             </span>
           </div>
 
-          <h1 className="display" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)", fontWeight: 900, lineHeight: 1.1, marginBottom: 14 }}>
+          <h1 className="display" style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)", fontWeight: 900, lineHeight: 1.1, color: "#111827", marginBottom: 14 }}>
             How Rimna Digital Lottery Works
           </h1>
 
-          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "#E2E8F0", maxWidth: 680, lineHeight: 1.6, marginBottom: 24 }}>
+          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "#374151", maxWidth: 680, lineHeight: 1.6, marginBottom: 24, fontWeight: 500 }}>
             Learn how to choose your lucky numbers, complete mobile payment, watch our founders draw the 10 guaranteed winners live on video, and claim instant cash rewards.
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "12px 22px", fontSize: "0.9375rem", textDecoration: "none" }}>
-              <Ticket size={16} /> Choose Your Ticket Now
+            <Link
+              href="/#choose-ticket"
+              className="casino-btn-red"
+              style={{
+                padding: "12px 24px",
+                fontSize: "0.9375rem",
+                textDecoration: "none",
+                fontWeight: 900,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                boxShadow: "0 4px 14px rgba(220, 38, 38, 0.35)",
+              }}
+            >
+              <Ticket size={17} /> Choose Your Ticket Now
             </Link>
-            <Link href="/results" className="casino-btn-dark" style={{ padding: "12px 20px", fontSize: "0.9375rem", textDecoration: "none", border: "1.5px solid #F59E0B" }}>
-              <Award size={16} color="#F59E0B" /> View Live & Past Results
+            <Link
+              href="/results"
+              className="casino-btn-gold"
+              style={{
+                padding: "12px 20px",
+                fontSize: "0.9375rem",
+                textDecoration: "none",
+                fontWeight: 900,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Award size={17} color="#111827" /> View Live & Past Results
             </Link>
           </div>
         </div>
@@ -251,14 +277,14 @@ export default function HowItWorksPage() {
         </div>
 
         {/* ── Ready to Play CTA Banner ───────────────────────────────── */}
-        <div style={{ background: "#0A1122", border: "2px solid #F59E0B", borderRadius: "20px", padding: "clamp(24px, 4vw, 40px)", textAlign: "center", color: "#FFFFFF" }}>
-          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)", fontWeight: 900, color: "#FFFFFF", marginBottom: 10 }}>
+        <div style={{ background: "#FFFDF5", border: "2px solid #F59E0B", borderRadius: "20px", padding: "clamp(24px, 4vw, 40px)", textAlign: "center", color: "#111827", boxShadow: "0 10px 30px rgba(245, 158, 11, 0.15)" }}>
+          <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)", fontWeight: 900, color: "#111827", marginBottom: 10 }}>
             Ready to Play & Win?
           </h2>
-          <p style={{ color: "#E2E8F0", fontSize: "0.95rem", maxWidth: 540, margin: "0 auto 20px", lineHeight: 1.5 }}>
+          <p style={{ color: "#4B5563", fontSize: "0.95rem", maxWidth: 540, margin: "0 auto 20px", lineHeight: 1.5 }}>
             Pick your lucky number, choose your pool capacity, and join thousands of winners across Ethiopia and the diaspora.
           </p>
-          <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "14px 28px", fontSize: "1rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "14px 28px", fontSize: "1rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, boxShadow: "0 4px 14px rgba(220, 38, 38, 0.35)" }}>
             <Ticket size={18} /> Go to Ticket Selector
           </Link>
         </div>
