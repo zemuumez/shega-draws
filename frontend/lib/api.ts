@@ -261,8 +261,31 @@ export const ETB_TICKET_CONFIGS: TicketPriceConfig[] = [
     title: "200 Birr Grand Holiday Jackpot",
     pools: [
       { size: 1000, label: "1,000 (1K)", pool: "200,000 ETB", jackpot: "70,000 ETB (1st)", totalSum: 200000 },
+      { size: 2000, label: "2,000 (2K)", pool: "400,000 ETB", jackpot: "120,000 ETB (1st)", totalSum: 400000 },
       { size: 3000, label: "3,000 (3K)", pool: "600,000 ETB", jackpot: "180,000 ETB (1st)", totalSum: 600000 },
       { size: 5000, label: "5,000 (5K)", pool: "1,000,000 ETB", jackpot: "320,000 ETB (1st)", totalSum: 1000000 },
+    ],
+  },
+  {
+    price: 500,
+    currency: "ETB",
+    title: "500 Birr Diamond Jackpot",
+    pools: [
+      { size: 1000, label: "1,000 (1K)", pool: "500,000 ETB", jackpot: "150,000 ETB (1st)", totalSum: 500000 },
+      { size: 2000, label: "2,000 (2K)", pool: "1,000,000 ETB", jackpot: "300,000 ETB (1st)", totalSum: 1000000 },
+      { size: 3000, label: "3,000 (3K)", pool: "1,500,000 ETB", jackpot: "450,000 ETB (1st)", totalSum: 1500000 },
+      { size: 5000, label: "5,000 (5K)", pool: "2,500,000 ETB", jackpot: "750,000 ETB (1st)", totalSum: 2500000 },
+    ],
+  },
+  {
+    price: 1000,
+    currency: "ETB",
+    title: "1,000 Birr Mega VIP Draw",
+    pools: [
+      { size: 1000, label: "1,000 (1K)", pool: "1,000,000 ETB", jackpot: "300,000 ETB (1st)", totalSum: 1000000 },
+      { size: 2000, label: "2,000 (2K)", pool: "2,000,000 ETB", jackpot: "600,000 ETB (1st)", totalSum: 2000000 },
+      { size: 3000, label: "3,000 (3K)", pool: "3,000,000 ETB", jackpot: "900,000 ETB (1st)", totalSum: 3000000 },
+      { size: 5000, label: "5,000 (5K)", pool: "5,000,000 ETB", jackpot: "1,500,000 ETB (1st)", totalSum: 5000000 },
     ],
   },
   {

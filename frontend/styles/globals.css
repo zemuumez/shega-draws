@@ -827,6 +827,13 @@ h1, h2, h3, h4, h5 {
   filter: brightness(1.08);
 }
 
+/* Mobile Sticky Action Bar for Ticket Configurator */
+@media (max-width: 768px) {
+  .mobile-only-floating-bar {
+    display: flex !important;
+  }
+}
+
 
 
 

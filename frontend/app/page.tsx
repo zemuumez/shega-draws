@@ -18,7 +18,7 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { HeroBuyButton } from "@/components/HeroBuyButton";
 import { Trophy, CheckCircle2, ShieldCheck, ArrowRight, Clock, Award, Sparkles } from "lucide-react";
 import { JackpotCardsSection } from "@/components/JackpotCardsSection";
-import { DrawsExplorer } from "@/components/DrawsExplorer";
+import { InteractiveTicketConfigurator } from "@/components/InteractiveTicketConfigurator";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 
 export const metadata: Metadata = {
@@ -275,9 +275,9 @@ export default async function HomePage() {
           <JackpotCardsSection cmsCards={cmsJackpotCards} />
         </div>
 
-        {/* ── 3. Full Draws Catalog (Dedicated Full-Width Section) ── */}
+        {/* ── 3. Interactive Ticket Configurator (Choose Currency -> Price -> Pool) ── */}
         <div style={{ marginBottom: 60 }}>
-          <DrawsExplorer initialDraws={allDraws} />
+          <InteractiveTicketConfigurator />
         </div>
 
         {/* ── 4. Bottom Testimonials & Newsletter Section ── */}
