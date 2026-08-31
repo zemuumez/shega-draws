@@ -247,8 +247,8 @@ export default function EntriesPage() {
           <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>
             You have no active ticket entries under phone {user.phone}. Choose your lucky number now!
           </p>
-          <Link href="/enter" className="btn-base btn-primary">
-            <Ticket size={16} /> Buy a Ticket Now
+          <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "12px 24px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <Ticket size={16} /> Choose & Buy a Ticket Now
           </Link>
         </div>
       )}
@@ -259,7 +259,7 @@ export default function EntriesPage() {
             <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--blue-navy)", textTransform: "uppercase" }}>
               Your Active Tickets ({entries.length})
             </span>
-            <Link href="/enter" className="btn-base btn-primary" style={{ fontSize: "0.8125rem", padding: "6px 14px" }}>
+            <Link href="/#choose-ticket" className="casino-btn-red" style={{ fontSize: "0.8125rem", padding: "6px 14px", textDecoration: "none" }}>
               + Buy Another Ticket
             </Link>
           </div>

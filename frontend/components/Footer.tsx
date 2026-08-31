@@ -67,10 +67,11 @@ export function Footer({ siteSettings }: FooterProps) {
               {t.footer.quickLinks}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem" }}>
-              <Link href="/#draws-catalog" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.draws}</Link>
-              <Link href="/enter" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.enter}</Link>
+              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Choose Tickets</Link>
+              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>How It Works</Link>
               <Link href="/entries" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.myEntries}</Link>
               <Link href="/results" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.results}</Link>
+              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Why Rimna</Link>
               <Link href="/admin/login" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.admin}</Link>
             </div>
           </div>

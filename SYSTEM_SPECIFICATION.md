@@ -1,6 +1,6 @@
 # Rimna International Digital Lottery — Comprehensive System Specification & Architecture
 
-> **Document Version:** 1.0.0  
+> **Document Version:** 2.0.0 (Simplified Production Architecture)  
 > **Date:** September 2026  
 > **Platform Name:** Rimna International Digital Lottery (RIMNA)  
 > **Primary Domains:** Ethiopia (Local ETB) & Global Diaspora (USD)
@@ -10,24 +10,22 @@
 ## 1. Executive Summary & Vision
 
 ### 1.1 The Core Mission
-Traditional and digital lotteries across developing markets suffer from two fundamental problems:
-1. **Lack of Transparency**: Unauditable digital algorithms ("black boxes") where users question whether real winners exist.
-2. **Complexity and Low Odds**: Uncapped, nationwide lotteries with millions of participants where an individual's chances of winning are virtually zero (e.g. 1 in 10,000,000).
+Traditional national lotteries suffer from two fundamental user pain points:
+1. **Low Odds & Endless Pools**: Millions of tickets are sold with virtually zero chance of winning (e.g. 1 in 10,000,000).
+2. **Opaque & Complicated Processes**: Unclear drawing schedules, complex rules, and hidden computerized algorithms.
 
-**Rimna International Digital Lottery (RIMNA)** disrupts this model through **Simplicity, Capped Pools, and 100% Live Video Transparency**:
-- **Capped Participant Pools**: Draws close at fixed sizes (1K, 2K, 3K, or 5K tickets).
-- **High Winning Odds**: 10 guaranteed winners in every pool (e.g., **1 in 100 odds** for a 1,000-person pool).
-- **Public Video Broadcasts**: Company founders physically conduct draws on live video (YouTube & Telegram) with zero hidden automation.
-- **Cryptographic Fairness**: SHA-256 commit-reveal seeds published before tickets are sold, allowing independent verification.
-- **Dual Currency Architecture**: Seamless local payment via Telebirr & CBE Birr, alongside USD support for the global Ethiopian diaspora.
+**Rimna International Digital Lottery (RIMNA)** simplifies the lottery experience through **Extreme Simplicity, Capped Pools, and 100% Physical Live Video Broadcasts**:
+- **Simplicity First**: Players do not navigate complex catalogs. They configure their ticket directly: `Currency → Price Tier → Pool Capacity`.
+- **Capped Participant Pools**: Draws are strictly limited to fixed sizes (1,000, 2,000, 3,000, or 5,000 tickets).
+- **High Winning Odds**: 10 guaranteed winners in every single pool (e.g., **1 in 100 odds** for a 1,000-ticket pool).
+- **100% Public Video Broadcasts**: Company founders physically spin the lottery tumbler and draw numbered balls live on camera (YouTube & Telegram) with zero hidden automation.
+- **Dual Currency & Instant Verification**: Local mobile payments via Telebirr & CBE Birr alongside USD support for the Ethiopian diaspora.
 
 ---
 
 ## 2. Game Mechanics & Mathematical Model
 
-### 2.1 The 3-Step Selection Flow
-The user journey is built around a frictionless interactive ticket builder:
-$$\text{Currency} \longrightarrow \text{Ticket Price} \longrightarrow \text{Participant Pool Size}$$
+### 2.1 The Simple 3-Step Selection Flow
 
 ```
    ┌────────────────────────────────────────────────────────┐
@@ -47,7 +45,7 @@ $$\text{Currency} \longrightarrow \text{Ticket Price} \longrightarrow \text{Part
    └───────────────────────────┬────────────────────────────┘
                                │
    ┌───────────────────────────▼────────────────────────────┐
-   │          DYNAMIC REWARD POOL & GUARANTEED 10 WINNERS   │
+   │             INSTANT SUMMARY & 10 WINNERS               │
    │    Total Pool = Ticket Price × Pool Size (100% Payout) │
    └────────────────────────────────────────────────────────┘
 ```
@@ -71,12 +69,11 @@ $$\text{Currency} \longrightarrow \text{Ticket Price} \longrightarrow \text{Part
    | **5,000 (5K)** | 10 Winners | **1 in 500** |
 
 3. **Guaranteed Prize Distribution (10 Ranks — 100% Payout)**:
-   Every draw guarantees payouts across 10 distinct winning ranks:
 
    | Rank | Tier Name | % of Total Pool | Example (100K ETB Pool) | Example (1M ETB Pool) |
    | :---: | :--- | :---: | :---: | :---: |
    | **#1** | **Grand Jackpot** | **30%** | **30,000 ETB** | **300,000 ETB** |
-   | **#2** | **2nd Prize (Luxury)** | **20%** | **20,000 ETB** | **200,000 ETB** |
+   | **#2** | **2nd Prize (Luxury Reward)** | **20%** | **20,000 ETB** | **200,000 ETB** |
    | **#3** | **3rd Prize (High Cash)** | **15%** | **15,000 ETB** | **150,000 ETB** |
    | **#4** | 4th Prize | 10% | 10,000 ETB | 100,000 ETB |
    | **#5** | 5th Prize | 7% | 7,000 ETB | 70,000 ETB |
@@ -85,7 +82,7 @@ $$\text{Currency} \longrightarrow \text{Ticket Price} \longrightarrow \text{Part
    | **#8** | 8th Prize | 3% | 3,000 ETB | 30,000 ETB |
    | **#9** | 9th Prize | 3% | 3,000 ETB | 30,000 ETB |
    | **#10** | 10th Prize | 3% | 3,000 ETB | 30,000 ETB |
-   | **TOTAL** | **10 Winners** | **100%** | **100,000 ETB** | **1,000,000 ETB** |
+   | **TOTAL** | **10 Guaranteed Winners** | **100%** | **100,000 ETB** | **1,000,000 ETB** |
 
 ---
 
@@ -93,36 +90,35 @@ $$\text{Currency} \longrightarrow \text{Ticket Price} \longrightarrow \text{Part
 
 ```mermaid
 graph TD
-    User([👤 Player / Diaspora]) -->|1. Configure & Pick Number| Frontend[Next.js Web App]
-    User -->|2. Pay & Upload Proof| Backend[Go High-Performance API]
-    Admin([🛡️ Admin / Verifier]) -->|3. Audit & Approve Receipts| Studio[Admin Dashboard / Sanity]
+    User([👤 Player / Diaspora]) -->|1. Configure & Pick Number| Web[Next.js Web App]
+    User -->|2. Pay & Upload Proof| Backend[Go REST API]
+    Admin([🛡️ Admin / Verifier]) -->|3. Verify Screenshots & Approve| AdminDash[Admin Dashboard / Sanity]
     Founders([🎥 Company Founders]) -->|4. Conduct Live Video Draw| Video[YouTube / Telegram Live]
-    Auditor([🔍 Public Auditor]) -->|5. Verify SHA-256 Commitment| Crypto[SHA-256 Verifier]
+    Admin -->|5. Publish Winners & Pay Out| Backend
 ```
 
 ### 3.1 Actors Table
 
 | Actor | Responsibilities | Key Touchpoints |
 | :--- | :--- | :--- |
-| **Player (Local ETB)** | Selects ticket price & pool, picks lucky numbers (00–99), pays via Telebirr or CBE, uploads transaction screenshot. | Web App, `/entries`, Live Stream |
-| **Player (Diaspora USD)** | Plays via international debit/credit or remittance wire in USD, receives payouts via global wire or remittance. | Web App, USD Currency Toggle |
-| **Admin Operator** | Reviews pending payment screenshots against merchant ledger, approves/rejects entries, manages draw schedules. | `/admin/dashboard`, `/studio` |
-| **Company Founders** | Broadcasts live draw video, spins physical tumbler, announces winners on camera. | Telegram / YouTube Live |
-| **Public Auditor** | Independently calculates SHA-256 seeds and verifies cryptographic commitment hashes. | `/results`, Cryptographic Audit Tool |
+| **Player (Local ETB)** | Configures ticket, selects lucky number (00–99), pays via Telebirr or CBE, uploads screenshot proof, watches live draw. | Web App, `/entries`, Live Stream |
+| **Player (Diaspora USD)** | Plays in USD via international payment/wire, tracks ticket status, watches live draw, receives global payout. | Web App, USD Currency Selector |
+| **Admin Operator** | Reviews pending screenshot receipts, approves/rejects entries, registers winning numbers after the live draw, marks payouts. | `/admin/dashboard`, `/studio` |
+| **Company Founders** | Broadcasts live draw video on camera, spins physical lottery tumbler, calls out winning numbers in real time. | YouTube & Telegram Live Stream |
 
 ---
 
 ## 4. Frontend Architecture & Design System
 
 ### 4.1 Technology Stack
-- **Framework**: Next.js 14 (App Router, Server Components & Client Components)
-- **Language**: TypeScript with strict typing
+- **Framework**: Next.js 14 (App Router, Server & Client Components)
+- **Language**: TypeScript
 - **Styling**: Vanilla CSS Design System with CSS variables (`globals.css`)
-- **CMS**: Sanity Studio v3 (`/studio`) for instant marketing copy, hero banners, and dynamic draw parameters
+- **CMS**: Sanity Studio v3 (`/studio`) for instant marketing copy, banners, and draw configuration
 - **Icons**: Lucide React
 - **Internationalization**: Trilingual support (`en` English, `am` Amharic, `om` Afaan Oromoo)
 
-### 4.2 Design System Tokens
+### 4.2 Design Tokens & Theme
 - **Theme**: Luxury Casino Gold & Rough Cream Paper Raffle Aesthetic
 - **Color Palette**:
   - Surface Background: `#FFFDF5` (Warm cream raffle paper)
@@ -131,26 +127,26 @@ graph TD
   - Status Indicators: `#059669` / `#ECFDF5` (Approved/Capacity green), `#D97706` (Pending gold)
   - Deep Contrast: `#111827` (Dark slate header typography)
 
-### 4.3 Page Hierarchy
+### 4.3 Page Structure
 1. **`/` (Home)**:
    - Official Unobstructed Panoramic Hero Banner (`RIMNA INTERNATIONAL DIGITAL LOTTERY`).
    - Quick-Action & Countdown bar (`Live Draw In: DD:HH:MM:SS`, `Choose & Buy Ticket ↓`, `How It Works`).
-   - Centerpiece **Interactive Ticket Configurator** with equal desktop vertical alignment.
+   - Centerpiece **Interactive Ticket Configurator** (Desktop 1:1 equal vertical height alignment, mobile 4-column responsive grid).
    - Testimonials & Trust Badges.
 2. **`/how-it-works` (Comprehensive Player Guide)**:
-   - 4-step detailed guide explaining selection, phone login, live draws, and instant payouts.
+   - 4-step clear walkthrough: Choosing ticket, phone login & tracking, physical live video draws, and instant 30-minute payouts.
 3. **`/results` (Live & Past Audited Results)**:
-   - Live stream video player, winning numbers breakdown, winner payout confirmations, SHA-256 verifier.
+   - Live stream video player, winning numbers breakdown, and payout confirmations.
 4. **`/entries` (My Tickets Dashboard)**:
-   - Phone-authenticated personal dashboard tracking chosen numbers, transaction status (🟡 Pending / 🟢 Approved), and draw countdowns.
+   - Phone-authenticated personal dashboard tracking chosen numbers, status (🟡 Pending / 🟢 Approved), and draw countdowns.
 5. **`/studio` (Sanity CMS Studio)**:
-   - Admin content manager for banners, draws, FAQs, translations, and proof submissions.
+   - Content management for hero banners, FAQs, translations, and submitted screenshot proof review.
 
 ---
 
 ## 5. Backend Architecture in Go (Golang)
 
-### 5.1 Architecture Overview (Clean Modular Architecture)
+### 5.1 Clean Modular Architecture
 The backend is structured using Go best practices for ultra-low latency, concurrent connection handling, and rock-solid transaction safety:
 
 ```
@@ -165,7 +161,7 @@ backend/
 │   │   ├── user.go                 # User entity & Auth models
 │   │   └── transaction.go          # Payment Transaction models
 │   ├── usecase/                    # Pure Business Logic Layer
-│   │   ├── draw_uc.go              # Create draw, close pool, compute winners
+│   │   ├── draw_uc.go              # Create draw, close pool, publish winners
 │   │   ├── ticket_uc.go            # Ticket purchase, number allocation
 │   │   └── payment_uc.go           # Payment verification & receipt approval
 │   ├── repository/                 # Database Persistence Layer
@@ -183,7 +179,6 @@ backend/
 │       ├── draw_scheduler.go       # Auto-closes draws upon deadline/pool cap
 │       └── notify_worker.go        # SMS & Telegram winner notification sender
 └── pkg/
-    ├── crypto/                     # SHA-256 Commit-Reveal generator & verifier
     └── storage/                    # S3 / Cloudinary receipt upload client
 ```
 
@@ -195,25 +190,24 @@ backend/
 - `POST /api/v1/entries/purchase` — Creates a pending ticket entry with payment receipt upload.
 - `GET  /api/v1/entries/my-tickets` — Fetches all tickets belonging to authenticated phone number.
 - `GET  /api/v1/results/latest` — Returns winning numbers, prize amounts, and live video URL.
-- `GET  /api/v1/results/verify/:draw_id` — Verifies SHA-256 seed commitment.
 
 #### Admin & Operator Routes
 - `POST /api/v1/admin/auth/login` — Admin authentication.
 - `GET  /api/v1/admin/entries/pending` — Lists pending screenshot receipts.
 - `POST /api/v1/admin/entries/:id/review` — Approves or rejects a player entry with reason.
-- `POST /api/v1/admin/draws/:id/execute` — Publishes winning numbers, reveals seed, and assigns winners.
-- `POST /api/v1/admin/draws/:id/payout` — Records payout confirmation reference.
+- `POST /api/v1/admin/draws/:id/publish-results` — Records drawn winning numbers and assigns winner payouts.
+- `POST /api/v1/admin/draws/:id/payout` — Records payout confirmation reference (Telebirr / CBE / Wire).
 
 ---
 
 ## 6. PostgreSQL Database Schema & Strategy
 
 ### 6.1 Database Strategy & ACID Concurrency
-- **Concurrency Control**: To prevent two users from buying the same number or exceeding pool capacity simultaneously, all purchase operations use PostgreSQL row-level locks:
+- **Concurrency Control**: Prevents duplicate numbers or exceeding pool capacity using row-level locking:
   ```sql
   SELECT current_tickets, pool_capacity FROM draws WHERE id = $1 FOR UPDATE;
   ```
-- **Idempotent Transactions**: All payment receipts are hashed (`receipt_image_hash`) with unique constraints to prevent duplicate proof submission.
+- **Idempotent Transactions**: All payment receipts are hashed (`screenshot_hash`) to prevent duplicate proof submission.
 
 ### 6.2 DDL Schema (PostgreSQL 15+)
 
@@ -224,7 +218,7 @@ CREATE TABLE users (
     phone_number VARCHAR(20) NOT NULL UNIQUE,
     full_name VARCHAR(100),
     email VARCHAR(100),
-    role VARCHAR(20) DEFAULT 'player' CHECK (role IN ('player', 'admin', 'operator', 'auditor')),
+    role VARCHAR(20) DEFAULT 'player' CHECK (role IN ('player', 'admin', 'operator')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -242,8 +236,6 @@ CREATE TABLE draws (
     current_tickets INT DEFAULT 0,
     status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('draft', 'open', 'closed', 'completed', 'cancelled')),
     deadline TIMESTAMP WITH TIME ZONE NOT NULL,
-    commitment_hash VARCHAR(64) NOT NULL,           -- SHA-256 commitment hash
-    revealed_seed VARCHAR(128),                     -- Revealed publicly after draw
     live_video_url VARCHAR(255),                    -- YouTube / Telegram stream URL
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -311,25 +303,7 @@ CREATE INDEX idx_audit_created_at ON audit_logs(created_at);
 
 ---
 
-## 7. Security, Provable Fairness & Verification
-
-### 7.1 SHA-256 Commit-Reveal Scheme
-To guarantee that winning outcomes are never rigged or manipulated:
-
-1. **Commit Phase (Pre-Draw)**:
-   - Before a draw opens for ticket sales, the server generates a cryptographically secure random 256-bit seed $S$.
-   - The commitment hash $H = \text{SHA256}(S)$ is permanently stored in the database and published in the frontend UI.
-2. **Draw Phase (Live Video Broadcast)**:
-   - Company founders broadcast live on video.
-   - Physical numbered balls are drawn from the tumbler machine on camera.
-3. **Reveal Phase (Post-Draw)**:
-   - The server publishes the unhashed seed $S$.
-   - Any player or auditor can verify the commitment using standard SHA-256:
-     $$\text{IsFair} = (\text{SHA256}(S) \stackrel{?}{=} H)$$
-
----
-
-## 8. Deployment, Storage & Infrastructure Blueprint
+## 7. Deployment & Infrastructure Blueprint
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -351,12 +325,15 @@ To guarantee that winning outcomes are never rigged or manipulated:
 └───────────────────────────────┘ └───────────────────────────────┘
 ```
 
-- **Receipt Storage**: Player screenshot uploads are encrypted and stored in Amazon S3 / Cloudinary with pre-signed read URLs.
+- **Receipt Storage**: Player screenshot uploads are encrypted and stored in Amazon S3 / Cloudinary with pre-signed URLs.
 - **SMS & Notifications**: Telebirr Webhooks / Twilio / Africa's Talking API for instant ticket approval SMS alerts.
-- **Monitoring & Observability**: Structured JSON logging in Go (`uber-go/zap`), Prometheus metrics, and Grafana health dashboards.
+- **Monitoring & Observability**: Structured JSON logging in Go (`uber-go/zap`), Prometheus metrics, and Grafana dashboards.
 
 ---
 
-## 9. Conclusion & Roadmap
+## 8. Summary of What Makes Rimna Unique
 
-Rimna International Digital Lottery transforms the lottery landscape by replacing opaque systems with **verifiable transparency, capped pools, high winning odds, and physical founder live streams**. The architecture specified in this document guarantees performance, security, and effortless scalability across Ethiopia and the global diaspora.
+1. **No Catalogs or Clutter**: A single, clean ticket configurator (`Currency → Price → Pool Capacity`).
+2. **Guaranteed 10 Winners (100% Payout)**: Every capped pool produces 10 verified winners.
+3. **Physical Transparency**: Conducted live on camera by company founders on YouTube and Telegram.
+4. **Instant Payouts**: 30-minute direct transfers via Telebirr, CBE Bank, or international wire.
