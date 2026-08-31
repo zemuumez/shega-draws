@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type Currency } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { Trophy, Users, ShieldCheck, ChevronDown, ChevronUp, ArrowUpRight, Award, Sparkles, CheckCircle2, Ticket } from "lucide-react";
+import { Trophy, Users, ShieldCheck, ArrowUpRight, Award, Sparkles, CheckCircle2, Ticket, HelpCircle } from "lucide-react";
 import { BuyTicketModal } from "./BuyTicketModal";
 
 interface PriceOption {
@@ -41,18 +41,11 @@ const POOLS: PoolOption[] = [
   { size: 5000, label: "5K", ticketsCount: "5,000 tickets" },
 ];
 
-// Prize distribution percentages for the 10 guaranteed winners
-const PRIZE_PERCENTAGES = [
-  { rank: 1, percent: 0.30, label: "1st Prize · Grand Jackpot" },
-  { rank: 2, percent: 0.20, label: "2nd Prize" },
-  { rank: 3, percent: 0.15, label: "3rd Prize" },
-  { rank: 4, percent: 0.10, label: "4th Prize" },
-  { rank: 5, percent: 0.07, label: "5th Prize" },
-  { rank: 6, percent: 0.05, label: "6th Prize" },
-  { rank: 7, percent: 0.04, label: "7th Prize" },
-  { rank: 8, percent: 0.03, label: "8th Prize" },
-  { rank: 9, percent: 0.03, label: "9th Prize" },
-  { rank: 10, percent: 0.03, label: "10th Prize" },
+// Top 3 Prize distribution percentages
+const TOP_3_PRIZES = [
+  { rank: 1, percent: 0.30, label: "1st Prize · Grand Jackpot", color: "gold" },
+  { rank: 2, percent: 0.20, label: "2nd Prize · Luxury Reward", color: "silver" },
+  { rank: 3, percent: 0.15, label: "3rd Prize · High Cash", color: "bronze" },
 ];
 
 export function InteractiveTicketConfigurator() {
@@ -60,11 +53,9 @@ export function InteractiveTicketConfigurator() {
   const [currency, setCurrency] = useState<Currency>("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
-  const [showAllPrizes, setShowAllPrizes] = useState<boolean>(false);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState<boolean>(false);
 
   const isUSD = currency === "USD";
-  const currencySymbol = isUSD ? "$" : "ETB";
   const currentPrices = isUSD ? USD_PRICES : ETB_PRICES;
 
   // Handle currency switch
@@ -87,14 +78,13 @@ export function InteractiveTicketConfigurator() {
     return `${amount.toLocaleString()} ETB`;
   };
 
-  // 10 Guaranteed Prizes List
-  const calculatedPrizes = PRIZE_PERCENTAGES.map((p) => ({
+  // Top 3 Prizes List
+  const calculatedTop3Prizes = TOP_3_PRIZES.map((p) => ({
     rank: p.rank,
     label: p.label,
     amount: formatMoney(Math.round(totalPrizePool * p.percent)),
+    color: p.color,
   }));
-
-  const visiblePrizes = showAllPrizes ? calculatedPrizes : calculatedPrizes.slice(0, 4);
 
   return (
     <section
@@ -400,7 +390,7 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* 4. GUARANTEED PRIZES ACCORDION STRIP */}
+          {/* 4. TOP 3 GUARANTEED PRIZES STRIP */}
           <div
             style={{
               background: "#FFFFFF",
@@ -410,69 +400,53 @@ export function InteractiveTicketConfigurator() {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 900, textTransform: "uppercase" }}>
-                {showAllPrizes ? "All 10 guaranteed prizes" : "Top 4 of 10 guaranteed prizes"}
+              <span className="mono" style={{ fontSize: "0.75rem", color: "#111827", fontWeight: 900, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 5 }}>
+                <Trophy size={14} color="#D97706" /> Top 3 Guaranteed Cash Prizes
               </span>
-
-              <button
-                type="button"
-                onClick={() => setShowAllPrizes((prev) => !prev)}
-                style={{
-                  background: showAllPrizes ? "#EFF6FF" : "#FEF9C3",
-                  border: showAllPrizes ? "1px solid #BFDBFE" : "1px solid #FDE047",
-                  color: showAllPrizes ? "#1D4ED8" : "#854D0E",
-                  fontSize: "0.75rem",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: "3px 8px",
-                  borderRadius: "6px",
-                }}
-              >
-                {showAllPrizes ? "Show less" : "Show more"}
-                {showAllPrizes ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-              </button>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "#059669", fontWeight: 800 }}>
+                100% Payout
+              </span>
             </div>
 
-            {/* Prize cards grid */}
+            {/* 3 Prize Cards in a Clean Grid */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(135px, 1fr))",
-                gap: 6,
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 8,
               }}
             >
-              {visiblePrizes.map((pz) => (
+              {calculatedTop3Prizes.map((pz) => (
                 <div
                   key={pz.rank}
                   style={{
-                    background: pz.rank === 1 ? "#FEF9C3" : "#FAFAFA",
-                    border: `1.5px solid ${pz.rank === 1 ? "#FDE047" : "#E5E7EB"}`,
-                    borderRadius: "8px",
-                    padding: "7px 10px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    background: pz.rank === 1 ? "#FEF9C3" : pz.rank === 2 ? "#EFF6FF" : "#F8FAFC",
+                    border: `1.5px solid ${pz.rank === 1 ? "#FDE047" : pz.rank === 2 ? "#BFDBFE" : "#E2E8F0"}`,
+                    borderRadius: "10px",
+                    padding: "10px 8px",
+                    textAlign: "center",
+                    boxShadow: pz.rank === 1 ? "0 2px 6px rgba(245, 158, 11, 0.15)" : "none",
                   }}
                 >
                   <span
                     className="mono"
                     style={{
-                      fontSize: "0.75rem",
-                      fontWeight: pz.rank === 1 ? 900 : 700,
-                      color: pz.rank === 1 ? "#854D0E" : "#4B5563",
+                      fontSize: "0.6875rem",
+                      fontWeight: 900,
+                      color: pz.rank === 1 ? "#854D0E" : pz.rank === 2 ? "#1D4ED8" : "#475569",
+                      display: "block",
+                      marginBottom: 2,
                     }}
                   >
-                    #{pz.rank}
+                    #{pz.rank} {pz.rank === 1 ? "JACKPOT" : pz.rank === 2 ? "2ND" : "3RD"}
                   </span>
                   <span
-                    className="mono"
+                    className="display"
                     style={{
-                      fontSize: "0.8125rem",
+                      fontSize: "0.9375rem",
                       fontWeight: 900,
                       color: pz.rank === 1 ? "#DC2626" : "#111827",
+                      display: "block",
                     }}
                   >
                     {pz.amount}
@@ -627,24 +601,36 @@ export function InteractiveTicketConfigurator() {
               </p>
             </div>
 
-            {/* Link to Past Results */}
-            <div style={{ textAlign: "center", marginTop: 4 }}>
+            {/* Link to How It Works Guide & Past Results */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6, flexWrap: "wrap", gap: 6 }}>
+              <Link
+                href="/how-it-works"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: "0.75rem",
+                  color: "#1D4ED8",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                <HelpCircle size={13} color="#1D4ED8" /> How It Works Guide
+              </Link>
+
               <Link
                 href="/results"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 5,
+                  gap: 4,
                   fontSize: "0.75rem",
                   color: "#4B5563",
                   textDecoration: "none",
                   fontWeight: 700,
-                  transition: "color 0.15s ease",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#D97706")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#4B5563")}
               >
-                <Award size={14} color="#D97706" /> View Past Audited Results & Live Streams
+                <Award size={13} color="#D97706" /> Past Results
               </Link>
             </div>
           </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Ticket, ListChecks, ShieldCheck, LogIn, Phone, Send, Menu, X, Award } from "lucide-react";
+import { Home, Ticket, ListChecks, ShieldCheck, LogIn, Phone, Send, Menu, X, Award, Sparkles } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 import { getUser, logout, type StoredUser } from "@/lib/api";
 import { SignInModal } from "./SignInModal";
@@ -34,9 +34,10 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
 
   // Base navigation links
   const navItems = [
-    { href: "/",        label: t.nav.draws,     icon: Home },
-    { href: "/results", label: t.nav.results,   icon: ShieldCheck },
-    { href: "/about",   label: "Why Rimna",     icon: Award },
+    { href: "/",              label: "Tickets & Play",  icon: Home },
+    { href: "/how-it-works",  label: "How It Works",    icon: Sparkles },
+    { href: "/results",       label: t.nav.results,     icon: ShieldCheck },
+    { href: "/about",         label: "Why Rimna",       icon: Award },
   ];
 
   // Add "My Tickets" ONLY if signed in
