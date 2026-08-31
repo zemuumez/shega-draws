@@ -1,10 +1,18 @@
-import { defineConfig } from "sanity";
+import { defineConfig, type Tool } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schema } from "./sanity/schemaTypes";
+import { MigrationTool } from "./sanity/tools/MigrationTool";
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "demo-project-id";
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "ocm4sz73";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
+
+const contentSyncTool: Tool = {
+  name: "content-sync",
+  title: "⚡ Content Sync",
+  icon: () => "🚀",
+  component: MigrationTool,
+};
 
 export default defineConfig({
   basePath: "/studio",
@@ -12,21 +20,104 @@ export default defineConfig({
   title: "Rimna Digital Lottery CMS Studio",
   projectId,
   dataset,
+  tools: (prev) => [contentSyncTool, ...prev],
   plugins: [
     structureTool({
       structure: (S) =>
         S.list()
-          .title("Rimna Lottery Control Center")
+          .title("Rimna Digital Lottery CMS")
           .items([
             // ══════════════════════════════════════════════════════════
-            // Section 1: Lottery & Draw Management
+            // 1. Homepage Management
             // ══════════════════════════════════════════════════════════
             S.listItem()
-              .title("🎟️ Lottery & Draws Management")
+              .title("🏠 Homepage Management")
+              .child(
+                S.list()
+                  .title("Homepage Content & Cards")
+                  .items([
+                    S.listItem()
+                      .title("🌟 Hero Banner Section")
+                      .child(
+                        S.document()
+                          .schemaType("heroContent")
+                          .documentId("heroContent")
+                      ),
+                    S.documentTypeListItem("jackpotCard").title("🎫 3 Featured Hero Jackpot Cards"),
+                    S.documentTypeListItem("testimonial").title("⭐ Customer Testimonials & Reviews"),
+                    S.documentTypeListItem("promotion").title("📢 Special Events & Deals"),
+                  ])
+              ),
+
+            // ══════════════════════════════════════════════════════════
+            // 2. Page Sections Content
+            // ══════════════════════════════════════════════════════════
+            S.listItem()
+              .title("📄 Page Sections & Text Content")
+              .child(
+                S.list()
+                  .title("Section Content")
+                  .items([
+                    S.listItem()
+                      .title("💡 Why Rimna Lottery Section")
+                      .child(
+                        S.document()
+                          .schemaType("sectionContent")
+                          .documentId("section-why-rimna")
+                      ),
+                    S.listItem()
+                      .title("📺 Live Video Broadcast Banner")
+                      .child(
+                        S.document()
+                          .schemaType("sectionContent")
+                          .documentId("section-live-broadcast")
+                      ),
+                    S.listItem()
+                      .title("📝 How It Works (3 Steps)")
+                      .child(
+                        S.document()
+                          .schemaType("sectionContent")
+                          .documentId("section-how-it-works")
+                      ),
+                    S.listItem()
+                      .title("🔐 Cryptographic Fairness Section")
+                      .child(
+                        S.document()
+                          .schemaType("sectionContent")
+                          .documentId("section-fairness")
+                      ),
+                    S.listItem()
+                      .title("🏅 Winners Feed Header")
+                      .child(
+                        S.document()
+                          .schemaType("sectionContent")
+                          .documentId("section-winners-feed")
+                      ),
+                    S.listItem()
+                      .title("🔢 Draws Explorer Header")
+                      .child(
+                        S.document()
+                          .schemaType("sectionContent")
+                          .documentId("section-draws-explorer")
+                      ),
+                    S.divider(),
+                    S.documentTypeListItem("sectionContent").title("📁 All Page Sections"),
+                  ])
+              ),
+
+            S.divider(),
+
+            // ══════════════════════════════════════════════════════════
+            // 3. Draws & Raffle Catalog
+            // ══════════════════════════════════════════════════════════
+            S.listItem()
+              .title("🎟️ Draws & Ticket Catalog")
               .child(
                 S.list()
                   .title("Lottery Draws")
                   .items([
+                    S.documentTypeListItem("draw").title("📁 All Lottery Draws (Catalog)"),
+                    S.divider(),
                     S.listItem()
                       .title("🟢 Open Active Draws")
                       .child(
@@ -42,48 +133,24 @@ export default defineConfig({
                           .filter('_type == "draw" && status == "upcoming"')
                       ),
                     S.listItem()
-                      .title("🔒 Closed / Completed Draws")
+                      .title("🔒 Completed Draws")
                       .child(
                         S.documentList()
                           .title("Completed Draws")
                           .filter('_type == "draw" && (status == "closed" || status == "revealed")')
                       ),
-                    S.divider(),
-                    S.documentTypeListItem("draw").title("📁 All Lottery Draws (Catalog)"),
                   ])
               ),
 
             // ══════════════════════════════════════════════════════════
-            // Section 2: Ticket Entries & Payment Screenshots
+            // 4. Ticket Entries & Payment Screenshots
             // ══════════════════════════════════════════════════════════
             S.listItem()
               .title("💳 Ticket Entries & Payment Screenshots")
               .child(
                 S.list()
-                  .title("Payment Proof Verifications")
+                  .title("Player Entries & Verification")
                   .items([
-                    S.listItem()
-                      .title("🟡 Pending Approval (Needs Verification)")
-                      .child(
-                        S.documentList()
-                          .title("Unverified Payment Screenshots")
-                          .filter('_type == "playerEntry" && status == "pending"')
-                      ),
-                    S.listItem()
-                      .title("🟢 Confirmed & Approved Entries")
-                      .child(
-                        S.documentList()
-                          .title("Approved Ticket Purchases")
-                          .filter('_type == "playerEntry" && status == "confirmed"')
-                      ),
-                    S.listItem()
-                      .title("🔴 Rejected Entries (Invalid Proof)")
-                      .child(
-                        S.documentList()
-                          .title("Rejected Submissions")
-                          .filter('_type == "playerEntry" && status == "rejected"')
-                      ),
-                    S.divider(),
                     S.listItem()
                       .title("📸 With Screenshot Attached")
                       .child(
@@ -91,26 +158,34 @@ export default defineConfig({
                           .title("Entries With Payment Screenshots")
                           .filter('_type == "playerEntry" && defined(proofScreenshot)')
                       ),
-                    S.documentTypeListItem("playerEntry").title("📁 All Player Entries & Screenshots"),
+                    S.listItem()
+                      .title("🟡 Pending Approval (Needs Verification)")
+                      .child(
+                        S.documentList()
+                          .title("Unverified Payment Submissions")
+                          .filter('_type == "playerEntry" && status == "pending"')
+                      ),
+                    S.listItem()
+                      .title("🟢 Approved Entries")
+                      .child(
+                        S.documentList()
+                          .title("Approved Purchases")
+                          .filter('_type == "playerEntry" && status == "confirmed"')
+                      ),
+                    S.listItem()
+                      .title("🔴 Rejected Entries")
+                      .child(
+                        S.documentList()
+                          .title("Rejected Submissions")
+                          .filter('_type == "playerEntry" && status == "rejected"')
+                      ),
+                    S.divider(),
+                    S.documentTypeListItem("playerEntry").title("📁 All Player Entries"),
                   ])
               ),
 
             // ══════════════════════════════════════════════════════════
-            // Section 3: Featured Jackpot Cards & Ad Banners
-            // ══════════════════════════════════════════════════════════
-            S.listItem()
-              .title("📢 Jackpot Cards & Ad Banners")
-              .child(
-                S.list()
-                  .title("Banners & Ad Management")
-                  .items([
-                    S.documentTypeListItem("jackpotCard").title("🌟 Top 3 Hero Jackpot Cards"),
-                    S.documentTypeListItem("promotion").title("✨ Special Holiday & Promos"),
-                  ])
-              ),
-
-            // ══════════════════════════════════════════════════════════
-            // Section 4: Results & Payout Audits
+            // 5. Results & Payout Audits
             // ══════════════════════════════════════════════════════════
             S.listItem()
               .title("🏆 Results & Winning Numbers")
@@ -123,7 +198,7 @@ export default defineConfig({
               ),
 
             // ══════════════════════════════════════════════════════════
-            // Section 5: Customer Care & Inbox
+            // 6. Customer Care & Inbox
             // ══════════════════════════════════════════════════════════
             S.listItem()
               .title("📬 Customer Care & Inbox")
@@ -132,134 +207,34 @@ export default defineConfig({
                   .title("Contact Submissions")
                   .items([
                     S.listItem()
-                      .title("🔴 New Inquiries (Needs Action)")
+                      .title("🔴 New Inquiries")
                       .child(
                         S.documentList()
-                          .title("New Unread Inquiries")
+                          .title("New Unread Messages")
                           .filter('_type == "contactMessage" && status == "new"')
                       ),
                     S.listItem()
-                      .title("🟡 In Progress")
+                      .title("🟢 Resolved Inquiries")
                       .child(
                         S.documentList()
-                          .title("In Progress Messages")
-                          .filter('_type == "contactMessage" && status == "in_progress"')
-                      ),
-                    S.listItem()
-                      .title("🟢 Resolved")
-                      .child(
-                        S.documentList()
-                          .title("Resolved Inquiries")
+                          .title("Resolved Messages")
                           .filter('_type == "contactMessage" && status == "resolved"')
                       ),
                     S.divider(),
-                    S.documentTypeListItem("contactMessage").title("📁 All Inbox Submissions"),
+                    S.documentTypeListItem("contactMessage").title("📁 All Inbox Messages"),
                   ])
               ),
 
             S.divider(),
 
             // ══════════════════════════════════════════════════════════
-            // Section 6: Website Content & Page Sections
+            // 7. Platform Settings & Multilingual Dictionary
             // ══════════════════════════════════════════════════════════
             S.listItem()
-              .title("📝 Website Content & Sections")
+              .title("🌐 Platform Settings & Languages")
               .child(
                 S.list()
-                  .title("Editable Page Content")
-                  .items([
-                    S.listItem()
-                      .title("🌟 Hero Banner (Homepage)")
-                      .child(
-                        S.document()
-                          .schemaType("heroContent")
-                          .documentId("heroContent")
-                      ),
-                    S.divider(),
-                    S.listItem()
-                      .title("📐 How It Works Section")
-                      .child(
-                        S.documentList()
-                          .title("How It Works")
-                          .filter('_type == "sectionContent" && sectionKey == "how-it-works"')
-                      ),
-                    S.listItem()
-                      .title("🎯 Why Rimna Lottery Section")
-                      .child(
-                        S.documentList()
-                          .title("Why Rimna")
-                          .filter('_type == "sectionContent" && sectionKey == "why-rimna"')
-                      ),
-                    S.listItem()
-                      .title("📺 Live Broadcast Banner")
-                      .child(
-                        S.documentList()
-                          .title("Live Broadcast")
-                          .filter('_type == "sectionContent" && sectionKey == "live-broadcast"')
-                      ),
-                    S.listItem()
-                      .title("🔐 Cryptographic Fairness")
-                      .child(
-                        S.documentList()
-                          .title("Fairness Section")
-                          .filter('_type == "sectionContent" && sectionKey == "fairness"')
-                      ),
-                    S.listItem()
-                      .title("🏅 Winners Feed Section")
-                      .child(
-                        S.documentList()
-                          .title("Winners Feed")
-                          .filter('_type == "sectionContent" && sectionKey == "winners-feed"')
-                      ),
-                    S.listItem()
-                      .title("🎮 Quick Pick / Number Selector")
-                      .child(
-                        S.documentList()
-                          .title("Quick Pick Section")
-                          .filter('_type == "sectionContent" && sectionKey == "quick-pick"')
-                      ),
-                    S.listItem()
-                      .title("🔢 Draws Explorer Header")
-                      .child(
-                        S.documentList()
-                          .title("Draws Explorer")
-                          .filter('_type == "sectionContent" && sectionKey == "draws-explorer"')
-                      ),
-                    S.divider(),
-                    S.documentTypeListItem("sectionContent").title("📁 All Page Sections"),
-                  ])
-              ),
-
-            // ══════════════════════════════════════════════════════════
-            // Section 7: Testimonials & Social Proof
-            // ══════════════════════════════════════════════════════════
-            S.listItem()
-              .title("⭐ Testimonials & Social Proof")
-              .child(
-                S.list()
-                  .title("Customer Reviews")
-                  .items([
-                    S.listItem()
-                      .title("🟢 Active Testimonials (Showing)")
-                      .child(
-                        S.documentList()
-                          .title("Active Testimonials")
-                          .filter('_type == "testimonial" && isActive == true')
-                      ),
-                    S.documentTypeListItem("testimonial").title("📁 All Testimonials"),
-                  ])
-              ),
-
-            S.divider(),
-
-            // ══════════════════════════════════════════════════════════
-            // Section 8: Platform Settings & Multilingual
-            // ══════════════════════════════════════════════════════════
-            S.listItem()
-              .title("🌐 Platform & Multilingual Config")
-              .child(
-                S.list()
-                  .title("Platform Configuration")
+                  .title("Settings & Translations")
                   .items([
                     S.listItem()
                       .title("⚙️ Global Site Settings & Hotlines")
@@ -268,60 +243,8 @@ export default defineConfig({
                           .schemaType("siteSettings")
                           .documentId("siteSettings")
                       ),
-                    S.divider(),
-                    // Translation filtered by category
-                    S.listItem()
-                      .title("🧭 Navigation & Header Strings")
-                      .child(
-                        S.documentList()
-                          .title("Navigation Translations")
-                          .filter('_type == "translation" && category == "nav"')
-                      ),
-                    S.listItem()
-                      .title("🌟 Hero & CTA Strings")
-                      .child(
-                        S.documentList()
-                          .title("Hero Translations")
-                          .filter('_type == "translation" && category == "hero"')
-                      ),
-                    S.listItem()
-                      .title("🎟️ Tickets & Catalog Strings")
-                      .child(
-                        S.documentList()
-                          .title("Ticket Translations")
-                          .filter('_type == "translation" && (category == "tickets" || category == "draws")')
-                      ),
-                    S.listItem()
-                      .title("🛒 Buy Modal & Checkout Strings")
-                      .child(
-                        S.documentList()
-                          .title("Modal Translations")
-                          .filter('_type == "translation" && category == "modal"')
-                      ),
-                    S.listItem()
-                      .title("🏆 Results & Prize Strings")
-                      .child(
-                        S.documentList()
-                          .title("Results Translations")
-                          .filter('_type == "translation" && category == "results"')
-                      ),
-                    S.listItem()
-                      .title("🛡️ Trust & Fairness Strings")
-                      .child(
-                        S.documentList()
-                          .title("Trust Translations")
-                          .filter('_type == "translation" && (category == "trust" || category == "fairness")')
-                      ),
-                    S.listItem()
-                      .title("📄 Footer & Support Strings")
-                      .child(
-                        S.documentList()
-                          .title("Footer Translations")
-                          .filter('_type == "translation" && (category == "footer" || category == "support")')
-                      ),
-                    S.divider(),
-                    S.documentTypeListItem("translation").title("🌍 All Translation Strings"),
-                    S.documentTypeListItem("faq").title("💬 Help & FAQs"),
+                    S.documentTypeListItem("translation").title("🌍 Multilingual Dictionary (All Strings)"),
+                    S.documentTypeListItem("faq").title("💬 FAQs & Help Center"),
                   ])
               ),
           ]),
