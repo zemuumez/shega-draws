@@ -17,6 +17,11 @@ export const metadata: Metadata = {
     title: "Rimna Digital Lottery — Provably Fair Digital Lottery",
     description: "Pick your number, pay via Telebirr or CBE, and verify the cryptographic seed on draw day.",
   },
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export const revalidate = 60; // Revalidate layout data every 60 seconds

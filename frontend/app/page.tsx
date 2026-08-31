@@ -6,14 +6,12 @@ import { sanityClient } from "@/lib/sanity/client";
 import {
   ALL_DRAWS_QUERY,
   HERO_CONTENT_QUERY,
-  SECTION_CONTENT_QUERY,
   TESTIMONIALS_QUERY,
   type CMSHeroContent,
-  type CMSSectionContent,
   type CMSTestimonial,
 } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
-import { Trophy, CheckCircle2, ShieldCheck, Ticket, Sparkles, Award, HelpCircle } from "lucide-react";
+import { Trophy, CheckCircle2, Ticket, Sparkles, Award } from "lucide-react";
 import { InteractiveTicketConfigurator } from "@/components/InteractiveTicketConfigurator";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 
@@ -57,12 +55,11 @@ function mapSanityDraw(s: any): DrawState {
 }
 
 export default async function HomePage() {
-  const [cmsDrawsRes, activeDrawState, fallbackDrawsRes, heroContentRes, sectionContentRes, testimonialsRes] = await Promise.allSettled([
+  const [cmsDrawsRes, activeDrawState, fallbackDrawsRes, heroContentRes, testimonialsRes] = await Promise.allSettled([
     sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
     sanityClient.fetch<CMSHeroContent>(HERO_CONTENT_QUERY).catch(() => null),
-    sanityClient.fetch<CMSSectionContent[]>(SECTION_CONTENT_QUERY).catch(() => null),
     sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => null),
   ]);
 
@@ -70,7 +67,6 @@ export default async function HomePage() {
   const drawState = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
   const fallbackDraws = fallbackDrawsRes.status === "fulfilled" ? fallbackDrawsRes.value : [];
   const heroContent = heroContentRes.status === "fulfilled" ? heroContentRes.value : null;
-  const sectionContents = sectionContentRes.status === "fulfilled" ? sectionContentRes.value : null;
   const testimonials = testimonialsRes.status === "fulfilled" ? testimonialsRes.value : null;
 
   // Convert CMS draws to DrawState
@@ -98,191 +94,121 @@ export default async function HomePage() {
   const deadline = currentApprovedDraw?.deadline || new Date(Date.now() + 3 * 86400000).toISOString();
 
   return (
-    <div style={{ paddingBottom: 60, width: "100%", overflowX: "hidden" }}>
-      {/* ── 1. Full-Width Hero Section with Official User-Provided Panoramic Banner ── */}
+    <div style={{ paddingBottom: 80, width: "100%", overflowX: "hidden" }}>
+      {/* ── 1. Hero Showcase Banner (100% Uncovered & Completely Visible) ── */}
       <section
-        className="hero-section-wrapper"
         style={{
-          position: "relative",
-          width: "100%",
-          borderTop: "2px solid #F59E0B",
-          borderBottom: "2px solid #F59E0B",
-          borderLeft: "none",
-          borderRight: "none",
-          borderRadius: 0,
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)",
-          marginBottom: 36,
-          overflow: "hidden",
-          backgroundColor: "#0A1B3A",
+          maxWidth: 1200,
+          margin: "18px auto 24px",
+          padding: "0 clamp(14px, 3vw, 28px)",
+          boxSizing: "border-box",
         }}
       >
-        {/* Full Section Official Background Banner */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+        {/* The Official Rimna Banner — Unobstructed, Full Image */}
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: "1200 / 480",
+            minHeight: 220,
+            maxHeight: 520,
+            borderRadius: "20px",
+            overflow: "hidden",
+            border: "2px solid #F59E0B",
+            boxShadow: "0 12px 36px rgba(0, 0, 0, 0.12)",
+            background: "#4B98E8",
+          }}
+        >
           <Image
             src="/images/rimna-official-hero.jpg"
-            alt="Rimna International Digital Lottery Official Banner"
+            alt="Rimna International Digital Lottery Official Panoramic Banner"
             fill
             priority
             style={{ objectFit: "cover", objectPosition: "center center" }}
           />
         </div>
 
-        {/* Sophisticated Dark Gradient Overlay for High Contrast Text */}
+        {/* Sleek Action & Live Countdown Bar (Directly Below Banner) */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(90deg, rgba(10, 27, 58, 0.94) 0%, rgba(10, 27, 58, 0.86) 52%, rgba(10, 27, 58, 0.65) 100%)",
-            zIndex: 2,
+            marginTop: 14,
+            background: "#FFFFFF",
+            border: "2px solid #F59E0B",
+            borderRadius: "16px",
+            padding: "14px clamp(14px, 3vw, 24px)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 14,
+            boxShadow: "0 4px 16px rgba(245, 158, 11, 0.12)",
           }}
-        />
+        >
+          {/* Trust Badges */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span className="badge badge-gold" style={{ fontSize: "0.75rem", fontWeight: 800, padding: "5px 10px" }}>
+              <Trophy size={14} color="#D97706" /> 10 Guaranteed Winners Per Draw
+            </span>
+            <span className="badge badge-green" style={{ fontSize: "0.75rem", fontWeight: 800, padding: "5px 10px" }}>
+              <CheckCircle2 size={14} color="#059669" /> 100% Public Video Broadcast
+            </span>
+          </div>
 
-        {/* Hero Content Container */}
-        <div style={{ position: "relative", zIndex: 3, maxWidth: 1140, margin: "0 auto", padding: "0 clamp(16px, 4vw, 32px)", boxSizing: "border-box" }}>
-          <div
-            className="hero-grid-layout"
-            style={{
-              display: "grid",
-              gap: 32,
-              alignItems: "center",
-            }}
-          >
-            {/* Left Column: Live Jackpot Status & Action Buttons */}
-            <div>
-              {/* Trust Badges */}
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 14 }}>
-                <span className="badge badge-gold">
-                  <Trophy size={13} color="#D97706" /> 10 GUARANTEED WINNERS PER DRAW
-                </span>
-                <span className="badge" style={{ background: "rgba(16, 185, 129, 0.2)", color: "#34D399", border: "1px solid #059669", fontWeight: 800 }}>
-                  <CheckCircle2 size={13} color="#34D399" /> 100% PUBLIC VIDEO BROADCAST
-                </span>
-              </div>
+          {/* Live Countdown Widget */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span className="mono" style={{ fontSize: "0.75rem", color: "#6B7280", fontWeight: 800, textTransform: "uppercase" }}>
+              Live Draw In:
+            </span>
+            <CountdownTimer target={deadline} />
+          </div>
 
-              {/* Title */}
-              <h1
-                className="display"
-                style={{
-                  fontSize: "clamp(1.85rem, 4.2vw, 2.85rem)",
-                  fontWeight: 900,
-                  color: "#FFFFFF",
-                  lineHeight: 1.12,
-                  marginBottom: 12,
-                  textShadow: "0 2px 8px rgba(0,0,0,0.6)",
-                }}
-              >
-                {heroContent?.title || "Rimna International Digital Lottery"}
-              </h1>
+          {/* Action CTAs */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <a
+              href="#choose-ticket"
+              className="casino-btn-red"
+              style={{
+                padding: "10px 22px",
+                fontSize: "0.9375rem",
+                fontWeight: 900,
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
+                boxShadow: "0 4px 14px rgba(220, 38, 38, 0.35)",
+              }}
+            >
+              <Ticket size={17} /> Choose & Buy Ticket ↓
+            </a>
 
-              <p
-                style={{
-                  fontSize: "clamp(0.9rem, 2vw, 1.05rem)",
-                  color: "#F1F5F9",
-                  lineHeight: 1.5,
-                  maxWidth: 540,
-                  marginBottom: 24,
-                  textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-                }}
-              >
-                {heroContent?.subtitle || "Choose your lucky number, select your participant pool, and watch our founders draw the 10 guaranteed winning numbers live on video stream."}
-              </p>
-
-              {/* High-Impact Action CTAs: Smooth Scroll & How It Works Guide */}
-              <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                <a
-                  href="#choose-ticket"
-                  className="casino-btn-red"
-                  style={{
-                    padding: "13px 24px",
-                    fontSize: "0.95rem",
-                    fontWeight: 900,
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                    cursor: "pointer",
-                  }}
-                >
-                  <Ticket size={18} /> Choose & Buy Ticket ↓
-                </a>
-
-                <Link
-                  href="/how-it-works"
-                  className="casino-btn-dark"
-                  style={{
-                    padding: "13px 20px",
-                    fontSize: "0.95rem",
-                    fontWeight: 800,
-                    textDecoration: "none",
-                    border: "1.5px solid #F59E0B",
-                    background: "rgba(17, 24, 39, 0.85)",
-                    backdropFilter: "blur(6px)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <Sparkles size={16} color="#F59E0B" /> How It Works & Guide
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Column: Mini Box with 3D Gold Tumbler & Live Countdown */}
-            <div>
-              <div
-                className="card-base"
-                style={{
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  border: "2.5px solid #F59E0B",
-                  background: "#111827",
-                  boxShadow: "0 14px 32px rgba(0, 0, 0, 0.45)",
-                }}
-              >
-                {/* Dedicated Mini Card Graphic */}
-                <div style={{ position: "relative", width: "100%", height: 215 }}>
-                  <Image
-                    src="/images/hero-mini-card.jpg"
-                    alt="Golden Jackpot Raffle Tumbler Machine"
-                    fill
-                    priority
-                    style={{ objectFit: "cover" }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(180deg, rgba(17, 24, 39, 0.1) 0%, rgba(17, 24, 39, 0.65) 100%)",
-                    }}
-                  />
-                  <div style={{ position: "absolute", bottom: 8, left: 10, right: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 6 }}>
-                    <span className="badge" style={{ background: "#FEF08A", color: "#854D0E", border: "1px solid #FACC15", fontWeight: 900, fontSize: "0.6875rem" }}>
-                      <Trophy size={12} color="#D97706" /> 10 Guaranteed Winners
-                    </span>
-                    <span className="mono" style={{ fontSize: "0.6875rem", color: "#FFFFFF", fontWeight: 800, textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
-                      Live Video Draw
-                    </span>
-                  </div>
-                </div>
-
-                {/* Countdown Strip */}
-                <div style={{ padding: "10px 12px", background: "#FFFFFF", borderTop: "2px solid #F59E0B" }}>
-                  <CountdownTimer target={deadline} />
-                </div>
-              </div>
-            </div>
+            <Link
+              href="/how-it-works"
+              className="casino-btn-gold"
+              style={{
+                padding: "10px 18px",
+                fontSize: "0.9375rem",
+                fontWeight: 900,
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <Sparkles size={15} color="#111827" /> How It Works
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Page Inner Container for Centerpiece Content ── */}
-      <div className="page-inner-container" style={{ marginTop: 28 }}>
-        {/* ── 2. Interactive Ticket Configurator (Centerpiece) ── */}
-        <div style={{ marginBottom: 54 }}>
+      {/* ── 2. Page Inner Container for Centerpiece Content ── */}
+      <div className="page-inner-container" style={{ marginTop: 32 }}>
+        {/* ── Interactive Ticket Configurator (Centerpiece) ── */}
+        <div style={{ marginBottom: 56 }}>
           <InteractiveTicketConfigurator />
         </div>
 
-        {/* ── 3. Bottom Testimonials & Newsletter Section ── */}
+        {/* ── Testimonials & Newsletter Section ── */}
         <div style={{ marginBottom: 48 }}>
           <TestimonialsNewsletter cmsTestimonials={testimonials} />
         </div>

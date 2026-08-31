@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Ticket, ShieldCheck, Phone, Mail, Send, Award, Users } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
@@ -41,20 +42,13 @@ export function Footer({ siteSettings }: FooterProps) {
           {/* Brand Column */}
           <div style={{ maxWidth: 340 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: "var(--radius-sm)",
-                  background: "linear-gradient(135deg, #FACC15 0%, #EAB308 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1px solid #FDE047",
-                }}
-              >
-                <Ticket size={18} color="#1E3A8A" />
-              </div>
+              <Image
+                src="/images/rimna-logo.png"
+                alt="Rimna Official Logo"
+                width={36}
+                height={36}
+                style={{ borderRadius: "8px", objectFit: "cover" }}
+              />
               <span className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800 }}>
                 {siteName}
               </span>

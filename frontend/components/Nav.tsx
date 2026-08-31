@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Home, Ticket, ListChecks, ShieldCheck, LogIn, Phone, Send, Menu, X, Award, Sparkles } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
@@ -188,21 +189,27 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
             <div
               className="brand-badge"
               style={{
-                padding: "5px clamp(12px, 2.5vw, 22px)",
-                borderRadius: "20px",
+                padding: "4px clamp(10px, 2vw, 18px)",
+                borderRadius: "24px",
                 background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
                 boxShadow: "0 3px 10px rgba(234, 179, 8, 0.45)",
                 border: "1.5px solid #FEF08A",
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
+                gap: 8,
               }}
             >
-              <Ticket size={18} color="#111827" />
+              <Image
+                src="/images/rimna-logo.png"
+                alt="Rimna Logo"
+                width={26}
+                height={26}
+                style={{ borderRadius: "50%", objectFit: "cover" }}
+              />
               <span
                 className="display brand-text"
                 style={{
-                  fontSize: "clamp(0.95rem, 2vw, 1.25rem)",
+                  fontSize: "clamp(0.95rem, 2vw, 1.2rem)",
                   color: "#111827",
                   fontWeight: 900,
                   letterSpacing: "-0.3px",
