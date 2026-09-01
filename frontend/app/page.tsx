@@ -5,9 +5,9 @@ import { getActiveDraw, listDraws, type DrawState, type Currency, type PoolOptio
 import { sanityClient } from "@/lib/sanity/client";
 import {
   ALL_DRAWS_QUERY,
-  HERO_CONTENT_QUERY,
+  SITE_SETTINGS_QUERY,
   TESTIMONIALS_QUERY,
-  type CMSHeroContent,
+  type CMSSiteSettings,
   type CMSTestimonial,
 } from "@/lib/sanity/queries";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -55,18 +55,18 @@ function mapSanityDraw(s: any): DrawState {
 }
 
 export default async function HomePage() {
-  const [cmsDrawsRes, activeDrawState, fallbackDrawsRes, heroContentRes, testimonialsRes] = await Promise.allSettled([
+  const [cmsDrawsRes, activeDrawState, fallbackDrawsRes, siteSettingsRes, testimonialsRes] = await Promise.allSettled([
     sanityClient.fetch<any[]>(ALL_DRAWS_QUERY).catch(() => null),
     getActiveDraw().catch(() => null),
     listDraws().catch(() => []),
-    sanityClient.fetch<CMSHeroContent>(HERO_CONTENT_QUERY).catch(() => null),
+    sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
     sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => null),
   ]);
 
   const rawCmsDraws = cmsDrawsRes.status === "fulfilled" ? cmsDrawsRes.value : null;
   const drawState = activeDrawState.status === "fulfilled" ? activeDrawState.value : null;
   const fallbackDraws = fallbackDrawsRes.status === "fulfilled" ? fallbackDrawsRes.value : [];
-  const heroContent = heroContentRes.status === "fulfilled" ? heroContentRes.value : null;
+  const siteSettings = siteSettingsRes.status === "fulfilled" ? siteSettingsRes.value : null;
   const testimonials = testimonialsRes.status === "fulfilled" ? testimonialsRes.value : null;
 
   // Convert CMS draws to DrawState

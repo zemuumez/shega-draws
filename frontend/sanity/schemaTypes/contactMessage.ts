@@ -2,21 +2,13 @@ import { defineField, defineType } from "sanity";
 
 export const contactMessageType = defineType({
   name: "contactMessage",
-  title: "Contact Form Inbox Message",
+  title: "✉️ Player Contact Messages",
   type: "document",
   fields: [
     defineField({
       name: "name",
       title: "Sender Full Name",
       type: "string",
-      validation: (Rule) => Rule.required(),
-      readOnly: true,
-    }),
-    defineField({
-      name: "phone",
-      title: "Phone / Telegram Contact",
-      type: "string",
-      validation: (Rule) => Rule.required(),
       readOnly: true,
     }),
     defineField({
@@ -26,27 +18,35 @@ export const contactMessageType = defineType({
       readOnly: true,
     }),
     defineField({
-      name: "topic",
-      title: "Inquiry Topic",
+      name: "phone",
+      title: "Phone Number",
       type: "string",
-      options: {
-        list: [
-          { title: "🎟️ Ticket Purchase Assistance", value: "purchase" },
-          { title: "🏆 Winner Payout Claim", value: "payout" },
-          { title: "📺 Live Broadcast Question", value: "broadcast" },
-          { title: "💳 Payment Proof Verification", value: "payment_proof" },
-          { title: "💬 General Support / Other", value: "general" },
-        ],
-      },
+      readOnly: true,
+    }),
+    defineField({
+      name: "subject",
+      title: "Subject / Inquiry Type",
+      type: "string",
       readOnly: true,
     }),
     defineField({
       name: "message",
-      title: "Message Body",
+      title: "Message Text",
       type: "text",
       rows: 4,
-      validation: (Rule) => Rule.required(),
       readOnly: true,
+    }),
+    defineField({
+      name: "status",
+      title: "Status",
+      type: "string",
+      options: {
+        list: [
+          { title: "🟡 Unread", value: "unread" },
+          { title: "🟢 Resolved / Replied", value: "resolved" },
+        ],
+      },
+      initialValue: "unread",
     }),
     defineField({
       name: "submittedAt",
@@ -54,42 +54,19 @@ export const contactMessageType = defineType({
       type: "datetime",
       readOnly: true,
     }),
-    defineField({
-      name: "status",
-      title: "Resolution Status",
-      type: "string",
-      options: {
-        list: [
-          { title: "🔴 New (Unread / Needs Action)", value: "new" },
-          { title: "🟡 In Progress (Contacting Player)", value: "in_progress" },
-          { title: "🟢 Resolved (Completed)", value: "resolved" },
-          { title: "⚪ Spam / Ignored", value: "spam" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "new",
-    }),
-    defineField({
-      name: "adminNotes",
-      title: "Internal Support Notes",
-      type: "text",
-      rows: 2,
-      placeholder: "e.g. Called customer on Telebirr, resolved payment proof receipt on Sep 2nd.",
-    }),
   ],
   preview: {
     select: {
-      title: "name",
-      phone: "phone",
-      topic: "topic",
+      name: "name",
+      subject: "subject",
       status: "status",
       date: "submittedAt",
     },
-    prepare({ title, phone, topic, status, date }) {
-      const statusIcon = status === "resolved" ? "🟢" : status === "in_progress" ? "🟡" : "🔴";
+    prepare({ name, subject, status, date }) {
+      const icon = status === "resolved" ? "🟢" : "🟡";
       return {
-        title: `${statusIcon} ${title || "Anonymous"} (${phone || ""})`,
-        subtitle: `${topic || "General"} · ${date ? new Date(date).toLocaleDateString() : ""}`,
+        title: `${icon} ${name || "Unknown"} — ${subject || "General Inquiry"}`,
+        subtitle: date ? new Date(date).toLocaleString() : "Recent",
       };
     },
   },

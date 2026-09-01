@@ -5,17 +5,17 @@ import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { sanityClient } from "@/lib/sanity/client";
-import { TRANSLATIONS_QUERY, SITE_SETTINGS_QUERY, type CMSSiteSettings, type CMSTranslation } from "@/lib/sanity/queries";
+import { SITE_SETTINGS_QUERY, type CMSSiteSettings } from "@/lib/sanity/queries";
 
 export const metadata: Metadata = {
-  title: { default: "Rimna Digital Lottery — Cryptographic Digital Lottery & Raffles", template: "%s · Rimna Digital Lottery" },
-  description: "A transparent, cryptographically verifiable digital raffle platform. Pick a number, pay securely, and verify the outcome yourself.",
-  keywords: ["lottery", "raffle", "digital draw", "Ethiopia", "Telebirr", "CBE Birr", "Rimna Digital Lottery", "provably fair raffle"],
+  title: { default: "Rimna International Digital Lottery — 100% Live Public Draws", template: "%s · Rimna Digital Lottery" },
+  description: "A transparent, physical live video draw digital lottery. Pick your lucky number, choose your pool capacity, and win guaranteed cash prizes.",
+  keywords: ["lottery", "raffle", "digital draw", "Ethiopia", "Telebirr", "CBE Birr", "Rimna Digital Lottery", "transparent lottery"],
   openGraph: {
     type: "website",
     siteName: "Rimna Digital Lottery",
-    title: "Rimna Digital Lottery — Provably Fair Digital Lottery",
-    description: "Pick your number, pay via Telebirr or CBE, and verify the cryptographic seed on draw day.",
+    title: "Rimna International Digital Lottery — 100% Live Video Draws",
+    description: "Pick your number, pay via Telebirr or CBE, and watch founders draw winning numbers live on video.",
   },
   icons: {
     icon: "/favicon.png",
@@ -27,14 +27,7 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Revalidate layout data every 60 seconds
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Fetch CMS translations and site settings at the layout level
-  const [cmsTranslationsRes, siteSettingsRes] = await Promise.allSettled([
-    sanityClient.fetch<CMSTranslation[]>(TRANSLATIONS_QUERY).catch(() => null),
-    sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
-  ]);
-
-  const cmsTranslations = cmsTranslationsRes.status === "fulfilled" ? cmsTranslationsRes.value : null;
-  const siteSettings = siteSettingsRes.status === "fulfilled" ? siteSettingsRes.value : null;
+  const siteSettings = await sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null);
 
   return (
     <html lang="en">
@@ -44,7 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="bg-subtle-mesh">
-        <LanguageProvider cmsTranslations={cmsTranslations ?? undefined}>
+        <LanguageProvider>
           <ScrollProgressBar />
           <Nav />
           <main id="main-content" className="page-content">

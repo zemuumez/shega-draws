@@ -2,35 +2,35 @@ import { defineField, defineType } from "sanity";
 
 export const playerEntryType = defineType({
   name: "playerEntry",
-  title: "Ticket Entry & Payment Screenshot",
+  title: "🎟️ Submitted Ticket Receipts",
   type: "document",
   fieldsets: [
     {
       name: "playerInfo",
-      title: "👤 Player Information",
-      options: { collapsible: true, collapsed: false },
+      title: "👤 Player Contact",
+      options: { collapsible: false },
     },
     {
       name: "ticketDetails",
-      title: "🎟️ Ticket & Draw Details",
-      options: { collapsible: true, collapsed: false },
+      title: "🎟️ Chosen Ticket & Pool Details",
+      options: { collapsible: false },
     },
     {
       name: "payment",
-      title: "💳 Payment & Verification",
-      options: { collapsible: true, collapsed: false },
+      title: "💳 Payment & Transaction Screenshot",
+      options: { collapsible: false },
     },
     {
       name: "admin",
-      title: "🔧 Admin Review & Notes",
-      options: { collapsible: true, collapsed: false },
+      title: "🛡️ Admin Approval & Notes",
+      options: { collapsible: false },
     },
   ],
   fields: [
-    // ─── Player Info ───────────────────────────────────────────────────
+    // ─── 1. Player Info ──────────────────────────────────────────────
     defineField({
       name: "playerName",
-      title: "Player Name",
+      title: "Player Full Name",
       type: "string",
       fieldset: "playerInfo",
       validation: (Rule) => Rule.required(),
@@ -38,25 +38,24 @@ export const playerEntryType = defineType({
     }),
     defineField({
       name: "playerPhone",
-      title: "Player Phone / Contact",
+      title: "Player Mobile Phone (Login ID)",
       type: "string",
       fieldset: "playerInfo",
       validation: (Rule) => Rule.required(),
       readOnly: true,
     }),
 
-    // ─── Ticket Details ────────────────────────────────────────────────
+    // ─── 2. Ticket Details ───────────────────────────────────────────
     defineField({
       name: "drawId",
       title: "Draw Reference ID",
       type: "string",
       fieldset: "ticketDetails",
-      validation: (Rule) => Rule.required(),
       readOnly: true,
     }),
     defineField({
       name: "luckyNumber",
-      title: "Selected Lucky Number",
+      title: "Selected Lucky Number (00-99)",
       type: "string",
       fieldset: "ticketDetails",
       validation: (Rule) => Rule.required(),
@@ -64,15 +63,15 @@ export const playerEntryType = defineType({
     }),
     defineField({
       name: "poolCapacity",
-      title: "Selected Pool Capacity",
+      title: "Participant Pool Size",
       type: "string",
       fieldset: "ticketDetails",
-      placeholder: "1,000 (1K), 2,000 (2K), etc.",
+      placeholder: "1,000 (1K), 2,000 (2K), 3,000 (3K), 5,000 (5K)",
       readOnly: true,
     }),
     defineField({
       name: "amount",
-      title: "Ticket Amount Paid",
+      title: "Ticket Price Paid",
       type: "number",
       fieldset: "ticketDetails",
       readOnly: true,
@@ -83,19 +82,22 @@ export const playerEntryType = defineType({
       type: "string",
       fieldset: "ticketDetails",
       options: {
-        list: ["ETB", "USD"],
+        list: [
+          { title: "ETB (Ethiopian Birr)", value: "ETB" },
+          { title: "USD (US Dollars)", value: "USD" },
+        ],
       },
       readOnly: true,
     }),
     defineField({
       name: "submittedAt",
-      title: "Submission Timestamp",
+      title: "Submitted At",
       type: "datetime",
       fieldset: "ticketDetails",
       readOnly: true,
     }),
 
-    // ─── Payment & Verification ────────────────────────────────────────
+    // ─── 3. Payment & Screenshot Proof ────────────────────────────────
     defineField({
       name: "paymentMethod",
       title: "Payment Method Used",
@@ -107,7 +109,6 @@ export const playerEntryType = defineType({
           { title: "Commercial Bank of Ethiopia (CBE)", value: "cbebirr" },
           { title: "Awash Bank", value: "awash" },
           { title: "Dashen Bank", value: "dashen" },
-          { title: "Bank of Abyssinia", value: "abyssinia" },
           { title: "Credit / Debit Card", value: "card" },
           { title: "Wire Transfer / Remittance", value: "wire" },
         ],
@@ -116,16 +117,17 @@ export const playerEntryType = defineType({
     }),
     defineField({
       name: "proofScreenshot",
-      title: "📸 Payment Screenshot / Bank Receipt",
+      title: "📸 Payment Receipt Screenshot / SMS Slip",
       type: "image",
       fieldset: "payment",
       options: {
         hotspot: true,
       },
-      description: "Screenshot submitted by the player to verify their payment. Check the Telebirr/CBE transaction SMS or deposit slip carefully before approving.",
+      description:
+        "Inspect the payment SMS screenshot carefully to verify the transaction amount, date, and sender name before confirming.",
     }),
 
-    // ─── Admin Review ──────────────────────────────────────────────────
+    // ─── 4. Admin Verification & Approval ─────────────────────────────
     defineField({
       name: "status",
       title: "Verification Status",
@@ -134,8 +136,8 @@ export const playerEntryType = defineType({
       options: {
         list: [
           { title: "🟡 Pending (Needs Verification)", value: "pending" },
-          { title: "🟢 Confirmed & Approved (Valid)", value: "confirmed" },
-          { title: "🔴 Rejected (Fake/Duplicate Proof)", value: "rejected" },
+          { title: "🟢 Confirmed & Approved (Valid Ticket)", value: "confirmed" },
+          { title: "🔴 Rejected (Invalid / Duplicate Proof)", value: "rejected" },
         ],
         layout: "radio",
       },
@@ -147,7 +149,7 @@ export const playerEntryType = defineType({
       type: "text",
       fieldset: "admin",
       rows: 2,
-      placeholder: "e.g. Telebirr TxID: 8GH49392 verified on CBE portal.",
+      placeholder: "e.g. Telebirr TxID: 884729 verified on merchant portal.",
     }),
   ],
   preview: {
@@ -165,7 +167,7 @@ export const playerEntryType = defineType({
       const statusIcon = status === "confirmed" ? "🟢" : status === "rejected" ? "🔴" : "🟡";
       return {
         title: `${statusIcon} #${number || "??"} — ${name || "Anonymous"} (${phone || ""})`,
-        subtitle: `${drawId || ""} · ${amount || 0} ${currency || "ETB"} [${status?.toUpperCase() || "PENDING"}]`,
+        subtitle: `${drawId || ""} · ${amount || 0} ${currency || "ETB"} [${(status || "PENDING").toUpperCase()}]`,
         media,
       };
     },

@@ -22,7 +22,7 @@ export function getSanityClient(): SanityClient | null {
 }
 
 export function getSanityWriteClient(): SanityClient | null {
-  const token = process.env.SANITY_API_TOKEN;
+  const token = process.env.SANITY_API_TOKEN || process.env.SANITY_API_WRITE_TOKEN;
   if (!projectId || !token || projectId === "your-project-id-here") return null;
   if (!_writeClient) {
     _writeClient = createClient({
