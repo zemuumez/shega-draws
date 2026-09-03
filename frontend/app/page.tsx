@@ -130,8 +130,7 @@ export default async function HomePage() {
             WebkitBackdropFilter: "blur(14px)",
             borderTop: "1.5px solid rgba(239, 232, 216, 0.7)",
             borderBottom: "1.5px solid rgba(239, 232, 216, 0.7)",
-            padding: "clamp(56px, 7vw, 80px) 0",
-            margin: "clamp(36px, 5vw, 64px) 0",
+            padding: "64px 0 60px",
             width: "100%",
           }}
         >
