@@ -41,17 +41,14 @@ export function Footer({ siteSettings }: FooterProps) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 32, marginBottom: 40 }}>
           {/* Brand Column */}
           <div style={{ maxWidth: 340 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 14 }}>
               <Image
-                src="/images/rimna-logo.png"
-                alt="Rimna Official Logo"
-                width={36}
-                height={36}
-                style={{ borderRadius: "8px", objectFit: "cover" }}
+                src="/images/rimna-brand-logo.png"
+                alt="Rimna International Digital Lottery"
+                width={170}
+                height={44}
+                style={{ height: "40px", width: "auto", objectFit: "contain" }}
               />
-              <span className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", fontWeight: 800 }}>
-                {siteName}
-              </span>
             </div>
 
             <p style={{ color: "var(--text-muted)", fontSize: "0.8125rem", lineHeight: 1.6, marginBottom: 18 }}>

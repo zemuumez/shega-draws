@@ -179,38 +179,29 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           })}
         </div>
 
-        {/* Center / Brand Logo & Text (Only Logo & Text, No Golden Wrapper) */}
+        {/* Center / Brand Logo (Full Logo Image with Integrated Text) */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <Link
             href="/"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
               textDecoration: "none",
-              padding: "4px 0",
+              padding: "2px 0",
             }}
           >
             <Image
-              src="/images/rimna-logo.png"
-              alt="Rimna Logo"
-              width={32}
-              height={32}
-              style={{ borderRadius: "50%", objectFit: "cover" }}
-            />
-            <span
-              className="display brand-text"
+              src="/images/rimna-brand-logo.png"
+              alt="Rimna International Digital Lottery"
+              width={180}
+              height={46}
+              priority
               style={{
-                fontSize: "clamp(1.1rem, 2.2vw, 1.4rem)",
-                color: "#111827",
-                fontWeight: 900,
-                letterSpacing: "-0.3px",
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
+                height: "clamp(34px, 4.2vw, 42px)",
+                width: "auto",
+                objectFit: "contain",
               }}
-            >
-              Rimna Lottery
-            </span>
+            />
           </Link>
         </div>
 
