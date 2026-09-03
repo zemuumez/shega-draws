@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Star, Send, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Send, CheckCircle2, ChevronLeft, ChevronRight, MessageSquare, BellRing } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSTestimonial } from "@/lib/sanity/queries";
 
@@ -70,143 +70,194 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        gap: 16,
-        margin: "20px 0 24px",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: 20,
+        margin: "0",
       }}
     >
-      {/* ── Testimonials Box ──────────────────────────────────── */}
+      {/* ── 1. Verified Winner Stories Card ────────────────────── */}
       <div
-        className="card-base"
         style={{
-          background: "#FFFFFF",
-          borderRadius: "14px",
-          border: "1.5px solid var(--gray-line)",
-          padding: "24px 22px",
+          background: "rgba(255, 255, 255, 0.06)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderRadius: "20px",
+          border: "1.5px solid rgba(253, 224, 71, 0.35)",
+          padding: "26px 24px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.3)",
+          color: "#FFFFFF",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <h4 className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 900 }}>
-            Winner Testimonials
-          </h4>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "8px",
+                background: "rgba(253, 224, 71, 0.15)",
+                border: "1px solid #FDE047",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <MessageSquare size={16} color="#FDE047" />
+            </div>
+            <h4 className="display" style={{ fontSize: "1.2rem", color: "#FEF08A", fontWeight: 900, margin: 0 }}>
+              Winner Testimonials
+            </h4>
+          </div>
 
           <div style={{ display: "flex", gap: 6 }}>
             <button
               type="button"
+              aria-label="Previous testimonial"
               onClick={handlePrev}
               style={{
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 borderRadius: "50%",
-                border: "1px solid var(--gray-line)",
-                background: "#F8FAFC",
+                border: "1px solid rgba(253, 224, 71, 0.4)",
+                background: "rgba(255, 255, 255, 0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
+                color: "#FFFFFF",
+                transition: "all 120ms ease",
               }}
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={16} />
             </button>
             <button
               type="button"
+              aria-label="Next testimonial"
               onClick={handleNext}
               style={{
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 borderRadius: "50%",
-                border: "1px solid var(--gray-line)",
-                background: "#F8FAFC",
+                border: "1px solid rgba(253, 224, 71, 0.4)",
+                background: "rgba(255, 255, 255, 0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
+                color: "#FFFFFF",
+                transition: "all 120ms ease",
               }}
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <div style={{ display: "flex", gap: 3, marginBottom: 8 }}>
+          <div style={{ display: "flex", gap: 3, marginBottom: 10 }}>
             {[...Array(current.rating || 5)].map((_, i) => (
-              <Star key={i} size={14} fill="#EAB308" color="#EAB308" />
+              <Star key={i} size={15} fill="#FACC15" color="#FACC15" />
             ))}
           </div>
 
-          <p style={{ fontStyle: "italic", color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: 12 }}>
+          <p style={{ fontStyle: "italic", color: "#E2E8F0", fontSize: "0.9375rem", lineHeight: 1.65, margin: "0 0 16px" }}>
             &ldquo;{currentQuote}&rdquo;
           </p>
 
-          <div>
-            <strong style={{ color: "var(--blue-navy)", fontSize: "0.875rem", display: "block" }}>
+          <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)", paddingTop: 12 }}>
+            <strong style={{ color: "#FFFFFF", fontSize: "0.9375rem", display: "block" }}>
               {current.name} · {current.location}
             </strong>
-            <span className="mono" style={{ fontSize: "0.75rem", color: "var(--gold-deep)", fontWeight: 700 }}>
-              Won {current.prizeWon}
+            <span className="mono" style={{ fontSize: "0.8125rem", color: "#FDE047", fontWeight: 800 }}>
+              🏆 Won {current.prizeWon}
               {current.drawTitle ? ` — ${current.drawTitle}` : ""}
             </span>
           </div>
         </div>
       </div>
 
-      {/* ── Join The Newsletter / Telegram Community Box ───────── */}
+      {/* ── 2. Official Community & Live Alerts Box ─────────── */}
       <div
-        className="card-base"
         style={{
-          background: "#FFFFFF",
-          borderRadius: "14px",
-          border: "1.5px solid var(--gray-line)",
-          padding: "24px 22px",
+          background: "rgba(255, 255, 255, 0.06)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderRadius: "20px",
+          border: "1.5px solid rgba(253, 224, 71, 0.35)",
+          padding: "26px 24px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.3)",
+          color: "#FFFFFF",
         }}
       >
         <div>
-          <h4 className="display" style={{ fontSize: "1.125rem", color: "var(--blue-navy)", fontWeight: 900, marginBottom: 4 }}>
-            Join The Community & Alerts
-          </h4>
-          <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", marginBottom: 16 }}>
-            Get instant SMS and Telegram alerts when new jackpot pools open or winning numbers are revealed.
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "8px",
+                background: "rgba(16, 185, 129, 0.15)",
+                border: "1px solid #34D399",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <BellRing size={16} color="#34D399" />
+            </div>
+            <h4 className="display" style={{ fontSize: "1.2rem", color: "#FEF08A", fontWeight: 900, margin: 0 }}>
+              Official Community & Alerts
+            </h4>
+          </div>
+          <p style={{ fontSize: "0.875rem", color: "#CBD5E1", lineHeight: 1.55, margin: "8px 0 20px" }}>
+            Get instant Telegram and SMS notifications when a new jackpot pool opens or winning numbers are drawn live on video.
           </p>
         </div>
 
         {subscribed ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--teal-dark)", fontWeight: 700, fontSize: "0.875rem", padding: "10px 0" }}>
-            <CheckCircle2 size={18} color="var(--teal)" /> Subscribed! You will receive draw notifications.
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399", fontWeight: 800, fontSize: "0.9375rem", padding: "10px 0" }}>
+            <CheckCircle2 size={20} color="#34D399" /> Subscribed! You will receive draw notifications.
           </div>
         ) : (
-          <form onSubmit={handleSubscribe} style={{ display: "flex", gap: 8 }}>
+          <form onSubmit={handleSubscribe} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <input
               type="text"
-              className="input-base"
-              placeholder="Enter email or Telegram handle"
+              placeholder="Enter email or Telegram @handle"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ fontSize: "0.875rem", flex: 1 }}
+              style={{
+                fontSize: "0.875rem",
+                flex: 1,
+                minWidth: 180,
+                background: "rgba(15, 23, 42, 0.7)",
+                border: "1.5px solid rgba(253, 224, 71, 0.4)",
+                borderRadius: "10px",
+                padding: "11px 14px",
+                color: "#FFFFFF",
+                outline: "none",
+              }}
             />
             <button
               type="submit"
-              className="btn-base"
+              className="casino-btn-red"
               style={{
-                background: "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
-                color: "#FFFFFF",
-                fontWeight: 800,
-                fontSize: "0.8125rem",
-                padding: "10px 18px",
-                borderRadius: "8px",
-                boxShadow: "0 2px 6px rgba(185, 28, 28, 0.3)",
+                padding: "11px 20px",
+                fontSize: "0.875rem",
+                fontWeight: 900,
+                borderRadius: "10px",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+                boxShadow: "0 4px 14px rgba(220, 38, 38, 0.4)",
               }}
             >
-              Sign Up
+              Join Alerts
             </button>
           </form>
         )}
