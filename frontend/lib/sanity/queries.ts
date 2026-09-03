@@ -93,7 +93,34 @@ export const PLAYER_ENTRIES_QUERY = defineQuery(`
   }
 `);
 
+/** Fetch promotional ads and big rewards for homepage carousel */
+export const ADVERTISEMENTS_QUERY = defineQuery(`
+  *[_type == "advertisement" && isActive == true] | order(order asc) {
+    _id,
+    title,
+    subtitle,
+    badge,
+    "imageUrl": image.asset->url,
+    estimatedValue,
+    targetDrawId,
+    ctaText,
+    order
+  }
+`);
+
 // ── Types ─────────────────────────────────────────────────────────────
+
+export interface CMSAdvertisement {
+  _id: string;
+  title: string;
+  subtitle: string;
+  badge: string;
+  imageUrl: string;
+  estimatedValue?: string;
+  targetDrawId?: string;
+  ctaText?: string;
+  order?: number;
+}
 
 export interface CMSDraw {
   _id: string;

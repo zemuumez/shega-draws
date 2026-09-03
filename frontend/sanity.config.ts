@@ -52,11 +52,15 @@ export default defineConfig({
                   .documentId("siteSettings")
               ),
 
-            // 5. Winner Testimonials
+            // 5. Promotional Ads & Featured Prizes
+            S.documentTypeListItem("advertisement")
+              .title("📢 Promotional Ads & Featured Prizes"),
+
+            // 6. Winner Testimonials
             S.documentTypeListItem("testimonial")
               .title("💬 Winner Testimonials"),
 
-            // 6. Player Contact Messages
+            // 7. Player Contact Messages
             S.documentTypeListItem("contactMessage")
               .title("✉️ Player Contact Messages"),
           ]),

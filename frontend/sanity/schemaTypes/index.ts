@@ -3,6 +3,7 @@ import { playerEntryType } from "./playerEntry";
 import { drawType } from "./draw";
 import { drawResultType } from "./drawResult";
 import { siteSettingsType } from "./siteSettings";
+import { advertisementType } from "./advertisement";
 import { testimonialType } from "./testimonial";
 import { contactMessageType } from "./contactMessage";
 
@@ -12,6 +13,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     drawType,
     drawResultType,
     siteSettingsType,
+    advertisementType,
     testimonialType,
     contactMessageType,
   ],

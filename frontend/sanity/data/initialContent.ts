@@ -126,7 +126,45 @@ export const ALL_INITIAL_DOCUMENTS = [
     featured: true,
   },
 
-  // ─── 5. Sample Submitted Ticket Receipts (For Studio Verification) ──
+  // ─── 5. Promotional Advertisements & Big Prizes ─────────────────────
+  {
+    _id: "ad-electric-suv",
+    _type: "advertisement",
+    title: "Brand New 2026 Luxury Electric SUV",
+    subtitle: "100% Guaranteed delivery or cash equivalent. Featured grand reward in our 500 Birr Grand Jackpot Draw.",
+    badge: "🚗 GRAND LUXURY VEHICLE",
+    estimatedValue: "4,500,000 ETB / $35,000 USD",
+    targetDrawId: "RDL-ETB-500",
+    ctaText: "Enter Draw & Win Car",
+    order: 1,
+    isActive: true,
+  },
+  {
+    _id: "ad-dream-villa",
+    _type: "advertisement",
+    title: "Contemporary 3-Bedroom Dream Villa",
+    subtitle: "Fully finished luxury architecture with private pool and panoramic views. 100% live video transparent drawing.",
+    badge: "🏡 REAL ESTATE REWARD",
+    estimatedValue: "12,000,000 ETB / $95,000 USD",
+    targetDrawId: "RDL-ETB-1000",
+    ctaText: "Enter Draw & Win Villa",
+    order: 2,
+    isActive: true,
+  },
+  {
+    _id: "ad-smart-home",
+    _type: "advertisement",
+    title: "Smart Kitchen & Big Electronics Mega Bundle",
+    subtitle: "Includes 4-Door Touchscreen French-Door Smart Refrigerator, 85-inch 4K OLED TV, and Flagship Tech Pack.",
+    badge: "⚡ SMART HOME APPLIANCES",
+    estimatedValue: "1,500,000 ETB / $12,000 USD",
+    targetDrawId: "RDL-ETB-200",
+    ctaText: "Enter Draw & Win Tech",
+    order: 3,
+    isActive: true,
+  },
+
+  // ─── 6. Sample Submitted Ticket Receipts (For Studio Verification) ──
   {
     _id: "entry-sample-telebirr-1",
     _type: "playerEntry",
