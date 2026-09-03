@@ -70,7 +70,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.35) 45%, rgba(15, 23, 42, 0.75) 100%)",
+            "linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.25) 45%, rgba(15, 23, 42, 0.65) 100%)",
           zIndex: 0,
           pointerEvents: "none",
         }}
@@ -161,19 +161,20 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
           </p>
         </div>
 
-        {/* Right Side: Floating High-Impact Casino Gold Feature Card */}
+        {/* Right Side: Floating Translucent Glass Feature Card */}
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <div
             style={{
               width: "100%",
               maxWidth: 420,
-              background: "rgba(255, 253, 245, 0.94)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
+              background: "rgba(15, 23, 42, 0.58)",
+              backdropFilter: "blur(24px) saturate(190%)",
+              WebkitBackdropFilter: "blur(24px) saturate(190%)",
               borderRadius: "24px",
-              border: "2.5px solid #F59E0B",
+              border: "2px solid rgba(253, 224, 71, 0.75)",
               padding: "24px 22px",
-              boxShadow: "0 20px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(254, 240, 138, 0.8)",
+              boxShadow:
+                "0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(254, 240, 138, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)",
               display: "flex",
               flexDirection: "column",
               gap: 16,
@@ -187,22 +188,23 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
                   width: 40,
                   height: 40,
                   borderRadius: "12px",
-                  background: "#FEF9C3",
+                  background: "rgba(254, 240, 138, 0.2)",
                   border: "1.5px solid #FDE047",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
+                  boxShadow: "0 2px 8px rgba(234, 179, 8, 0.25)",
                 }}
               >
-                <Trophy size={20} color="#D97706" />
+                <Trophy size={20} color="#FDE047" />
               </div>
               <div>
                 <span
                   style={{
                     fontSize: "0.6875rem",
                     fontWeight: 900,
-                    color: "#D97706",
+                    color: "#FEF08A",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
                     display: "block",
@@ -210,7 +212,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
                 >
                   10 GUARANTEED WINNERS
                 </span>
-                <span style={{ fontSize: "0.75rem", color: "#4B5563", fontWeight: 700 }}>
+                <span style={{ fontSize: "0.75rem", color: "#E2E8F0", fontWeight: 700 }}>
                   High Winning Odds (1 in 100)
                 </span>
               </div>
@@ -222,15 +224,16 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
               style={{
                 fontSize: "1.35rem",
                 fontWeight: 900,
-                color: "#111827",
+                color: "#FFFFFF",
                 lineHeight: 1.25,
                 margin: 0,
+                textShadow: "0 2px 8px rgba(0,0,0,0.6)",
               }}
             >
               100% Guaranteed Cash Payouts In Every Single Pool
             </h3>
 
-            <p style={{ fontSize: "0.8125rem", color: "#4B5563", lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, margin: 0 }}>
               No endless rollover delays. Every single draw pays out 10 distinct cash ranks live on video within 30 minutes.
             </p>
 
@@ -271,7 +274,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
         </div>
       </div>
 
-      {/* ── 4. Bottom Overlapping Quick-Tier Bar ── */}
+      {/* ── 4. Bottom Overlapping Translucent Glass Quick-Tier Bar ── */}
       <div
         style={{
           position: "relative",
@@ -285,26 +288,28 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
       >
         <div
           style={{
-            background: "rgba(255, 253, 245, 0.94)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderRadius: "22px",
-            border: "2px solid #F59E0B",
+            background: "rgba(15, 23, 42, 0.58)",
+            backdropFilter: "blur(24px) saturate(190%)",
+            WebkitBackdropFilter: "blur(24px) saturate(190%)",
+            borderRadius: "24px",
+            border: "2px solid rgba(253, 224, 71, 0.75)",
             padding: "18px clamp(16px, 2.5vw, 24px)",
-            boxShadow: "0 20px 48px -8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(254, 240, 138, 0.8)",
-            color: "#111827",
+            boxShadow:
+              "0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(254, 240, 138, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)",
+            color: "#FFFFFF",
           }}
         >
           {/* Header Label */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
-            <Sparkles size={14} color="#D97706" />
+            <Sparkles size={14} color="#FDE047" />
             <span
               style={{
                 fontSize: "0.6875rem",
                 fontWeight: 900,
-                color: "#92400E",
+                color: "#FEF08A",
                 textTransform: "uppercase",
                 letterSpacing: "0.8px",
+                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
               }}
             >
               CHOOSE YOUR LUCKY TIER FAST
@@ -323,16 +328,19 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 1: Currency Toggle */}
             <div
               style={{
-                background: "rgba(255, 251, 235, 0.9)",
-                border: "1.5px solid #FDE047",
+                background: "rgba(0, 0, 0, 0.4)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid rgba(253, 224, 71, 0.45)",
                 borderRadius: "12px",
                 padding: "8px 12px",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 800, textTransform: "uppercase" }}>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
                 CURRENCY
               </span>
               <div style={{ display: "flex", gap: 4, marginTop: 2 }}>
@@ -343,13 +351,13 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
                     flex: 1,
                     padding: "4px 8px",
                     borderRadius: "6px",
-                    border: "none",
-                    background: !isUSD ? "#FDE047" : "transparent",
-                    color: "#111827",
+                    border: !isUSD ? "1.5px solid #FDE047" : "1px solid rgba(255,255,255,0.15)",
+                    background: !isUSD ? "#FEF08A" : "rgba(255, 255, 255, 0.08)",
+                    color: !isUSD ? "#854D0E" : "#E2E8F0",
                     fontSize: "0.75rem",
                     fontWeight: 900,
                     cursor: "pointer",
-                    boxShadow: !isUSD ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                    boxShadow: !isUSD ? "0 2px 6px rgba(234, 179, 8, 0.35)" : "none",
                   }}
                 >
                   🇪🇹 ETB
@@ -361,13 +369,13 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
                     flex: 1,
                     padding: "4px 8px",
                     borderRadius: "6px",
-                    border: "none",
-                    background: isUSD ? "#FDE047" : "transparent",
-                    color: "#111827",
+                    border: isUSD ? "1.5px solid #93C5FD" : "1px solid rgba(255,255,255,0.15)",
+                    background: isUSD ? "#EFF6FF" : "rgba(255, 255, 255, 0.08)",
+                    color: isUSD ? "#1D4ED8" : "#E2E8F0",
                     fontSize: "0.75rem",
                     fontWeight: 900,
                     cursor: "pointer",
-                    boxShadow: isUSD ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                    boxShadow: isUSD ? "0 2px 6px rgba(29, 78, 216, 0.35)" : "none",
                   }}
                 >
                   🇺🇸 USD
@@ -378,16 +386,19 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 2: Ticket Price */}
             <div
               style={{
-                background: "rgba(255, 251, 235, 0.9)",
-                border: "1.5px solid #FDE047",
+                background: "rgba(0, 0, 0, 0.4)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid rgba(253, 224, 71, 0.45)",
                 borderRadius: "12px",
                 padding: "8px 12px",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 800, textTransform: "uppercase" }}>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
                 TICKET PRICE
               </span>
               <select
@@ -398,14 +409,14 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
                   border: "none",
                   fontSize: "0.875rem",
                   fontWeight: 900,
-                  color: "#111827",
+                  color: "#FFFFFF",
                   cursor: "pointer",
                   outline: "none",
                   padding: "2px 0",
                 }}
               >
                 {priceOptions.map((p) => (
-                  <option key={p} value={p}>
+                  <option key={p} value={p} style={{ background: "#0F172A", color: "#FFFFFF" }}>
                     {isUSD ? `$${p} USD Entry` : `${p} ETB Fixed Price`}
                   </option>
                 ))}
@@ -415,16 +426,19 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 3: Pool Capacity */}
             <div
               style={{
-                background: "rgba(255, 251, 235, 0.9)",
-                border: "1.5px solid #FDE047",
+                background: "rgba(0, 0, 0, 0.4)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid rgba(253, 224, 71, 0.45)",
                 borderRadius: "12px",
                 padding: "8px 12px",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 800, textTransform: "uppercase" }}>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
                 POOL CAPACITY
               </span>
               <select
@@ -435,14 +449,14 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
                   border: "none",
                   fontSize: "0.875rem",
                   fontWeight: 900,
-                  color: "#111827",
+                  color: "#FFFFFF",
                   cursor: "pointer",
                   outline: "none",
                   padding: "2px 0",
                 }}
               >
                 {poolOptions.map((p) => (
-                  <option key={p.size} value={p.size}>
+                  <option key={p.size} value={p.size} style={{ background: "#0F172A", color: "#FFFFFF" }}>
                     {p.label} People
                   </option>
                 ))}
@@ -452,19 +466,22 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 4: Guaranteed Odds Preview */}
             <div
               style={{
-                background: "rgba(255, 251, 235, 0.9)",
-                border: "1.5px solid #FDE047",
+                background: "rgba(0, 0, 0, 0.4)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid rgba(253, 224, 71, 0.45)",
                 borderRadius: "12px",
                 padding: "8px 12px",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 800, textTransform: "uppercase" }}>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
                 WINNING ODDS
               </span>
-              <span style={{ fontSize: "0.875rem", fontWeight: 900, color: "#D97706" }}>
+              <span style={{ fontSize: "0.875rem", fontWeight: 900, color: "#FDE047" }}>
                 1 in {selectedPool / 10} Odds · 10 Winners
               </span>
             </div>

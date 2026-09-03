@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import {
-  ChevronLeft,
-  ChevronRight,
   Sparkles,
   Clock,
   CheckCircle2,
   Calendar,
+  Pause,
+  Play,
+  ArrowRight,
 } from "lucide-react";
 import type { CMSAdvertisement } from "@/lib/sanity/queries";
 
@@ -27,7 +28,7 @@ const DEFAULT_ADS: AdItem[] = [
     id: "ad-car",
     badge: "🚗 GRAND LUXURY SUV",
     title: "2026 Electric Luxury SUV",
-    subtitle: "100% Guaranteed delivery or full cash equivalent. Featured grand reward in our upcoming luxury pool.",
+    subtitle: "100% Guaranteed delivery or full cash equivalent. Featured grand reward in upcoming pool.",
     estimatedValue: "4,500,000 ETB",
     imageUrl: "/images/ad-luxury-car.jpg",
     statusTag: "⏳ COMING SOON",
@@ -75,13 +76,10 @@ interface AdvertisementCarouselProps {
 }
 
 export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(3);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   // Map CMS ads or fallback to default
-  const ads: AdItem[] =
+  const baseAds: AdItem[] =
     cmsAds && cmsAds.length > 0
       ? cmsAds.map((ad, idx) => ({
           id: ad._id || `ad-${idx}`,
@@ -94,56 +92,41 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
         }))
       : DEFAULT_ADS;
 
-  // Responsive items per view: 3 on Desktop, 2 on Tablet, 1 on Mobile
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 680) {
-        setVisibleCount(1);
-      } else if (window.innerWidth < 1024) {
-        setVisibleCount(2);
-      } else {
-        setVisibleCount(3);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const maxIndex = Math.max(0, ads.length - visibleCount);
-
-  // Auto-scroll every 4 seconds (pauses on hover)
-  useEffect(() => {
-    if (isPaused || maxIndex <= 0) return;
-
-    timeoutRef.current = setTimeout(() => {
-      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-    }, 4000);
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [currentIndex, isPaused, maxIndex]);
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-  };
+  // Quadruple the items to ensure a seamless infinite seamless continuous loop
+  const infiniteAds = [...baseAds, ...baseAds, ...baseAds, ...baseAds];
 
   return (
     <section
       style={{
-        maxWidth: 1220,
-        margin: "0 auto 36px",
-        padding: "0 clamp(14px, 3.5vw, 32px)",
+        maxWidth: 1360,
+        margin: "0 auto",
+        padding: "0 clamp(12px, 3vw, 24px)",
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
-      {/* ── Header Row: Title & Manual Controls ── */}
+      <style>{`
+        @keyframes smoothInfiniteAdScroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .ad-continuous-track {
+          display: flex;
+          gap: 16px;
+          width: max-content;
+          animation: smoothInfiniteAdScroll 38s linear infinite;
+          will-change: transform;
+        }
+        .ad-continuous-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      {/* ── Header Row: Title & Smooth Autoscroll Status ── */}
       <div
         style={{
           display: "flex",
@@ -158,13 +141,13 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
             <span
               style={{
-                background: "#FEF9C3",
-                border: "1px solid #FDE047",
+                background: "rgba(254, 240, 138, 0.9)",
+                border: "1px solid #EAB308",
                 borderRadius: "20px",
                 padding: "2px 9px",
                 fontSize: "0.6875rem",
                 fontWeight: 900,
-                color: "#92400E",
+                color: "#854D0E",
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
                 display: "inline-flex",
@@ -172,7 +155,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                 gap: 4,
               }}
             >
-              <Sparkles size={11} color="#D97706" /> UPCOMING LOTTERIES & ADVERTISEMENTS
+              <Sparkles size={11} color="#B45309" /> UPCOMING LOTTERIES & SPONSOR SHOWCASE
             </span>
           </div>
           <h2
@@ -189,95 +172,67 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
           </h2>
         </div>
 
-        {/* Manual Arrow Controls */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        {/* Hover status hint / Pause toggle */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
             type="button"
-            aria-label="Previous advertisement"
-            onClick={handlePrev}
+            onClick={() => setIsPaused(!isPaused)}
             style={{
               background: "#FFFFFF",
-              border: "1.5px solid #E5E7EB",
-              borderRadius: "50%",
-              width: 36,
-              height: 36,
-              display: "flex",
+              border: "1.5px solid #E2E8F0",
+              borderRadius: "20px",
+              padding: "4px 12px",
+              fontSize: "0.6875rem",
+              fontWeight: 800,
+              color: "#475569",
+              display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center",
+              gap: 5,
               cursor: "pointer",
-              color: "#111827",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.06)",
-              transition: "all 140ms ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#FEF9C3";
-              e.currentTarget.style.borderColor = "#FDE047";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#FFFFFF";
-              e.currentTarget.style.borderColor = "#E5E7EB";
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
             }}
           >
-            <ChevronLeft size={18} />
-          </button>
-
-          <button
-            type="button"
-            aria-label="Next advertisement"
-            onClick={handleNext}
-            style={{
-              background: "#FFFFFF",
-              border: "1.5px solid #E5E7EB",
-              borderRadius: "50%",
-              width: 36,
-              height: 36,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: "#111827",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.06)",
-              transition: "all 140ms ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#FEF9C3";
-              e.currentTarget.style.borderColor = "#FDE047";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#FFFFFF";
-              e.currentTarget.style.borderColor = "#E5E7EB";
-            }}
-          >
-            <ChevronRight size={18} />
+            {isPaused ? (
+              <>
+                <Play size={11} color="#059669" /> Resume Scroll
+              </>
+            ) : (
+              <>
+                <Pause size={11} color="#D97706" /> Hover to Pause
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* ── 3-Card Carousel Track (Shows 3 Cards At A Time on Desktop) ── */}
+      {/* ── Continuous Smooth Marquee Track with Fade Masks ── */}
       <div
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         style={{
-          overflow: "hidden",
+          position: "relative",
           width: "100%",
-          borderRadius: "20px",
+          overflow: "hidden",
+          padding: "6px 0",
+          maskImage: "linear-gradient(to right, transparent, black 2.5%, black 97.5%, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 2.5%, black 97.5%, transparent)",
         }}
       >
         <div
+          className="ad-continuous-track"
           style={{
-            display: "flex",
-            gap: 16,
-            transition: "transform 400ms cubic-bezier(0.25, 1, 0.5, 1)",
-            transform: `translateX(calc(-${currentIndex} * (${100 / visibleCount}% + ${16 / visibleCount}px - ${16 / visibleCount}px)))`,
+            animationPlayState: isPaused ? "paused" : "running",
           }}
         >
-          {ads.map((ad) => (
+          {infiniteAds.map((ad, idx) => (
             <div
-              key={ad.id}
+              key={`${ad.id}-${idx}`}
               style={{
-                flex: `0 0 calc(${100 / visibleCount}% - ${(16 * (visibleCount - 1)) / visibleCount}px)`,
-                minWidth: 0,
-                background: "#FFFDF5",
+                width: "clamp(290px, 28vw, 360px)",
+                flexShrink: 0,
+                background: "rgba(255, 253, 245, 0.95)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
                 borderRadius: "18px",
                 border: "2px solid #F59E0B",
                 boxShadow: "0 6px 18px rgba(245, 158, 11, 0.16), 0 1px 3px rgba(0,0,0,0.05)",
@@ -285,11 +240,11 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                 flexDirection: "column",
                 overflow: "hidden",
                 boxSizing: "border-box",
-                transition: "transform 140ms ease, box-shadow 140ms ease",
+                transition: "transform 180ms ease, box-shadow 180ms ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-3px)";
-                e.currentTarget.style.boxShadow = "0 12px 26px rgba(245, 158, 11, 0.28)";
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 12px 28px rgba(245, 158, 11, 0.3)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
@@ -362,7 +317,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                   <Clock size={10} /> COMING SOON
                 </div>
 
-                {/* Bottom Left Value Pill */}
+                {/* Bottom Left Estimated Value Pill */}
                 <div
                   style={{
                     position: "absolute",
@@ -381,7 +336,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                 </div>
               </div>
 
-              {/* Card Content (Clean Informational Ad Showcase Without Buttons) */}
+              {/* Card Content */}
               <div
                 style={{
                   padding: "14px 16px",
@@ -430,7 +385,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                   </p>
                 </div>
 
-                {/* Bottom Status Footer (No Buy Button) */}
+                {/* Bottom Status Footer (No Buy Buttons) */}
                 <div
                   style={{
                     paddingTop: 8,
@@ -452,36 +407,6 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ── Pagination Indicator Dots ── */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 6,
-          marginTop: 14,
-        }}
-      >
-        {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
-          <button
-            key={idx}
-            type="button"
-            aria-label={`Go to slide group ${idx + 1}`}
-            onClick={() => setCurrentIndex(idx)}
-            style={{
-              width: idx === currentIndex ? 20 : 6,
-              height: 6,
-              borderRadius: 3,
-              background: idx === currentIndex ? "#111827" : "#D1D5DB",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-              transition: "all 200ms ease",
-            }}
-          />
-        ))}
       </div>
     </section>
   );
