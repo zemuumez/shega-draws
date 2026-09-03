@@ -35,16 +35,11 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
 
   // Base navigation links
   const navItems = [
-    { href: "/",              label: "Tickets & Play",  icon: Home },
-    { href: "/how-it-works",  label: "How It Works",    icon: Sparkles },
-    { href: "/results",       label: t.nav.results,     icon: ShieldCheck },
-    { href: "/about",         label: "Why Rimna",       icon: Award },
+    { href: "/",         label: "Draws",       icon: Home },
+    { href: "/entries",  label: "My Tickets",  icon: ListChecks },
+    { href: "/results",  label: "Results",     icon: ShieldCheck },
+    { href: "/about",    label: "Why Rimna",   icon: Award },
   ];
-
-  // Add "My Tickets" ONLY if signed in
-  if (currentUser) {
-    navItems.splice(1, 0, { href: "/entries", label: t.nav.myEntries, icon: ListChecks });
-  }
 
   return (
     <>
@@ -59,7 +54,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         onClose={() => setIsContactOpen(false)}
       />
 
-      {/* ── 1. Top Utility Header Ribbon (High-End Dark Navy & Gold Theme) ─── */}
+      {/* ── 1. Top Utility Header Ribbon (Dark Navy & Gold Theme) ─── */}
       <div
         className="top-utility-ribbon"
         style={{
@@ -81,21 +76,22 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
             href="https://t.me/RimnaLotteryOfficial"
             target="_blank"
             rel="noreferrer"
-            className="top-ribbon-telegram"
             style={{ display: "flex", alignItems: "center", gap: 5, color: "#FDE047", fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}
           >
             <Send size={12} color="#FDE047" /> <span className="hide-on-mobile">Official Telegram:</span> @RimnaLottery
           </a>
           <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
-          <span className="top-ribbon-hotline" style={{ display: "flex", alignItems: "center", gap: 5, color: "#D1D5DB", fontWeight: 700, whiteSpace: "nowrap" }}>
-            <Phone size={12} color="#10B981" /> <span className="hide-on-mobile">24/7 Hotline:</span> +251 911 000 000
+          <span className="hide-on-mobile" style={{ display: "flex", alignItems: "center", gap: 5, color: "#D1D5DB", fontWeight: 700, whiteSpace: "nowrap" }}>
+            <Phone size={12} color="#10B981" /> 24/7 Hotline: +251 911 000 000
           </span>
         </div>
 
         {/* Quick Login & Language */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-          <LanguageSwitcher />
-          <span style={{ color: "#4B5563" }}>|</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          <div className="hide-on-mobile">
+            <LanguageSwitcher />
+          </div>
+          <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
           {currentUser ? (
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span className="mono" style={{ color: "#FDE047", fontWeight: 800, fontSize: "0.6875rem" }}>
@@ -132,7 +128,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         </div>
       </div>
 
-      {/* ── 2. Main Symmetrical Navigation Bar (Left Links · Center Logo · Right Actions) ───── */}
+      {/* ── 2. Main Navigation Bar (Desktop Grid · Mobile Flex with Breadcrumb) ───── */}
       <nav
         aria-label="Main navigation"
         className="main-navbar"
@@ -151,8 +147,8 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           boxSizing: "border-box",
         }}
       >
-        {/* Left Side: Navigation Links */}
-        <div style={{ display: "flex", gap: 6, alignItems: "center", justifySelf: "start" }}>
+        {/* Desktop Left: Navigation Links */}
+        <div className="desktop-nav-links">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href));
             return (
@@ -166,7 +162,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
                   padding: "6px 12px",
                   color: "#111827",
                   fontSize: "0.8125rem",
-                  fontWeight: active ? 900 : 700,
+                  fontWeight: 900,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -183,48 +179,43 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
           })}
         </div>
 
-        {/* Center: Brand Logo Ribbon Badge (Centered) */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", justifySelf: "center" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <div
-              className="brand-badge"
+        {/* Center / Brand Logo & Text (Only Logo & Text, No Golden Wrapper) */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              textDecoration: "none",
+              padding: "4px 0",
+            }}
+          >
+            <Image
+              src="/images/rimna-logo.png"
+              alt="Rimna Logo"
+              width={32}
+              height={32}
+              style={{ borderRadius: "50%", objectFit: "cover" }}
+            />
+            <span
+              className="display brand-text"
               style={{
-                padding: "4px clamp(10px, 2vw, 18px)",
-                borderRadius: "24px",
-                background: "linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%)",
-                boxShadow: "0 3px 10px rgba(234, 179, 8, 0.45)",
-                border: "1.5px solid #FEF08A",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
+                fontSize: "clamp(1.1rem, 2.2vw, 1.4rem)",
+                color: "#111827",
+                fontWeight: 900,
+                letterSpacing: "-0.3px",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
               }}
             >
-              <Image
-                src="/images/rimna-logo.png"
-                alt="Rimna Logo"
-                width={26}
-                height={26}
-                style={{ borderRadius: "50%", objectFit: "cover" }}
-              />
-              <span
-                className="display brand-text"
-                style={{
-                  fontSize: "clamp(0.95rem, 2vw, 1.2rem)",
-                  color: "#111827",
-                  fontWeight: 900,
-                  letterSpacing: "-0.3px",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Rimna Lottery
-              </span>
-            </div>
+              Rimna Lottery
+            </span>
           </Link>
         </div>
 
-        {/* Right Side: Contact Us CTA */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, justifySelf: "end" }}>
+        {/* Desktop Right: Contact Us Button */}
+        <div className="desktop-contact-btn" style={{ justifySelf: "end" }}>
           <button
             type="button"
             onClick={() => setIsContactOpen(true)}
@@ -238,7 +229,97 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
             <Phone size={13} /> <span className="contact-btn-text">Contact Us</span>
           </button>
         </div>
+
+        {/* Mobile Right: Breadcrumb Hamburger Menu Button */}
+        <button
+          type="button"
+          aria-label="Toggle navigation menu"
+          className="mobile-breadcrumb-btn"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={20} color="#111827" /> : <Menu size={20} color="#111827" />}
+        </button>
       </nav>
+
+      {/* ── 3. Mobile Slide-Down Breadcrumb Menu Drawer ───── */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-drawer animate-fade">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {navItems.map(({ href, label, icon: Icon }) => {
+              const active = pathname === href || (href !== "/" && pathname.startsWith(href));
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{
+                    background: active ? "#FEF9C3" : "#FAFAFA",
+                    border: active ? "1.5px solid #FDE047" : "1px solid #E5E7EB",
+                    borderRadius: 8,
+                    padding: "10px 14px",
+                    color: "#111827",
+                    fontSize: "0.9375rem",
+                    fontWeight: active ? 900 : 700,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    textDecoration: "none",
+                  }}
+                >
+                  <Icon size={18} color={active ? "#D97706" : "#4B5563"} />
+                  {label}
+                </Link>
+              );
+            })}
+
+            {/* Mobile Language Switcher */}
+            <div style={{ padding: "8px 0 4px", borderTop: "1px solid #E5E7EB", marginTop: 4 }}>
+              <span style={{ fontSize: "0.75rem", color: "#6B7280", fontWeight: 700, display: "block", marginBottom: 6 }}>
+                🌐 Choose Language / ቋንቋ ምረጡ
+              </span>
+              <LanguageSwitcher />
+            </div>
+
+            {/* Mobile Hotline */}
+            <a
+              href="tel:+251911000000"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#111827",
+                fontSize: "0.875rem",
+                fontWeight: 700,
+                textDecoration: "none",
+                background: "#F9FAFB",
+                border: "1px solid #E5E7EB",
+                padding: "8px 12px",
+                borderRadius: 8,
+              }}
+            >
+              <Phone size={15} color="#10B981" /> 24/7 Hotline: +251 911 000 000
+            </a>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setIsContactOpen(true);
+              }}
+              className="casino-btn-gold"
+              style={{
+                marginTop: 4,
+                padding: "11px 16px",
+                fontSize: "0.9375rem",
+                width: "100%",
+                justifyContent: "center",
+              }}
+            >
+              <Phone size={16} /> Contact Us
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
