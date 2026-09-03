@@ -11,6 +11,7 @@ import {
   type CMSAdvertisement,
 } from "@/lib/sanity/queries";
 import { CinematicStadiumHero } from "@/components/CinematicStadiumHero";
+import { PaymentLogosFarm } from "@/components/PaymentLogosFarm";
 import { AdvertisementCarousel } from "@/components/AdvertisementCarousel";
 import { InteractiveTicketConfigurator } from "@/components/InteractiveTicketConfigurator";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
@@ -116,11 +117,11 @@ export default async function HomePage() {
         />
 
         {/* 1. Screenful Cinematic Hero */}
-        <div style={{ position: "relative", zIndex: 2, marginBottom: "clamp(48px, 6vw, 76px)" }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <CinematicStadiumHero />
         </div>
 
-        {/* 2. Promotional Advertisements & Teasers (Translucent Champagne Frosted Layer with Generous Vertical Breathing Room) */}
+        {/* 2. Promotional Advertisements & Teasers (Containing Payment Gateways at the Top) */}
         <section
           style={{
             position: "relative",
@@ -130,10 +131,16 @@ export default async function HomePage() {
             WebkitBackdropFilter: "blur(14px)",
             borderTop: "1.5px solid rgba(239, 232, 216, 0.7)",
             borderBottom: "1.5px solid rgba(239, 232, 216, 0.7)",
-            padding: "64px 0 60px",
+            padding: "clamp(36px, 4.5vw, 56px) 0 clamp(48px, 6vw, 68px)",
             width: "100%",
           }}
         >
+          {/* Top Payment Logos Farm */}
+          <div style={{ marginBottom: "clamp(36px, 5vw, 56px)" }}>
+            <PaymentLogosFarm />
+          </div>
+
+          {/* Advertisement Showcase */}
           <AdvertisementCarousel cmsAds={ads} />
         </section>
 
