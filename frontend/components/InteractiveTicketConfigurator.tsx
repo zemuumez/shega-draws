@@ -112,36 +112,42 @@ export function InteractiveTicketConfigurator() {
   return (
     <div
       style={{
-        background: "rgba(255, 253, 245, 0.90)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        background: "rgba(255, 255, 255, 0.42)",
+        backdropFilter: "blur(28px) saturate(180%)",
+        WebkitBackdropFilter: "blur(28px) saturate(180%)",
         borderRadius: "24px",
-        padding: "clamp(16px, 2.5vw, 26px)",
-        border: "2px solid rgba(245, 158, 11, 0.75)",
-        boxShadow: "0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(254, 240, 138, 0.6)",
+        padding: "clamp(14px, 2.5vw, 24px)",
+        border: "2px solid rgba(253, 224, 71, 0.75)",
+        boxShadow:
+          "0 32px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.8)",
         position: "relative",
+        boxSizing: "border-box",
       }}
     >
-      {/* ── 1. Compact Header Bar ───────────────────────────────────── */}
+      {/* ── 1. Compact Glass Header Bar ────────────────────────────── */}
       <div
         style={{
-          marginBottom: 16,
+          marginBottom: 14,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
           gap: 8,
-          borderBottom: "1.5px solid rgba(253, 224, 71, 0.7)",
-          paddingBottom: 12,
+          borderBottom: "1.5px solid rgba(253, 224, 71, 0.55)",
+          paddingBottom: 10,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Image
             src="/images/rimna-logo.png"
             alt="Rimna Emblem"
-            width={28}
-            height={28}
-            style={{ borderRadius: "50%", objectFit: "cover" }}
+            width={30}
+            height={30}
+            style={{
+              borderRadius: "50%",
+              objectFit: "cover",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            }}
           />
           <div>
             <h2
@@ -152,6 +158,7 @@ export function InteractiveTicketConfigurator() {
                 color: "#111827",
                 margin: 0,
                 lineHeight: 1.1,
+                textShadow: "0 1px 2px rgba(255,255,255,0.8)",
               }}
             >
               Interactive Ticket Configurator
@@ -164,6 +171,7 @@ export function InteractiveTicketConfigurator() {
                 textTransform: "uppercase",
                 fontWeight: 800,
                 letterSpacing: "0.5px",
+                display: "block",
               }}
             >
               Capped Pools · 10 Guaranteed Winners · 100% Video Draw
@@ -175,32 +183,34 @@ export function InteractiveTicketConfigurator() {
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span
             style={{
-              background: "rgba(254, 249, 195, 0.9)",
-              border: "1px solid #FDE047",
-              color: "#92400E",
+              background: "rgba(254, 240, 138, 0.95)",
+              border: "1px solid #EAB308",
+              color: "#854D0E",
               fontSize: "0.6875rem",
-              fontWeight: 800,
+              fontWeight: 900,
               padding: "3px 8px",
               borderRadius: "14px",
               display: "inline-flex",
               alignItems: "center",
               gap: 4,
+              boxShadow: "0 2px 6px rgba(234, 179, 8, 0.25)",
             }}
           >
-            <Trophy size={11} color="#D97706" /> 10 Winners
+            <Trophy size={11} color="#B45309" /> 10 Winners
           </span>
           <span
             style={{
-              background: "rgba(236, 253, 245, 0.9)",
-              border: "1px solid #A7F3D0",
+              background: "rgba(236, 253, 245, 0.95)",
+              border: "1px solid #10B981",
               color: "#065F46",
               fontSize: "0.6875rem",
-              fontWeight: 800,
+              fontWeight: 900,
               padding: "3px 8px",
               borderRadius: "14px",
               display: "inline-flex",
               alignItems: "center",
               gap: 4,
+              boxShadow: "0 2px 6px rgba(16, 185, 129, 0.2)",
             }}
           >
             <CheckCircle2 size={11} color="#059669" /> Live Video
@@ -208,31 +218,38 @@ export function InteractiveTicketConfigurator() {
         </div>
       </div>
 
-      {/* ── 2. Main Two-Column Space-Optimized Grid ───────────────── */}
+      {/* ── 2. Main Two-Column Translucent Floating Grid ───────────── */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: "clamp(14px, 2vw, 20px)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(310px, 1fr))",
+          gap: "clamp(12px, 2vw, 18px)",
           alignItems: "stretch",
         }}
       >
-        {/* ── LEFT COLUMN: Modern Segmented Pill Controls ───────── */}
+        {/* ── LEFT COLUMN: Translucent Frosted Glass Controls ───── */}
         <div
           style={{
+            background: "rgba(255, 255, 255, 0.62)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderRadius: "16px",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            padding: "clamp(12px, 2vw, 16px)",
             display: "flex",
             flexDirection: "column",
             gap: 12,
             justifyContent: "space-between",
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
           }}
         >
-          {/* A. CURRENCY SELECTOR (Modern Segmented Switch) */}
+          {/* A. CURRENCY SELECTOR */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase" }}>
                 1. CURRENCY
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "#6B7280", fontWeight: 700 }}>
+              <span style={{ fontSize: "0.6875rem", color: "#4B5563", fontWeight: 800 }}>
                 {isUSD ? "International / Diaspora" : "Ethiopia National"}
               </span>
             </div>
@@ -242,7 +259,7 @@ export function InteractiveTicketConfigurator() {
                 background: "rgba(241, 245, 249, 0.85)",
                 borderRadius: "10px",
                 padding: 3,
-                border: "1.5px solid rgba(226, 232, 240, 0.9)",
+                border: "1px solid rgba(203, 213, 225, 0.8)",
                 width: "100%",
                 boxSizing: "border-box",
               }}
@@ -262,7 +279,7 @@ export function InteractiveTicketConfigurator() {
                   cursor: "pointer",
                   transition: "all 0.12s ease",
                   textAlign: "center",
-                  boxShadow: currency === "ETB" ? "0 2px 4px rgba(234, 179, 8, 0.25)" : "none",
+                  boxShadow: currency === "ETB" ? "0 2px 6px rgba(234, 179, 8, 0.3)" : "none",
                 }}
               >
                 🇪🇹 ETB (Birr)
@@ -283,7 +300,7 @@ export function InteractiveTicketConfigurator() {
                   cursor: "pointer",
                   transition: "all 0.12s ease",
                   textAlign: "center",
-                  boxShadow: currency === "USD" ? "0 2px 4px rgba(29, 78, 216, 0.2)" : "none",
+                  boxShadow: currency === "USD" ? "0 2px 6px rgba(29, 78, 216, 0.25)" : "none",
                 }}
               >
                 🇺🇸 USD ($)
@@ -291,13 +308,13 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* B. TICKET PRICE SELECTION (Compact 4-Pill Grid) */}
+          {/* B. TICKET PRICE SELECTION */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase" }}>
                 2. TICKET PRICE
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "#B45309", fontWeight: 800 }}>
+              <span style={{ fontSize: "0.6875rem", color: "#B45309", fontWeight: 900 }}>
                 Selected: {formatMoney(selectedPrice)}
               </span>
             </div>
@@ -319,13 +336,13 @@ export function InteractiveTicketConfigurator() {
                     style={{
                       padding: "8px 4px",
                       borderRadius: "10px",
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(226, 232, 240, 0.8)",
-                      background: isSelected ? "rgba(254, 249, 195, 0.95)" : "rgba(255, 255, 255, 0.85)",
+                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(255, 255, 255, 0.9)",
+                      background: isSelected ? "#FEF9C3" : "rgba(255, 255, 255, 0.82)",
                       color: "#111827",
                       cursor: "pointer",
                       textAlign: "center",
                       transition: "all 0.12s ease",
-                      boxShadow: isSelected ? "0 2px 8px rgba(245, 158, 11, 0.25)" : "0 1px 2px rgba(0,0,0,0.02)",
+                      boxShadow: isSelected ? "0 4px 12px rgba(245, 158, 11, 0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
                     }}
                   >
                     <div
@@ -355,13 +372,13 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* C. PARTICIPANT POOL SELECTION (Compact 4-Pill Grid) */}
+          {/* C. PARTICIPANT POOL SELECTION */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase" }}>
                 3. PARTICIPANT POOL
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "#6B7280", fontWeight: 700 }}>
+              <span style={{ fontSize: "0.6875rem", color: "#4B5563", fontWeight: 800 }}>
                 {currentPoolObj.ticketsCount}
               </span>
             </div>
@@ -383,13 +400,13 @@ export function InteractiveTicketConfigurator() {
                     style={{
                       padding: "8px 4px",
                       borderRadius: "10px",
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(226, 232, 240, 0.8)",
-                      background: isSelected ? "rgba(254, 240, 138, 0.95)" : "rgba(255, 255, 255, 0.85)",
+                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(255, 255, 255, 0.9)",
+                      background: isSelected ? "#FEF08A" : "rgba(255, 255, 255, 0.82)",
                       color: isSelected ? "#854D0E" : "#374151",
                       cursor: "pointer",
                       textAlign: "center",
                       transition: "all 0.12s ease",
-                      boxShadow: isSelected ? "0 2px 8px rgba(245, 158, 11, 0.25)" : "0 1px 2px rgba(0,0,0,0.02)",
+                      boxShadow: isSelected ? "0 4px 12px rgba(245, 158, 11, 0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
                     }}
                   >
                     <div
@@ -420,11 +437,11 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* D. TOP PRIZES (Expandable: Top 3 vs All 10 Guaranteed Payouts) */}
+          {/* D. TOP PRIZES */}
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.88)",
-              border: "1.5px solid #FDE047",
+              background: "rgba(255, 255, 255, 0.82)",
+              border: "1.5px solid rgba(253, 224, 71, 0.9)",
               borderRadius: "12px",
               padding: "8px 10px",
             }}
@@ -442,7 +459,7 @@ export function InteractiveTicketConfigurator() {
                   border: "none",
                   color: "#B45309",
                   fontSize: "0.6875rem",
-                  fontWeight: 800,
+                  fontWeight: 900,
                   cursor: "pointer",
                   display: "inline-flex",
                   alignItems: "center",
@@ -509,28 +526,28 @@ export function InteractiveTicketConfigurator() {
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN: Space-Optimized Translucent Ticket Card & Stat Grid ── */}
+        {/* ── RIGHT COLUMN: Translucent Floating Summary Card & Stat Grid ── */}
         <div
           style={{
-            background: "rgba(255, 255, 255, 0.92)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
+            background: "rgba(255, 255, 255, 0.72)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
             border: "2px solid #F59E0B",
-            borderRadius: "14px",
+            borderRadius: "16px",
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
+            boxShadow: "0 12px 36px rgba(0, 0, 0, 0.15)",
           }}
         >
-          {/* Slim Compact Header Banner (Reduced Visual Weight) */}
+          {/* Header Banner */}
           <div
             style={{
               position: "relative",
               width: "100%",
-              height: 56,
-              background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
+              height: 54,
+              background: "linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -547,7 +564,7 @@ export function InteractiveTicketConfigurator() {
             </div>
             <span
               style={{
-                background: "rgba(253, 224, 71, 0.2)",
+                background: "rgba(253, 224, 71, 0.25)",
                 border: "1px solid #FDE047",
                 color: "#FEF08A",
                 fontSize: "0.625rem",
@@ -560,18 +577,18 @@ export function InteractiveTicketConfigurator() {
             </span>
           </div>
 
-          {/* Compact 2x3 Stat Grid */}
+          {/* Translucent 2x3 Stat Grid */}
           <div
             style={{
               padding: "12px 14px",
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               gap: 8,
-              background: "rgba(255, 253, 249, 0.8)",
+              background: "rgba(255, 253, 249, 0.4)",
             }}
           >
             {/* Stat 1: Total Prize Pool */}
-            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+            <div style={{ background: "rgba(255, 255, 255, 0.92)", border: "1px solid rgba(229, 231, 235, 0.9)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
               <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
                 TOTAL PRIZE POOL
               </span>
@@ -581,7 +598,7 @@ export function InteractiveTicketConfigurator() {
             </div>
 
             {/* Stat 2: 1st Jackpot Prize */}
-            <div style={{ background: "rgba(254, 249, 195, 0.95)", border: "1px solid #FDE047", borderRadius: "8px", padding: "6px 8px" }}>
+            <div style={{ background: "rgba(254, 249, 195, 0.95)", border: "1px solid #FDE047", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(234, 179, 8, 0.15)" }}>
               <span style={{ fontSize: "0.625rem", color: "#854D0E", fontWeight: 800, display: "block" }}>
                 1ST GRAND JACKPOT
               </span>
@@ -591,7 +608,7 @@ export function InteractiveTicketConfigurator() {
             </div>
 
             {/* Stat 3: Participants */}
-            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+            <div style={{ background: "rgba(255, 255, 255, 0.92)", border: "1px solid rgba(229, 231, 235, 0.9)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
               <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
                 POOL CAPACITY
               </span>
@@ -601,7 +618,7 @@ export function InteractiveTicketConfigurator() {
             </div>
 
             {/* Stat 4: Winning Odds */}
-            <div style={{ background: "rgba(236, 253, 245, 0.95)", border: "1px solid #A7F3D0", borderRadius: "8px", padding: "6px 8px" }}>
+            <div style={{ background: "rgba(236, 253, 245, 0.95)", border: "1px solid #A7F3D0", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(16, 185, 129, 0.15)" }}>
               <span style={{ fontSize: "0.625rem", color: "#065F46", fontWeight: 800, display: "block" }}>
                 WINNING ODDS
               </span>
@@ -611,7 +628,7 @@ export function InteractiveTicketConfigurator() {
             </div>
 
             {/* Stat 5: Guaranteed Winners */}
-            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+            <div style={{ background: "rgba(255, 255, 255, 0.92)", border: "1px solid rgba(229, 231, 235, 0.9)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
               <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
                 CASH WINNERS
               </span>
@@ -621,7 +638,7 @@ export function InteractiveTicketConfigurator() {
             </div>
 
             {/* Stat 6: Draw Date */}
-            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+            <div style={{ background: "rgba(255, 255, 255, 0.92)", border: "1px solid rgba(229, 231, 235, 0.9)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
               <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
                 DRAW BROADCAST
               </span>
@@ -631,8 +648,8 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* Action CTA & Quick Links */}
-          <div style={{ padding: "10px 14px 12px", borderTop: "1px solid rgba(229, 231, 235, 0.8)", background: "rgba(255, 255, 255, 0.95)" }}>
+          {/* Action CTA */}
+          <div style={{ padding: "10px 14px 12px", borderTop: "1px solid rgba(229, 231, 235, 0.8)", background: "rgba(255, 255, 255, 0.92)" }}>
             <button
               type="button"
               onClick={() => setIsBuyModalOpen(true)}
@@ -648,7 +665,7 @@ export function InteractiveTicketConfigurator() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                boxShadow: "0 4px 12px rgba(220, 38, 38, 0.4)",
+                boxShadow: "0 4px 14px rgba(220, 38, 38, 0.45)",
               }}
             >
               <Ticket size={16} /> Buy Ticket — {formatMoney(selectedPrice)}
@@ -677,7 +694,7 @@ export function InteractiveTicketConfigurator() {
                   alignItems: "center",
                   gap: 3,
                   fontSize: "0.6875rem",
-                  color: "#6B7280",
+                  color: "#4B5563",
                   textDecoration: "none",
                   fontWeight: 700,
                 }}
