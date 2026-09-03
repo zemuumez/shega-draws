@@ -97,7 +97,7 @@ export function PaymentLogosFarm() {
           position: "relative",
         }}
       >
-        {/* Horizontal Hover-Scrollable Track */}
+        {/* Horizontal Hover-Scrollable Track with Uniform Height and Width for All Logos */}
         <div
           ref={scrollRef}
           onWheel={handleWheel}
@@ -109,12 +109,12 @@ export function PaymentLogosFarm() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "clamp(28px, 4vw, 56px)",
+            gap: "clamp(18px, 2.5vw, 32px)",
             overflowX: "auto",
             overflowY: "hidden",
             scrollBehavior: isDragging ? "auto" : "smooth",
             cursor: isDragging ? "grabbing" : "grab",
-            padding: "8px 4px",
+            padding: "8px 4px 12px",
             userSelect: "none",
             WebkitOverflowScrolling: "touch",
             maskImage: "linear-gradient(to right, transparent, black 1.5%, black 98.5%, transparent)",
@@ -126,14 +126,21 @@ export function PaymentLogosFarm() {
               key={`${logo.id}-${idx}`}
               title={logo.name}
               style={{
-                height: "clamp(80px, 9.5vw, 108px)",
-                width: "clamp(145px, 14vw, 195px)",
+                height: "clamp(68px, 7.5vw, 84px)",
+                width: "clamp(150px, 14vw, 190px)",
+                minWidth: "clamp(150px, 14vw, 190px)",
+                maxWidth: "clamp(150px, 14vw, 190px)",
                 flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 boxSizing: "border-box",
-                padding: 0,
+                padding: "6px 12px",
+                background: "rgba(255, 255, 255, 0.6)",
+                border: "1px solid rgba(229, 231, 235, 0.8)",
+                borderRadius: "14px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.03)",
+                transition: "all 180ms ease",
               }}
             >
               <div
@@ -147,7 +154,7 @@ export function PaymentLogosFarm() {
                   transition: "transform 180ms ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.08)";
+                  e.currentTarget.style.transform = "scale(1.06)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "scale(1)";
