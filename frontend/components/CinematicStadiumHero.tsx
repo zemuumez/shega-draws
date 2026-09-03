@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -55,54 +54,37 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
     <section
       style={{
         position: "relative",
-        minHeight: "90vh",
+        minHeight: "88vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: "radial-gradient(ellipse at center, #1E293B 0%, #0F172A 70%, #020617 100%)",
+        background: "transparent",
         overflow: "hidden",
         color: "#FFFFFF",
         paddingBottom: "clamp(32px, 6vw, 64px)",
       }}
     >
-      {/* ── 1. Full Panoramic Background Image (Custom AI Generated Arena) ── */}
+      {/* ── 1. Gradient Highlights Over Fixed Background ── */}
       <div
         style={{
           position: "absolute",
           inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.35) 45%, rgba(15, 23, 42, 0.75) 100%)",
           zIndex: 0,
+          pointerEvents: "none",
         }}
-      >
-        <Image
-          src="/images/rimna-stadium-hero.jpg"
-          alt="Rimna Digital Lottery Grand Live Drawing Arena"
-          fill
-          priority
-          style={{
-            objectFit: "cover",
-            objectPosition: "center center",
-            filter: "brightness(0.8) contrast(1.15)",
-          }}
-        />
-
-        {/* Rich Cinematic Warm Gold & Deep Navy Gradient Overlays */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.4) 45%, rgba(15, 23, 42, 0.88) 100%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.18) 0%, transparent 65%)",
-          }}
-        />
-      </div>
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 50% 40%, rgba(234, 179, 8, 0.16) 0%, transparent 65%)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
 
       {/* ── 2. Interactive 3D Canvas Floating Particles ── */}
       <FloatingParticlesCanvas />
@@ -185,7 +167,9 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             style={{
               width: "100%",
               maxWidth: 420,
-              background: "#FFFDF5",
+              background: "rgba(255, 253, 245, 0.94)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
               borderRadius: "24px",
               border: "2.5px solid #F59E0B",
               padding: "24px 22px",
@@ -287,7 +271,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
         </div>
       </div>
 
-      {/* ── 4. Bottom Overlapping Quick-Tier Bar (Warm Casino Gold & Red Theme) ── */}
+      {/* ── 4. Bottom Overlapping Quick-Tier Bar ── */}
       <div
         style={{
           position: "relative",
@@ -301,7 +285,9 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
       >
         <div
           style={{
-            background: "#FFFDF5",
+            background: "rgba(255, 253, 245, 0.94)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
             borderRadius: "22px",
             border: "2px solid #F59E0B",
             padding: "18px clamp(16px, 2.5vw, 24px)",
@@ -337,7 +323,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 1: Currency Toggle */}
             <div
               style={{
-                background: "#FFFBEB",
+                background: "rgba(255, 251, 235, 0.9)",
                 border: "1.5px solid #FDE047",
                 borderRadius: "12px",
                 padding: "8px 12px",
@@ -392,7 +378,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 2: Ticket Price */}
             <div
               style={{
-                background: "#FFFBEB",
+                background: "rgba(255, 251, 235, 0.9)",
                 border: "1.5px solid #FDE047",
                 borderRadius: "12px",
                 padding: "8px 12px",
@@ -429,7 +415,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 3: Pool Capacity */}
             <div
               style={{
-                background: "#FFFBEB",
+                background: "rgba(255, 251, 235, 0.9)",
                 border: "1.5px solid #FDE047",
                 borderRadius: "12px",
                 padding: "8px 12px",
@@ -466,7 +452,7 @@ export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps
             {/* Slot 4: Guaranteed Odds Preview */}
             <div
               style={{
-                background: "#FFFBEB",
+                background: "rgba(255, 251, 235, 0.9)",
                 border: "1.5px solid #FDE047",
                 borderRadius: "12px",
                 padding: "8px 12px",

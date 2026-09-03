@@ -5,7 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { type Currency } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { Trophy, Users, ArrowUpRight, Award, CheckCircle2, Ticket, HelpCircle } from "lucide-react";
+import {
+  Trophy,
+  Users,
+  ArrowUpRight,
+  Award,
+  CheckCircle2,
+  Ticket,
+  HelpCircle,
+  Percent,
+  Calendar,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { BuyTicketModal } from "./BuyTicketModal";
 
 interface PriceOption {
@@ -41,11 +54,18 @@ const POOLS: PoolOption[] = [
   { size: 5000, label: "5K", ticketsCount: "5,000 tickets" },
 ];
 
-// Top 3 Prize distribution percentages
-const TOP_3_PRIZES = [
-  { rank: 1, percent: 0.30, label: "1st Prize · Grand Jackpot", color: "gold" },
-  { rank: 2, percent: 0.20, label: "2nd Prize · Luxury Reward", color: "silver" },
-  { rank: 3, percent: 0.15, label: "3rd Prize · High Cash", color: "bronze" },
+// All 10 Guaranteed Prize distribution percentages (Sums to 100%)
+const ALL_10_PRIZES = [
+  { rank: 1, percent: 0.30, label: "1st Grand Jackpot", tag: "30%" },
+  { rank: 2, percent: 0.20, label: "2nd Luxury Prize", tag: "20%" },
+  { rank: 3, percent: 0.15, label: "3rd High Cash", tag: "15%" },
+  { rank: 4, percent: 0.08, label: "4th Cash Prize", tag: "8%" },
+  { rank: 5, percent: 0.06, label: "5th Cash Prize", tag: "6%" },
+  { rank: 6, percent: 0.05, label: "6th Cash Prize", tag: "5%" },
+  { rank: 7, percent: 0.04, label: "7th Cash Prize", tag: "4%" },
+  { rank: 8, percent: 0.04, label: "8th Cash Prize", tag: "4%" },
+  { rank: 9, percent: 0.04, label: "9th Cash Prize", tag: "4%" },
+  { rank: 10, percent: 0.04, label: "10th Cash Prize", tag: "4%" },
 ];
 
 export function InteractiveTicketConfigurator() {
@@ -54,6 +74,7 @@ export function InteractiveTicketConfigurator() {
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState<boolean>(false);
+  const [showAllPrizes, setShowAllPrizes] = useState<boolean>(false);
 
   const isUSD = currency === "USD";
   const currentPrices = isUSD ? USD_PRICES : ETB_PRICES;
@@ -78,118 +99,150 @@ export function InteractiveTicketConfigurator() {
     return `${amount.toLocaleString()} ETB`;
   };
 
-  // Top 3 Prizes List
-  const calculatedTop3Prizes = TOP_3_PRIZES.map((p) => ({
+  // Calculate all 10 prizes based on live pool total
+  const calculatedAll10Prizes = ALL_10_PRIZES.map((p) => ({
     rank: p.rank,
     label: p.label,
+    tag: p.tag,
     amount: formatMoney(Math.round(totalPrizePool * p.percent)),
-    color: p.color,
   }));
 
+  const visiblePrizes = showAllPrizes ? calculatedAll10Prizes : calculatedAll10Prizes.slice(0, 3);
+
   return (
-    <section
-      id="choose-ticket"
-      className="card-base rough-paper-ticket"
+    <div
       style={{
-        background: "#FFFDF5",
-        borderRadius: "20px",
-        padding: "clamp(16px, 3.5vw, 36px)",
-        border: "2px solid #F59E0B",
-        boxShadow: "0 10px 30px rgba(245, 158, 11, 0.1), 0 4px 12px rgba(0, 0, 0, 0.04)",
+        background: "rgba(255, 253, 245, 0.90)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderRadius: "24px",
+        padding: "clamp(16px, 2.5vw, 26px)",
+        border: "2px solid rgba(245, 158, 11, 0.75)",
+        boxShadow: "0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(254, 240, 138, 0.6)",
         position: "relative",
       }}
     >
-      {/* ── Top Header Strip ─────────────────────────────────────────── */}
-      <div style={{ marginBottom: 22, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      {/* ── 1. Compact Header Bar ───────────────────────────────────── */}
+      <div
+        style={{
+          marginBottom: 16,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 8,
+          borderBottom: "1.5px solid rgba(253, 224, 71, 0.7)",
+          paddingBottom: 12,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Image
             src="/images/rimna-logo.png"
-            alt="Rimna Logo"
-            width={36}
-            height={36}
-            style={{ borderRadius: "50%", objectFit: "cover", border: "1.5px solid #F59E0B" }}
+            alt="Rimna Emblem"
+            width={28}
+            height={28}
+            style={{ borderRadius: "50%", objectFit: "cover" }}
           />
           <div>
-            <span
+            <h2
               className="display"
               style={{
-                fontSize: "clamp(1.15rem, 2.5vw, 1.55rem)",
+                fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
                 fontWeight: 900,
                 color: "#111827",
+                margin: 0,
                 lineHeight: 1.1,
-                display: "block",
-                letterSpacing: "-0.3px",
               }}
             >
-              RIMNA
-            </span>
+              Interactive Ticket Configurator
+            </h2>
             <span
               className="mono"
               style={{
                 fontSize: "0.625rem",
-                color: "#6B7280",
+                color: "#78350F",
                 textTransform: "uppercase",
-                letterSpacing: "1px",
                 fontWeight: 800,
+                letterSpacing: "0.5px",
               }}
             >
-              INTERNATIONAL DIGITAL LOTTERY
+              Capped Pools · 10 Guaranteed Winners · 100% Video Draw
             </span>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-          <span className="badge badge-gold" style={{ fontSize: "0.75rem", fontWeight: 800, padding: "4px 10px" }}>
-            <Trophy size={13} color="#D97706" /> 10 Guaranteed Winners
+        {/* Header Badges */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span
+            style={{
+              background: "rgba(254, 249, 195, 0.9)",
+              border: "1px solid #FDE047",
+              color: "#92400E",
+              fontSize: "0.6875rem",
+              fontWeight: 800,
+              padding: "3px 8px",
+              borderRadius: "14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <Trophy size={11} color="#D97706" /> 10 Winners
           </span>
-          <span className="badge badge-green" style={{ fontSize: "0.75rem", fontWeight: 800, padding: "4px 10px" }}>
-            <CheckCircle2 size={13} color="#059669" /> Public Video Draw
+          <span
+            style={{
+              background: "rgba(236, 253, 245, 0.9)",
+              border: "1px solid #A7F3D0",
+              color: "#065F46",
+              fontSize: "0.6875rem",
+              fontWeight: 800,
+              padding: "3px 8px",
+              borderRadius: "14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <CheckCircle2 size={11} color="#059669" /> Live Video
           </span>
         </div>
       </div>
 
-      {/* ── Main Two-Column Grid Layout with Equal Vertical Height ──── */}
+      {/* ── 2. Main Two-Column Space-Optimized Grid ───────────────── */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))",
-          gap: "clamp(20px, 3vw, 36px)",
-          alignItems: "stretch", // Ensures both columns have 100% equal vertical space on desktop!
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "clamp(14px, 2vw, 20px)",
+          alignItems: "stretch",
         }}
       >
-        {/* ── LEFT COLUMN: Configuration Controls & Top 3 Prizes (Equal Height) ── */}
+        {/* ── LEFT COLUMN: Modern Segmented Pill Controls ───────── */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
+            gap: 12,
             justifyContent: "space-between",
-            gap: 16,
-            height: "100%",
           }}
         >
-          {/* 1. CURRENCY SELECTOR (Full Width Pill) */}
+          {/* A. CURRENCY SELECTOR (Modern Segmented Switch) */}
           <div>
-            <label
-              className="mono"
-              style={{
-                fontSize: "0.75rem",
-                color: "#6B7280",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                fontWeight: 900,
-                display: "block",
-                marginBottom: 6,
-              }}
-            >
-              CURRENCY
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase" }}>
+                1. CURRENCY
+              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#6B7280", fontWeight: 700 }}>
+                {isUSD ? "International / Diaspora" : "Ethiopia National"}
+              </span>
+            </div>
             <div
               style={{
                 display: "flex",
-                background: "#F3F4F6",
-                borderRadius: "14px",
-                padding: 4,
-                border: "1.5px solid #E5E7EB",
+                background: "rgba(241, 245, 249, 0.85)",
+                borderRadius: "10px",
+                padding: 3,
+                border: "1.5px solid rgba(226, 232, 240, 0.9)",
                 width: "100%",
                 boxSizing: "border-box",
               }}
@@ -199,20 +252,20 @@ export function InteractiveTicketConfigurator() {
                 onClick={() => handleCurrencyChange("ETB")}
                 style={{
                   flex: 1,
-                  padding: "10px 16px",
-                  borderRadius: "10px",
+                  padding: "7px 12px",
+                  borderRadius: "8px",
                   border: currency === "ETB" ? "1.5px solid #FDE047" : "none",
                   background: currency === "ETB" ? "#FEF08A" : "transparent",
-                  color: currency === "ETB" ? "#854D0E" : "#4B5563",
+                  color: currency === "ETB" ? "#854D0E" : "#475569",
                   fontWeight: 900,
-                  fontSize: "0.9375rem",
+                  fontSize: "0.8125rem",
                   cursor: "pointer",
-                  transition: "all 0.15s ease",
+                  transition: "all 0.12s ease",
                   textAlign: "center",
-                  boxShadow: currency === "ETB" ? "0 2px 6px rgba(234, 179, 8, 0.25)" : "none",
+                  boxShadow: currency === "ETB" ? "0 2px 4px rgba(234, 179, 8, 0.25)" : "none",
                 }}
               >
-                ETB (Birr)
+                🇪🇹 ETB (Birr)
               </button>
 
               <button
@@ -220,46 +273,40 @@ export function InteractiveTicketConfigurator() {
                 onClick={() => handleCurrencyChange("USD")}
                 style={{
                   flex: 1,
-                  padding: "10px 16px",
-                  borderRadius: "10px",
+                  padding: "7px 12px",
+                  borderRadius: "8px",
                   border: currency === "USD" ? "1.5px solid #BFDBFE" : "none",
                   background: currency === "USD" ? "#EFF6FF" : "transparent",
-                  color: currency === "USD" ? "#1D4ED8" : "#4B5563",
+                  color: currency === "USD" ? "#1D4ED8" : "#475569",
                   fontWeight: 900,
-                  fontSize: "0.9375rem",
+                  fontSize: "0.8125rem",
                   cursor: "pointer",
-                  transition: "all 0.15s ease",
+                  transition: "all 0.12s ease",
                   textAlign: "center",
-                  boxShadow: currency === "USD" ? "0 2px 6px rgba(29, 78, 216, 0.2)" : "none",
+                  boxShadow: currency === "USD" ? "0 2px 4px rgba(29, 78, 216, 0.2)" : "none",
                 }}
               >
-                USD ($)
+                🇺🇸 USD ($)
               </button>
             </div>
           </div>
 
-          {/* 2. TICKET PRICE SELECTION (4 Columns Grid) */}
+          {/* B. TICKET PRICE SELECTION (Compact 4-Pill Grid) */}
           <div>
-            <label
-              className="mono"
-              style={{
-                fontSize: "0.75rem",
-                color: "#6B7280",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                fontWeight: 900,
-                display: "block",
-                marginBottom: 6,
-              }}
-            >
-              TICKET PRICE
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase" }}>
+                2. TICKET PRICE
+              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#B45309", fontWeight: 800 }}>
+                Selected: {formatMoney(selectedPrice)}
+              </span>
+            </div>
 
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 8,
+                gap: 6,
               }}
             >
               {currentPrices.map((tier) => {
@@ -270,58 +317,36 @@ export function InteractiveTicketConfigurator() {
                     type="button"
                     onClick={() => setSelectedPrice(tier.value)}
                     style={{
-                      padding: "11px 4px",
-                      borderRadius: "12px",
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid #E5E7EB",
-                      background: isSelected ? "#FEF9C3" : "#FFFFFF",
+                      padding: "8px 4px",
+                      borderRadius: "10px",
+                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(226, 232, 240, 0.8)",
+                      background: isSelected ? "rgba(254, 249, 195, 0.95)" : "rgba(255, 255, 255, 0.85)",
                       color: "#111827",
                       cursor: "pointer",
                       textAlign: "center",
-                      transition: "all 0.15s ease",
-                      boxShadow: isSelected ? "0 4px 12px rgba(245, 158, 11, 0.25)" : "0 1px 3px rgba(0,0,0,0.03)",
+                      transition: "all 0.12s ease",
+                      boxShadow: isSelected ? "0 2px 8px rgba(245, 158, 11, 0.25)" : "0 1px 2px rgba(0,0,0,0.02)",
                     }}
                   >
                     <div
                       className="display"
                       style={{
-                        fontSize: "clamp(1.15rem, 2.2vw, 1.4rem)",
+                        fontSize: "1.1rem",
                         fontWeight: 900,
                         lineHeight: 1.1,
                         color: isSelected ? "#B45309" : "#111827",
-                        marginBottom: 1,
                       }}
                     >
-                      {tier.label}
-                    </div>
-                    <div
-                      className="mono"
-                      style={{
-                        fontSize: "0.625rem",
-                        fontWeight: 800,
-                        color: isSelected ? "#854D0E" : "#6B7280",
-                        textTransform: "uppercase",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {isUSD ? "USD" : "ETB"}
+                      {isUSD ? `$${tier.label}` : tier.label}
                     </div>
                     <div
                       style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 3,
                         fontSize: "0.5625rem",
                         fontWeight: 800,
-                        color: "#059669",
-                        background: "#ECFDF5",
-                        padding: "1px 4px",
-                        borderRadius: "4px",
-                        border: "1px solid #A7F3D0",
-                        whiteSpace: "nowrap",
+                        color: isSelected ? "#854D0E" : "#64748B",
+                        textTransform: "uppercase",
                       }}
                     >
-                      <span style={{ display: "inline-block", width: 4, height: 4, borderRadius: "50%", background: "#059669" }} />
                       {tier.percentLeft}% left
                     </div>
                   </button>
@@ -330,22 +355,13 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* 3. PARTICIPANT POOL SELECTION (4 Columns Grid) */}
+          {/* C. PARTICIPANT POOL SELECTION (Compact 4-Pill Grid) */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <label
-                className="mono"
-                style={{
-                  fontSize: "0.75rem",
-                  color: "#6B7280",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  fontWeight: 900,
-                }}
-              >
-                PARTICIPANT POOL
-              </label>
-              <span className="mono" style={{ fontSize: "0.75rem", color: "#6B7280", fontWeight: 700 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase" }}>
+                3. PARTICIPANT POOL
+              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#6B7280", fontWeight: 700 }}>
                 {currentPoolObj.ticketsCount}
               </span>
             </div>
@@ -354,7 +370,7 @@ export function InteractiveTicketConfigurator() {
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 8,
+                gap: 6,
               }}
             >
               {POOLS.map((pool) => {
@@ -365,15 +381,15 @@ export function InteractiveTicketConfigurator() {
                     type="button"
                     onClick={() => setSelectedPool(pool.size)}
                     style={{
-                      padding: "11px 4px",
-                      borderRadius: "12px",
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid #E5E7EB",
-                      background: isSelected ? "#FEF08A" : "#FFFFFF",
+                      padding: "8px 4px",
+                      borderRadius: "10px",
+                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(226, 232, 240, 0.8)",
+                      background: isSelected ? "rgba(254, 240, 138, 0.95)" : "rgba(255, 255, 255, 0.85)",
                       color: isSelected ? "#854D0E" : "#374151",
                       cursor: "pointer",
                       textAlign: "center",
-                      transition: "all 0.15s ease",
-                      boxShadow: isSelected ? "0 4px 12px rgba(245, 158, 11, 0.25)" : "0 1px 3px rgba(0,0,0,0.03)",
+                      transition: "all 0.12s ease",
+                      boxShadow: isSelected ? "0 2px 8px rgba(245, 158, 11, 0.25)" : "0 1px 2px rgba(0,0,0,0.02)",
                     }}
                   >
                     <div
@@ -383,19 +399,17 @@ export function InteractiveTicketConfigurator() {
                         justifyContent: "center",
                         gap: 3,
                         fontWeight: 900,
-                        fontSize: "0.9375rem",
+                        fontSize: "0.875rem",
                       }}
                     >
-                      <Users size={13} /> {pool.label}
+                      <Users size={12} /> {pool.label}
                     </div>
                     <div
-                      className="mono"
                       style={{
                         fontSize: "0.5625rem",
                         fontWeight: 800,
+                        color: isSelected ? "#854D0E" : "#64748B",
                         textTransform: "uppercase",
-                        color: isSelected ? "#854D0E" : "#6B7280",
-                        marginTop: 2,
                       }}
                     >
                       PEOPLE
@@ -406,55 +420,85 @@ export function InteractiveTicketConfigurator() {
             </div>
           </div>
 
-          {/* 4. TOP 3 GUARANTEED CASH PRIZES STRIP */}
+          {/* D. TOP PRIZES (Expandable: Top 3 vs All 10 Guaranteed Payouts) */}
           <div
             style={{
-              background: "#FFFFFF",
-              border: "1.5px solid #E5E7EB",
-              borderRadius: "14px",
-              padding: "12px 14px",
+              background: "rgba(255, 255, 255, 0.88)",
+              border: "1.5px solid #FDE047",
+              borderRadius: "12px",
+              padding: "8px 10px",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "#111827", fontWeight: 900, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
-                <Trophy size={13} color="#D97706" /> Top 3 Guaranteed Prizes
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <span className="mono" style={{ fontSize: "0.6875rem", color: "#92400E", fontWeight: 900, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
+                <Trophy size={12} color="#D97706" /> {showAllPrizes ? "All 10 Guaranteed Payouts" : "Top 3 Guaranteed Payouts"}
               </span>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "#059669", fontWeight: 800 }}>
-                100% Payout
-              </span>
+
+              <button
+                type="button"
+                onClick={() => setShowAllPrizes(!showAllPrizes)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#B45309",
+                  fontSize: "0.6875rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3,
+                  padding: 0,
+                }}
+              >
+                {showAllPrizes ? (
+                  <>Show Top 3 <ChevronUp size={13} /></>
+                ) : (
+                  <>Show All 10 Prizes <ChevronDown size={13} /></>
+                )}
+              </button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
-              {calculatedTop3Prizes.map((pz) => (
+            {/* Prizes Grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: showAllPrizes ? "repeat(auto-fit, minmax(130px, 1fr))" : "repeat(3, 1fr)",
+                gap: 6,
+                maxHeight: showAllPrizes ? 220 : "none",
+                overflowY: showAllPrizes ? "auto" : "visible",
+                paddingRight: showAllPrizes ? 2 : 0,
+              }}
+            >
+              {visiblePrizes.map((pz) => (
                 <div
                   key={pz.rank}
                   style={{
-                    background: pz.rank === 1 ? "#FEF9C3" : pz.rank === 2 ? "#EFF6FF" : "#F8FAFC",
-                    border: `1px solid ${pz.rank === 1 ? "#FDE047" : pz.rank === 2 ? "#BFDBFE" : "#E2E8F0"}`,
+                    background: pz.rank === 1 ? "rgba(254, 249, 195, 0.95)" : pz.rank === 2 ? "rgba(239, 246, 255, 0.95)" : pz.rank === 3 ? "rgba(255, 251, 235, 0.95)" : "rgba(248, 250, 252, 0.9)",
+                    border: `1px solid ${pz.rank === 1 ? "#FDE047" : pz.rank === 2 ? "#BFDBFE" : pz.rank === 3 ? "#FDE68A" : "#E2E8F0"}`,
                     borderRadius: "8px",
-                    padding: "8px 4px",
+                    padding: "6px 4px",
                     textAlign: "center",
                   }}
                 >
                   <span
-                    className="mono"
                     style={{
                       fontSize: "0.5625rem",
                       fontWeight: 900,
-                      color: pz.rank === 1 ? "#854D0E" : pz.rank === 2 ? "#1D4ED8" : "#475569",
+                      color: pz.rank === 1 ? "#854D0E" : pz.rank === 2 ? "#1D4ED8" : pz.rank === 3 ? "#B45309" : "#475569",
                       display: "block",
                       marginBottom: 1,
                     }}
                   >
-                    #{pz.rank} {pz.rank === 1 ? "JACKPOT" : pz.rank === 2 ? "2ND" : "3RD"}
+                    #{pz.rank} {pz.rank <= 3 ? "" : `(${pz.tag})`}
                   </span>
                   <span
                     className="display"
                     style={{
-                      fontSize: "0.875rem",
+                      fontSize: "0.8125rem",
                       fontWeight: 900,
                       color: pz.rank === 1 ? "#DC2626" : "#111827",
                       display: "block",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {pz.amount}
@@ -465,166 +509,165 @@ export function InteractiveTicketConfigurator() {
           </div>
         </div>
 
-        {/* ── RIGHT COLUMN: Banner + Live Summary + Buy Action (Equal Height) ── */}
+        {/* ── RIGHT COLUMN: Space-Optimized Translucent Ticket Card & Stat Grid ── */}
         <div
           style={{
-            background: "#FFFFFF",
+            background: "rgba(255, 255, 255, 0.92)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
             border: "2px solid #F59E0B",
-            borderRadius: "18px",
+            borderRadius: "14px",
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.06)",
-            height: "100%",
+            boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
           }}
         >
-          {/* Top Visual Banner */}
-          <div style={{ position: "relative", width: "100%", height: 185, background: "#000000", flexShrink: 0 }}>
-            <Image
-              src="/images/rimna-lottery-card.jpg"
-              alt="Rimna Digital Lottery Grand Prize Mercedes G-Wagon and Car Keys"
-              fill
-              priority
-              style={{ objectFit: "cover" }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%)",
-              }}
-            />
-            <div style={{ position: "absolute", top: 10, right: 10 }}>
-              <span
-                style={{
-                  background: "#FEF08A",
-                  border: "1px solid #FACC15",
-                  color: "#854D0E",
-                  fontSize: "0.6875rem",
-                  fontWeight: 900,
-                  padding: "3px 8px",
-                  borderRadius: "6px",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                }}
-              >
-                100% LIVE VIDEO DRAW
+          {/* Slim Compact Header Banner (Reduced Visual Weight) */}
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: 56,
+              background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 14px",
+              boxSizing: "border-box",
+              color: "#FFFFFF",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Sparkles size={14} color="#FDE047" />
+              <span style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FEF08A" }}>
+                Live Draw Tier Summary
               </span>
             </div>
+            <span
+              style={{
+                background: "rgba(253, 224, 71, 0.2)",
+                border: "1px solid #FDE047",
+                color: "#FEF08A",
+                fontSize: "0.625rem",
+                fontWeight: 900,
+                padding: "2px 7px",
+                borderRadius: "10px",
+              }}
+            >
+              100% VIDEO DRAW
+            </span>
           </div>
 
-          {/* Details Metadata List */}
-          <div style={{ padding: "14px 18px", display: "flex", flexDirection: "column", gap: 8, flex: 1, justifyContent: "space-around" }}>
-            {/* Total prize pool */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "1.5px solid #F3F4F6", paddingBottom: 6 }}>
-              <span style={{ fontSize: "0.875rem", color: "#4B5563", fontWeight: 700 }}>
-                Total prize pool
+          {/* Compact 2x3 Stat Grid */}
+          <div
+            style={{
+              padding: "12px 14px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 8,
+              background: "rgba(255, 253, 249, 0.8)",
+            }}
+          >
+            {/* Stat 1: Total Prize Pool */}
+            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
+                TOTAL PRIZE POOL
               </span>
-              <span className="display" style={{ fontSize: "1.35rem", color: "#B45309", fontWeight: 900 }}>
+              <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "#B45309" }}>
                 {formatMoney(totalPrizePool)}
               </span>
             </div>
 
-            {/* Participants */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.8125rem", color: "#4B5563", fontWeight: 600 }}>
-                Participants
+            {/* Stat 2: 1st Jackpot Prize */}
+            <div style={{ background: "rgba(254, 249, 195, 0.95)", border: "1px solid #FDE047", borderRadius: "8px", padding: "6px 8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "#854D0E", fontWeight: 800, display: "block" }}>
+                1ST GRAND JACKPOT
               </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", color: "#111827", fontWeight: 800 }}>
-                {selectedPool.toLocaleString()} people
-              </span>
-            </div>
-
-            {/* Guaranteed winners */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.8125rem", color: "#4B5563", fontWeight: 600 }}>
-                Guaranteed winners
-              </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", color: "#111827", fontWeight: 800 }}>
-                10
-              </span>
-            </div>
-
-            {/* Odds of a prize */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.8125rem", color: "#4B5563", fontWeight: 600 }}>
-                Odds of a prize
-              </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", color: "#059669", fontWeight: 900 }}>
-                1 in {oddsRatio}
-              </span>
-            </div>
-
-            {/* Draw date */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.8125rem", color: "#4B5563", fontWeight: 600 }}>
-                Draw date
-              </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", color: "#111827", fontWeight: 800 }}>
-                Sep 3, 2026
-              </span>
-            </div>
-
-            {/* Top prize */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderTop: "1.5px solid #F3F4F6", paddingTop: 6 }}>
-              <span style={{ fontSize: "0.8125rem", color: "#4B5563", fontWeight: 700 }}>
-                Top prize (1st Rank)
-              </span>
-              <span className="display" style={{ fontSize: "1.1rem", color: "#B45309", fontWeight: 900 }}>
+              <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "#DC2626" }}>
                 {formatMoney(topPrize)}
+              </span>
+            </div>
+
+            {/* Stat 3: Participants */}
+            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
+                POOL CAPACITY
+              </span>
+              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#111827" }}>
+                {selectedPool.toLocaleString()} People
+              </span>
+            </div>
+
+            {/* Stat 4: Winning Odds */}
+            <div style={{ background: "rgba(236, 253, 245, 0.95)", border: "1px solid #A7F3D0", borderRadius: "8px", padding: "6px 8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "#065F46", fontWeight: 800, display: "block" }}>
+                WINNING ODDS
+              </span>
+              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#059669" }}>
+                1 in {oddsRatio} (High Odds)
+              </span>
+            </div>
+
+            {/* Stat 5: Guaranteed Winners */}
+            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
+                CASH WINNERS
+              </span>
+              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#111827" }}>
+                10 Guaranteed
+              </span>
+            </div>
+
+            {/* Stat 6: Draw Date */}
+            <div style={{ background: "rgba(255, 255, 255, 0.95)", border: "1px solid #E5E7EB", borderRadius: "8px", padding: "6px 8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "#6B7280", fontWeight: 800, display: "block" }}>
+                DRAW BROADCAST
+              </span>
+              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#111827" }}>
+                Sep 3, 2026
               </span>
             </div>
           </div>
 
-          {/* Bottom Action CTA */}
-          <div style={{ padding: "0 18px 16px" }}>
+          {/* Action CTA & Quick Links */}
+          <div style={{ padding: "10px 14px 12px", borderTop: "1px solid rgba(229, 231, 235, 0.8)", background: "rgba(255, 255, 255, 0.95)" }}>
             <button
               type="button"
               onClick={() => setIsBuyModalOpen(true)}
               className="casino-btn-red"
               style={{
                 width: "100%",
-                padding: "13px 18px",
-                fontSize: "0.95rem",
+                padding: "10px 14px",
+                fontSize: "0.9375rem",
                 fontWeight: 900,
+                borderRadius: "10px",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
+                boxShadow: "0 4px 12px rgba(220, 38, 38, 0.4)",
               }}
             >
-              <Ticket size={18} /> Buy ticket — {formatMoney(selectedPrice)}
+              <Ticket size={16} /> Buy Ticket — {formatMoney(selectedPrice)}
             </button>
 
-            <p
-              className="mono"
-              style={{
-                textAlign: "center",
-                fontSize: "0.6875rem",
-                color: "#6B7280",
-                marginTop: 6,
-                marginBottom: 4,
-                fontWeight: 600,
-              }}
-            >
-              ✓ Secure mobile checkout · Instant verification
-            </p>
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4, flexWrap: "wrap", gap: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
               <Link
                 href="/how-it-works"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 4,
-                  fontSize: "0.75rem",
+                  gap: 3,
+                  fontSize: "0.6875rem",
                   color: "#1D4ED8",
                   textDecoration: "none",
                   fontWeight: 700,
                 }}
               >
-                <HelpCircle size={13} color="#1D4ED8" /> How It Works Guide
+                <HelpCircle size={12} color="#1D4ED8" /> How It Works
               </Link>
 
               <Link
@@ -632,14 +675,14 @@ export function InteractiveTicketConfigurator() {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 4,
-                  fontSize: "0.75rem",
-                  color: "#4B5563",
+                  gap: 3,
+                  fontSize: "0.6875rem",
+                  color: "#6B7280",
                   textDecoration: "none",
                   fontWeight: 700,
                 }}
               >
-                <Award size={13} color="#D97706" /> Past Results
+                <Award size={12} color="#D97706" /> Past Results
               </Link>
             </div>
           </div>
@@ -656,8 +699,8 @@ export function InteractiveTicketConfigurator() {
           right: 12,
           background: "#111827",
           border: "2px solid #F59E0B",
-          borderRadius: "20px",
-          padding: "10px 16px",
+          borderRadius: "16px",
+          padding: "8px 14px",
           display: "none",
           alignItems: "center",
           justifyContent: "space-between",
@@ -666,10 +709,10 @@ export function InteractiveTicketConfigurator() {
         }}
       >
         <div>
-          <div className="display" style={{ fontSize: "1.2rem", fontWeight: 900, color: "#FFFFFF", lineHeight: 1.1 }}>
+          <div className="display" style={{ fontSize: "1.1rem", fontWeight: 900, color: "#FFFFFF", lineHeight: 1.1 }}>
             {formatMoney(selectedPrice)}
           </div>
-          <div style={{ fontSize: "0.6875rem", color: "#10B981", fontWeight: 800 }}>
+          <div style={{ fontSize: "0.625rem", color: "#10B981", fontWeight: 800 }}>
             Rimna Lottery · {currentPoolObj.label} pool
           </div>
         </div>
@@ -681,18 +724,18 @@ export function InteractiveTicketConfigurator() {
             background: "#FFFFFF",
             color: "#111827",
             border: "none",
-            borderRadius: "12px",
-            padding: "10px 20px",
+            borderRadius: "10px",
+            padding: "8px 16px",
             fontWeight: 900,
-            fontSize: "0.875rem",
+            fontSize: "0.8125rem",
             display: "inline-flex",
             alignItems: "center",
-            gap: 6,
+            gap: 5,
             cursor: "pointer",
             boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
           }}
         >
-          Buy ticket <ArrowUpRight size={16} />
+          Buy ticket <ArrowUpRight size={14} />
         </button>
       </div>
 
@@ -704,6 +747,6 @@ export function InteractiveTicketConfigurator() {
         initialPrice={selectedPrice}
         initialDrawId={`RDL-${currency}-${selectedPrice}`}
       />
-    </section>
+    </div>
   );
 }

@@ -91,36 +91,68 @@ export default async function HomePage() {
 
   return (
     <div style={{ width: "100%", overflowX: "hidden" }}>
-      {/* ── 1. Section: Screenful Cinematic Hero (Stadium Atmosphere / Deep Navy & 3D Gold Particles) ── */}
-      <CinematicStadiumHero />
-
-      {/* ── 2. Section: Promotional Advertisements & Teasers (Soft Warm Champagne Surface) ── */}
-      <section
+      {/* ── UNIFIED FIXED STILL PARALLAX BACKGROUND SECTION (Hero through Ticket Configurator) ── */}
+      <div
         style={{
-          background: "#FAF8F2",
-          borderTop: "1px solid #EFE8D8",
-          borderBottom: "1px solid #EFE8D8",
-          padding: "48px 0 36px",
+          position: "relative",
+          backgroundImage: "url(/images/rimna-stadium-hero.jpg)",
+          backgroundAttachment: "fixed",
+          backgroundPosition: "center top",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
           width: "100%",
         }}
       >
-        <AdvertisementCarousel cmsAds={ads} />
-      </section>
+        {/* Continuous Dark & Warm Golden Radial Ambient Overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.4) 35%, rgba(15, 23, 42, 0.65) 70%, rgba(15, 23, 42, 0.85) 100%)",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
 
-      {/* ── 3. Section: Centerpiece Interactive Ticket Configurator (Crisp White Banknote Surface) ── */}
-      <section
-        id="choose-ticket"
-        style={{
-          background: "#FFFFFF",
-          borderBottom: "1.5px solid #E5E7EB",
-          padding: "56px 0 60px",
-          width: "100%",
-        }}
-      >
-        <div className="page-inner-container">
-          <InteractiveTicketConfigurator />
+        {/* 1. Screenful Cinematic Hero */}
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <CinematicStadiumHero />
         </div>
-      </section>
+
+        {/* 2. Promotional Advertisements & Teasers (Translucent Champagne Frosted Layer) */}
+        <section
+          style={{
+            position: "relative",
+            zIndex: 2,
+            background: "rgba(250, 248, 242, 0.85)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            borderTop: "1.5px solid rgba(239, 232, 216, 0.7)",
+            borderBottom: "1.5px solid rgba(239, 232, 216, 0.7)",
+            padding: "44px 0 32px",
+            width: "100%",
+          }}
+        >
+          <AdvertisementCarousel cmsAds={ads} />
+        </section>
+
+        {/* 3. Centerpiece Interactive Ticket Configurator (Floating Translucent Glass Card Over The Still Background!) */}
+        <section
+          id="choose-ticket"
+          style={{
+            position: "relative",
+            zIndex: 2,
+            padding: "clamp(52px, 6vw, 80px) 0",
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          <div className="page-inner-container">
+            <InteractiveTicketConfigurator />
+          </div>
+        </section>
+      </div>
 
       {/* ── 4. Section: Winner Testimonials & Community Alerts (Sleek Dark VIP Lounge Surface) ── */}
       <section
