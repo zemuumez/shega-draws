@@ -109,18 +109,18 @@ export default async function HomePage() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.4) 35%, rgba(15, 23, 42, 0.65) 70%, rgba(15, 23, 42, 0.85) 100%)",
+              "linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.38) 35%, rgba(15, 23, 42, 0.65) 70%, rgba(15, 23, 42, 0.85) 100%)",
             pointerEvents: "none",
             zIndex: 1,
           }}
         />
 
         {/* 1. Screenful Cinematic Hero */}
-        <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2, marginBottom: "clamp(48px, 6vw, 76px)" }}>
           <CinematicStadiumHero />
         </div>
 
-        {/* 2. Promotional Advertisements & Teasers (Translucent Champagne Frosted Layer) */}
+        {/* 2. Promotional Advertisements & Teasers (Translucent Champagne Frosted Layer with Generous Vertical Breathing Room) */}
         <section
           style={{
             position: "relative",
@@ -130,7 +130,8 @@ export default async function HomePage() {
             WebkitBackdropFilter: "blur(14px)",
             borderTop: "1.5px solid rgba(239, 232, 216, 0.7)",
             borderBottom: "1.5px solid rgba(239, 232, 216, 0.7)",
-            padding: "44px 0 32px",
+            padding: "clamp(56px, 7vw, 80px) 0",
+            margin: "clamp(36px, 5vw, 64px) 0",
             width: "100%",
           }}
         >
@@ -143,7 +144,7 @@ export default async function HomePage() {
           style={{
             position: "relative",
             zIndex: 2,
-            padding: "clamp(52px, 6vw, 80px) 0",
+            padding: "clamp(48px, 6vw, 84px) 0 clamp(64px, 8vw, 104px)",
             width: "100%",
             boxSizing: "border-box",
           }}
@@ -154,17 +155,17 @@ export default async function HomePage() {
         </section>
       </div>
 
-      {/* ── 4. Section: Winner Testimonials & Community Alerts (Sleek Dark VIP Lounge Surface) ── */}
+      {/* ── 4. Section: Winner Testimonials & Community Alerts (Sleek Dark VIP Lounge Surface with Generous Separation) ── */}
       <section
         style={{
           background: "linear-gradient(180deg, #111827 0%, #1F2937 50%, #0B0F19 100%)",
           borderTop: "2px solid #FDE047",
-          padding: "56px 0 72px",
+          padding: "clamp(64px, 8vw, 96px) 0 clamp(72px, 9vw, 112px)",
           width: "100%",
         }}
       >
         <div className="page-inner-container">
-          <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div style={{ textAlign: "center", marginBottom: "clamp(28px, 4vw, 44px)" }}>
             <span
               style={{
                 background: "rgba(253, 224, 71, 0.15)",
@@ -189,7 +190,7 @@ export default async function HomePage() {
                 fontSize: "clamp(1.5rem, 3.2vw, 2.2rem)",
                 fontWeight: 900,
                 color: "#FFFFFF",
-                margin: "8px 0 4px",
+                margin: "10px 0 6px",
               }}
             >
               Real Winners. Instant Video Payouts.
