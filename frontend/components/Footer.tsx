@@ -45,9 +45,9 @@ export function Footer({ siteSettings }: FooterProps) {
               <Image
                 src="/images/rimna-brand-logo.png"
                 alt="Rimna International Digital Lottery"
-                width={170}
-                height={44}
-                style={{ height: "40px", width: "auto", objectFit: "contain" }}
+                width={200}
+                height={50}
+                style={{ height: "46px", width: "auto", objectFit: "contain" }}
               />
             </div>
 

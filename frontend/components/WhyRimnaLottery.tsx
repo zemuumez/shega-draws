@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trophy, Users, Award, Tv, Send, CheckCircle2, Ticket, CreditCard, ShieldCheck } from "lucide-react";
+import { Trophy, Users, Award, Tv, Send, CheckCircle2, Ticket, CreditCard, ShieldCheck, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSectionContent } from "@/lib/sanity/queries";
 
@@ -27,52 +27,96 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
 
   return (
     <div
-      className="card-base"
       style={{
-        padding: "20px 20px",
-        background: "#FFFFFF",
-        borderRadius: "14px",
-        border: "1.5px solid var(--gray-line)",
-        marginBottom: 16,
+        background: "rgba(15, 23, 42, 0.62)",
+        backdropFilter: "blur(24px) saturate(190%)",
+        WebkitBackdropFilter: "blur(24px) saturate(190%)",
+        borderRadius: "22px",
+        border: "2px solid rgba(253, 224, 71, 0.75)",
+        padding: "clamp(24px, 3.5vw, 36px)",
+        boxShadow:
+          "0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(254, 240, 138, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)",
+        color: "#FFFFFF",
       }}
     >
-      <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900, marginBottom: 10 }}>
-        {title}
-      </h3>
+      <div style={{ display: "inline-flex", marginBottom: 12 }}>
+        <span
+          style={{
+            background: "rgba(254, 240, 138, 0.2)",
+            border: "1px solid #FDE047",
+            color: "#FEF08A",
+            fontSize: "0.6875rem",
+            fontWeight: 900,
+            padding: "3px 10px",
+            borderRadius: "14px",
+            textTransform: "uppercase",
+            letterSpacing: "0.6px",
+          }}
+        >
+          OUR ETHICAL CORE VALUES
+        </span>
+      </div>
 
-      <div style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.7, display: "flex", flexDirection: "column", gap: 12 }}>
+      <h2
+        className="display"
+        style={{
+          fontSize: "clamp(1.4rem, 2.8vw, 2rem)",
+          color: "#FFFFFF",
+          fontWeight: 900,
+          marginBottom: 12,
+        }}
+      >
+        {title}
+      </h2>
+
+      <div style={{ color: "#E2E8F0", fontSize: "0.9375rem", lineHeight: 1.7, display: "flex", flexDirection: "column", gap: 14 }}>
         {body ? (
           <div style={{ whiteSpace: "pre-line" }}>{body}</div>
         ) : (
           <>
             <p>
-              Unlike automated lotteries with hidden black-box systems, <strong>Rimna Digital Lottery</strong> is built on genuine public transparency. All winning tickets are drawn live on video by the company founders during our scheduled public stream, where every selected number is held up and announced in real time for everyone to see.
+              Unlike automated lotteries with hidden black-box algorithms, <strong>Rimna Digital Lottery</strong> is built entirely on genuine public transparency. All winning tickets are drawn live on video by company founders during scheduled public broadcasts, where every single winning number is held up and announced in real time.
             </p>
 
             <p>
-              Every ticket tier operates with fixed, capped participant capacities (1,000, 2,000, 3,000, or 5,000 people). This guarantees that your odds of winning remain high, and <strong>every single draw awards guaranteed cash prizes to the Top 10 winning ranks</strong> without rollover delays.
+              Every ticket tier operates with fixed, capped participant pools (1,000, 2,000, 3,000, or 5,000 people). This guarantees that your odds of winning remain high, and <strong>every single draw awards guaranteed cash prizes to the Top 10 winning ranks</strong> without rollover delays.
             </p>
           </>
         )}
 
         {/* Feature Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginTop: 8 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginTop: 10 }}>
           {features ? (
             features.map((f, i) => {
               const fTitle = (language === "am" && f.titleAm) || (language === "om" && f.titleOm) || f.title;
               const fDesc = (language === "am" && f.descriptionAm) || (language === "om" && f.descriptionOm) || f.description;
               const isGold = f.color === "gold" || i === 0;
               const isBlue = f.color === "blue" || i === 1;
-              const bg = isGold ? "#FEF9C3" : isBlue ? "#EFF6FF" : "#ECFDF5";
-              const border = isGold ? "#FDE047" : isBlue ? "#BFDBFE" : "#A7F3D0";
-              const color = isGold ? "var(--gold-deep)" : isBlue ? "#2A65E6" : "#059669";
 
               return (
-                <div key={i} style={{ background: bg, border: `1px solid ${border}`, padding: "12px 14px", borderRadius: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: color, fontWeight: 800, fontSize: "0.8125rem", marginBottom: 4 }}>
-                    {isGold ? <Trophy size={15} /> : isBlue ? <Tv size={15} /> : <Users size={15} />} {fTitle}
+                <div
+                  key={i}
+                  style={{
+                    background: "rgba(0, 0, 0, 0.4)",
+                    border: `1.5px solid ${isGold ? "#FDE047" : isBlue ? "#60A5FA" : "#34D399"}`,
+                    padding: "16px 14px",
+                    borderRadius: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      color: isGold ? "#FEF08A" : isBlue ? "#93C5FD" : "#6EE7B7",
+                      fontWeight: 800,
+                      fontSize: "0.875rem",
+                      marginBottom: 6,
+                    }}
+                  >
+                    {isGold ? <Trophy size={16} /> : isBlue ? <Tv size={16} /> : <Users size={16} />} {fTitle}
                   </div>
-                  <span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>
+                  <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
                     {fDesc}
                   </span>
                 </div>
@@ -80,30 +124,51 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
             })
           ) : (
             <>
-              <div style={{ background: "#FEF9C3", border: "1px solid #FDE047", padding: "12px 14px", borderRadius: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--gold-deep)", fontWeight: 800, fontSize: "0.8125rem", marginBottom: 4 }}>
-                  <Trophy size={15} /> 10 Guaranteed Winners
+              <div
+                style={{
+                  background: "rgba(0, 0, 0, 0.4)",
+                  border: "1.5px solid #FDE047",
+                  padding: "16px 14px",
+                  borderRadius: "14px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FEF08A", fontWeight: 800, fontSize: "0.875rem", marginBottom: 6 }}>
+                  <Trophy size={16} color="#FDE047" /> 10 Guaranteed Winners
                 </div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>
-                  Every pool guarantees cash payouts for the Top 10 ranks without rollover delays.
+                <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
+                  Every draw awards guaranteed cash payouts to the Top 10 ranks without rollover delays.
                 </span>
               </div>
 
-              <div style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", padding: "12px 14px", borderRadius: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#2A65E6", fontWeight: 800, fontSize: "0.8125rem", marginBottom: 4 }}>
-                  <Tv size={15} /> 100% Live Streamed Draws
+              <div
+                style={{
+                  background: "rgba(0, 0, 0, 0.4)",
+                  border: "1.5px solid #60A5FA",
+                  padding: "16px 14px",
+                  borderRadius: "14px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#93C5FD", fontWeight: 800, fontSize: "0.875rem", marginBottom: 6 }}>
+                  <Tv size={16} color="#60A5FA" /> 100% Live Streamed Draws
                 </div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>
+                <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
                   Numbers drawn live on video broadcast so every participant sees the real outcome.
                 </span>
               </div>
 
-              <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "12px 14px", borderRadius: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#059669", fontWeight: 800, fontSize: "0.8125rem", marginBottom: 4 }}>
-                  <Users size={15} /> Fixed Pool Sizes
+              <div
+                style={{
+                  background: "rgba(0, 0, 0, 0.4)",
+                  border: "1.5px solid #34D399",
+                  padding: "16px 14px",
+                  borderRadius: "14px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6EE7B7", fontWeight: 800, fontSize: "0.875rem", marginBottom: 6 }}>
+                  <Users size={16} color="#34D399" /> Fixed Capped Pools
                 </div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>
-                  Pools are capped at 1K, 2K, 3K, and 5K tickets for transparent, fair odds.
+                <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
+                  Pools are capped at 1K, 2K, 3K, and 5K tickets for transparent, fair 1-in-100 odds.
                 </span>
               </div>
             </>

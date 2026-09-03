@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 import { getActiveDraw, getMyEntries, getUser, loginPlayer, logout, clearTokens, type Entry, type StoredUser } from "@/lib/api";
 import { EntryTicket } from "@/components/EntryTicket";
-import { Ticket, ArrowRight, Loader2, LogIn, Phone, User, CheckCircle2, ShieldCheck, RefreshCw, LogOut } from "lucide-react";
+import { Ticket, ArrowRight, Loader2, LogIn, Phone, User, CheckCircle2, ShieldCheck, RefreshCw, LogOut, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
 export default function EntriesPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState("");
-  const [user, setUserState]  = useState<StoredUser | null>(null);
+  const [error, setError] = useState("");
+  const [user, setUserState] = useState<StoredUser | null>(null);
 
   // Login form states
   const [loginPhone, setLoginPhone] = useState("");
-  const [loginName, setLoginName]   = useState("");
+  const [loginName, setLoginName] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
 
@@ -28,7 +28,7 @@ export default function EntriesPage() {
         const myEntries = await getMyEntries(active.id);
         setEntries(myEntries);
       } else {
-        // Mock entries if offline
+        // Sample fallback
         setEntries([
           {
             id: "ent-101",
@@ -40,11 +40,10 @@ export default function EntriesPage() {
             method: "telebirr",
             status: "confirmed",
             created_at: new Date().toISOString(),
-          }
+          },
         ]);
       }
     } catch (e: any) {
-      // If error or offline, fallback to sample entries
       setEntries([
         {
           id: "ent-sample-1",
@@ -56,7 +55,7 @@ export default function EntriesPage() {
           method: "telebirr",
           status: "confirmed",
           created_at: new Date().toISOString(),
-        }
+        },
       ]);
     } finally {
       setLoading(false);
@@ -99,178 +98,297 @@ export default function EntriesPage() {
     setEntries([]);
   };
 
-  // If user is not signed in, show high-clarity Phone Sign-in
-  if (!user) {
-    return (
-      <div style={{ maxWidth: 520, margin: "48px auto", padding: "0 20px" }}>
-        <div className="card-base animate-fade" style={{ padding: "36px 28px", border: "1.5px solid var(--blue-border)" }}>
-          <div
-            style={{
-              width: 54,
-              height: 54,
-              borderRadius: "50%",
-              background: "var(--blue-bg)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 16px",
-            }}
-          >
-            <Ticket size={28} color="#2A65E6" />
-          </div>
-
-          <h1 className="display" style={{ fontSize: "1.5rem", color: "var(--blue-navy)", marginBottom: 8, textAlign: "center", fontWeight: 800 }}>
-            Sign In to View My Tickets
-          </h1>
-          <p style={{ color: "var(--text-muted)", marginBottom: 24, fontSize: "0.875rem", textAlign: "center", lineHeight: 1.5 }}>
-            Enter your mobile phone number below to instantly access your purchased tickets, check winning results, and track payment verifications.
-          </p>
-
-          <form onSubmit={handlePlayerLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div>
-              <label htmlFor="login-phone" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "var(--blue-navy)", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                <Phone size={14} color="#2A65E6" /> Phone Number (Required)
-              </label>
-              <input
-                id="login-phone"
-                type="tel"
-                className="input-base"
-                placeholder="+251 9xx xxx xxx"
-                value={loginPhone}
-                onChange={(e) => setLoginPhone(e.target.value)}
-                required
-                style={{ fontSize: "0.9375rem" }}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="login-name" style={{ fontSize: "0.8125rem", fontWeight: 700, color: "var(--blue-navy)", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                <User size={14} color="#2A65E6" /> Your Full Name (Optional)
-              </label>
-              <input
-                id="login-name"
-                type="text"
-                className="input-base"
-                placeholder="e.g. Abebe Bikila"
-                value={loginName}
-                onChange={(e) => setLoginName(e.target.value)}
-                style={{ fontSize: "0.9375rem" }}
-              />
-            </div>
-
-            {loginError && (
-              <p role="alert" style={{ color: "var(--rust-dark)", background: "var(--rust-bg)", padding: "10px 12px", borderRadius: 8, fontSize: "0.8125rem" }}>
-                {loginError}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loginLoading}
-              className="btn-base btn-blue"
-              style={{ width: "100%", padding: "13px", fontSize: "0.9375rem", marginTop: 6 }}
-            >
-              {loginLoading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
-              Sign In & View My Tickets
-            </button>
-          </form>
-
-          <div style={{ borderTop: "1px solid var(--gray-line)", marginTop: 24, paddingTop: 18, textAlign: "center" }}>
-            <p style={{ color: "var(--text-subtle)", fontSize: "0.8125rem", marginBottom: 12 }}>
-              Haven&apos;t bought a raffle ticket yet?
-            </p>
-            <Link href="/enter" className="btn-base btn-primary" style={{ padding: "10px 18px", fontSize: "0.875rem" }}>
-              <Ticket size={15} /> Buy a Ticket Now
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px" }}>
-      {/* User Header & Logout Bar */}
-      <div className="card-base" style={{ padding: "20px 24px", marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
-        <div>
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "#2A65E6", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.5px" }}>
-            AUTHENTICATED PLAYER
-          </span>
-          <h1 className="display" style={{ fontSize: "1.45rem", color: "var(--blue-navy)", fontWeight: 800, margin: "2px 0" }}>
-            {user.name}
-          </h1>
-          <p className="mono" style={{ color: "var(--text-muted)", fontSize: "0.8125rem" }}>
-            Phone: <strong>{user.phone}</strong>
-          </p>
-        </div>
+    <div
+      style={{
+        width: "100%",
+        overflowX: "hidden",
+        position: "relative",
+        backgroundImage: "url(/images/rimna-stadium-hero.jpg)",
+        backgroundAttachment: "fixed",
+        backgroundPosition: "center top",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Background Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.6) 40%, rgba(15, 23, 42, 0.85) 100%)",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            type="button"
-            onClick={() => loadEntries(user)}
-            className="btn-base btn-secondary"
-            style={{ fontSize: "0.8125rem", padding: "8px 12px" }}
-            title="Refresh ticket entries"
-          >
-            <RefreshCw size={14} /> Refresh
-          </button>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="btn-base btn-secondary"
-            style={{ fontSize: "0.8125rem", padding: "8px 12px", color: "var(--rust-dark)" }}
-          >
-            <LogOut size={14} /> Log Out
-          </button>
-        </div>
-      </div>
-
-      {loading && (
-        <div style={{ textAlign: "center", padding: "40px 20px" }}>
-          <Loader2 className="animate-spin" size={28} color="#2A65E6" style={{ margin: "0 auto 10px" }} />
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>Loading your official entries…</p>
-        </div>
-      )}
-
-      {error && (
-        <p role="alert" style={{ color: "var(--rust-dark)", background: "var(--rust-bg)", padding: "12px", borderRadius: 8, fontSize: "0.875rem", marginBottom: 16 }}>
-          {error}
-        </p>
-      )}
-
-      {!loading && entries.length === 0 && (
-        <div className="card-base" style={{ padding: "40px 24px", textAlign: "center" }}>
-          <Ticket size={32} color="var(--gray)" style={{ margin: "0 auto 12px" }} />
-          <h2 className="display" style={{ fontSize: "1.25rem", color: "var(--blue-navy)", marginBottom: 6 }}>
-            No Submitted Tickets Found
-          </h2>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: 20 }}>
-            You have no active ticket entries under phone {user.phone}. Choose your lucky number now!
-          </p>
-          <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "12px 24px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <Ticket size={16} /> Choose & Buy a Ticket Now
-          </Link>
-        </div>
-      )}
-
-      {!loading && entries.length > 0 && (
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 800, color: "var(--blue-navy)", textTransform: "uppercase" }}>
-              Your Active Tickets ({entries.length})
+      <div style={{ position: "relative", zIndex: 2, paddingBottom: 80 }}>
+        {/* ── Header ────────────────────────────────────────────────── */}
+        <section
+          style={{
+            maxWidth: 1220,
+            margin: "0 auto",
+            padding: "clamp(48px, 6vw, 72px) clamp(16px, 3.5vw, 32px) clamp(24px, 3vw, 40px)",
+            boxSizing: "border-box",
+          }}
+        >
+          <div style={{ display: "inline-flex", marginBottom: 14 }}>
+            <span
+              style={{
+                background: "rgba(15, 23, 42, 0.8)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid #FDE047",
+                padding: "6px 14px",
+                borderRadius: "30px",
+                fontSize: "0.8125rem",
+                fontWeight: 900,
+                color: "#FEF08A",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
+              }}
+            >
+              <Ticket size={14} color="#FACC15" /> PLAYER DASHBOARD & TICKETS
             </span>
-            <Link href="/#choose-ticket" className="casino-btn-red" style={{ fontSize: "0.8125rem", padding: "6px 14px", textDecoration: "none" }}>
-              + Buy Another Ticket
-            </Link>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {entries.map((entry) => (
-              <EntryTicket key={entry.id} entry={entry} />
-            ))}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16 }}>
+            <div>
+              <h1
+                className="display"
+                style={{
+                  fontSize: "clamp(2.2rem, 4.5vw, 3.5rem)",
+                  fontWeight: 900,
+                  lineHeight: 1.1,
+                  color: "#FFFFFF",
+                  letterSpacing: "-0.8px",
+                  margin: "0 0 14px",
+                  textShadow: "0 2px 20px rgba(0, 0, 0, 0.8)",
+                }}
+              >
+                My Lottery Tickets
+              </h1>
+              <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "#F1F5F9", maxWidth: 640, margin: 0 }}>
+                View your active draw tickets, track live number statuses, and verify guaranteed prize payouts.
+              </p>
+            </div>
+
+            {user && (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "10px 20px", textDecoration: "none" }}>
+                  <Ticket size={15} /> Buy More Tickets
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  style={{
+                    background: "rgba(239, 68, 68, 0.2)",
+                    border: "1px solid #EF4444",
+                    color: "#FCA5A5",
+                    borderRadius: "30px",
+                    padding: "10px 18px",
+                    fontSize: "0.875rem",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <LogOut size={14} /> Sign Out
+                </button>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        </section>
+
+        {/* ── Content Body ──────────────────────────────────────────── */}
+        <section
+          style={{
+            maxWidth: 1220,
+            margin: "0 auto",
+            padding: "0 clamp(16px, 3.5vw, 32px)",
+            boxSizing: "border-box",
+          }}
+        >
+          {!user ? (
+            /* Sign-In Card */
+            <div
+              style={{
+                maxWidth: 480,
+                margin: "0 auto",
+                background: "rgba(15, 23, 42, 0.65)",
+                backdropFilter: "blur(24px) saturate(190%)",
+                WebkitBackdropFilter: "blur(24px) saturate(190%)",
+                borderRadius: "22px",
+                border: "2px solid rgba(253, 224, 71, 0.75)",
+                padding: "32px 28px",
+                boxShadow: "0 24px 60px rgba(0, 0, 0, 0.7)",
+                color: "#FFFFFF",
+              }}
+            >
+              <div style={{ textAlign: "center", marginBottom: 24 }}>
+                <div
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: "14px",
+                    background: "rgba(254, 240, 138, 0.2)",
+                    border: "1.5px solid #FDE047",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 12px",
+                  }}
+                >
+                  <LogIn size={24} color="#FDE047" />
+                </div>
+                <h2 className="display" style={{ fontSize: "1.5rem", fontWeight: 900, color: "#FFFFFF", margin: "0 0 6px" }}>
+                  Sign In to View Your Tickets
+                </h2>
+                <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: 0 }}>
+                  Enter your mobile number to instantly access your confirmed draw tickets.
+                </p>
+              </div>
+
+              {loginError && (
+                <div
+                  style={{
+                    background: "rgba(239, 68, 68, 0.2)",
+                    border: "1px solid #EF4444",
+                    color: "#FCA5A5",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
+                    fontSize: "0.8125rem",
+                    marginBottom: 16,
+                  }}
+                >
+                  {loginError}
+                </div>
+              )}
+
+              <form onSubmit={handlePlayerLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div>
+                  <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                    Phone Number (Telebirr / CBE)
+                  </label>
+                  <input
+                    type="tel"
+                    value={loginPhone}
+                    onChange={(e) => setLoginPhone(e.target.value)}
+                    placeholder="0911 234 567"
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "10px",
+                      color: "#FFFFFF",
+                      fontSize: "0.9375rem",
+                      boxSizing: "border-box",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#CBD5E1", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                    Your Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={loginName}
+                    onChange={(e) => setLoginName(e.target.value)}
+                    placeholder="e.g. Abebe Bikila"
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "10px",
+                      color: "#FFFFFF",
+                      fontSize: "0.9375rem",
+                      boxSizing: "border-box",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="casino-btn-red"
+                  style={{
+                    padding: "14px",
+                    fontSize: "0.9375rem",
+                    cursor: loginLoading ? "not-allowed" : "pointer",
+                    marginTop: 6,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                  }}
+                >
+                  {loginLoading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
+                  {loginLoading ? "Verifying Account..." : "Access My Tickets"}
+                </button>
+              </form>
+            </div>
+          ) : (
+            /* Tickets Grid */
+            <div>
+              {loading ? (
+                <div style={{ textAlign: "center", padding: "60px 0", color: "#FEF08A" }}>
+                  <Loader2 size={36} className="animate-spin" style={{ margin: "0 auto 12px" }} />
+                  <p style={{ fontSize: "1rem", fontWeight: 700 }}>Loading your confirmed draw tickets...</p>
+                </div>
+              ) : entries.length === 0 ? (
+                <div
+                  style={{
+                    maxWidth: 500,
+                    margin: "0 auto",
+                    background: "rgba(15, 23, 42, 0.65)",
+                    backdropFilter: "blur(24px)",
+                    borderRadius: "22px",
+                    border: "2px solid rgba(253, 224, 71, 0.75)",
+                    padding: "36px 24px",
+                    textAlign: "center",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <Ticket size={40} color="#FDE047" style={{ margin: "0 auto 12px" }} />
+                  <h3 className="display" style={{ fontSize: "1.35rem", fontWeight: 900, margin: "0 0 8px" }}>
+                    No Tickets Found in Active Draw
+                  </h3>
+                  <p style={{ fontSize: "0.875rem", color: "#CBD5E1", marginBottom: 20 }}>
+                    You haven&apos;t purchased any tickets for this live draw yet. Pick your lucky number now!
+                  </p>
+                  <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "12px 24px", textDecoration: "none" }}>
+                    <Ticket size={16} /> Choose Lucky Number
+                  </Link>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                    gap: 20,
+                  }}
+                >
+                  {entries.map((entry) => (
+                    <EntryTicket key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

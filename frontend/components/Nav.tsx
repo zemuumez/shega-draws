@@ -193,11 +193,11 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
             <Image
               src="/images/rimna-brand-logo.png"
               alt="Rimna International Digital Lottery"
-              width={180}
-              height={46}
+              width={240}
+              height={56}
               priority
               style={{
-                height: "clamp(34px, 4.2vw, 42px)",
+                height: "clamp(38px, 4.5vw, 48px)",
                 width: "auto",
                 objectFit: "contain",
               }}

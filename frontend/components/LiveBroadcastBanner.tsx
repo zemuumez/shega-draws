@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Tv, Send, Trophy, CheckCircle2, Ticket } from "lucide-react";
+import { Tv, Send, Trophy, CheckCircle2, Ticket, Sparkles, ShieldCheck, Radio } from "lucide-react";
 import { BuyTicketModal } from "./BuyTicketModal";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSectionContent } from "@/lib/sanity/queries";
@@ -18,14 +18,12 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
     (language === "am" && cmsContent?.titleAm) ||
     (language === "om" && cmsContent?.titleOm) ||
     cmsContent?.title ||
-    "Numbers Drawn Live on Video for All Participants";
+    "100% Live Video Winner Draws by Company Founders";
 
   const body =
     (language === "am" && cmsContent?.bodyAm) ||
     (language === "om" && cmsContent?.bodyOm) ||
     cmsContent?.body;
-
-  const features = cmsContent?.features && cmsContent.features.length > 0 ? cmsContent.features : null;
 
   return (
     <>
@@ -38,118 +36,146 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
       />
 
       <div
-        className="card-base interactive-ticket-card lottery-guilloche-bg"
         style={{
-          background: "#FFFFFF",
-          border: "2px solid #F59E0B",
-          borderRadius: "14px",
-          padding: "20px 22px",
-          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.04)",
-          marginBottom: 20,
+          background: "rgba(15, 23, 42, 0.62)",
+          backdropFilter: "blur(24px) saturate(190%)",
+          WebkitBackdropFilter: "blur(24px) saturate(190%)",
+          borderRadius: "22px",
+          border: "2px solid rgba(253, 224, 71, 0.75)",
+          padding: "clamp(20px, 3.5vw, 32px)",
+          boxShadow:
+            "0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(254, 240, 138, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)",
+          color: "#FFFFFF",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: 16,
+            marginBottom: 16,
+          }}
+        >
           <div>
-            <span className="casino-ribbon-badge">
-              <span className="pulse-radar" style={{ width: 7, height: 7, borderRadius: "50%", background: "#FFFFFF", display: "inline-block" }} />
-              LIVE PUBLIC WINNER DRAWING
-            </span>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: "rgba(220, 38, 38, 0.25)",
+                border: "1px solid #EF4444",
+                borderRadius: "20px",
+                padding: "3px 10px",
+                marginBottom: 8,
+              }}
+            >
+              <Radio size={12} color="#EF4444" className="animate-pulse" />
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  fontWeight: 900,
+                  color: "#FCA5A5",
+                  letterSpacing: "0.8px",
+                  textTransform: "uppercase",
+                }}
+              >
+                OFFICIAL PUBLIC BROADCAST
+              </span>
+            </div>
 
-            <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900, lineHeight: 1.2 }}>
+            <h2
+              className="display"
+              style={{
+                fontSize: "clamp(1.25rem, 2.5vw, 1.75rem)",
+                fontWeight: 900,
+                color: "#FFFFFF",
+                margin: 0,
+                lineHeight: 1.2,
+              }}
+            >
               {title}
-            </h3>
+            </h2>
           </div>
 
           <button
             type="button"
             onClick={() => setIsBuyModalOpen(true)}
             className="casino-btn-red"
-            style={{ fontSize: "0.8125rem", padding: "8px 14px" }}
+            style={{
+              fontSize: "0.875rem",
+              padding: "10px 20px",
+              cursor: "pointer",
+            }}
           >
-            <Ticket size={14} /> Enter Active Draw
+            <Ticket size={15} /> Enter Active Draw Now
           </button>
         </div>
 
-        <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: 18 }}>
+        <p style={{ color: "#E2E8F0", fontSize: "0.9375rem", lineHeight: 1.65, margin: "0 0 20px" }}>
           {body || (
             <>
-              There are no hidden algorithms or automated backdoors. The founder and host of <strong>Rimna Digital Lottery</strong> pick each winning number live on camera during the scheduled broadcast and show every winning ticket directly to all viewers so you know instantly if you won!
+              There are no hidden algorithms or automated backdoors. The company founders host every scheduled live public draw on video, pulling each physical winning number from the illuminated lottery tumbler and showing every ticket directly to viewers in real time!
             </>
           )}
         </p>
 
-        {/* Broadcast Channels & Guarantees */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10 }}>
-          {features ? (
-            features.map((f, i) => {
-              const fTitle = (language === "am" && f.titleAm) || (language === "om" && f.titleOm) || f.title;
-              const fDesc = (language === "am" && f.descriptionAm) || (language === "om" && f.descriptionOm) || f.description;
-              const isRed = f.color === "red" || i === 0;
-              const isBlue = f.color === "blue" || i === 1;
+        {/* Channels & Guarantees Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(0, 0, 0, 0.4)",
+              border: "1px solid rgba(254, 240, 138, 0.3)",
+              borderRadius: "14px",
+              padding: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FEF08A", fontWeight: 800, fontSize: "0.875rem", marginBottom: 4 }}>
+              <Tv size={16} color="#FDE047" /> Live Stream Schedule
+            </div>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
+              Every Friday & Sunday at 8:00 PM EAT (Addis Ababa Time).
+            </span>
+          </div>
 
-              return (
-                <div key={i} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: "50%", background: isRed ? "#FEE2E2" : isBlue ? "#EFF6FF" : "#FEF9C3", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {isRed ? <Tv size={18} color="#DC2626" /> : isBlue ? <Send size={18} color="#2A65E6" /> : <Trophy size={18} color="var(--gold-deep)" />}
-                  </div>
-                  <div>
-                    <strong style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", display: "block" }}>
-                      {fTitle}
-                    </strong>
-                    {fDesc && (
-                      <span style={{ fontSize: "0.6875rem", color: "var(--text-subtle)" }}>
-                        {fDesc}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <>
-              <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FEE2E2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Tv size={18} color="#DC2626" />
-                </div>
-                <div>
-                  <strong style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", display: "block" }}>
-                    YouTube Live Stream
-                  </strong>
-                  <span style={{ fontSize: "0.6875rem", color: "var(--text-subtle)" }}>
-                    Watch live draw in HD
-                  </span>
-                </div>
-              </div>
+          <div
+            style={{
+              background: "rgba(0, 0, 0, 0.4)",
+              border: "1px solid rgba(52, 211, 153, 0.3)",
+              borderRadius: "14px",
+              padding: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6EE7B7", fontWeight: 800, fontSize: "0.875rem", marginBottom: 4 }}>
+              <CheckCircle2 size={16} color="#34D399" /> 10 Guaranteed Winners
+            </div>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
+              100% of the player prize pool is awarded in every single draw without rollovers.
+            </span>
+          </div>
 
-              <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#EFF6FF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Send size={18} color="#2A65E6" />
-                </div>
-                <div>
-                  <strong style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", display: "block" }}>
-                    Telegram Live Channel
-                  </strong>
-                  <span style={{ fontSize: "0.6875rem", color: "var(--text-subtle)" }}>
-                    @RimnaLotteryOfficial
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FEF9C3", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Trophy size={18} color="var(--gold-deep)" />
-                </div>
-                <div>
-                  <strong style={{ fontSize: "0.8125rem", color: "var(--blue-navy)", display: "block" }}>
-                    10 Instant Cash Winners
-                  </strong>
-                  <span style={{ fontSize: "0.6875rem", color: "var(--text-subtle)" }}>
-                    Paid via Telebirr / CBE / Bank
-                  </span>
-                </div>
-              </div>
-            </>
-          )}
+          <div
+            style={{
+              background: "rgba(0, 0, 0, 0.4)",
+              border: "1px solid rgba(96, 165, 250, 0.3)",
+              borderRadius: "14px",
+              padding: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#93C5FD", fontWeight: 800, fontSize: "0.875rem", marginBottom: 4 }}>
+              <Send size={16} color="#60A5FA" /> Official Telegram Stream
+            </div>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
+              Join @RimnaLottery to watch the live video and chat with fellow participants.
+            </span>
+          </div>
         </div>
       </div>
     </>

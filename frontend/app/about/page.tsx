@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { WhyRimnaLottery } from "@/components/WhyRimnaLottery";
-import { Trophy, Tv, Users, ShieldCheck, Phone, Send, CheckCircle2, ArrowRight } from "lucide-react";
+import { Trophy, Tv, Users, ShieldCheck, Phone, Send, CheckCircle2, ArrowRight, Ticket, Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Why Rimna Digital Lottery — Public Transparency & Live Draws",
@@ -10,96 +10,223 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="page-inner-container" style={{ padding: "32px clamp(14px, 3vw, 24px)", maxWidth: 1040, margin: "0 auto" }}>
-      {/* ── Page Header ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
-        <div
+    <div
+      style={{
+        width: "100%",
+        overflowX: "hidden",
+        position: "relative",
+        backgroundImage: "url(/images/rimna-stadium-hero.jpg)",
+        backgroundAttachment: "fixed",
+        backgroundPosition: "center top",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Background Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.6) 40%, rgba(15, 23, 42, 0.85) 100%)",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
+
+      <div style={{ position: "relative", zIndex: 2, paddingBottom: 80 }}>
+        {/* ── 1. Page Header ────────────────────────────────────────── */}
+        <section
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: "10px",
-            background: "#FEF9C3",
-            border: "1.5px solid #FDE047",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
+            maxWidth: 1220,
+            margin: "0 auto",
+            padding: "clamp(48px, 6vw, 72px) clamp(16px, 3.5vw, 32px) clamp(24px, 3vw, 40px)",
+            boxSizing: "border-box",
           }}
         >
-          <ShieldCheck size={24} color="#D97706" />
-        </div>
-        <div>
-          <h1 className="display" style={{ fontSize: "clamp(1.35rem, 3vw, 1.85rem)", color: "#111827", fontWeight: 900, lineHeight: 1.15 }}>
+          <div style={{ display: "inline-flex", marginBottom: 14 }}>
+            <span
+              style={{
+                background: "rgba(15, 23, 42, 0.8)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1.5px solid #FDE047",
+                padding: "6px 14px",
+                borderRadius: "30px",
+                fontSize: "0.8125rem",
+                fontWeight: 900,
+                color: "#FEF08A",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
+              }}
+            >
+              <ShieldCheck size={14} color="#FACC15" /> ETHIOPIA & DIASPORA TRANSPARENT LOTTERY
+            </span>
+          </div>
+
+          <h1
+            className="display"
+            style={{
+              fontSize: "clamp(2.2rem, 4.5vw, 3.5rem)",
+              fontWeight: 900,
+              lineHeight: 1.1,
+              color: "#FFFFFF",
+              letterSpacing: "-0.8px",
+              margin: "0 0 14px",
+              textShadow: "0 2px 20px rgba(0, 0, 0, 0.8)",
+            }}
+          >
             Why Rimna Digital Lottery?
           </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginTop: 2 }}>
-            Ethiopia and the Diaspora&apos;s premier digital lottery built on genuine public transparency and guaranteed payouts.
-          </p>
-        </div>
-      </div>
 
-      {/* ── Why Rimna Feature Component ── */}
-      <div style={{ marginBottom: 28 }}>
-        <WhyRimnaLottery />
-      </div>
-
-      {/* ── 24/7 Live Support & Hotline Section ── */}
-      <div
-        className="card-base"
-        style={{
-          borderRadius: "14px",
-          border: "2px solid #F59E0B",
-          background: "#FFFBEB",
-          padding: "22px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 16,
-          marginBottom: 28,
-        }}
-      >
-        <div>
-          <span style={{ fontSize: "0.6875rem", color: "#D97706", textTransform: "uppercase", fontWeight: 800, display: "block" }}>
-            24/7 CUSTOMER CARE
-          </span>
-          <h3 className="display" style={{ fontSize: "1.25rem", color: "#111827", fontWeight: 900 }}>
-            Dedicated Support & Player Assistance
-          </h3>
-          <p style={{ fontSize: "0.8125rem", color: "#4B5563", marginTop: 2 }}>
-            Have questions about buying tickets, verifying numbers, or claiming your cash prize? Contact us directly.
-          </p>
-        </div>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a
-            href="tel:+251911000000"
-            className="casino-btn-dark"
-            style={{ padding: "9px 16px", textDecoration: "none" }}
+          <p
+            style={{
+              fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+              lineHeight: 1.6,
+              color: "#F1F5F9",
+              maxWidth: 700,
+              margin: "0 0 24px",
+              textShadow: "0 1px 8px rgba(0,0,0,0.8)",
+            }}
           >
-            <Phone size={14} color="#10B981" /> Call +251 911 000 000
-          </a>
-          <a
-            href="https://t.me/RimnaLotteryOfficial"
-            target="_blank"
-            rel="noreferrer"
-            className="casino-btn-red"
-            style={{ padding: "9px 16px", textDecoration: "none" }}
-          >
-            <Send size={14} /> Telegram @RimnaLottery
-          </a>
-        </div>
-      </div>
+            Ethiopia and the Diaspora&apos;s premier digital lottery built on genuine public transparency, fixed capped participant pools, and 10 guaranteed winners per draw.
+          </p>
 
-      {/* CTA to Explore Draws */}
-      <div style={{ textAlign: "center", padding: "16px 0" }}>
-        <Link
-          href="/"
-          className="casino-btn-red"
-          style={{ padding: "12px 28px", fontSize: "0.9375rem", textDecoration: "none" }}
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <Link
+              href="/#choose-ticket"
+              className="casino-btn-red"
+              style={{
+                padding: "12px 24px",
+                fontSize: "0.9375rem",
+                textDecoration: "none",
+                fontWeight: 900,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Ticket size={17} /> Pick Lucky Number Now
+            </Link>
+            <Link
+              href="/how-it-works"
+              style={{
+                background: "rgba(15, 23, 42, 0.75)",
+                backdropFilter: "blur(12px)",
+                border: "1.5px solid #FDE047",
+                color: "#FEF08A",
+                borderRadius: "30px",
+                padding: "12px 20px",
+                fontSize: "0.9375rem",
+                textDecoration: "none",
+                fontWeight: 900,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Sparkles size={17} color="#FDE047" /> Read Full Guide
+            </Link>
+          </div>
+        </section>
+
+        {/* ── 2. Why Rimna Core Pillars Showcase ────────────────────── */}
+        <section
+          style={{
+            maxWidth: 1220,
+            margin: "0 auto 36px",
+            padding: "0 clamp(16px, 3.5vw, 32px)",
+            boxSizing: "border-box",
+          }}
         >
-          Explore Active Draws & Buy Tickets <ArrowRight size={16} />
-        </Link>
+          <WhyRimnaLottery />
+        </section>
+
+        {/* ── 3. 24/7 Dedicated Player Care Hub ─────────────────────── */}
+        <section
+          style={{
+            maxWidth: 1220,
+            margin: "0 auto",
+            padding: "0 clamp(16px, 3.5vw, 32px)",
+            boxSizing: "border-box",
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(15, 23, 42, 0.62)",
+              backdropFilter: "blur(24px) saturate(190%)",
+              WebkitBackdropFilter: "blur(24px) saturate(190%)",
+              borderRadius: "22px",
+              border: "2px solid rgba(253, 224, 71, 0.75)",
+              padding: "clamp(20px, 3.5vw, 32px)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 16,
+              color: "#FFFFFF",
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  textTransform: "uppercase",
+                  fontWeight: 900,
+                  letterSpacing: "0.8px",
+                  display: "block",
+                }}
+              >
+                24/7 DEDICATED CUSTOMER CARE
+              </span>
+              <h3 className="display" style={{ fontSize: "1.35rem", color: "#FFFFFF", fontWeight: 900, margin: "2px 0 4px" }}>
+                Official Player Assistance & Verification
+              </h3>
+              <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: 0, maxWidth: 600 }}>
+                Have questions about ticket verification, payment methods, or claiming cash payouts? Our team is available 24 hours a day.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <a
+                href="tel:+251911000000"
+                className="casino-btn-gold"
+                style={{
+                  padding: "11px 20px",
+                  textDecoration: "none",
+                  fontWeight: 900,
+                  fontSize: "0.875rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <Phone size={15} color="#111827" /> Call +251 911 000 000
+              </a>
+              <a
+                href="https://t.me/RimnaLotteryOfficial"
+                target="_blank"
+                rel="noreferrer"
+                className="casino-btn-red"
+                style={{
+                  padding: "11px 20px",
+                  textDecoration: "none",
+                  fontWeight: 900,
+                  fontSize: "0.875rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <Send size={15} /> Telegram @RimnaLottery
+              </a>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
