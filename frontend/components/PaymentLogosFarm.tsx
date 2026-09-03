@@ -97,7 +97,7 @@ export function PaymentLogosFarm() {
           position: "relative",
         }}
       >
-        {/* Horizontal Hover-Scrollable Track with Uniform Height and Width for All Logos */}
+        {/* Horizontal Hover-Scrollable Track with Strict Uniform Height & Width for All Logos */}
         <div
           ref={scrollRef}
           onWheel={handleWheel}
@@ -109,7 +109,7 @@ export function PaymentLogosFarm() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "clamp(18px, 2.5vw, 32px)",
+            gap: "clamp(16px, 2vw, 24px)",
             overflowX: "auto",
             overflowY: "hidden",
             scrollBehavior: isDragging ? "auto" : "smooth",
@@ -126,18 +126,18 @@ export function PaymentLogosFarm() {
               key={`${logo.id}-${idx}`}
               title={logo.name}
               style={{
-                height: "clamp(68px, 7.5vw, 84px)",
-                width: "clamp(150px, 14vw, 190px)",
-                minWidth: "clamp(150px, 14vw, 190px)",
-                maxWidth: "clamp(150px, 14vw, 190px)",
+                height: "clamp(64px, 7vw, 76px)",
+                width: "clamp(160px, 15vw, 195px)",
+                minWidth: "clamp(160px, 15vw, 195px)",
+                maxWidth: "clamp(160px, 15vw, 195px)",
                 flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 boxSizing: "border-box",
                 padding: "6px 12px",
-                background: "rgba(255, 255, 255, 0.6)",
-                border: "1px solid rgba(229, 231, 235, 0.8)",
+                background: "rgba(255, 255, 255, 0.75)",
+                border: "1px solid rgba(229, 231, 235, 0.9)",
                 borderRadius: "14px",
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.03)",
                 transition: "all 180ms ease",
