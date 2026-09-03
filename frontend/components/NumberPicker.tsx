@@ -16,7 +16,6 @@ export function NumberPicker({
   poolSize = 1000,
   takenNumbers = [],
 }: NumberPickerProps) {
-  const [gridOpen, setGridOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [isRolling, setIsRolling] = useState(false);
@@ -24,12 +23,11 @@ export function NumberPicker({
   const PAGE_SIZE = 100;
   const totalPages = Math.ceil(poolSize / PAGE_SIZE);
 
-  // Generate simulated realistic taken numbers if none passed (e.g. ~25% sold)
+  // Generate simulated realistic taken numbers if none passed (e.g. ~20% sold)
   const effectiveTaken = useMemo(() => {
     if (takenNumbers.length > 0) return new Set(takenNumbers);
     const mockSet = new Set<string>();
-    // Pre-populate some popular numbers as taken
-    const sample = [3, 7, 13, 21, 42, 77, 88, 99, 107, 142, 200, 250, 333, 404, 500, 666, 777, 888, 999, 1000, 1234, 1500, 1777, 2000];
+    const sample = [3, 7, 13, 21, 42, 77, 88, 99, 107, 142, 200, 250, 333, 404, 500, 666, 777, 888, 999, 1000, 1234, 1500, 1777, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
     sample.forEach((n) => {
       if (n <= poolSize) mockSet.add(String(n));
     });
@@ -70,68 +68,65 @@ export function NumberPicker({
       if (count >= 10) {
         clearInterval(interval);
         setIsRolling(false);
-        // Find an actually untaken random number
         let finalNum = Math.floor(Math.random() * poolSize) + 1;
-        while (effectiveTaken.has(String(finalNum)) && mockSetSize(effectiveTaken) < poolSize) {
+        while (effectiveTaken.has(String(finalNum)) && effectiveTaken.size < poolSize) {
           finalNum = Math.floor(Math.random() * poolSize) + 1;
         }
         onChange(String(finalNum));
-        // Jump page to show selected number
         setCurrentPage(Math.floor((finalNum - 1) / PAGE_SIZE));
       }
-    }, 50);
-  };
-
-  const handleManualInput = (val: string) => {
-    const clean = val.replace(/\D/g, "");
-    if (!clean) {
-      onChange("");
-      return;
-    }
-    const num = parseInt(clean, 10);
-    if (num >= 1 && num <= poolSize) {
-      onChange(String(num));
-      setCurrentPage(Math.floor((num - 1) / PAGE_SIZE));
-    }
+    }, 45);
   };
 
   const isCurrentValueTaken = effectiveTaken.has(value);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {/* ── Top Wheel & Selected Number Display ───────────────────── */}
       <div
         style={{
-          background: "linear-gradient(135deg, #FEF9C3 0%, #EFF5FF 100%)",
-          border: "1.5px solid #FDE047",
-          borderRadius: "var(--radius-lg)",
-          padding: "20px 24px",
+          background: "rgba(0, 0, 0, 0.45)",
+          border: "1.5px solid rgba(253, 224, 71, 0.75)",
+          borderRadius: "16px",
+          padding: "16px 20px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: 16,
+          gap: 14,
+          boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.15)",
         }}
       >
         <div>
-          <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--blue-navy)", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.5px" }}>
+          <span
+            style={{
+              fontSize: "0.6875rem",
+              color: "#FEF08A",
+              textTransform: "uppercase",
+              fontWeight: 900,
+              letterSpacing: "0.8px",
+              display: "block",
+            }}
+          >
             SELECTED LUCKY TICKET NUMBER
           </span>
+
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
             <div
               className="display"
               style={{
-                fontSize: "2.75rem",
-                fontWeight: 800,
-                color: isCurrentValueTaken ? "var(--rust-dark)" : "var(--blue-navy)",
-                background: "#FFFFFF",
-                border: isCurrentValueTaken ? "2px solid var(--rust-border)" : "2px solid #2A65E6",
-                borderRadius: 10,
-                padding: "2px 18px",
-                boxShadow: "0 4px 12px rgba(42, 101, 230, 0.12)",
+                fontSize: "2.4rem",
+                fontWeight: 900,
+                color: isCurrentValueTaken ? "#FCA5A5" : "#FDE047",
+                background: "rgba(0, 0, 0, 0.6)",
+                border: isCurrentValueTaken ? "2px solid #EF4444" : "2px solid #FDE047",
+                borderRadius: 12,
+                padding: "2px 16px",
+                boxShadow: isCurrentValueTaken ? "0 0 14px rgba(239, 68, 68, 0.4)" : "0 0 16px rgba(253, 224, 71, 0.35)",
                 lineHeight: 1.15,
-                minWidth: 110,
+                minWidth: 90,
                 textAlign: "center",
+                textShadow: "0 2px 10px rgba(0,0,0,0.8)",
               }}
             >
               #{value || "---"}
@@ -139,47 +134,62 @@ export function NumberPicker({
 
             <div>
               {value && !isCurrentValueTaken ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--teal-dark)", fontSize: "0.8125rem", fontWeight: 700 }}>
-                  <Check size={16} /> Available to Pick
+                <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#6EE7B7", fontSize: "0.8125rem", fontWeight: 800 }}>
+                  <Check size={15} color="#34D399" /> Available to Pick
                 </div>
               ) : value && isCurrentValueTaken ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--rust-dark)", fontSize: "0.8125rem", fontWeight: 700 }}>
-                  <Lock size={14} /> Already Taken
+                <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#FCA5A5", fontSize: "0.8125rem", fontWeight: 800 }}>
+                  <Lock size={14} color="#EF4444" /> Already Taken
                 </div>
               ) : null}
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "var(--text-subtle)", display: "block" }}>
-                Range: #1 to #{poolSize.toLocaleString()}
+              <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}>
+                Pool Range: #1 to #{poolSize.toLocaleString()}
               </span>
             </div>
           </div>
         </div>
 
         {/* Quick Action: Pick Random */}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button
-            type="button"
-            onClick={rollRandom}
-            disabled={isRolling}
-            className="btn-base btn-primary"
-            style={{ padding: "10px 18px", fontSize: "0.875rem" }}
-          >
-            <Dice5 size={18} className={isRolling ? "animate-spin" : ""} />
-            Pick Random Number
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={rollRandom}
+          disabled={isRolling}
+          className="casino-btn-gold"
+          style={{
+            padding: "10px 18px",
+            fontSize: "0.875rem",
+            fontWeight: 900,
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 7,
+          }}
+        >
+          <Dice5 size={17} className={isRolling ? "animate-spin" : ""} color="#111827" />
+          Pick Random Number
+        </button>
       </div>
 
-      {/* ── Search & Jump to Range Filter ─────────────────────────── */}
+      {/* ── Search & Range Jump Filter ────────────────────────────── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-        <div style={{ position: "relative", minWidth: 220, flex: 1 }}>
-          <Search size={14} color="var(--text-subtle)" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+        <div style={{ position: "relative", minWidth: 200, flex: 1 }}>
+          <Search size={14} color="#94A3B8" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
-            className="input-base"
             placeholder={`Type specific number (1 - ${poolSize.toLocaleString()})...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ paddingLeft: 34, height: 40, fontSize: "0.8125rem" }}
+            style={{
+              width: "100%",
+              padding: "10px 12px 10px 34px",
+              background: "rgba(0, 0, 0, 0.45)",
+              border: "1.5px solid rgba(255, 255, 255, 0.15)",
+              borderRadius: "10px",
+              color: "#FFFFFF",
+              fontSize: "0.8125rem",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
           />
         </div>
 
@@ -190,14 +200,26 @@ export function NumberPicker({
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
               disabled={currentPage === 0}
-              className="btn-base btn-secondary"
-              style={{ width: 34, height: 34, padding: 0 }}
+              style={{
+                width: 34,
+                height: 34,
+                padding: 0,
+                background: "rgba(0, 0, 0, 0.4)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: "8px",
+                color: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage === 0 ? "not-allowed" : "pointer",
+                opacity: currentPage === 0 ? 0.4 : 1,
+              }}
               aria-label="Previous range"
             >
               <ChevronLeft size={16} />
             </button>
 
-            <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--blue-navy)", padding: "0 6px" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", padding: "0 6px" }}>
               #{currentPage * PAGE_SIZE + 1} – #{Math.min(poolSize, (currentPage + 1) * PAGE_SIZE)}
             </span>
 
@@ -205,8 +227,20 @@ export function NumberPicker({
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={currentPage >= totalPages - 1}
-              className="btn-base btn-secondary"
-              style={{ width: 34, height: 34, padding: 0 }}
+              style={{
+                width: 34,
+                height: 34,
+                padding: 0,
+                background: "rgba(0, 0, 0, 0.4)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: "8px",
+                color: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: currentPage >= totalPages - 1 ? "not-allowed" : "pointer",
+                opacity: currentPage >= totalPages - 1 ? 0.4 : 1,
+              }}
               aria-label="Next range"
             >
               <ChevronRight size={16} />
@@ -218,86 +252,71 @@ export function NumberPicker({
       {/* ── Interactive Scrollable Number Board ────────────────────── */}
       <div
         style={{
-          background: "#FFFFFF",
-          border: "1.5px solid var(--blue-border)",
-          borderRadius: "var(--radius-md)",
-          padding: "16px 14px",
-          boxShadow: "var(--shadow-sm)",
+          background: "rgba(0, 0, 0, 0.45)",
+          border: "1.5px solid rgba(255, 255, 255, 0.12)",
+          borderRadius: "14px",
+          padding: "14px",
+          maxHeight: 250,
+          overflowY: "auto",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-          <span className="mono" style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--blue-navy)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 6 }}>
-            <Grid size={14} color="#2A65E6" /> Interactive Numbers Board ({poolSize.toLocaleString()} Total Slots)
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, fontSize: "0.6875rem", color: "#CBD5E1" }}>
+          <span style={{ fontWeight: 800, color: "#FEF08A" }}>
+            SELECTABLE NUMBERS ({poolSize.toLocaleString()} TOTAL POOL SLOTS)
           </span>
-
-          <div style={{ display: "flex", gap: 12, alignItems: "center", fontSize: "0.6875rem" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text-subtle)" }}>
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "#EFF5FF", border: "1px solid #C3DAFE" }} /> Available
+          <div style={{ display: "flex", gap: 10 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255, 255, 255, 0.2)" }} /> Available
             </span>
-            <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--rust-dark)" }}>
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "var(--rust-bg)", border: "1px solid var(--rust-border)" }} /> Taken (Red)
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#FCA5A5" }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444" }} /> Taken
             </span>
-            <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--blue-navy)", fontWeight: 700 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "#2A65E6" }} /> Selected
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#FEF08A" }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#FDE047" }} /> Selected
             </span>
           </div>
         </div>
 
-        {/* The Grid of Numbers */}
         <div
           style={{
-            maxHeight: 280,
-            overflowY: "auto",
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(52px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(44px, 1fr))",
             gap: 6,
-            padding: 4,
           }}
         >
-          {pageNumbers.map((n) => {
-            const strNum = String(n);
-            const isTaken = effectiveTaken.has(strNum);
-            const isSelected = value === strNum;
+          {pageNumbers.map((num) => {
+            const isSelected = String(num) === value;
+            const isTaken = effectiveTaken.has(String(num));
 
             return (
               <button
-                key={n}
+                key={num}
                 type="button"
                 disabled={isTaken}
-                onClick={() => onChange(strNum)}
-                title={isTaken ? `Number #${n} is already taken` : `Select Number #${n}`}
+                onClick={() => onChange(String(num))}
                 style={{
                   height: 38,
-                  borderRadius: 6,
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "0.8125rem",
-                  fontWeight: isSelected ? 800 : isTaken ? 600 : 700,
-                  cursor: isTaken ? "not-allowed" : "pointer",
+                  borderRadius: 8,
                   border: isSelected
-                    ? "2px solid #2A65E6"
+                    ? "2px solid #FDE047"
                     : isTaken
-                    ? "1px solid var(--rust-border)"
-                    : "1px solid #E2E8F0",
+                    ? "1px solid rgba(239, 68, 68, 0.3)"
+                    : "1px solid rgba(255, 255, 255, 0.12)",
                   background: isSelected
-                    ? "#2A65E6"
+                    ? "linear-gradient(180deg, #FDE047 0%, #EAB308 100%)"
                     : isTaken
-                    ? "var(--rust-bg)"
-                    : "#EFF5FF",
-                  color: isSelected
-                    ? "#FFFFFF"
-                    : isTaken
-                    ? "var(--rust-dark)"
-                    : "var(--blue-navy)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all var(--transition-fast)",
-                  boxShadow: isSelected ? "0 2px 8px rgba(42, 101, 230, 0.35)" : "none",
-                  opacity: isTaken ? 0.65 : 1,
+                    ? "rgba(239, 68, 68, 0.12)"
+                    : "rgba(255, 255, 255, 0.06)",
+                  color: isSelected ? "#111827" : isTaken ? "#F87171" : "#FFFFFF",
+                  fontWeight: isSelected ? 900 : 700,
+                  fontSize: "0.8125rem",
+                  cursor: isTaken ? "not-allowed" : "pointer",
                   textDecoration: isTaken ? "line-through" : "none",
+                  boxShadow: isSelected ? "0 0 10px rgba(253, 224, 71, 0.6)" : "none",
+                  transition: "all 150ms ease",
                 }}
               >
-                {n}
+                {num}
               </button>
             );
           })}
@@ -305,8 +324,4 @@ export function NumberPicker({
       </div>
     </div>
   );
-}
-
-function mockSetSize(s: Set<string>): number {
-  return s.size;
 }

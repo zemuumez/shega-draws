@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Upload, CheckCircle } from "lucide-react";
+import { Upload, CheckCircle, Image as ImageIcon } from "lucide-react";
 
 interface PaymentProofUploaderProps {
   onChange: (file: File) => void;
@@ -35,9 +35,17 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
   return (
     <div>
       <label
-        style={{ display: "block", fontSize: "0.75rem", color: "var(--gray)", marginBottom: 8, fontWeight: 500 }}
+        style={{
+          display: "block",
+          fontSize: "0.75rem",
+          color: "#FEF08A",
+          marginBottom: 8,
+          fontWeight: 800,
+          textTransform: "uppercase",
+          letterSpacing: "0.5px",
+        }}
       >
-        Payment screenshot
+        Payment Screenshot / SMS Proof
       </label>
       <div
         role="button"
@@ -49,14 +57,14 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         style={{
-          border: `1.5px dashed ${dragging ? "var(--gold)" : "var(--gray-line)"}`,
-          borderRadius: "var(--radius-md)",
-          padding: "20px 16px",
+          border: `1.5px dashed ${dragging ? "#FDE047" : "rgba(253, 224, 71, 0.4)"}`,
+          borderRadius: "14px",
+          padding: "18px 16px",
           textAlign: "center",
           cursor: "pointer",
-          background: dragging ? "var(--gold-glow)" : "rgba(255,255,255,0.02)",
-          transition: "border-color var(--transition-fast), background var(--transition-fast)",
-          minHeight: 90,
+          background: dragging ? "rgba(254, 240, 138, 0.1)" : "rgba(0, 0, 0, 0.45)",
+          transition: "border-color 150ms ease, background 150ms ease",
+          minHeight: 84,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -68,21 +76,21 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
             <img
               src={preview}
               alt="Payment proof preview"
-              style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, border: "1px solid var(--gray-line)" }}
+              style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1.5px solid #FDE047" }}
             />
             <div style={{ textAlign: "left" }}>
-              <div style={{ color: "var(--paper)", fontSize: "0.875rem" }}>{fileName}</div>
-              <div style={{ color: "var(--teal-soft)", fontSize: "0.75rem", display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-                <CheckCircle size={12} /> Ready to submit
+              <div style={{ color: "#FFFFFF", fontSize: "0.875rem", fontWeight: 700 }}>{fileName || "screenshot.png"}</div>
+              <div style={{ color: "#6EE7B7", fontSize: "0.75rem", display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontWeight: 800 }}>
+                <CheckCircle size={13} color="#34D399" /> Proof Ready to Submit
               </div>
             </div>
           </div>
         ) : (
-          <div style={{ color: "var(--gray)", fontSize: "0.875rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-            <Upload size={22} />
+          <div style={{ color: "#CBD5E1", fontSize: "0.875rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <Upload size={20} color="#FDE047" />
             <span>
-              Tap or drag a screenshot here<br />
-              <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>JPEG, PNG or WEBP · max 5 MB</span>
+              Tap or drag payment receipt here<br />
+              <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>JPEG, PNG, or WEBP (Max 5MB)</span>
             </span>
           </div>
         )}

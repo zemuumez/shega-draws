@@ -764,6 +764,7 @@ export function InteractiveTicketConfigurator() {
         onClose={() => setIsBuyModalOpen(false)}
         initialCurrency={currency}
         initialPrice={selectedPrice}
+        initialPoolSize={selectedPool}
         initialDrawId={`RDL-${currency}-${selectedPrice}`}
       />
     </div>
