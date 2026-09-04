@@ -7,8 +7,8 @@ export const siteSettingsType = defineType({
   fieldsets: [
     {
       name: "tierControls",
-      title: "🎛️ Active Lottery Prices & Pool Capacities (Enable / Disable)",
-      options: { collapsible: false },
+      title: "🎛️ Active Lottery Prices & Pool Capacities (Add, Edit, Delete, Toggle)",
+      options: { collapsible: true, collapsed: false },
     },
     {
       name: "branding",
@@ -34,6 +34,12 @@ export const siteSettingsType = defineType({
       type: "array",
       fieldset: "tierControls",
       description: "Manage ETB ticket prices. You can add new price amounts, edit values/labels, delete tiers, or turn on/off.",
+      initialValue: [
+        { value: 100, label: "100", isEnabled: true },
+        { value: 200, label: "200", isEnabled: true },
+        { value: 500, label: "500", isEnabled: true },
+        { value: 1000, label: "1,000", isEnabled: true },
+      ],
       of: [
         {
           type: "object",
@@ -83,6 +89,12 @@ export const siteSettingsType = defineType({
       type: "array",
       fieldset: "tierControls",
       description: "Manage USD diaspora ticket prices ($25, $50, $100, $250, etc.). Add new amounts, edit, delete, or turn on/off.",
+      initialValue: [
+        { value: 25, label: "25", isEnabled: true },
+        { value: 50, label: "50", isEnabled: true },
+        { value: 100, label: "100", isEnabled: true },
+        { value: 250, label: "250", isEnabled: true },
+      ],
       of: [
         {
           type: "object",
@@ -132,6 +144,12 @@ export const siteSettingsType = defineType({
       type: "array",
       fieldset: "tierControls",
       description: "Manage lottery participant pool sizes (1K, 2K, 3K, 5K, 10K, etc.). Add new sizes, edit, delete, or turn on/off.",
+      initialValue: [
+        { size: 1000, label: "1K", ticketsCount: "1,000 tickets", isEnabled: true },
+        { size: 2000, label: "2K", ticketsCount: "2,000 tickets", isEnabled: true },
+        { size: 3000, label: "3K", ticketsCount: "3,000 tickets", isEnabled: true },
+        { size: 5000, label: "5K", ticketsCount: "5,000 tickets", isEnabled: true },
+      ],
       of: [
         {
           type: "object",
