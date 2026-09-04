@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Upload, CheckCircle, Image as ImageIcon } from "lucide-react";
+import { Upload, CheckCircle, AlertCircle, Image as ImageIcon } from "lucide-react";
 
 interface PaymentProofUploaderProps {
   onChange: (file: File) => void;
@@ -9,14 +9,30 @@ interface PaymentProofUploaderProps {
   fileName?: string;
 }
 
-const ACCEPTED = "image/jpeg,image/png,image/webp";
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export function PaymentProofUploader({ onChange, preview, fileName }: PaymentProofUploaderProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) return;
+    setErrorMessage(null);
+
+    // 1. Check MIME type
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setErrorMessage("Unsupported format. Please upload a JPEG, PNG, or WEBP image.");
+      return;
+    }
+
+    // 2. Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      setErrorMessage(`File is too large (${sizeMb} MB). Maximum allowed size is 5 MB.`);
+      return;
+    }
+
     onChange(file);
   }
 
@@ -47,6 +63,28 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
       >
         Payment Screenshot / SMS Proof
       </label>
+
+      {errorMessage && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 12px",
+            background: "rgba(239, 68, 68, 0.15)",
+            border: "1px solid #EF4444",
+            borderRadius: 8,
+            color: "#FCA5A5",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            marginBottom: 10,
+          }}
+        >
+          <AlertCircle size={14} color="#EF4444" style={{ flexShrink: 0 }} />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
       <div
         role="button"
         tabIndex={0}
@@ -57,7 +95,7 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         style={{
-          border: `1.5px dashed ${dragging ? "#FDE047" : "rgba(253, 224, 71, 0.4)"}`,
+          border: `1.5px dashed ${errorMessage ? "#EF4444" : dragging ? "#FDE047" : "rgba(253, 224, 71, 0.4)"}`,
           borderRadius: "14px",
           padding: "18px 16px",
           textAlign: "center",
@@ -99,7 +137,7 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
       <input
         ref={fileRef}
         type="file"
-        accept={ACCEPTED}
+        accept={ACCEPTED_TYPES.join(",")}
         style={{ display: "none" }}
         aria-hidden="true"
         onChange={onInputChange}

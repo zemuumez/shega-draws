@@ -3,6 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schema } from "./sanity/schemaTypes";
 import { MigrationTool } from "./sanity/tools/MigrationTool";
+import { ScreenshotManagerTool } from "./sanity/tools/ScreenshotManagerTool";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "ocm4sz73";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
@@ -14,22 +15,59 @@ const contentSyncTool: Tool = {
   component: MigrationTool,
 };
 
+const screenshotManagerTool: Tool = {
+  name: "screenshot-manager",
+  title: "📸 Storage & Screenshots",
+  icon: () => "📸",
+  component: ScreenshotManagerTool,
+};
+
 export default defineConfig({
   basePath: "/studio",
   name: "rimna_lottery_cms",
   title: "Rimna Digital Lottery Studio",
   projectId,
   dataset,
-  tools: (prev) => [contentSyncTool, ...prev],
+  tools: (prev) => [screenshotManagerTool, contentSyncTool, ...prev],
   plugins: [
     structureTool({
       structure: (S) =>
         S.list()
           .title("Rimna CMS Management")
           .items([
-            // 1. Primary: Submitted Ticket Receipts & Payment Proofs
-            S.documentTypeListItem("playerEntry")
-              .title("📸 Submitted Ticket Receipts & Proofs"),
+            // 1. Primary: Submitted Ticket Receipts & Payment Proofs with filters
+            S.listItem()
+              .title("📸 Submitted Ticket Receipts & Proofs")
+              .child(
+                S.list()
+                  .title("Receipts Filter")
+                  .items([
+                    S.listItem()
+                      .title("📋 All Submitted Receipts")
+                      .child(S.documentTypeList("playerEntry").title("All Receipts")),
+                    S.listItem()
+                      .title("🟡 Pending Verification")
+                      .child(
+                        S.documentList()
+                          .title("🟡 Pending Verification")
+                          .filter('_type == "playerEntry" && (status == "pending" || !defined(status))')
+                      ),
+                    S.listItem()
+                      .title("🟢 Confirmed & Approved")
+                      .child(
+                        S.documentList()
+                          .title("🟢 Confirmed & Approved")
+                          .filter('_type == "playerEntry" && status == "confirmed"')
+                      ),
+                    S.listItem()
+                      .title("🔴 Rejected Proofs")
+                      .child(
+                        S.documentList()
+                          .title("🔴 Rejected Proofs")
+                          .filter('_type == "playerEntry" && status == "rejected"')
+                      ),
+                  ])
+              ),
 
             S.divider(),
 

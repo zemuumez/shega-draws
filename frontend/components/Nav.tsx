@@ -47,12 +47,23 @@ export function Nav({
     window.location.reload();
   };
 
-  // Base navigation links
-  const navItems = [
-    { href: "/",         label: "Draws",       icon: Home },
-    { href: "/entries",  label: "My Tickets",  icon: ListChecks },
-    { href: "/results",  label: "Results",     icon: ShieldCheck },
-    { href: "/about",    label: "Why Rimna",   icon: Award },
+  // Left desktop links
+  const leftNavItems = [
+    { href: "/",            label: "Draws",        icon: Home },
+    { href: "/how-it-works", label: "How It Works", icon: Sparkles },
+    { href: "/results",     label: "Results",      icon: ShieldCheck },
+  ];
+
+  // Right desktop links
+  const rightNavItems = [
+    { href: "/entries",     label: "My Tickets",   icon: ListChecks },
+    { href: "/about",       label: "Why Rimna",    icon: Award },
+  ];
+
+  // All navigation links for mobile drawer
+  const allNavItems = [
+    ...leftNavItems,
+    ...rightNavItems,
   ];
 
   return (
@@ -147,7 +158,7 @@ export function Nav({
         </div>
       </div>
 
-      {/* ── 2. Main Navigation Bar (Desktop Grid · Mobile Flex with Breadcrumb) ───── */}
+      {/* ── 2. Main Navigation Bar (Desktop Split Grid · Mobile Left Logo / Right Breadcrumb) ───── */}
       <nav
         aria-label="Main navigation"
         className="main-navbar"
@@ -166,9 +177,9 @@ export function Nav({
           boxSizing: "border-box",
         }}
       >
-        {/* Desktop Left: Navigation Links */}
-        <div className="desktop-nav-links">
-          {navItems.map(({ href, label, icon: Icon }) => {
+        {/* Desktop Left: Navigation Links (Draws, How It Works, Results) */}
+        <div className="desktop-left-links" style={{ display: "flex", alignItems: "center", gap: 6, justifySelf: "start" }}>
+          {leftNavItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href));
             return (
               <Link
@@ -198,8 +209,8 @@ export function Nav({
           })}
         </div>
 
-        {/* Center / Brand Logo (Full Logo Image with Integrated Text) */}
-        <div style={{ display: "flex", alignItems: "center" }}>
+        {/* Center / Brand Logo */}
+        <div className="navbar-center-logo" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Link
             href="/"
             style={{
@@ -224,8 +235,37 @@ export function Nav({
           </Link>
         </div>
 
-        {/* Desktop Right: Contact Us Button */}
-        <div className="desktop-contact-btn" style={{ justifySelf: "end" }}>
+        {/* Desktop Right: Navigation Links (My Tickets, Why Rimna) + Contact Us Button */}
+        <div className="desktop-right-links" style={{ display: "flex", alignItems: "center", gap: 8, justifySelf: "end" }}>
+          {rightNavItems.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href || (href !== "/" && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  background: active ? "#FEF9C3" : "transparent",
+                  border: active ? "1.5px solid #FDE047" : "1.5px solid transparent",
+                  borderRadius: 8,
+                  padding: "6px 12px",
+                  color: "#111827",
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  transition: "all var(--transition-fast)",
+                }}
+              >
+                <Icon size={15} color={active ? "#D97706" : "#4B5563"} />
+                {label}
+              </Link>
+            );
+          })}
+
           <button
             type="button"
             onClick={() => setIsContactOpen(true)}
@@ -234,6 +274,7 @@ export function Nav({
               padding: "6px clamp(10px, 1.5vw, 16px)",
               fontSize: "0.8125rem",
               fontWeight: 900,
+              marginLeft: 4,
             }}
           >
             <Phone size={13} /> <span className="contact-btn-text">Contact Us</span>
@@ -255,7 +296,7 @@ export function Nav({
       {isMobileMenuOpen && (
         <div className="mobile-menu-drawer animate-fade">
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {navItems.map(({ href, label, icon: Icon }) => {
+            {allNavItems.map(({ href, label, icon: Icon }) => {
               const active = pathname === href || (href !== "/" && pathname.startsWith(href));
               return (
                 <Link

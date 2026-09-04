@@ -862,11 +862,11 @@ h1, h2, h3, h4, h5 {
     padding: 10px 16px !important;
   }
 
-  .desktop-nav-links {
+  .desktop-left-links {
     display: none !important;
   }
 
-  .desktop-contact-btn {
+  .desktop-right-links {
     display: none !important;
   }
 

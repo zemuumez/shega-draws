@@ -105,13 +105,22 @@ export default function AdminDashboard() {
               Edit jackpots, prize showcases, multilingual translations (English / Amharic / Afaan Oromoo), sponsor promos, and platform bank accounts live.
             </p>
           </div>
-          <Link
-            href="/studio"
-            className="btn-base btn-primary"
-            style={{ padding: "9px 18px", fontSize: "0.84375rem", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}
-          >
-            <SlidersHorizontal size={14} /> Launch Studio Editor
-          </Link>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Link
+              href="/studio/screenshot-manager"
+              className="btn-base"
+              style={{ padding: "9px 16px", fontSize: "0.84375rem", display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none", background: "#0F172A", border: "1.5px solid #FDE047", color: "#FEF08A" }}
+            >
+              📸 Bulk Screenshots & Storage
+            </Link>
+            <Link
+              href="/studio"
+              className="btn-base btn-primary"
+              style={{ padding: "9px 18px", fontSize: "0.84375rem", display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}
+            >
+              <SlidersHorizontal size={14} /> Launch Studio Editor
+            </Link>
+          </div>
         </div>
       </Card>
 
