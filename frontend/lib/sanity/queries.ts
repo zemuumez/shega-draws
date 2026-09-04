@@ -59,15 +59,22 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     cbeAccountNumber,
     cbeAccountName,
     diasporaWireInstructions,
-    enable100Etb,
-    enable200Etb,
-    enable500Etb,
-    enable1000Etb,
-    enable50Usd,
-    enable1kPool,
-    enable2kPool,
-    enable3kPool,
-    enable5kPool
+    etbPrices[]{
+      value,
+      label,
+      isEnabled
+    },
+    usdPrices[]{
+      value,
+      label,
+      isEnabled
+    },
+    poolSizes[]{
+      size,
+      label,
+      ticketsCount,
+      isEnabled
+    }
   }
 `);
 
@@ -157,6 +164,19 @@ export interface CMSDrawResult {
   }>;
 }
 
+export interface CMSPriceOption {
+  value: number;
+  label?: string;
+  isEnabled?: boolean;
+}
+
+export interface CMSPoolOption {
+  size: number;
+  label?: string;
+  ticketsCount?: string;
+  isEnabled?: boolean;
+}
+
 export interface CMSSiteSettings {
   siteName?: string;
   tagline?: string;
@@ -176,15 +196,9 @@ export interface CMSSiteSettings {
   footerDescriptionOm?: string;
   copyrightText?: string;
   complianceText?: string;
-  enable100Etb?: boolean;
-  enable200Etb?: boolean;
-  enable500Etb?: boolean;
-  enable1000Etb?: boolean;
-  enable50Usd?: boolean;
-  enable1kPool?: boolean;
-  enable2kPool?: boolean;
-  enable3kPool?: boolean;
-  enable5kPool?: boolean;
+  etbPrices?: CMSPriceOption[];
+  usdPrices?: CMSPriceOption[];
+  poolSizes?: CMSPoolOption[];
 }
 
 export interface CMSTestimonial {

@@ -24,27 +24,28 @@ import { BuyTicketModal } from "./BuyTicketModal";
 interface PriceOption {
   value: number;
   label: string;
-  percentLeft: number;
+  isEnabled?: boolean;
 }
 
 const ETB_PRICES: PriceOption[] = [
-  { value: 100, label: "100", percentLeft: 39 },
-  { value: 200, label: "200", percentLeft: 66 },
-  { value: 500, label: "500", percentLeft: 14 },
-  { value: 1000, label: "1,000", percentLeft: 59 },
+  { value: 100, label: "100" },
+  { value: 200, label: "200" },
+  { value: 500, label: "500" },
+  { value: 1000, label: "1,000" },
 ];
 
 const USD_PRICES: PriceOption[] = [
-  { value: 25, label: "25", percentLeft: 58 },
-  { value: 50, label: "50", percentLeft: 72 },
-  { value: 100, label: "100", percentLeft: 44 },
-  { value: 250, label: "250", percentLeft: 19 },
+  { value: 25, label: "25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 250, label: "250" },
 ];
 
 interface PoolOption {
   size: number;
   label: string;
   ticketsCount: string;
+  isEnabled?: boolean;
 }
 
 const POOLS: PoolOption[] = [
@@ -82,59 +83,89 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
   const [isBuyModalOpen, setIsBuyModalOpen] = useState<boolean>(false);
   const [showAllPrizes, setShowAllPrizes] = useState<boolean>(false);
 
+  // Derive dynamic ETB Prices from CMS or fallback to default
+  const etbPrices: PriceOption[] = React.useMemo(() => {
+    if (siteSettings?.etbPrices && siteSettings.etbPrices.length > 0) {
+      return siteSettings.etbPrices.map((p) => ({
+        value: p.value,
+        label: p.label || p.value.toLocaleString(),
+        isEnabled: p.isEnabled !== false,
+      }));
+    }
+    return ETB_PRICES;
+  }, [siteSettings]);
+
+  // Derive dynamic USD Prices from CMS or fallback to default
+  const usdPrices: PriceOption[] = React.useMemo(() => {
+    if (siteSettings?.usdPrices && siteSettings.usdPrices.length > 0) {
+      return siteSettings.usdPrices.map((p) => ({
+        value: p.value,
+        label: p.label || p.value.toLocaleString(),
+        isEnabled: p.isEnabled !== false,
+      }));
+    }
+    return USD_PRICES;
+  }, [siteSettings]);
+
+  // Derive dynamic Pool Sizes from CMS or fallback to default
+  const poolOptions: PoolOption[] = React.useMemo(() => {
+    if (siteSettings?.poolSizes && siteSettings.poolSizes.length > 0) {
+      return siteSettings.poolSizes.map((p) => ({
+        size: p.size,
+        label: p.label || (p.size >= 1000 ? `${p.size / 1000}K` : `${p.size}`),
+        ticketsCount: p.ticketsCount || `${p.size.toLocaleString()} tickets`,
+        isEnabled: p.isEnabled !== false,
+      }));
+    }
+    return POOLS;
+  }, [siteSettings]);
+
   const isUSD = currency === "USD";
-  const currentPrices = isUSD ? USD_PRICES : ETB_PRICES;
+  const currentPrices = isUSD ? usdPrices : etbPrices;
 
   const isPriceEnabled = (val: number, curr: Currency) => {
-    if (!siteSettings) return true;
-    if (curr === "ETB") {
-      if (val === 100) return siteSettings.enable100Etb !== false;
-      if (val === 200) return siteSettings.enable200Etb !== false;
-      if (val === 500) return siteSettings.enable500Etb !== false;
-      if (val === 1000) return siteSettings.enable1000Etb !== false;
-    } else {
-      if (val === 50) return siteSettings.enable50Usd !== false;
-    }
-    return true;
+    const list = curr === "USD" ? usdPrices : etbPrices;
+    const match = list.find((p) => p.value === val);
+    return match ? match.isEnabled !== false : true;
   };
 
   const isPoolEnabled = (size: number) => {
-    if (!siteSettings) return true;
-    if (size === 1000) return siteSettings.enable1kPool !== false;
-    if (size === 2000) return siteSettings.enable2kPool !== false;
-    if (size === 3000) return siteSettings.enable3kPool !== false;
-    if (size === 5000) return siteSettings.enable5kPool !== false;
-    return true;
+    const match = poolOptions.find((p) => p.size === size);
+    return match ? match.isEnabled !== false : true;
   };
 
-  // Automatically switch to first enabled price/pool if current is disabled
+  // Automatically switch to first enabled price/pool if current is disabled or deleted
   React.useEffect(() => {
-    const availablePrices = isUSD ? USD_PRICES : ETB_PRICES;
-    if (!isPriceEnabled(selectedPrice, currency)) {
-      const firstEnabled = availablePrices.find((p) => isPriceEnabled(p.value, currency));
+    const availablePrices = isUSD ? usdPrices : etbPrices;
+    const priceExists = availablePrices.some((p) => p.value === selectedPrice);
+    if (!priceExists || !isPriceEnabled(selectedPrice, currency)) {
+      const firstEnabled = availablePrices.find((p) => isPriceEnabled(p.value, currency)) || availablePrices[0];
       if (firstEnabled) {
         setSelectedPrice(firstEnabled.value);
       }
     }
-    if (!isPoolEnabled(selectedPool)) {
-      const firstEnabledPool = POOLS.find((p) => isPoolEnabled(p.size));
+    const poolExists = poolOptions.some((p) => p.size === selectedPool);
+    if (!poolExists || !isPoolEnabled(selectedPool)) {
+      const firstEnabledPool = poolOptions.find((p) => isPoolEnabled(p.size)) || poolOptions[0];
       if (firstEnabledPool) {
         setSelectedPool(firstEnabledPool.size);
       }
     }
-  }, [siteSettings, currency, selectedPrice, selectedPool, isUSD]);
+  }, [siteSettings, currency, selectedPrice, selectedPool, isUSD, usdPrices, etbPrices, poolOptions]);
 
   // Handle currency switch
   const handleCurrencyChange = (newCurr: Currency) => {
     setCurrency(newCurr);
-    const available = newCurr === "USD" ? USD_PRICES : ETB_PRICES;
+    const available = newCurr === "USD" ? usdPrices : etbPrices;
     const firstEnabled = available.find((p) => isPriceEnabled(p.value, newCurr)) || available[0];
-    setSelectedPrice(firstEnabled.value);
+    if (firstEnabled) {
+      setSelectedPrice(firstEnabled.value);
+    }
   };
 
   // Calculations
   const totalPrizePool = selectedPrice * selectedPool;
-  const currentPoolObj = POOLS.find((p) => p.size === selectedPool) || POOLS[0];
+  const currentPoolObj = poolOptions.find((p) => p.size === selectedPool) || poolOptions[0] || { size: 1000, label: "1K", ticketsCount: "1,000 tickets" };
   const topPrize = Math.round(totalPrizePool * 0.30);
   const oddsRatio = Math.round(selectedPool / 10);
 
@@ -370,7 +401,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
+                gridTemplateColumns: currentPrices.length <= 4 ? `repeat(${currentPrices.length}, 1fr)` : "repeat(auto-fit, minmax(68px, 1fr))",
                 gap: 6,
               }}
             >
@@ -408,7 +439,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                     <div
                       className="display"
                       style={{
-                        fontSize: "1.1rem",
+                        fontSize: "1.15rem",
                         fontWeight: 900,
                         lineHeight: 1.1,
                         color: !enabled ? "#64748B" : isSelected ? "#B45309" : "#FFFFFF",
@@ -418,13 +449,13 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                     </div>
                     <div
                       style={{
-                        fontSize: "0.5625rem",
+                        fontSize: "0.625rem",
                         fontWeight: 800,
                         color: !enabled ? "#94A3B8" : isSelected ? "#854D0E" : "#94A3B8",
                         textTransform: "uppercase",
                       }}
                     >
-                      {!enabled ? "PAUSED" : `${tier.percentLeft}% left`}
+                      {!enabled ? "PAUSED" : (isUSD ? "USD" : "ETB")}
                     </div>
                   </button>
                 );
@@ -446,11 +477,11 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
+                gridTemplateColumns: poolOptions.length <= 4 ? `repeat(${poolOptions.length}, 1fr)` : "repeat(auto-fit, minmax(68px, 1fr))",
                 gap: 6,
               }}
             >
-              {POOLS.map((pool) => {
+              {poolOptions.map((pool) => {
                 const isSelected = selectedPool === pool.size;
                 const enabled = isPoolEnabled(pool.size);
 

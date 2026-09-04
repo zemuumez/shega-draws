@@ -27,79 +27,158 @@ export const siteSettingsType = defineType({
     },
   ],
   fields: [
-    // ─── Tier Controls (Turn on/off prices and pool sizes) ─────────────
+    // ─── Tier Controls (Manage, Add, Edit, Delete, Toggle Prices & Pools) ─
     defineField({
-      name: "enable100Etb",
-      title: "🟢 100 ETB Ticket Price Option",
-      type: "boolean",
+      name: "etbPrices",
+      title: "🇪🇹 ETB Ticket Prices (Add, Edit, Delete, Toggle)",
+      type: "array",
       fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 100 ETB button is disabled and non-clickable on the website.",
+      description: "Manage ETB ticket prices. You can add new price amounts, edit values/labels, delete tiers, or turn on/off.",
+      of: [
+        {
+          type: "object",
+          name: "etbPriceOption",
+          title: "ETB Price Option",
+          fields: [
+            {
+              name: "value",
+              title: "Price in ETB (Birr)",
+              type: "number",
+              validation: (Rule) => Rule.required().positive(),
+            },
+            {
+              name: "label",
+              title: "Display Label",
+              type: "string",
+              description: "Optional display text (e.g. '100', '200', '500', '1,000'). Defaults to price if blank.",
+            },
+            {
+              name: "isEnabled",
+              title: "Active & Clickable on Website",
+              type: "boolean",
+              initialValue: true,
+              description: "Turn off to disable/pause on the frontend without deleting.",
+            },
+          ],
+          preview: {
+            select: {
+              value: "value",
+              label: "label",
+              isEnabled: "isEnabled",
+            },
+            prepare({ value, label, isEnabled }) {
+              const status = isEnabled !== false ? "🟢 Active" : "🔴 Paused / Disabled";
+              return {
+                title: `${label || value || 0} ETB`,
+                subtitle: status,
+              };
+            },
+          },
+        },
+      ],
     }),
     defineField({
-      name: "enable200Etb",
-      title: "🟢 200 ETB Ticket Price Option",
-      type: "boolean",
+      name: "usdPrices",
+      title: "🇺🇸 USD Diaspora Ticket Prices (Add, Edit, Delete, Toggle)",
+      type: "array",
       fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 200 ETB button is disabled and non-clickable on the website.",
+      description: "Manage USD diaspora ticket prices ($25, $50, $100, $250, etc.). Add new amounts, edit, delete, or turn on/off.",
+      of: [
+        {
+          type: "object",
+          name: "usdPriceOption",
+          title: "USD Price Option",
+          fields: [
+            {
+              name: "value",
+              title: "Price in USD ($)",
+              type: "number",
+              validation: (Rule) => Rule.required().positive(),
+            },
+            {
+              name: "label",
+              title: "Display Label",
+              type: "string",
+              description: "Optional display text (e.g. '25', '50', '100', '250'). Defaults to price if blank.",
+            },
+            {
+              name: "isEnabled",
+              title: "Active & Clickable on Website",
+              type: "boolean",
+              initialValue: true,
+              description: "Turn off to disable/pause on the frontend without deleting.",
+            },
+          ],
+          preview: {
+            select: {
+              value: "value",
+              label: "label",
+              isEnabled: "isEnabled",
+            },
+            prepare({ value, label, isEnabled }) {
+              const status = isEnabled !== false ? "🟢 Active" : "🔴 Paused / Disabled";
+              return {
+                title: `$${label || value || 0} USD`,
+                subtitle: status,
+              };
+            },
+          },
+        },
+      ],
     }),
     defineField({
-      name: "enable500Etb",
-      title: "🟢 500 ETB Ticket Price Option",
-      type: "boolean",
+      name: "poolSizes",
+      title: "👥 Participant Pool Capacities (Add, Edit, Delete, Toggle)",
+      type: "array",
       fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 500 ETB button is disabled and non-clickable on the website.",
-    }),
-    defineField({
-      name: "enable1000Etb",
-      title: "🟢 1,000 ETB Ticket Price Option",
-      type: "boolean",
-      fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 1,000 ETB button is disabled and non-clickable on the website.",
-    }),
-    defineField({
-      name: "enable50Usd",
-      title: "🟢 $50 USD Diaspora Ticket Price Option",
-      type: "boolean",
-      fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the $50 USD button is disabled and non-clickable on the website.",
-    }),
-
-    defineField({
-      name: "enable1kPool",
-      title: "👥 1,000 People (1K) Pool Capacity",
-      type: "boolean",
-      fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 1K participant pool button is disabled and non-clickable on the website.",
-    }),
-    defineField({
-      name: "enable2kPool",
-      title: "👥 2,000 People (2K) Pool Capacity",
-      type: "boolean",
-      fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 2K participant pool button is disabled and non-clickable on the website.",
-    }),
-    defineField({
-      name: "enable3kPool",
-      title: "👥 3,000 People (3K) Pool Capacity",
-      type: "boolean",
-      fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 3K participant pool button is disabled and non-clickable on the website.",
-    }),
-    defineField({
-      name: "enable5kPool",
-      title: "👥 5,000 People (5K) Pool Capacity",
-      type: "boolean",
-      fieldset: "tierControls",
-      initialValue: true,
-      description: "When turned off, the 5K participant pool button is disabled and non-clickable on the website.",
+      description: "Manage lottery participant pool sizes (1K, 2K, 3K, 5K, 10K, etc.). Add new sizes, edit, delete, or turn on/off.",
+      of: [
+        {
+          type: "object",
+          name: "poolSizeOption",
+          title: "Pool Capacity Option",
+          fields: [
+            {
+              name: "size",
+              title: "Total Participant Count (e.g. 1000, 2000, 3000, 5000)",
+              type: "number",
+              validation: (Rule) => Rule.required().positive(),
+            },
+            {
+              name: "label",
+              title: "Badge Label (e.g. '1K', '2K', '3K', '5K')",
+              type: "string",
+            },
+            {
+              name: "ticketsCount",
+              title: "Tickets Count Label (e.g. '1,000 tickets')",
+              type: "string",
+            },
+            {
+              name: "isEnabled",
+              title: "Active & Clickable on Website",
+              type: "boolean",
+              initialValue: true,
+              description: "Turn off to disable/pause on the frontend without deleting.",
+            },
+          ],
+          preview: {
+            select: {
+              size: "size",
+              label: "label",
+              ticketsCount: "ticketsCount",
+              isEnabled: "isEnabled",
+            },
+            prepare({ size, label, ticketsCount, isEnabled }) {
+              const status = isEnabled !== false ? "🟢 Active" : "🔴 Paused / Disabled";
+              return {
+                title: `${label || size} Pool (${(size || 0).toLocaleString()} people)`,
+                subtitle: `${status} • ${ticketsCount || `${(size || 0).toLocaleString()} tickets`}`,
+              };
+            },
+          },
+        },
+      ],
     }),
 
     // ─── Branding ────────────────────────────────────────────────────
