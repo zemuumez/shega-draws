@@ -2,22 +2,15 @@ import { defineConfig, type Tool } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schema } from "./sanity/schemaTypes";
-import { MigrationTool } from "./sanity/tools/MigrationTool";
 import { ScreenshotManagerTool } from "./sanity/tools/ScreenshotManagerTool";
+import { BackupView } from "./sanity/components/BackupView";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "ocm4sz73";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 
-const contentSyncTool: Tool = {
-  name: "content-sync",
-  title: "⚡ Content Sync",
-  icon: () => "🚀",
-  component: MigrationTool,
-};
-
 const screenshotManagerTool: Tool = {
   name: "screenshot-manager",
-  title: "📸 Storage & Screenshots",
+  title: "Storage & Screenshots",
   icon: () => "📸",
   component: ScreenshotManagerTool,
 };
@@ -28,7 +21,18 @@ export default defineConfig({
   title: "Rimna Digital Lottery Studio",
   projectId,
   dataset,
-  tools: (prev) => [screenshotManagerTool, contentSyncTool, ...prev],
+  // Tab order: 1. Structure -> 2. Storage & Screenshots -> 3. Vision
+  tools: (prev) => {
+    const structure = prev.find((t) => t.name === "structure");
+    const vision = prev.find((t) => t.name === "vision");
+    const others = prev.filter((t) => t.name !== "structure" && t.name !== "vision");
+    return [
+      ...(structure ? [structure] : []),
+      screenshotManagerTool,
+      ...(vision ? [vision] : []),
+      ...others,
+    ];
+  },
   plugins: [
     structureTool({
       structure: (S) =>
@@ -101,9 +105,20 @@ export default defineConfig({
             // 7. Player Contact Messages
             S.documentTypeListItem("contactMessage")
               .title("✉️ Player Contact Messages"),
+
+            S.divider(),
+
+            // 8. Complete CMS Backup & Data Export
+            S.listItem()
+              .title("💾 CMS Complete Backup & Export")
+              .child(
+                S.component(BackupView)
+                  .title("💾 CMS Complete Backup & Export")
+              ),
           ]),
     }),
     visionTool(),
   ],
   schema,
 });
+

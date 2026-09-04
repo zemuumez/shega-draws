@@ -227,9 +227,25 @@ A structured 4-step wizard with persistent state:
   - 🟢 Confirmed & Approved
   - 🔴 Rejected Proofs
 
-### 6.3 Studio Custom Tools
-- **`ScreenshotManagerTool` (`/studio/screenshot-manager`)**: Dedicated dashboard for storage tracking, filtering, bulk ZIP downloads, and storage-saving asset deletion.
-- **`MigrationTool` (`/studio/content-sync`)**: One-click initial content synchronization tool for rapid environment seeding.
+### 6.3 Studio Tab Order & Custom Tools
+Sanity Studio header navigation tabs are strictly ordered:
+1. **`Structure`** (`/studio/structure`): Complete CMS management hierarchy including ticket receipts, active draws, results, site settings, ads, testimonials, and backup manager.
+2. **`Storage & Screenshots`** (`/studio/screenshot-manager`): Dedicated dashboard for disk storage metrics, proof filtering, 1-click batch ZIP downloads, and storage-saving asset purges.
+3. **`Vision`** (`/studio/vision`): GROQ testing console.
+
+### 6.4 Full CMS Backup & Restore Manager (`BackupView.tsx`)
+Embedded directly inside the Sanity Structure navigation under **"💾 CMS Complete Backup & Export"**:
+1. **Dataset Content Breakdown**: Real-time live counter of total documents, player receipts, active draws, results, advertisements, and testimonials.
+2. **Export Dataset (JSON / ZIP)**:
+   - **Complete JSON Backup**: 1-Click download of the entire CMS dataset (`rimna_cms_backup_[timestamp].json`) containing all platform settings, lottery pools, pricing models, receipts, and winner history.
+   - **Full ZIP Archive Bundle**: Bundles the complete JSON dataset with media references and backup README into a `.zip` archive for cold storage.
+   - **Backup Timestamp Tracker**: Automatically records the date and time of the last backup.
+3. **Interactive 1-Click Restoration Engine**:
+   - **File Upload & Validation**: Upload any previously exported `rimna_cms_backup_*.json` file directly in the Sanity Studio UI.
+   - **Automated Document Parsing**: Parses documents, displays the document count, and validates schema integrity.
+   - **Live Restoration with Real-time Progress**: Sequentially executes `client.createOrReplace(doc)` for each document, updating live progress bar and status log.
+4. **CLI / Command-Line Restoration Alternative**:
+   - Run `npx sanity dataset import [backup_file].ndjson [dataset_name] --replace` from the command line.
 
 ---
 
@@ -296,6 +312,8 @@ When thousands of players submit high-resolution payment screenshots, Sanity ass
 |  CMS Bulk Screenshot Manager Tool   | ✅ Completed  | Release v2.4.0           |
 |  Bulk ZIP Screenshot Downloader     | ✅ Completed  | Release v2.4.0           |
 |  Storage-Saving Asset Purge API     | ✅ Completed  | Release v2.4.0           |
+|  CMS Tab Order (Structure, Storage) | ✅ Completed  | Release v2.4.1           |
+|  CMS Full Backup & Export Tool      | ✅ Completed  | Release v2.4.1           |
 |  SMS Gateway Automated OCR Parsing  | ⏳ Planned    | Release v2.5.0           |
 |  Diaspora Stripe / Card Gateway     | ⏳ Planned    | Release v2.5.0           |
 |  Automated Telegram Bot Notifier    | ⏳ Planned    | Release v2.6.0           |
@@ -311,6 +329,8 @@ When thousands of players submit high-resolution payment screenshots, Sanity ass
 - [x] **Responsive Mobile Breadcrumb**: Left-aligned logo, right-aligned hamburger button with slide-down drawer.
 - [x] **Image Sanitization**: 5MB client/server limits, JPEG/PNG/WEBP whitelist, binary magic byte validation.
 - [x] **Bulk Screenshot Management**: Sanity Studio tool & REST API for bulk filtering, ZIP downloads, and storage-saving document/asset purges.
+- [x] **CMS Studio Tab Order**: Strictly ordered as `Structure` ➔ `Storage & Screenshots` ➔ `Vision` (with "Content Sync" removed).
+- [x] **CMS Complete Backup & Export Tool**: Added `💾 CMS Complete Backup & Export` inside Structure with 1-click JSON and ZIP dataset exports.
 
 ### 9.2 In-Progress & Next Up (🔄)
 - [ ] **Automated Telebirr SMS Parser / OCR**: Exploring lightweight client/server OCR to automatically extract Telebirr Transaction ID and amount from screenshots.
