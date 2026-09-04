@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Ticket, ShieldCheck, Phone, Mail, Send, Award, Users } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
@@ -12,7 +13,12 @@ interface FooterProps {
 }
 
 export function Footer({ siteSettings }: FooterProps) {
+  const pathname = usePathname();
   const { language, t } = useLanguage();
+
+  if (pathname?.startsWith("/studio")) {
+    return null;
+  }
 
   // CMS values with hardcoded fallbacks
   const siteName = siteSettings?.siteName || t.appName;

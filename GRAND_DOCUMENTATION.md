@@ -366,12 +366,23 @@ npm run dev
 # Run TypeScript compilation check
 npx tsc --noEmit
 
-# Seed CMS Initial Data
-npm run seed:cms
+### 10.3 Vercel Production Deployment & Sanity CORS Configuration
+When hosting on Vercel, Sanity Studio operates as an embedded SPA in the user's browser connecting to `https://[project-id].api.sanity.io`.
 
-# Launch Studio locally
-# Open http://localhost:3000/studio
-```
+1. **Add Vercel Domain to Sanity CORS Allowed Origins**:
+   - Navigate to [https://sanity.io/manage](https://sanity.io/manage) ➔ Select Project **`ocm4sz73`** ➔ **API** ➔ **CORS Origins**.
+   - Click **Add CORS Origin**.
+   - Origin: `https://*.vercel.app` (or your custom domain like `https://your-domain.com`).
+   - Allow credentials: **Check "Allow credentials" (True)**.
+   - Save.
+
+2. **Configure Environment Variables in Vercel Dashboard**:
+   - Go to your Vercel Project ➔ **Settings** ➔ **Environment Variables**.
+   - Add:
+     - `NEXT_PUBLIC_SANITY_PROJECT_ID` = `ocm4sz73`
+     - `NEXT_PUBLIC_SANITY_DATASET` = `production`
+     - `SANITY_API_TOKEN` = `your_sanity_write_token`
 
 ---
 *End of Grand Master Documentation — Keep this file up to date with every subsequent codebase modification.*
+

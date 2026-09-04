@@ -13,10 +13,12 @@ export default function StudioLayout({
         bottom: 0,
         height: "100vh",
         maxHeight: "100dvh",
+        width: "100vw",
         overflow: "hidden",
         margin: 0,
         padding: 0,
         zIndex: 9999,
+        background: "#0E1015",
       }}
     >
       {children}
