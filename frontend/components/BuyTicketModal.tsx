@@ -7,6 +7,8 @@ import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
 import { registerPlayer, submitEntry, getUser, type Currency, USD_TICKET_CONFIGS, ETB_TICKET_CONFIGS } from "@/lib/api";
 
+import type { CMSSiteSettings } from "@/lib/sanity/queries";
+
 interface BuyTicketModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,6 +16,7 @@ interface BuyTicketModalProps {
   initialPrice?: number;
   initialPoolSize?: number;
   initialDrawId?: string;
+  siteSettings?: CMSSiteSettings | null;
 }
 
 const STEP_LABELS = ["Player Details", "Lucky Number", "Payment & Proof"];
@@ -25,6 +28,7 @@ export function BuyTicketModal({
   initialPrice = 100,
   initialPoolSize = 1000,
   initialDrawId = "RDL-ACTIVE",
+  siteSettings,
 }: BuyTicketModalProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -462,23 +466,46 @@ export function BuyTicketModal({
                   Transfer Exact Amount: <span style={{ fontSize: "1rem", color: "#FFFFFF" }}>{isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`}</span>
                 </div>
                 {method === "telebirr" && (
-                  <div>
-                    Telebirr Merchant / Phone: <strong style={{ color: "#FDE047" }}>0911 000 000</strong> (Rimna Lottery)
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <div>
+                      Telebirr Merchant Code: <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.telebirrMerchantCode || "884729"}</strong>
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                      Merchant: {siteSettings?.siteName || "Rimna International Digital Lottery"} • Hotline: {siteSettings?.contactPhone || "+251 911 000 000"}
+                    </div>
                   </div>
                 )}
                 {method === "cbe" && (
-                  <div>
-                    CBE Account: <strong style={{ color: "#FDE047" }}>1000 1234 5678</strong> (Rimna Digital Lottery)
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <div>
+                      Commercial Bank of Ethiopia (CBE) Account: <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.cbeAccountNumber || "1000 1234 5678"}</strong>
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                      Account Holder: <strong style={{ color: "#FFFFFF" }}>{siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC"}</strong>
+                    </div>
                   </div>
                 )}
                 {method === "card" && (
                   <div>
-                    Secure Visa / Mastercard clearing gateway with instant 256-bit SSL tokenization.
+                    {isUSD && siteSettings?.diasporaWireInstructions ? (
+                      <div style={{ whiteSpace: "pre-line" }}>{siteSettings.diasporaWireInstructions}</div>
+                    ) : (
+                      <div>Secure Visa / Mastercard clearing gateway with instant 256-bit SSL tokenization.</div>
+                    )}
+                  </div>
+                )}
+                {method === "paypal" && (
+                  <div>
+                    {siteSettings?.diasporaWireInstructions ? (
+                      <div style={{ whiteSpace: "pre-line" }}>{siteSettings.diasporaWireInstructions}</div>
+                    ) : (
+                      <div>PayPal & Diaspora Wire instructions: Send to verified official clearing gateway.</div>
+                    )}
                   </div>
                 )}
                 {method === "chapa" && (
                   <div>
-                    Instant transfer supported across Awash, Dashen, Abyssinia, and all Ethiopian bank apps.
+                    Instant transfer supported across Awash, Dashen, Abyssinia, and all Ethiopian bank apps to {siteSettings?.siteName || "Rimna Digital Lottery"}.
                   </div>
                 )}
               </div>

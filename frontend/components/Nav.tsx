@@ -10,13 +10,27 @@ import { getUser, logout, type StoredUser } from "@/lib/api";
 import { SignInModal } from "./SignInModal";
 import { ContactUsModal } from "./ContactUsModal";
 
-export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
+import type { CMSSiteSettings } from "@/lib/sanity/queries";
+
+export function Nav({
+  pendingCount = 0,
+  siteSettings,
+}: {
+  pendingCount?: number;
+  siteSettings?: CMSSiteSettings | null;
+}) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const [currentUser, setCurrentUser] = useState<StoredUser | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
+  const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
+  const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace("@", "")}`);
+  const siteName = siteSettings?.siteName || "Rimna International Digital Lottery";
+  const logoImage = siteSettings?.logoImageUrl || "/images/rimna-brand-logo.png";
 
   useEffect(() => {
     setCurrentUser(getUser());
@@ -52,6 +66,7 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
       <ContactUsModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
+        siteSettings={siteSettings}
       />
 
       {/* ── 1. Top Utility Header Ribbon (Dark Navy & Gold Theme) ─── */}
@@ -73,17 +88,21 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
         {/* Support & Community */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "nowrap", overflow: "hidden" }}>
           <a
-            href="https://t.me/RimnaLotteryOfficial"
+            href={telegramUrl}
             target="_blank"
             rel="noreferrer"
             style={{ display: "flex", alignItems: "center", gap: 5, color: "#FDE047", fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            <Send size={12} color="#FDE047" /> <span className="hide-on-mobile">Official Telegram:</span> @RimnaLottery
+            <Send size={12} color="#FDE047" /> <span className="hide-on-mobile">Official Telegram:</span> {telegramHandle}
           </a>
           <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
-          <span className="hide-on-mobile" style={{ display: "flex", alignItems: "center", gap: 5, color: "#D1D5DB", fontWeight: 700, whiteSpace: "nowrap" }}>
-            <Phone size={12} color="#10B981" /> 24/7 Hotline: +251 911 000 000
-          </span>
+          <a
+            href={`tel:${contactPhone.replace(/\s+/g, "")}`}
+            className="hide-on-mobile"
+            style={{ display: "flex", alignItems: "center", gap: 5, color: "#D1D5DB", fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none" }}
+          >
+            <Phone size={12} color="#10B981" /> 24/7 Hotline: {contactPhone}
+          </a>
         </div>
 
         {/* Quick Login & Language */}
@@ -191,8 +210,8 @@ export function Nav({ pendingCount = 0 }: { pendingCount?: number }) {
             }}
           >
             <Image
-              src="/images/rimna-brand-logo.png"
-              alt="Rimna International Digital Lottery"
+              src={logoImage}
+              alt={siteName}
               width={240}
               height={56}
               priority

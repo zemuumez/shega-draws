@@ -218,8 +218,8 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Image
-            src="/images/rimna-logo.png"
-            alt="Rimna Emblem"
+            src={siteSettings?.logoImageUrl || "/images/rimna-logo.png"}
+            alt={siteSettings?.siteName || "Rimna Emblem"}
             width={30}
             height={30}
             style={{
@@ -869,6 +869,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         initialPrice={selectedPrice}
         initialPoolSize={selectedPool}
         initialDrawId={`RDL-${currency}-${selectedPrice}`}
+        siteSettings={siteSettings}
       />
     </div>
   );

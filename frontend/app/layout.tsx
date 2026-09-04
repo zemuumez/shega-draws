@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60; // Revalidate layout data every 60 seconds
+export const revalidate = 0;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const siteSettings = await sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null);
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="bg-subtle-mesh">
         <LanguageProvider>
           <ScrollProgressBar />
-          <Nav />
+          <Nav siteSettings={siteSettings} />
           <main id="main-content" className="page-content">
             {children}
           </main>

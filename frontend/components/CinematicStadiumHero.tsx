@@ -15,28 +15,53 @@ import {
 } from "lucide-react";
 import { FloatingParticlesCanvas } from "./FloatingParticlesCanvas";
 
+import type { CMSSiteSettings } from "@/lib/sanity/queries";
+
 interface CinematicStadiumHeroProps {
   onQuickEnter?: (currency: "ETB" | "USD", price: number, pool: number) => void;
+  siteSettings?: CMSSiteSettings | null;
 }
 
-export function CinematicStadiumHero({ onQuickEnter }: CinematicStadiumHeroProps) {
+export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicStadiumHeroProps) {
   const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
 
   const isUSD = selectedCurrency === "USD";
 
-  const priceOptions = isUSD ? [25, 50, 100, 250] : [100, 200, 500, 1000];
-  const poolOptions = [
-    { size: 1000, label: "1,000 (1K)" },
-    { size: 2000, label: "2,000 (2K)" },
-    { size: 3000, label: "3,000 (3K)" },
-    { size: 5000, label: "5,000 (5K)" },
-  ];
+  const priceOptions = isUSD
+    ? siteSettings?.usdPrices && siteSettings.usdPrices.length > 0
+      ? siteSettings.usdPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
+      : [25, 50, 100, 250]
+    : siteSettings?.etbPrices && siteSettings.etbPrices.length > 0
+    ? siteSettings.etbPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
+    : [100, 200, 500, 1000];
+
+  const poolOptions =
+    siteSettings?.poolSizes && siteSettings.poolSizes.length > 0
+      ? siteSettings.poolSizes
+          .filter((p) => p.isEnabled !== false)
+          .map((p) => ({
+            size: p.size,
+            label: p.label || (p.size >= 1000 ? `${p.size / 1000}K` : `${p.size}`),
+          }))
+      : [
+          { size: 1000, label: "1,000 (1K)" },
+          { size: 2000, label: "2,000 (2K)" },
+          { size: 3000, label: "3,000 (3K)" },
+          { size: 5000, label: "5,000 (5K)" },
+        ];
 
   const handleCurrencyChange = (curr: "ETB" | "USD") => {
     setSelectedCurrency(curr);
-    setSelectedPrice(curr === "USD" ? 50 : 100);
+    const available = curr === "USD"
+      ? siteSettings?.usdPrices && siteSettings.usdPrices.length > 0
+        ? siteSettings.usdPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
+        : [25, 50, 100, 250]
+      : siteSettings?.etbPrices && siteSettings.etbPrices.length > 0
+      ? siteSettings.etbPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
+      : [100, 200, 500, 1000];
+    setSelectedPrice(available[0] || (curr === "USD" ? 50 : 100));
   };
 
   const handleActionClick = () => {

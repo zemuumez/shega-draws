@@ -4,17 +4,24 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Phone, Send, CheckCircle2 } from "lucide-react";
 
+import type { CMSSiteSettings } from "@/lib/sanity/queries";
+
 interface ContactUsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  siteSettings?: CMSSiteSettings | null;
 }
 
-export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
+export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModalProps) {
   const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+
+  const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
+  const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
+  const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace("@", "")}`);
 
   useEffect(() => {
     setMounted(true);
@@ -123,7 +130,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
         {/* Direct Contact Channels */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
           <a
-            href="tel:+251911000000"
+            href={`tel:${contactPhone.replace(/\s+/g, "")}`}
             style={{
               background: "#F8FAFC",
               border: "1px solid var(--gray-line)",
@@ -141,12 +148,12 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
               <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block" }}>
                 PHONE HOTLINE
               </span>
-              <strong style={{ fontSize: "0.75rem" }}>+251 911 000 000</strong>
+              <strong style={{ fontSize: "0.75rem" }}>{contactPhone}</strong>
             </div>
           </a>
 
           <a
-            href="https://t.me/RimnaLotteryOfficial"
+            href={telegramUrl}
             target="_blank"
             rel="noreferrer"
             style={{
@@ -166,7 +173,7 @@ export function ContactUsModal({ isOpen, onClose }: ContactUsModalProps) {
               <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block" }}>
                 TELEGRAM
               </span>
-              <strong style={{ fontSize: "0.75rem" }}>@RimnaLottery</strong>
+              <strong style={{ fontSize: "0.75rem" }}>{telegramHandle}</strong>
             </div>
           </a>
         </div>

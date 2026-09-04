@@ -96,7 +96,7 @@ export default async function HomePage() {
       <div
         style={{
           position: "relative",
-          backgroundImage: "url(/images/rimna-stadium-hero.jpg)",
+          backgroundImage: `url(${siteSettings?.heroBannerImageUrl || "/images/rimna-stadium-hero.jpg"})`,
           backgroundAttachment: "fixed",
           backgroundPosition: "center top",
           backgroundSize: "cover",
@@ -118,7 +118,7 @@ export default async function HomePage() {
 
         {/* 1. Screenful Cinematic Hero */}
         <div style={{ position: "relative", zIndex: 2 }}>
-          <CinematicStadiumHero />
+          <CinematicStadiumHero siteSettings={siteSettings} />
         </div>
 
         {/* 2. Promotional Advertisements & Teasers (Containing Payment Gateways at the Top) */}

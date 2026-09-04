@@ -2,20 +2,31 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { WhyRimnaLottery } from "@/components/WhyRimnaLottery";
 import { Trophy, Tv, Users, ShieldCheck, Phone, Send, CheckCircle2, ArrowRight, Ticket, Sparkles } from "lucide-react";
+import { sanityClient } from "@/lib/sanity/client";
+import { SITE_SETTINGS_QUERY, type CMSSiteSettings } from "@/lib/sanity/queries";
 
 export const metadata: Metadata = {
   title: "Why Rimna Digital Lottery — Public Transparency & Live Draws",
   description: "Learn why Rimna Digital Lottery is Ethiopia's most transparent lottery. 100% live video draws, fixed pools, and 10 guaranteed winners.",
 };
 
-export default function AboutPage() {
+export const revalidate = 0;
+
+export default async function AboutPage() {
+  const siteSettings = await sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null);
+
+  const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
+  const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
+  const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace("@", "")}`);
+  const heroBanner = siteSettings?.heroBannerImageUrl || "/images/rimna-stadium-hero.jpg";
+
   return (
     <div
       style={{
         width: "100%",
         overflowX: "hidden",
         position: "relative",
-        backgroundImage: "url(/images/rimna-stadium-hero.jpg)",
+        backgroundImage: `url(${heroBanner})`,
         backgroundAttachment: "fixed",
         backgroundPosition: "center top",
         backgroundSize: "cover",
@@ -193,7 +204,7 @@ export default function AboutPage() {
 
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <a
-                href="tel:+251911000000"
+                href={`tel:${contactPhone.replace(/\s+/g, "")}`}
                 className="casino-btn-gold"
                 style={{
                   padding: "11px 20px",
@@ -205,10 +216,10 @@ export default function AboutPage() {
                   gap: 6,
                 }}
               >
-                <Phone size={15} color="#111827" /> Call +251 911 000 000
+                <Phone size={15} color="#111827" /> Call {contactPhone}
               </a>
               <a
-                href="https://t.me/RimnaLotteryOfficial"
+                href={telegramUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="casino-btn-red"
@@ -222,7 +233,7 @@ export default function AboutPage() {
                   gap: 6,
                 }}
               >
-                <Send size={15} /> Telegram @RimnaLottery
+                <Send size={15} /> Telegram {telegramHandle}
               </a>
             </div>
           </div>
