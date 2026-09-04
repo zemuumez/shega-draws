@@ -6,22 +6,102 @@ export const siteSettingsType = defineType({
   type: "document",
   fieldsets: [
     {
+      name: "tierControls",
+      title: "🎛️ Active Lottery Prices & Pool Capacities (Enable / Disable)",
+      options: { collapsible: false },
+    },
+    {
       name: "branding",
       title: "🎨 Official Branding & Banners",
-      options: { collapsible: false },
+      options: { collapsible: true, collapsed: true },
     },
     {
       name: "contacts",
       title: "📞 24/7 Hotline & Social Channels",
-      options: { collapsible: false },
+      options: { collapsible: true, collapsed: true },
     },
     {
       name: "paymentAccounts",
       title: "💳 Official Bank & Telebirr Payment Accounts",
-      options: { collapsible: false },
+      options: { collapsible: true, collapsed: true },
     },
   ],
   fields: [
+    // ─── Tier Controls (Turn on/off prices and pool sizes) ─────────────
+    defineField({
+      name: "enable100Etb",
+      title: "🟢 100 ETB Ticket Price Option",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 100 ETB button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable200Etb",
+      title: "🟢 200 ETB Ticket Price Option",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 200 ETB button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable500Etb",
+      title: "🟢 500 ETB Ticket Price Option",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 500 ETB button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable1000Etb",
+      title: "🟢 1,000 ETB Ticket Price Option",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 1,000 ETB button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable50Usd",
+      title: "🟢 $50 USD Diaspora Ticket Price Option",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the $50 USD button is disabled and non-clickable on the website.",
+    }),
+
+    defineField({
+      name: "enable1kPool",
+      title: "👥 1,000 People (1K) Pool Capacity",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 1K participant pool button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable2kPool",
+      title: "👥 2,000 People (2K) Pool Capacity",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 2K participant pool button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable3kPool",
+      title: "👥 3,000 People (3K) Pool Capacity",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 3K participant pool button is disabled and non-clickable on the website.",
+    }),
+    defineField({
+      name: "enable5kPool",
+      title: "👥 5,000 People (5K) Pool Capacity",
+      type: "boolean",
+      fieldset: "tierControls",
+      initialValue: true,
+      description: "When turned off, the 5K participant pool button is disabled and non-clickable on the website.",
+    }),
+
     // ─── Branding ────────────────────────────────────────────────────
     defineField({
       name: "siteName",
@@ -99,19 +179,18 @@ export const siteSettingsType = defineType({
       type: "text",
       fieldset: "paymentAccounts",
       rows: 3,
-      initialValue: "Send USD remittance via Western Union, Remitly, or direct wire to our official designated receiving account.",
+      initialValue: "Contact official support via Telegram @RimnaLotteryOfficial or wire to our designated clearing bank.",
     }),
   ],
   preview: {
     select: {
-      title: "siteName",
-      media: "heroBannerImage",
+      siteName: "siteName",
+      contactPhone: "contactPhone",
     },
-    prepare({ title, media }) {
+    prepare({ siteName, contactPhone }) {
       return {
-        title: title || "Site Configuration",
-        subtitle: "Official branding, hotline & payment accounts",
-        media,
+        title: siteName || "Site Settings",
+        subtitle: `Hotline: ${contactPhone || "+251 911 000 000"}`,
       };
     },
   },

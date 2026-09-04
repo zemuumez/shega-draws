@@ -58,7 +58,16 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     telebirrMerchantCode,
     cbeAccountNumber,
     cbeAccountName,
-    diasporaWireInstructions
+    diasporaWireInstructions,
+    enable100Etb,
+    enable200Etb,
+    enable500Etb,
+    enable1000Etb,
+    enable50Usd,
+    enable1kPool,
+    enable2kPool,
+    enable3kPool,
+    enable5kPool
   }
 `);
 
@@ -167,6 +176,15 @@ export interface CMSSiteSettings {
   footerDescriptionOm?: string;
   copyrightText?: string;
   complianceText?: string;
+  enable100Etb?: boolean;
+  enable200Etb?: boolean;
+  enable500Etb?: boolean;
+  enable1000Etb?: boolean;
+  enable50Usd?: boolean;
+  enable1kPool?: boolean;
+  enable2kPool?: boolean;
+  enable3kPool?: boolean;
+  enable5kPool?: boolean;
 }
 
 export interface CMSTestimonial {

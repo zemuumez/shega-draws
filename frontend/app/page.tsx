@@ -156,7 +156,7 @@ export default async function HomePage() {
           }}
         >
           <div className="page-inner-container">
-            <InteractiveTicketConfigurator />
+            <InteractiveTicketConfigurator siteSettings={siteSettings} />
           </div>
         </section>
       </div>

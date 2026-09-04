@@ -68,7 +68,13 @@ const ALL_10_PRIZES = [
   { rank: 10, percent: 0.04, label: "10th Cash Prize", tag: "4%" },
 ];
 
-export function InteractiveTicketConfigurator() {
+import type { CMSSiteSettings } from "@/lib/sanity/queries";
+
+interface InteractiveTicketConfiguratorProps {
+  siteSettings?: CMSSiteSettings | null;
+}
+
+export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicketConfiguratorProps) {
   const { language } = useLanguage();
   const [currency, setCurrency] = useState<Currency>("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
@@ -79,10 +85,51 @@ export function InteractiveTicketConfigurator() {
   const isUSD = currency === "USD";
   const currentPrices = isUSD ? USD_PRICES : ETB_PRICES;
 
+  const isPriceEnabled = (val: number, curr: Currency) => {
+    if (!siteSettings) return true;
+    if (curr === "ETB") {
+      if (val === 100) return siteSettings.enable100Etb !== false;
+      if (val === 200) return siteSettings.enable200Etb !== false;
+      if (val === 500) return siteSettings.enable500Etb !== false;
+      if (val === 1000) return siteSettings.enable1000Etb !== false;
+    } else {
+      if (val === 50) return siteSettings.enable50Usd !== false;
+    }
+    return true;
+  };
+
+  const isPoolEnabled = (size: number) => {
+    if (!siteSettings) return true;
+    if (size === 1000) return siteSettings.enable1kPool !== false;
+    if (size === 2000) return siteSettings.enable2kPool !== false;
+    if (size === 3000) return siteSettings.enable3kPool !== false;
+    if (size === 5000) return siteSettings.enable5kPool !== false;
+    return true;
+  };
+
+  // Automatically switch to first enabled price/pool if current is disabled
+  React.useEffect(() => {
+    const availablePrices = isUSD ? USD_PRICES : ETB_PRICES;
+    if (!isPriceEnabled(selectedPrice, currency)) {
+      const firstEnabled = availablePrices.find((p) => isPriceEnabled(p.value, currency));
+      if (firstEnabled) {
+        setSelectedPrice(firstEnabled.value);
+      }
+    }
+    if (!isPoolEnabled(selectedPool)) {
+      const firstEnabledPool = POOLS.find((p) => isPoolEnabled(p.size));
+      if (firstEnabledPool) {
+        setSelectedPool(firstEnabledPool.size);
+      }
+    }
+  }, [siteSettings, currency, selectedPrice, selectedPool, isUSD]);
+
   // Handle currency switch
   const handleCurrencyChange = (newCurr: Currency) => {
     setCurrency(newCurr);
-    setSelectedPrice(newCurr === "USD" ? 25 : 100);
+    const available = newCurr === "USD" ? USD_PRICES : ETB_PRICES;
+    const firstEnabled = available.find((p) => isPriceEnabled(p.value, newCurr)) || available[0];
+    setSelectedPrice(firstEnabled.value);
   };
 
   // Calculations
@@ -329,21 +376,33 @@ export function InteractiveTicketConfigurator() {
             >
               {currentPrices.map((tier) => {
                 const isSelected = selectedPrice === tier.value;
+                const enabled = isPriceEnabled(tier.value, currency);
+
                 return (
                   <button
                     key={tier.value}
                     type="button"
-                    onClick={() => setSelectedPrice(tier.value)}
+                    disabled={!enabled}
+                    onClick={() => enabled && setSelectedPrice(tier.value)}
                     style={{
                       padding: "8px 4px",
                       borderRadius: "10px",
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(255, 255, 255, 0.15)",
-                      background: isSelected ? "#FEF9C3" : "rgba(0, 0, 0, 0.35)",
-                      color: isSelected ? "#111827" : "#FFFFFF",
-                      cursor: "pointer",
+                      border: !enabled
+                        ? "1.5px dashed rgba(255, 255, 255, 0.15)"
+                        : isSelected
+                        ? "2px solid #F59E0B"
+                        : "1.5px solid rgba(255, 255, 255, 0.15)",
+                      background: !enabled
+                        ? "rgba(0, 0, 0, 0.25)"
+                        : isSelected
+                        ? "#FEF9C3"
+                        : "rgba(0, 0, 0, 0.35)",
+                      color: !enabled ? "#64748B" : isSelected ? "#111827" : "#FFFFFF",
+                      cursor: !enabled ? "not-allowed" : "pointer",
+                      opacity: !enabled ? 0.38 : 1,
                       textAlign: "center",
                       transition: "all 0.12s ease",
-                      boxShadow: isSelected ? "0 4px 12px rgba(245, 158, 11, 0.35)" : "0 1px 3px rgba(0,0,0,0.2)",
+                      boxShadow: isSelected && enabled ? "0 4px 12px rgba(245, 158, 11, 0.35)" : "0 1px 3px rgba(0,0,0,0.2)",
                     }}
                   >
                     <div
@@ -352,7 +411,7 @@ export function InteractiveTicketConfigurator() {
                         fontSize: "1.1rem",
                         fontWeight: 900,
                         lineHeight: 1.1,
-                        color: isSelected ? "#B45309" : "#FFFFFF",
+                        color: !enabled ? "#64748B" : isSelected ? "#B45309" : "#FFFFFF",
                       }}
                     >
                       {isUSD ? `$${tier.label}` : tier.label}
@@ -361,11 +420,11 @@ export function InteractiveTicketConfigurator() {
                       style={{
                         fontSize: "0.5625rem",
                         fontWeight: 800,
-                        color: isSelected ? "#854D0E" : "#94A3B8",
+                        color: !enabled ? "#94A3B8" : isSelected ? "#854D0E" : "#94A3B8",
                         textTransform: "uppercase",
                       }}
                     >
-                      {tier.percentLeft}% left
+                      {!enabled ? "PAUSED" : `${tier.percentLeft}% left`}
                     </div>
                   </button>
                 );
@@ -393,21 +452,33 @@ export function InteractiveTicketConfigurator() {
             >
               {POOLS.map((pool) => {
                 const isSelected = selectedPool === pool.size;
+                const enabled = isPoolEnabled(pool.size);
+
                 return (
                   <button
                     key={pool.size}
                     type="button"
-                    onClick={() => setSelectedPool(pool.size)}
+                    disabled={!enabled}
+                    onClick={() => enabled && setSelectedPool(pool.size)}
                     style={{
                       padding: "8px 4px",
                       borderRadius: "10px",
-                      border: isSelected ? "2px solid #F59E0B" : "1.5px solid rgba(255, 255, 255, 0.15)",
-                      background: isSelected ? "#FEF08A" : "rgba(0, 0, 0, 0.35)",
-                      color: isSelected ? "#854D0E" : "#E2E8F0",
-                      cursor: "pointer",
+                      border: !enabled
+                        ? "1.5px dashed rgba(255, 255, 255, 0.15)"
+                        : isSelected
+                        ? "2px solid #F59E0B"
+                        : "1.5px solid rgba(255, 255, 255, 0.15)",
+                      background: !enabled
+                        ? "rgba(0, 0, 0, 0.25)"
+                        : isSelected
+                        ? "#FEF9C3"
+                        : "rgba(0, 0, 0, 0.35)",
+                      color: !enabled ? "#64748B" : isSelected ? "#111827" : "#FFFFFF",
+                      cursor: !enabled ? "not-allowed" : "pointer",
+                      opacity: !enabled ? 0.38 : 1,
                       textAlign: "center",
                       transition: "all 0.12s ease",
-                      boxShadow: isSelected ? "0 4px 12px rgba(245, 158, 11, 0.35)" : "0 1px 3px rgba(0,0,0,0.2)",
+                      boxShadow: isSelected && enabled ? "0 4px 12px rgba(245, 158, 11, 0.35)" : "0 1px 3px rgba(0,0,0,0.2)",
                     }}
                   >
                     <div
@@ -415,22 +486,23 @@ export function InteractiveTicketConfigurator() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: 3,
-                        fontWeight: 900,
+                        gap: 2,
                         fontSize: "0.875rem",
+                        fontWeight: 900,
+                        color: !enabled ? "#64748B" : isSelected ? "#854D0E" : "#FFFFFF",
                       }}
                     >
-                      <Users size={12} /> {pool.label}
+                      <Users size={11} color={!enabled ? "#64748B" : isSelected ? "#854D0E" : "#FDE047"} /> {pool.label}
                     </div>
                     <div
                       style={{
                         fontSize: "0.5625rem",
                         fontWeight: 800,
-                        color: isSelected ? "#854D0E" : "#94A3B8",
+                        color: !enabled ? "#94A3B8" : isSelected ? "#854D0E" : "#94A3B8",
                         textTransform: "uppercase",
                       }}
                     >
-                      PEOPLE
+                      {!enabled ? "PAUSED" : "PEOPLE"}
                     </div>
                   </button>
                 );
