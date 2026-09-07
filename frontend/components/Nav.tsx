@@ -281,96 +281,47 @@ export function Nav({
           </button>
         </div>
 
-        {/* Mobile Right: Breadcrumb Hamburger Menu Button */}
-        <button
-          type="button"
-          aria-label="Toggle navigation menu"
-          className="mobile-breadcrumb-btn"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={20} color="#111827" /> : <Menu size={20} color="#111827" />}
-        </button>
+        {/* Mobile Top Right: Quick Contact Us Pill */}
+        <div className="mobile-contact-quick-btn" style={{ display: "none", alignItems: "center", gap: 8 }}>
+          <button
+            type="button"
+            onClick={() => setIsContactOpen(true)}
+            className="casino-btn-gold"
+            style={{
+              padding: "6px 12px",
+              fontSize: "0.75rem",
+              fontWeight: 900,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <Phone size={12} /> Contact
+          </button>
+        </div>
       </nav>
 
-      {/* ── 3. Mobile Slide-Down Breadcrumb Menu Drawer ───── */}
-      {isMobileMenuOpen && (
-        <div className="mobile-menu-drawer animate-fade">
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {allNavItems.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href || (href !== "/" && pathname.startsWith(href));
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  style={{
-                    background: active ? "#FEF9C3" : "#FAFAFA",
-                    border: active ? "1.5px solid #FDE047" : "1px solid #E5E7EB",
-                    borderRadius: 8,
-                    padding: "10px 14px",
-                    color: "#111827",
-                    fontSize: "0.9375rem",
-                    fontWeight: active ? 900 : 700,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    textDecoration: "none",
-                  }}
-                >
-                  <Icon size={18} color={active ? "#D97706" : "#4B5563"} />
-                  {label}
-                </Link>
-              );
-            })}
-
-            {/* Mobile Language Switcher */}
-            <div style={{ padding: "8px 0 4px", borderTop: "1px solid #E5E7EB", marginTop: 4 }}>
-              <span style={{ fontSize: "0.75rem", color: "#6B7280", fontWeight: 700, display: "block", marginBottom: 6 }}>
-                🌐 Choose Language / ቋንቋ ምረጡ
-              </span>
-              <LanguageSwitcher />
-            </div>
-
-            {/* Mobile Hotline */}
-            <a
-              href="tel:+251911000000"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#111827",
-                fontSize: "0.875rem",
-                fontWeight: 700,
-                textDecoration: "none",
-                background: "#F9FAFB",
-                border: "1px solid #E5E7EB",
-                padding: "8px 12px",
-                borderRadius: 8,
-              }}
+      {/* ── 3. Mobile Bottom Navigation Dock (Fixed App-Like Bottom Bar) ───── */}
+      <nav aria-label="Mobile Bottom Navigation" className="mobile-bottom-nav">
+        {allNavItems.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || (href !== "/" && pathname.startsWith(href));
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`mobile-bottom-nav-item ${active ? "active" : ""}`}
             >
-              <Phone size={15} color="#10B981" /> 24/7 Hotline: +251 911 000 000
-            </a>
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                setIsContactOpen(true);
-              }}
-              className="casino-btn-gold"
-              style={{
-                marginTop: 4,
-                padding: "11px 16px",
-                fontSize: "0.9375rem",
-                width: "100%",
-                justifyContent: "center",
-              }}
-            >
-              <Phone size={16} /> Contact Us
-            </button>
-          </div>
-        </div>
-      )}
+              <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon size={19} color={active ? "#FDE047" : "#9CA3AF"} />
+                {href === "/entries" && pendingCount > 0 && (
+                  <span className="mobile-bottom-nav-badge">{pendingCount}</span>
+                )}
+              </div>
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </>
   );
 }

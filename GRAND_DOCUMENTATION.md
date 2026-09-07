@@ -145,14 +145,19 @@ Every issued or configured ticket renders with:
 
 ## 5. COMPLETE FEATURE CATALOG & UX FLOWS
 
-### 5.1 Responsive Split Navbar (`Nav.tsx`)
+### 5.1 Responsive Desktop Split Navbar & Mobile Bottom Navigation Dock (`Nav.tsx`)
 - **Desktop (Grid 1fr auto 1fr)**:
   - **Left Section**: `Draws` (`/`), `How It Works` (`/how-it-works`), `Results` (`/results`).
   - **Center**: Official Brand Logo (`/`).
   - **Right Section**: `My Tickets` (`/entries`), `Why Rimna` (`/about`), and `Contact Us` gold action button.
 - **Mobile (< 768px)**:
-  - Brand Logo left-aligned.
-  - Hamburger breadcrumb button right-aligned opening a smooth slide-down menu drawer with all 5 navigation links, language selector, and contact modal trigger.
+  - **Top Navigation Bar**: Brand Logo on the left with direct "Contact" action button on the right.
+  - **Mobile Bottom Navigation Dock (Fixed)**: Modern, app-like fixed glassmorphic dock anchored at the bottom of the screen (`z-index: 1000`):
+    - 🏠 **Draws** (`/`): Instant access to active lottery pools.
+    - ✨ **How It Works** (`/how-it-works`): Step-by-step game rules and visual guide.
+    - 🏆 **Results** (`/results`): Live 10-tier winners and past draws archive.
+    - 🎟️ **My Tickets** (`/entries`): Player receipts, lottery ticket cards, and live approval status badge.
+    - 👑 **Why Rimna** (`/about`): Trust, licensing, compliance, and platform security.
 - **Utility Header Ribbon**:
   - Live Telegram channel link (`@RimnaLotteryOfficial`).
   - 24/7 hotline click-to-call link.
@@ -314,6 +319,7 @@ When thousands of players submit high-resolution payment screenshots, Sanity ass
 |  Storage-Saving Asset Purge API     | ✅ Completed  | Release v2.4.0           |
 |  CMS Tab Order (Structure, Storage) | ✅ Completed  | Release v2.4.1           |
 |  CMS Full Backup & Export Tool      | ✅ Completed  | Release v2.4.1           |
+|  Mobile Bottom Navigation Dock      | ✅ Completed  | Release v2.4.2           |
 |  SMS Gateway Automated OCR Parsing  | ⏳ Planned    | Release v2.5.0           |
 |  Diaspora Stripe / Card Gateway     | ⏳ Planned    | Release v2.5.0           |
 |  Automated Telegram Bot Notifier    | ⏳ Planned    | Release v2.6.0           |
@@ -326,7 +332,7 @@ When thousands of players submit high-resolution payment screenshots, Sanity ass
 - [x] **Configurator Modal Persistence**: Pool sizes, ticket price, lucky number quantity, and user data persist across all steps.
 - [x] **Complete CMS Dynamic Bindings**: Site title, hotline, Telegram, support email, Telebirr merchant code, CBE account details, and diaspora instructions dynamically loaded.
 - [x] **Split Desktop Navbar**: Left links (`Draws`, `How It Works`, `Results`), Center Logo, Right links (`My Tickets`, `Why Rimna`, `Contact Us`).
-- [x] **Responsive Mobile Breadcrumb**: Left-aligned logo, right-aligned hamburger button with slide-down drawer.
+- [x] **Mobile Bottom Navigation Dock**: Fixed 5-link thumb-friendly glassmorphism bottom navigation dock (`Draws`, `How It Works`, `Results`, `My Tickets`, `Why Rimna`).
 - [x] **Image Sanitization**: 5MB client/server limits, JPEG/PNG/WEBP whitelist, binary magic byte validation.
 - [x] **Bulk Screenshot Management**: Sanity Studio tool & REST API for bulk filtering, ZIP downloads, and storage-saving document/asset purges.
 - [x] **CMS Studio Tab Order**: Strictly ordered as `Structure` ➔ `Storage & Screenshots` ➔ `Vision` (with "Content Sync" removed).
