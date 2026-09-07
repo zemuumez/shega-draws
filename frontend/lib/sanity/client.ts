@@ -1,14 +1,19 @@
 import { createClient, type SanityClient } from "next-sanity";
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "ocm4sz73";
-const dataset   = process.env.NEXT_PUBLIC_SANITY_DATASET   || "production";
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const dataset   = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2024-01-01";
 
 let _client: SanityClient | null = null;
 let _writeClient: SanityClient | null = null;
 
 export function getSanityClient(): SanityClient | null {
-  if (!projectId || projectId === "your-project-id-here") return null;
+  if (!projectId || projectId === "your-project-id-here") {
+    if (typeof window !== "undefined") {
+      console.warn("⚠️ [Sanity] NEXT_PUBLIC_SANITY_PROJECT_ID is not configured in your environment.");
+    }
+    return null;
+  }
   if (!_client) {
     _client = createClient({
       projectId,

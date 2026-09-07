@@ -5,7 +5,7 @@ import { schema } from "./sanity/schemaTypes";
 import { ScreenshotManagerTool } from "./sanity/tools/ScreenshotManagerTool";
 import { BackupView } from "./sanity/components/BackupView";
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "ocm4sz73";
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 
 const screenshotManagerTool: Tool = {

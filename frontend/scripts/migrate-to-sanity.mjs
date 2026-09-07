@@ -23,7 +23,7 @@ if (existsSync(envPath)) {
   }
 }
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || envVars.NEXT_PUBLIC_SANITY_PROJECT_ID || "ocm4sz73";
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || envVars.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || envVars.NEXT_PUBLIC_SANITY_DATASET || "production";
 const token = process.env.SANITY_API_TOKEN || envVars.SANITY_API_TOKEN;
 
