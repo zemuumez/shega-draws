@@ -240,7 +240,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 textShadow: "0 2px 8px rgba(0,0,0,0.6)",
               }}
             >
-              {t.quickPick.title || "Interactive Ticket Configurator"}
+              {t.configurator?.title || "Interactive Ticket Configurator"}
             </h2>
             <span
               className="mono"
@@ -253,7 +253,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 display: "block",
               }}
             >
-              {t.fairness.title || "Capped Pools · 10 Guaranteed Winners · 100% Video Draw"}
+              {t.configurator?.subtitle || "Capped Pools · 10 Guaranteed Winners · 100% Video Draw"}
             </span>
           </div>
         </div>
@@ -275,7 +275,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
               boxShadow: "0 2px 6px rgba(234, 179, 8, 0.2)",
             }}
           >
-            <Trophy size={11} color="#FDE047" /> 10 Winners
+            <Trophy size={11} color="#FDE047" /> {t.configurator?.tenWinners || "10 Winners"}
           </span>
           <span
             style={{
@@ -292,7 +292,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
               boxShadow: "0 2px 6px rgba(16, 185, 129, 0.2)",
             }}
           >
-            <CheckCircle2 size={11} color="#34D399" /> Live Video
+            <CheckCircle2 size={11} color="#34D399" /> {t.configurator?.liveVideo || "Live Video"}
           </span>
         </div>
       </div>
@@ -326,10 +326,10 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                1. CURRENCY
+                {t.configurator?.currencyStep || "1. CURRENCY"}
               </span>
               <span style={{ fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 800 }}>
-                {isUSD ? "International / Diaspora" : "Ethiopia National"}
+                {isUSD ? (t.configurator?.currencyDiaspora || "International / Diaspora") : (t.configurator?.currencyNational || "Ethiopia National")}
               </span>
             </div>
             <div
@@ -391,10 +391,10 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                2. TICKET PRICE
+                {t.configurator?.ticketPriceStep || "2. TICKET PRICE"}
               </span>
               <span style={{ fontSize: "0.6875rem", color: "#FDE047", fontWeight: 900 }}>
-                Selected: {formatMoney(selectedPrice)}
+                {t.configurator?.selectedPriceLabel || "Selected:"} {formatMoney(selectedPrice)}
               </span>
             </div>
 
@@ -455,7 +455,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                         textTransform: "uppercase",
                       }}
                     >
-                      {!enabled ? "PAUSED" : (isUSD ? "USD" : "ETB")}
+                      {!enabled ? (t.configurator?.paused || "PAUSED") : (isUSD ? "USD" : "ETB")}
                     </div>
                   </button>
                 );
@@ -467,7 +467,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                3. PARTICIPANT POOL
+                {t.configurator?.poolStep || "3. PARTICIPANT POOL"}
               </span>
               <span style={{ fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 800 }}>
                 {currentPoolObj.ticketsCount}
@@ -533,7 +533,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                         textTransform: "uppercase",
                       }}
                     >
-                      {!enabled ? "PAUSED" : "PEOPLE"}
+                      {!enabled ? (t.configurator?.paused || "PAUSED") : (t.configurator?.people || "PEOPLE")}
                     </div>
                   </button>
                 );
@@ -552,7 +552,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
-                <Trophy size={12} color="#FDE047" /> {showAllPrizes ? "All 10 Guaranteed Payouts" : "Top 3 Guaranteed Payouts"}
+                <Trophy size={12} color="#FDE047" /> {showAllPrizes ? (t.configurator?.allPayoutsTitle || "All 10 Guaranteed Payouts") : (t.configurator?.topPayoutsTitle || "Top 3 Guaranteed Payouts")}
               </span>
 
               <button
@@ -572,9 +572,9 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 }}
               >
                 {showAllPrizes ? (
-                  <>Show Top 3 <ChevronUp size={13} /></>
+                  <>{t.configurator?.hidePrizes || "Show Top 3"} <ChevronUp size={13} /></>
                 ) : (
-                  <>Show All 10 Prizes <ChevronDown size={13} /></>
+                  <>{t.configurator?.showAllPrizes || "Show All 10 Prizes"} <ChevronDown size={13} /></>
                 )}
               </button>
             </div>
@@ -664,7 +664,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <Sparkles size={14} color="#FDE047" />
               <span style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FEF08A" }}>
-                Live Draw Tier Summary
+                {t.configurator?.summaryTitle || "Live Draw Tier Summary"}
               </span>
             </div>
             <span
@@ -678,7 +678,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 borderRadius: "10px",
               }}
             >
-              100% VIDEO DRAW
+              {t.configurator?.summaryBadge || "100% VIDEO DRAW"}
             </span>
           </div>
 
@@ -695,7 +695,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             {/* Stat 1: Total Prize Pool */}
             <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
               <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
-                TOTAL PRIZE POOL
+                {t.configurator?.totalPrizePool || "TOTAL PRIZE POOL"}
               </span>
               <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "#FDE047" }}>
                 {formatMoney(totalPrizePool)}
@@ -705,7 +705,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             {/* Stat 2: 1st Jackpot Prize */}
             <div style={{ background: "rgba(254, 240, 138, 0.15)", border: "1px solid #FDE047", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(234, 179, 8, 0.2)" }}>
               <span style={{ fontSize: "0.625rem", color: "#FEF08A", fontWeight: 800, display: "block" }}>
-                1ST GRAND JACKPOT
+                {t.configurator?.firstJackpot || "1ST GRAND JACKPOT"}
               </span>
               <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "#F87171" }}>
                 {formatMoney(topPrize)}
@@ -715,37 +715,37 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             {/* Stat 3: Participants */}
             <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
               <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
-                POOL CAPACITY
+                {t.configurator?.poolCapacity || "POOL CAPACITY"}
               </span>
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
-                {selectedPool.toLocaleString()} People
+                {selectedPool.toLocaleString()} {t.configurator?.people || "People"}
               </span>
             </div>
 
             {/* Stat 4: Winning Odds */}
             <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid #10B981", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(16, 185, 129, 0.2)" }}>
               <span style={{ fontSize: "0.625rem", color: "#6EE7B7", fontWeight: 800, display: "block" }}>
-                WINNING ODDS
+                {t.configurator?.winningOdds || "WINNING ODDS"}
               </span>
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#34D399" }}>
-                1 in {oddsRatio} (High Odds)
+                1 in {oddsRatio} ({t.configurator?.oddsValue || "High Odds"})
               </span>
             </div>
 
             {/* Stat 5: Guaranteed Winners */}
             <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
               <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
-                CASH WINNERS
+                {t.configurator?.cashWinners || "CASH WINNERS"}
               </span>
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
-                10 Guaranteed
+                {t.configurator?.guaranteedCount || "10 Guaranteed"}
               </span>
             </div>
 
             {/* Stat 6: Draw Date */}
             <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
               <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
-                DRAW BROADCAST
+                {t.configurator?.drawBroadcast || "DRAW BROADCAST"}
               </span>
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
                 Sep 3, 2026
@@ -773,7 +773,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 boxShadow: "0 4px 14px rgba(220, 38, 38, 0.45)",
               }}
             >
-              <Ticket size={16} /> Buy Ticket — {formatMoney(selectedPrice)}
+              <Ticket size={16} /> {t.configurator?.buyTicketBtn || "Buy Ticket"} — {formatMoney(selectedPrice)}
             </button>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
@@ -789,7 +789,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                   fontWeight: 700,
                 }}
               >
-                <HelpCircle size={12} color="#93C5FD" /> How It Works
+                <HelpCircle size={12} color="#93C5FD" /> {t.configurator?.howItWorksLink || "How It Works"}
               </Link>
 
               <Link
@@ -804,7 +804,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                   fontWeight: 700,
                 }}
               >
-                <Award size={12} color="#FDE047" /> Past Results
+                <Award size={12} color="#FDE047" /> {t.configurator?.pastResultsLink || "Past Results"}
               </Link>
             </div>
           </div>
@@ -857,7 +857,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
             boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
           }}
         >
-          Buy ticket <ArrowUpRight size={14} />
+          {t.configurator?.buyTicketBtn || "Buy ticket"} <ArrowUpRight size={14} />
         </button>
       </div>
 

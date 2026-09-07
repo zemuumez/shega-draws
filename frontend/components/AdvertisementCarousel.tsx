@@ -157,7 +157,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                 gap: 4,
               }}
             >
-              <Sparkles size={11} color="#B45309" /> UPCOMING LOTTERIES & SPONSOR SHOWCASE
+              <Sparkles size={11} color="#B45309" /> {t.adsSection?.badge || "UPCOMING LOTTERIES & SPONSOR SHOWCASE"}
             </span>
           </div>
           <h2
@@ -170,7 +170,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
               lineHeight: 1.15,
             }}
           >
-            Major Grand Prizes & Coming Soon Draws
+            {t.adsSection?.title || "Major Grand Prizes & Coming Soon Draws"}
           </h2>
         </div>
 
@@ -196,11 +196,11 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
           >
             {isPaused ? (
               <>
-                <Play size={11} color="#059669" /> Resume Scroll
+                <Play size={11} color="#059669" /> {t.adsSection?.resumeScroll || "Resume Scroll"}
               </>
             ) : (
               <>
-                <Pause size={11} color="#D97706" /> Hover to Pause
+                <Pause size={11} color="#D97706" /> {t.adsSection?.hoverToPause || "Hover to Pause"}
               </>
             )}
           </button>
@@ -316,7 +316,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                     gap: 3,
                   }}
                 >
-                  <Clock size={10} /> COMING SOON
+                  <Clock size={10} /> {t.adsSection?.comingSoon || "COMING SOON"}
                 </div>
 
                 {/* Bottom Left Estimated Value Pill */}
@@ -354,7 +354,7 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                   <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
                     <CheckCircle2 size={12} color="#059669" />
                     <span style={{ fontSize: "0.6875rem", color: "#059669", fontWeight: 900, textTransform: "uppercase" }}>
-                      Upcoming Official Pool
+                      {t.adsSection?.upcomingPool || "Upcoming Official Pool"}
                     </span>
                   </div>
 
@@ -401,9 +401,9 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
                   }}
                 >
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                    <Calendar size={12} /> Stay Tuned
+                    <Calendar size={12} /> {t.adsSection?.stayTuned || "Stay Tuned"}
                   </span>
-                  <span style={{ color: "#B45309" }}>100% Video Draw</span>
+                  <span style={{ color: "#B45309" }}>{t.adsSection?.videoDraw || "100% Video Draw"}</span>
                 </div>
               </div>
             </div>

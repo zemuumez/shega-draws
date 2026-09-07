@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getActiveDraw, getMyEntries, getUser, loginPlayer, logout, clearTokens, type Entry, type StoredUser } from "@/lib/api";
+import { getActiveDraw, getMyEntries, getUser, loginPlayer, clearTokens, type Entry, type StoredUser } from "@/lib/api";
 import { EntryTicket } from "@/components/EntryTicket";
-import { Ticket, ArrowRight, Loader2, LogIn, Phone, User, CheckCircle2, ShieldCheck, RefreshCw, LogOut, Sparkles } from "lucide-react";
+import { Ticket, Loader2, LogIn, LogOut, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function EntriesPage() {
+  const { t, language } = useLanguage();
+  const pageT = t.entriesPage;
+
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,7 +31,6 @@ export default function EntriesPage() {
         const myEntries = await getMyEntries(active.id);
         setEntries(myEntries);
       } else {
-        // Sample fallback
         setEntries([
           {
             id: "ent-101",
@@ -75,7 +77,7 @@ export default function EntriesPage() {
   const handlePlayerLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginPhone.trim()) {
-      setLoginError("Please enter your phone number");
+      setLoginError(language === "ti" ? "በጃኹም ቁጽሪ ስልክኹም ኣእትዉ" : language === "am" ? "እባክዎ ስልክ ቁጥርዎን ያስገቡ" : "Please enter your phone number");
       return;
     }
     setLoginLoading(true);
@@ -86,7 +88,7 @@ export default function EntriesPage() {
       setUserState(res.user);
       await loadEntries(res.user);
     } catch (err: any) {
-      setLoginError(err.message || "Failed to sign in. Please check your phone number.");
+      setLoginError(err.message || (language === "ti" ? "ምእታው ኣይተኻእለን። ቁጽሪ ስልክኹም መርምሩ።" : language === "am" ? "መግባት አልተቻለም። እባክዎ ስልክ ቁጥርዎን ያረጋግጡ።" : "Failed to sign in. Please check your phone number."));
     } finally {
       setLoginLoading(false);
     }
@@ -152,7 +154,7 @@ export default function EntriesPage() {
                 boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
               }}
             >
-              <Ticket size={14} color="#FACC15" /> PLAYER DASHBOARD & TICKETS
+              <Ticket size={14} color="#FACC15" /> {pageT?.badge || "MY OFFICIAL LOTTERY TICKETS"}
             </span>
           </div>
 
@@ -170,17 +172,17 @@ export default function EntriesPage() {
                   textShadow: "0 2px 20px rgba(0, 0, 0, 0.8)",
                 }}
               >
-                My Lottery Tickets
+                {pageT?.title || "My Purchased Tickets"}
               </h1>
               <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.1rem)", color: "#F1F5F9", maxWidth: 640, margin: 0 }}>
-                View your active draw tickets, track live number statuses, and verify guaranteed prize payouts.
+                {pageT?.subtitle || "Track your active tickets, verified lucky numbers, and live draw winning statuses."}
               </p>
             </div>
 
             {user && (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "10px 20px", textDecoration: "none" }}>
-                  <Ticket size={15} /> Buy More Tickets
+                  <Ticket size={15} /> {language === "ti" ? "ተወሳኺ ቲኬት ዓድጉ" : language === "am" ? "ተጨማሪ ቲኬት ይግዙ" : "Buy More Tickets"}
                 </Link>
                 <button
                   type="button"
@@ -199,7 +201,7 @@ export default function EntriesPage() {
                     gap: 6,
                   }}
                 >
-                  <LogOut size={14} /> Sign Out
+                  <LogOut size={14} /> {pageT?.signOutBtn || "Sign Out"}
                 </button>
               </div>
             )}
@@ -248,10 +250,10 @@ export default function EntriesPage() {
                   <LogIn size={24} color="#FDE047" />
                 </div>
                 <h2 className="display" style={{ fontSize: "1.5rem", fontWeight: 900, color: "#FFFFFF", margin: "0 0 6px" }}>
-                  Sign In to View Your Tickets
+                  {pageT?.loginTitle || "Sign In to View Your Tickets"}
                 </h2>
                 <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: 0 }}>
-                  Enter your mobile number to instantly access your confirmed draw tickets.
+                  {pageT?.loginDesc || "Enter your phone number used during ticket purchase to view all your confirmed entries."}
                 </p>
               </div>
 
@@ -274,7 +276,7 @@ export default function EntriesPage() {
               <form onSubmit={handlePlayerLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div>
                   <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                    Phone Number (Telebirr / CBE)
+                    {pageT?.phoneLabel || "Phone Number (e.g. 0911000000)"}
                   </label>
                   <input
                     type="tel"
@@ -298,7 +300,7 @@ export default function EntriesPage() {
 
                 <div>
                   <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#CBD5E1", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                    Your Name (Optional)
+                    {pageT?.nameLabel || "Your Name (Optional)"}
                   </label>
                   <input
                     type="text"
@@ -335,7 +337,7 @@ export default function EntriesPage() {
                   }}
                 >
                   {loginLoading ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
-                  {loginLoading ? "Verifying Account..." : "Access My Tickets"}
+                  {loginLoading ? (language === "ti" ? "ይረጋገጽ ኣሎ..." : language === "am" ? "በማረጋገጥ ላይ..." : "Verifying Account...") : (pageT?.signInBtn || "View My Tickets")}
                 </button>
               </form>
             </div>
@@ -345,7 +347,9 @@ export default function EntriesPage() {
               {loading ? (
                 <div style={{ textAlign: "center", padding: "60px 0", color: "#FEF08A" }}>
                   <Loader2 size={36} className="animate-spin" style={{ margin: "0 auto 12px" }} />
-                  <p style={{ fontSize: "1rem", fontWeight: 700 }}>Loading your confirmed draw tickets...</p>
+                  <p style={{ fontSize: "1rem", fontWeight: 700 }}>
+                    {language === "ti" ? "ቲኬታት ይጽዓን ኣሎ..." : language === "am" ? "ቲኬቶችዎ በመጫን ላይ ናቸው..." : "Loading your confirmed draw tickets..."}
+                  </p>
                 </div>
               ) : entries.length === 0 ? (
                 <div
@@ -363,26 +367,49 @@ export default function EntriesPage() {
                 >
                   <Ticket size={40} color="#FDE047" style={{ margin: "0 auto 12px" }} />
                   <h3 className="display" style={{ fontSize: "1.35rem", fontWeight: 900, margin: "0 0 8px" }}>
-                    No Tickets Found in Active Draw
+                    {pageT?.emptyTitle || "No Tickets Found"}
                   </h3>
                   <p style={{ fontSize: "0.875rem", color: "#CBD5E1", marginBottom: 20 }}>
-                    You haven&apos;t purchased any tickets for this live draw yet. Pick your lucky number now!
+                    {pageT?.emptyDesc || "You have not purchased any tickets yet. Pick your lucky number in our active draw and win big!"}
                   </p>
                   <Link href="/#choose-ticket" className="casino-btn-red" style={{ padding: "12px 24px", textDecoration: "none" }}>
-                    <Ticket size={16} /> Choose Lucky Number
+                    <Ticket size={16} /> {pageT?.buyFirstBtn || "Buy Your First Ticket"}
                   </Link>
                 </div>
               ) : (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                    gap: 20,
-                  }}
-                >
-                  {entries.map((entry) => (
-                    <EntryTicket key={entry.id} entry={entry} />
-                  ))}
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <h3 className="display" style={{ fontSize: "1.25rem", color: "#FFFFFF", fontWeight: 900, margin: 0 }}>
+                      {pageT?.myTicketsTitle || "Confirmed Tickets"} ({entries.length})
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => user && loadEntries(user)}
+                      style={{
+                        background: "rgba(255, 255, 255, 0.1)",
+                        border: "1px solid rgba(253, 224, 71, 0.4)",
+                        color: "#FEF08A",
+                        borderRadius: "20px",
+                        padding: "6px 14px",
+                        fontSize: "0.75rem",
+                        fontWeight: 800,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {pageT?.refreshBtn || "Refresh Tickets"}
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                      gap: 20,
+                    }}
+                  >
+                    {entries.map((entry) => (
+                      <EntryTicket key={entry.id} entry={entry} />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -237,10 +237,10 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                     display: "block",
                   }}
                 >
-                  10 GUARANTEED WINNERS
+                  {t.hero?.guaranteedWinnersBadge || "10 GUARANTEED WINNERS"}
                 </span>
                 <span style={{ fontSize: "0.75rem", color: "#E2E8F0", fontWeight: 700 }}>
-                  High Winning Odds (1 in 100)
+                  {t.hero?.oddsBadge || "High Winning Odds (1 in 100)"}
                 </span>
               </div>
             </div>
@@ -257,11 +257,11 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 textShadow: "0 2px 8px rgba(0,0,0,0.6)",
               }}
             >
-              100% Guaranteed Cash Payouts In Every Single Pool
+              {t.hero?.cardTitle || "100% Guaranteed Cash Payouts In Every Single Pool"}
             </h3>
 
             <p style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, margin: 0 }}>
-              No endless rollover delays. Every single draw pays out 10 distinct cash ranks live on video within 30 minutes.
+              {t.hero?.cardDesc || "No endless rollover delays. Every single draw pays out 10 distinct cash ranks live on video within 30 minutes."}
             </p>
 
             {/* Action Button: Signature Casino Red */}
@@ -282,7 +282,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxSizing: "border-box",
               }}
             >
-              <span>Explore Live Pools</span>
+              <span>{t.hero?.cardCta || "Explore Live Pools"}</span>
               <div
                 style={{
                   width: 26,

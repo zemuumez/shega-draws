@@ -2,7 +2,8 @@
 
 import React from "react";
 import type { Entry } from "@/lib/api";
-import { Trophy, CheckCircle2, Clock, ShieldCheck, Ticket } from "lucide-react";
+import { Trophy, CheckCircle2, Clock, Ticket } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface EntryTicketProps {
   entry: Entry;
@@ -11,6 +12,9 @@ interface EntryTicketProps {
 }
 
 export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps) {
+  const { t, language } = useLanguage();
+  const pageT = t.entriesPage;
+
   const wonRank = winningNumbers
     ? Object.entries(winningNumbers).find(
         ([, num]) => num === entry.number && entry.status === "confirmed"
@@ -21,6 +25,12 @@ export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps)
 
   const isConfirmed = entry.status === "confirmed";
   const isRejected = entry.status === "rejected";
+
+  const statusText = isConfirmed
+    ? (pageT?.statusConfirmed || "Confirmed in Draw")
+    : isRejected
+    ? (pageT?.statusRejected || "Payment Failed")
+    : (pageT?.statusPending || "Pending Verification");
 
   return (
     <div
@@ -45,7 +55,8 @@ export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps)
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <Ticket size={14} color="#FDE047" />
           <span style={{ fontSize: "0.75rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            TICKET #{entry.id.slice(0, 8).toUpperCase()}
+            {language === "ti" ? "ቲኬት #" : language === "am" ? "ቲኬት ቁጥር #" : "TICKET #"}
+            {entry.id.slice(0, 8).toUpperCase()}
           </span>
         </div>
 
@@ -64,7 +75,7 @@ export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps)
           }}
         >
           {isConfirmed ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-          {isConfirmed ? "Confirmed in Draw" : isRejected ? "Payment Failed" : "Pending Verification"}
+          {statusText}
         </span>
       </div>
 
@@ -72,13 +83,13 @@ export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps)
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
           <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#FFFFFF" }}>
-            {entry.user_name ?? "You"}
+            {entry.user_name ?? (language === "ti" ? "ንስኻ" : language === "am" ? "እርስዎ" : "You")}
           </div>
           <div style={{ fontSize: "0.8125rem", color: "#CBD5E1", marginTop: 2 }}>
             {entry.amount} ETB · Paid via {entry.method.toUpperCase()}
           </div>
           <div style={{ fontSize: "0.6875rem", color: "#94A3B8", marginTop: 4 }}>
-            Entered on {new Date(entry.created_at).toLocaleDateString()}
+            {new Date(entry.created_at).toLocaleDateString()}
           </div>
         </div>
 
@@ -118,8 +129,10 @@ export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps)
             fontSize: "0.875rem",
           }}
         >
-          <Trophy size={18} color="#34D399" />
-          <span>Winner! {wonPrize.label}: {wonPrize.prizeTitle}</span>
+          <Trophy size={16} color="#FDE047" />
+          <span>
+            {language === "ti" ? "እንቋዕ ሓጎሰኩም! ተዓዊትኩም ኣለኹም:" : language === "am" ? "እንኳን ደስ አለዎት! አሸንፈዋል:" : "Congratulations! You won:"} {wonPrize.prizeTitle}
+          </span>
         </div>
       )}
     </div>

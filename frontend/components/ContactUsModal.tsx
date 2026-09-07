@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Phone, Send, CheckCircle2 } from "lucide-react";
-
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
 interface ContactUsModalProps {
@@ -13,6 +13,7 @@ interface ContactUsModalProps {
 }
 
 export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModalProps) {
+  const { t, language } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -120,10 +121,14 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
             <Phone size={22} color="#2A65E6" />
           </div>
           <h3 className="display" style={{ fontSize: "1.375rem", color: "#111827", fontWeight: 900 }}>
-            Contact Customer Support
+            {language === "ti" ? "ናይ ዓማዊል ደገፍ ርኸቡ" : language === "am" ? "የደንበኞች አገልግሎትን ያነጋግሩ" : "Contact Customer Support"}
           </h3>
           <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
-            Our team is available 24/7 to assist with ticket purchases, draw questions, and winner payouts.
+            {language === "ti"
+              ? "ጉጅለና ብዛዕባ ዕዳጋ ቲኬትን ክፍሊት ሽልማትን ንምሕጋዝ 24/7 ድሉው እዩ።"
+              : language === "am"
+              ? "ቡድናችን ስለ ቲኬት ግዢ እና የሽልማት ክፍያዎች ለማገዝ በ24/7 ዝግጁ ነው።"
+              : "Our team is available 24/7 to assist with ticket purchases, draw questions, and winner payouts."}
           </p>
         </div>
 
@@ -146,7 +151,7 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
             <Phone size={16} color="#2A65E6" />
             <div>
               <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block" }}>
-                PHONE HOTLINE
+                {language === "ti" ? "ናይ ስልኪ መስመር" : language === "am" ? "የስልክ መስመር" : "PHONE HOTLINE"}
               </span>
               <strong style={{ fontSize: "0.75rem" }}>{contactPhone}</strong>
             </div>
@@ -181,19 +186,23 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
         {submitted ? (
           <div style={{ textAlign: "center", padding: "24px 0", color: "var(--teal-dark)" }}>
             <CheckCircle2 size={36} color="var(--teal)" style={{ margin: "0 auto 8px" }} />
-            <h4 style={{ fontSize: "1.125rem", fontWeight: 800 }}>Message Received!</h4>
-            <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>Our support agent will contact you shortly.</p>
+            <h4 style={{ fontSize: "1.125rem", fontWeight: 800 }}>
+              {language === "ti" ? "መልእኽትኹም በጺሑና ኣሎ!" : language === "am" ? "መልእክትዎ ደርሶናል!" : "Message Received!"}
+            </h4>
+            <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+              {language === "ti" ? "ናይ ደገፍ ወኪልና ኣብ ቀረባ ግዜ ክድውለልኩም እዩ።" : language === "am" ? "የድጋፍ ባለሙያችን በቅርቡ ያነጋግርዎታል።" : "Our support agent will contact you shortly."}
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div>
               <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
-                Your Name
+                {language === "ti" ? "ስምኩም" : language === "am" ? "የእርስዎ ስም" : "Your Name"}
               </label>
               <input
                 type="text"
                 className="input-base"
-                placeholder="e.g. Abebe Bikila"
+                placeholder={language === "ti" ? "ንኣብነት ኣበበ ቢቂላ" : language === "am" ? "ለምሳሌ አበበ ቢቂላ" : "e.g. Abebe Bikila"}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 style={{ fontSize: "0.875rem" }}
@@ -202,7 +211,7 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
 
             <div>
               <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
-                Phone Number / Telegram Handle
+                {language === "ti" ? "ቁጽሪ ስልኪ / ቴሌግራም" : language === "am" ? "ስልክ ቁጥር / የቴሌግራም አድራሻ" : "Phone Number / Telegram Handle"}
               </label>
               <input
                 type="text"
@@ -217,12 +226,12 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
 
             <div>
               <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#111827", textTransform: "uppercase", display: "block", marginBottom: 4 }}>
-                Message / Inquiring Ticket
+                {language === "ti" ? "መልእኽቲ / ሕቶ" : language === "am" ? "መልእክት / ጥያቄ" : "Message / Inquiring Ticket"}
               </label>
               <textarea
                 className="input-base"
                 rows={3}
-                placeholder="How can we help you today?"
+                placeholder={language === "ti" ? "ብኸመይ ክንሕግዘኩም ንኽእል?" : language === "am" ? "እንዴት ልንረዳዎ እንችላለን?" : "How can we help you today?"}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 required
@@ -235,7 +244,7 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
               className="btn-base btn-primary"
               style={{ width: "100%", padding: "11px", fontSize: "0.875rem", fontWeight: 800, justifyContent: "center", marginTop: 4 }}
             >
-              Send Message
+              {language === "ti" ? "መልእኽቲ ስደዱ" : language === "am" ? "መልእክት ይላኩ" : "Send Message"}
             </button>
           </form>
         )}

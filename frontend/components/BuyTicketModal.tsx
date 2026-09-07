@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Ticket, Users, ShieldCheck, Trophy, Sparkles, Check } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck } from "lucide-react";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
-import { registerPlayer, submitEntry, getUser, type Currency, USD_TICKET_CONFIGS, ETB_TICKET_CONFIGS } from "@/lib/api";
-
+import { submitEntry, getUser, type Currency } from "@/lib/api";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
 interface BuyTicketModalProps {
@@ -19,8 +19,6 @@ interface BuyTicketModalProps {
   siteSettings?: CMSSiteSettings | null;
 }
 
-const STEP_LABELS = ["Player Details", "Lucky Number", "Payment & Proof"];
-
 export function BuyTicketModal({
   isOpen,
   onClose,
@@ -30,7 +28,14 @@ export function BuyTicketModal({
   initialDrawId = "RDL-ACTIVE",
   siteSettings,
 }: BuyTicketModalProps) {
+  const { t, language } = useLanguage();
   const [mounted, setMounted] = useState(false);
+
+  const STEP_LABELS = [
+    language === "ti" ? "ናይ ተሳታፊ ዝርዝር" : language === "am" ? "የተሳታፊ መረጃ" : "Player Details",
+    language === "ti" ? "ዕድለኛ ቁጽሪ" : language === "am" ? "እድለኛ ቁጥር" : "Lucky Number",
+    language === "ti" ? "ክፍሊትን ደረሰኝን" : language === "am" ? "ክፍያና ደረሰኝ" : "Payment & Proof",
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -79,7 +84,6 @@ export function BuyTicketModal({
   }, [isOpen]);
 
   const isUSD = currency === "USD";
-  const currSymbol = isUSD ? "$" : "ETB";
 
   const handleApplyPromo = () => {
     if (promoCode.trim().length > 0) {
@@ -89,7 +93,7 @@ export function BuyTicketModal({
 
   const canAdvance = [
     name.trim().length >= 2 && phone.trim().length >= 7,
-    number.trim().length > 0 && parseInt(number, 10) >= 1 && parseInt(number, 10) <= poolSize,
+    number.trim().length > 0 && parseInt(number, 10) >= 0 && parseInt(number, 10) <= 99,
     !!proofFile && !!method,
   ];
 
@@ -101,27 +105,24 @@ export function BuyTicketModal({
   }
 
   async function submit() {
+    if (!canAdvance[2] || !proofFile) return;
     setLoading(true);
     setError("");
-    try {
-      await registerPlayer({ name: name.trim(), phone: phone.trim() });
 
+    try {
       const form = new FormData();
-      form.append("name", name.trim());
-      form.append("phone", phone.trim());
       form.append("draw_id", drawId);
       form.append("number", number);
       form.append("amount", String(ticketPrice));
-      form.append("currency", currency);
-      form.append("pool_capacity", `${poolSize.toLocaleString()} tickets`);
       form.append("method", method);
-      if (promoCode.trim()) form.append("promo_code", promoCode.trim());
-      if (proofFile) form.append("proof", proofFile);
+      form.append("proof", proofFile);
+      form.append("user_name", name.trim());
+      form.append("user_phone", phone.trim());
 
       await submitEntry(form);
       setStep(3); // Success step
     } catch (e: any) {
-      setError(e.message ?? "Something went wrong. Please try again.");
+      setError(e.message ?? (language === "ti" ? "ጌጋ ኣጋጢሙ። በጃኹም ደጊምኩም ፈትኑ።" : language === "am" ? "ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ።" : "Something went wrong. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -204,14 +205,6 @@ export function BuyTicketModal({
               cursor: "pointer",
               transition: "all 150ms ease",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#FFFFFF";
-              e.currentTarget.style.borderColor = "#FDE047";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#CBD5E1";
-              e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
-            }}
           >
             <X size={16} />
           </button>
@@ -227,7 +220,9 @@ export function BuyTicketModal({
               marginBottom: 4,
             }}
           >
-            {isUSD ? "DIASPORA USD TICKET" : "ETHIOPIA NATIONAL ETB TIER"} · #{drawId}
+            {isUSD
+              ? (language === "ti" ? "ናይ ዲያስፖራ ዶላር ቲኬት" : language === "am" ? "የዲያስፖራ ዶላር ቲኬት" : "DIASPORA USD TICKET")
+              : (language === "ti" ? "ናይ ኢትዮጵያ ብር ቲኬት" : language === "am" ? "የኢትዮጵያ ብር ቲኬት" : "ETHIOPIA NATIONAL ETB TIER")} · #{drawId}
           </span>
 
           <h2
@@ -240,15 +235,17 @@ export function BuyTicketModal({
               lineHeight: 1.15,
             }}
           >
-            {isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`} Entry Ticket
+            {isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`} {language === "ti" ? "ናይ ዕጫ ቲኬት" : language === "am" ? "የእጣ ቲኬት" : "Entry Ticket"}
           </h2>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.75rem", color: "#CBD5E1" }}>
             <span style={{ color: "#6EE7B7", fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
-              <Users size={12} /> {poolSize.toLocaleString()} Capped Pool
+              <Users size={12} /> {poolSize.toLocaleString()} {language === "ti" ? "ውሱን ተሳተፍቲ" : language === "am" ? "የተገደበ ተሳታፊ" : "Capped Pool"}
             </span>
             <span>•</span>
-            <span style={{ color: "#FEF08A", fontWeight: 800 }}>10 Guaranteed Winners</span>
+            <span style={{ color: "#FEF08A", fontWeight: 800 }}>
+              {language === "ti" ? "10 ውሑሳት ተዓወትቲ" : language === "am" ? "10 የተረጋገጡ አሸናፊዎች" : "10 Guaranteed Winners"}
+            </span>
           </div>
 
           {/* 3-Step Luxury Progress Bar (Only during steps 0-2) */}
@@ -272,10 +269,11 @@ export function BuyTicketModal({
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.75rem" }}>
                 <span style={{ color: "#CBD5E1", fontWeight: 700 }}>
-                  Step {step + 1} of 3: <strong style={{ color: "#FFFFFF" }}>{STEP_LABELS[step]}</strong>
+                  {language === "ti" ? `ደረጃ ${step + 1} ካብ 3:` : language === "am" ? `ደረጃ ${step + 1} ከ 3:` : `Step ${step + 1} of 3:`}{" "}
+                  <strong style={{ color: "#FFFFFF" }}>{STEP_LABELS[step]}</strong>
                 </span>
                 <span style={{ color: "#FEF08A", fontWeight: 800, fontSize: "0.6875rem" }}>
-                  10 Winners Guaranteed
+                  {language === "ti" ? "10 ውሑሳት ተዓወትቲ" : language === "am" ? "10 የተረጋገጡ አሸናፊዎች" : "10 Winners Guaranteed"}
                 </span>
               </div>
             </div>
@@ -304,18 +302,22 @@ export function BuyTicketModal({
           {step === 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: 0 }}>
-                Enter your player details so your winning cash payout can be transferred immediately upon live draw completion:
+                {language === "ti"
+                  ? "ዕጫ ምስ ተዛዘመ ሽልማትኩም ቀጥታ ክለኣኸልኩም ናይ ተሳታፊ ዝርዝርኩም ኣእትዉ:"
+                  : language === "am"
+                  ? "እጣው እንደተጠናቀቀ የሽልማት ገንዘብዎ በቀጥታ እንዲተላለፍ የተሳታፊ መረጃዎን ያስገቡ:"
+                  : "Enter your player details so your winning cash payout can be transferred immediately upon live draw completion:"}
               </p>
 
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                  Full Legal Name (as on Bank / ID)
+                  {t.ticketModal?.fullName || "Full Legal Name (as on Bank / ID)"}
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Abebe Bikila"
+                  placeholder={language === "ti" ? "ንኣብነት ኣበበ ቢቂላ" : language === "am" ? "ለምሳሌ አበበ ቢቂላ" : "e.g. Abebe Bikila"}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -332,7 +334,7 @@ export function BuyTicketModal({
 
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                  Phone Number (for Telebirr / CBE / Instant Payouts)
+                  {t.ticketModal?.phoneNumber || "Phone Number (for Telebirr / CBE / Instant Payouts)"}
                 </label>
                 <input
                   type="tel"
@@ -355,7 +357,7 @@ export function BuyTicketModal({
 
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#CBD5E1", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                  Promo / Referral Code (Optional)
+                  {language === "ti" ? "ናይ ፕሮሞ ኮድ (ኣማራጺ)" : language === "am" ? "የፕሮሞ ኮድ (አስገዳጅ አይደለም)" : "Promo / Referral Code (Optional)"}
                 </label>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
@@ -400,7 +402,11 @@ export function BuyTicketModal({
           {step === 1 && (
             <div>
               <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: "0 0 14px" }}>
-                Select your lucky ticket number between <strong>1</strong> and <strong>{poolSize.toLocaleString()}</strong>:
+                {language === "ti"
+                  ? "ካብ 00 ክሳብ 99 ዝፈትውዎ ዕድለኛ ቁጽሪ ምረጹ:"
+                  : language === "am"
+                  ? "ከ00 እስከ 99 የሚወዱትን እድለኛ ቁጥር ይምረጡ:"
+                  : "Select your lucky ticket number between 00 and 99:"}
               </p>
               <NumberPicker value={number} onChange={setNumber} poolSize={poolSize} />
             </div>
@@ -412,7 +418,7 @@ export function BuyTicketModal({
               {/* Payment Method Selector */}
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
-                  Choose Payment Method
+                  {t.ticketModal?.paymentMethod || "Choose Payment Method"}
                 </label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
                   {(isUSD
@@ -463,7 +469,8 @@ export function BuyTicketModal({
                 }}
               >
                 <div style={{ fontWeight: 800, color: "#FEF08A", marginBottom: 4 }}>
-                  Transfer Exact Amount: <span style={{ fontSize: "1rem", color: "#FFFFFF" }}>{isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`}</span>
+                  {language === "ti" ? "ልክዕ መጠን ዝውውር ግበሩ:" : language === "am" ? "ትክክለኛውን መጠን ያስተላልፉ:" : "Transfer Exact Amount:"}{" "}
+                  <span style={{ fontSize: "1rem", color: "#FFFFFF" }}>{isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`}</span>
                 </div>
                 {method === "telebirr" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -535,15 +542,15 @@ export function BuyTicketModal({
               </div>
 
               <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#FEF08A", textTransform: "uppercase" }}>
-                ENTRY SUBMITTED SUCCESSFULLY
+                {t.ticketModal?.successTitle || "ENTRY SUBMITTED SUCCESSFULLY"}
               </span>
 
               <h3 className="display" style={{ fontSize: "1.75rem", fontWeight: 900, color: "#FFFFFF", margin: "6px 0 10px" }}>
-                Lucky Number #{number} Confirmed!
+                {language === "ti" ? `ዕድለኛ ቁጽሪ #${number} ተረጋጊጹ!` : language === "am" ? `እድለኛ ቁጥር #${number} ተረጋግጧል!` : `Lucky Number #${number} Confirmed!`}
               </h3>
 
               <p style={{ fontSize: "0.875rem", color: "#CBD5E1", maxWidth: 440, margin: "0 auto 20px" }}>
-                Your payment proof for <strong>{isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`}</strong> has been received. Our automated auditing team is verifying your ticket for the scheduled live video draw.
+                {t.ticketModal?.successDesc || "Your payment proof has been received. Watch the live draw at the scheduled time!"}
               </p>
 
               <div
@@ -560,13 +567,17 @@ export function BuyTicketModal({
                 }}
               >
                 <div>
-                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>REGISTERED PLAYER</span>
+                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                    {language === "ti" ? "ዝተመዝገበ ተሳታፊ" : language === "am" ? "የተመዘገበ ተሳታፊ" : "REGISTERED PLAYER"}
+                  </span>
                   <div style={{ fontSize: "1rem", fontWeight: 800, color: "#FFFFFF" }}>{name}</div>
                   <div style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>{phone}</div>
                 </div>
 
                 <div style={{ textAlign: "right" }}>
-                  <span style={{ fontSize: "0.6875rem", color: "#FEF08A" }}>LUCKY NUMBER</span>
+                  <span style={{ fontSize: "0.6875rem", color: "#FEF08A" }}>
+                    {language === "ti" ? "ዕድለኛ ቁጽሪ" : language === "am" ? "እድለኛ ቁጥር" : "LUCKY NUMBER"}
+                  </span>
                   <div className="display" style={{ fontSize: "2rem", fontWeight: 900, color: "#FDE047", lineHeight: 1 }}>
                     #{number}
                   </div>
@@ -579,7 +590,7 @@ export function BuyTicketModal({
                 className="casino-btn-gold"
                 style={{ padding: "12px 32px", fontSize: "0.9375rem", fontWeight: 900, cursor: "pointer" }}
               >
-                Done & View Dashboard
+                {language === "ti" ? "ተዛዚሙ · ናብ ሰሌዳ ተመለስ" : language === "am" ? "ተጠናቀቀ · ወደ ሰሌዳ ተመለስ" : "Done & View Dashboard"}
               </button>
             </div>
           )}
@@ -615,7 +626,7 @@ export function BuyTicketModal({
                   gap: 6,
                 }}
               >
-                <ChevronLeft size={16} /> Back
+                <ChevronLeft size={16} /> {language === "ti" ? "ንድሕሪት" : language === "am" ? "ወደኋላ" : "Back"}
               </button>
             ) : (
               <div />
@@ -638,7 +649,7 @@ export function BuyTicketModal({
                   gap: 6,
                 }}
               >
-                Continue <ChevronRight size={16} />
+                {language === "ti" ? "ቀጽል" : language === "am" ? "ቀጥል" : "Continue"} <ChevronRight size={16} />
               </button>
             ) : (
               <button
@@ -658,7 +669,9 @@ export function BuyTicketModal({
                 }}
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-                {loading ? "Confirming Ticket..." : `Confirm & Enter — ${isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`}`}
+                {loading
+                  ? (language === "ti" ? "ቲኬት ይረጋገጽ ኣሎ..." : language === "am" ? "ቲኬት በማረጋገጥ ላይ..." : "Confirming Ticket...")
+                  : (language === "ti" ? `ኣረጋግጽን እተውን — ${isUSD ? `$${ticketPrice}` : `${ticketPrice} ብር`}` : language === "am" ? `አረጋግጥና ግባ — ${isUSD ? `$${ticketPrice}` : `${ticketPrice} ብር`}` : `Confirm & Enter — ${isUSD ? `$${ticketPrice}` : `${ticketPrice} ETB`}`)}
               </button>
             )}
           </div>

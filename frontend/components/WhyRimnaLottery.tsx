@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trophy, Users, Award, Tv, Send, CheckCircle2, Ticket, CreditCard, ShieldCheck, Sparkles } from "lucide-react";
+import { Trophy, Users, Tv } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSectionContent } from "@/lib/sanity/queries";
 
@@ -16,7 +16,7 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
     (language === "ti" && (cmsContent as any)?.titleTi) ||
     (language === "am" && cmsContent?.titleAm) ||
     cmsContent?.title ||
-    "Why Rimna Digital Lottery?";
+    (t.aboutPage?.title || "Why Rimna Digital Lottery?");
 
   const body =
     (language === "ti" && (cmsContent as any)?.bodyTi) ||
@@ -53,7 +53,7 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
             letterSpacing: "0.6px",
           }}
         >
-          OUR ETHICAL CORE VALUES
+          {language === "ti" ? "ናይ ስነ-ምግባር መትከላትና" : language === "am" ? "የስነ-ምግባር መርሆዎቻችን" : "OUR ETHICAL CORE VALUES"}
         </span>
       </div>
 
@@ -75,11 +75,19 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
         ) : (
           <>
             <p>
-              Unlike automated lotteries with hidden black-box algorithms, <strong>Rimna Digital Lottery</strong> is built entirely on genuine public transparency. All winning tickets are drawn live on video by company founders during scheduled public broadcasts, where every single winning number is held up and announced in real time.
+              {language === "ti"
+                ? "ካብቶም ብምስጢራዊ ናይ ኮምፒውተር ኣሰራርሓ ዝሰርሑ ሎተሪታት ብፍሉይ፡ ሪምና ዲጂታል ሎተሪ ምሉእ ብምሉእ ብወግዓዊ ግልጽነት ዝቖመ እዩ። ኩሎም ተዓወቲ ቲኬታት ብመስረትቲ ብቐጥታ ቪድዮ ፈነወ ይወጹ።"
+                : language === "am"
+                ? "ከተደበቁ የኮምፒውተር አልጎሪዝሞች በተለየ፡ ሪምና ዲጂታል ሎተሪ ሙሉ በሙሉ በእውነተኛ ይፋዊ ግልጽነት ላይ የተገነባ ነው። ሁሉም አሸናፊ ቲኬቶች በመስራቾቹ በቀጥታ ቪዲዮ ስርጭት ይወጣሉ።"
+                : "Unlike automated lotteries with hidden black-box algorithms, Rimna Digital Lottery is built entirely on genuine public transparency. All winning tickets are drawn live on video by company founders during scheduled public broadcasts, where every single winning number is held up and announced in real time."}
             </p>
 
             <p>
-              Every ticket tier operates with fixed, capped participant pools (1,000, 2,000, 3,000, or 5,000 people). This guarantees that your odds of winning remain high, and <strong>every single draw awards guaranteed cash prizes to the Top 10 winning ranks</strong> without rollover delays.
+              {language === "ti"
+                ? "ነፍሲ ወከፍ ናይ ቲኬት ዋጋ ብውሱን ናይ ተሳተፍቲ መጠን ይሰርሕ (1,000፣ 2,000፣ 3,000፣ ወይ 5,000 ሰባት)። እዚ ድማ ናይ ምዕዋት ዕድልኩም ልዑል ምዃኑ የረጋግጽ፡ ከምኡ'ውን ነፍሲ ወከፍ ዕጫ ንቀዳሞት 10 ደረጃታት ውሑስ ናይ ገንዘብ ሽልማት ይህብ።"
+                : language === "am"
+                ? "እያንዳንዱ የቲኬት ደረጃ በተገደበ የተሳታፊ መጠን ይሰራል (1,000፣ 2,000፣ 3,000፣ ወይም 5,000 ሰዎች)። ይህም የማሸነፍ እድልዎ ከፍተኛ ሆኖ እንዲቆይ ያረጋግጣል፡ እያንዳንዱ እጣ ለምርጥ 10 አሸናፊዎች የተረጋገጠ የገንዘብ ሽልማት ይሰጣል።"
+                : "Every ticket tier operates with fixed, capped participant pools (1,000, 2,000, 3,000, or 5,000 people). This guarantees that your odds of winning remain high, and every single draw awards guaranteed cash prizes to the Top 10 winning ranks without rollover delays."}
             </p>
           </>
         )}
@@ -133,10 +141,10 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FEF08A", fontWeight: 800, fontSize: "0.875rem", marginBottom: 6 }}>
-                  <Trophy size={16} color="#FDE047" /> 10 Guaranteed Winners
+                  <Trophy size={16} color="#FDE047" /> {language === "ti" ? "10 ውሑሳት ተዓወትቲ" : language === "am" ? "10 የተረጋገጡ አሸናፊዎች" : "10 Guaranteed Winners"}
                 </div>
                 <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
-                  Every draw awards guaranteed cash payouts to the Top 10 ranks without rollover delays.
+                  {language === "ti" ? "ነፍሲ ወከፍ ዕጫ ንቀዳሞት 10 ደረጃታት ውሑስ ናይ ገንዘብ ክፍሊት ይፍጽም።" : language === "am" ? "እያንዳንዱ እጣ ለምርጥ 10 አሸናፊዎች ዋስትና ያለው የገንዘብ ክፍያ ይፈጽማል።" : "Every draw awards guaranteed cash payouts to the Top 10 ranks without rollover delays."}
                 </span>
               </div>
 
@@ -149,10 +157,10 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#93C5FD", fontWeight: 800, fontSize: "0.875rem", marginBottom: 6 }}>
-                  <Tv size={16} color="#60A5FA" /> 100% Live Streamed Draws
+                  <Tv size={16} color="#60A5FA" /> {language === "ti" ? "100% ናይ ቀጥታ ቪድዮ ዕጫ" : language === "am" ? "100% የቀጥታ ቪዲዮ እጣ" : "100% Live Streamed Draws"}
                 </div>
                 <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
-                  Numbers drawn live on video broadcast so every participant sees the real outcome.
+                  {language === "ti" ? "ነፍሲ ወከፍ ተሳታፊ ናይ ሓቂ ውጽኢት ንኽርኢ ቁጽርታት ብቐጥታ ቪድዮ ይወጹ።" : language === "am" ? "እያንዳንዱ ተሳታፊ እውነተኛውን ውጤት እንዲያይ ቁጥሮች በቀጥታ ቪዲዮ ይወጣሉ።" : "Numbers drawn live on video broadcast so every participant sees the real outcome."}
                 </span>
               </div>
 
@@ -165,10 +173,10 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6EE7B7", fontWeight: 800, fontSize: "0.875rem", marginBottom: 6 }}>
-                  <Users size={16} color="#34D399" /> Fixed Capped Pools
+                  <Users size={16} color="#34D399" /> {language === "ti" ? "ውሱን ናይ ተሳተፍቲ ገደብ" : language === "am" ? "የተገደበ የተሳታፊ መጠን" : "Fixed Capped Pools"}
                 </div>
                 <span style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, display: "block" }}>
-                  Pools are capped at 1K, 2K, 3K, and 5K tickets for transparent, fair 1-in-100 odds.
+                  {language === "ti" ? "ን1-ኣብ-100 ናይ ምዕዋት ዕድል ተባሂሉ ቁጽሪ ተሳተፍቲ ኣብ 1ሺህ፣ 2ሺህ፣ 3ሺህን 5ሺህን ይድረስ።" : language === "am" ? "ለ1-በ-100 የማሸነፍ እድል ሲባል የተሳታፊዎች ቁጥር በ1ሺህ፣ 2ሺህ፣ 3ሺህ እና 5ሺህ የተገደበ ነው።" : "Pools are capped at 1K, 2K, 3K, and 5K tickets for transparent, fair 1-in-100 odds."}
                 </span>
               </div>
             </>

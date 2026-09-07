@@ -104,7 +104,7 @@ export function Nav({
             rel="noreferrer"
             style={{ display: "flex", alignItems: "center", gap: 5, color: "#FDE047", fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            <Send size={12} color="#FDE047" /> <span className="hide-on-mobile">Official Telegram:</span> {telegramHandle}
+            <Send size={12} color="#FDE047" /> <span className="hide-on-mobile">{t.nav?.officialTelegram || "Official Telegram:"}</span> {telegramHandle}
           </a>
           <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
           <a
@@ -112,7 +112,7 @@ export function Nav({
             className="hide-on-mobile"
             style={{ display: "flex", alignItems: "center", gap: 5, color: "#D1D5DB", fontWeight: 700, whiteSpace: "nowrap", textDecoration: "none" }}
           >
-            <Phone size={12} color="#10B981" /> 24/7 Hotline: {contactPhone}
+            <Phone size={12} color="#10B981" /> {t.nav?.hotline247 || "24/7 Hotline:"} {contactPhone}
           </a>
         </div>
 
@@ -132,7 +132,7 @@ export function Nav({
                 onClick={handleSignOut}
                 style={{ background: "none", border: "none", color: "#F87171", cursor: "pointer", fontSize: "0.6875rem", fontWeight: 800 }}
               >
-                Sign Out
+                {t.nav?.signOut || "Sign Out"}
               </button>
             </div>
           ) : (
@@ -152,7 +152,7 @@ export function Nav({
                 whiteSpace: "nowrap",
               }}
             >
-              <LogIn size={13} color="#FDE047" /> Login / Register
+              <LogIn size={13} color="#FDE047" /> {t.nav?.signIn || "Login / Register"}
             </button>
           )}
         </div>

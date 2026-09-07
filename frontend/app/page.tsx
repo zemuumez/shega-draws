@@ -172,41 +172,6 @@ export default async function HomePage() {
         }}
       >
         <div className="page-inner-container">
-          <div style={{ textAlign: "center", marginBottom: "clamp(28px, 4vw, 44px)" }}>
-            <span
-              style={{
-                background: "rgba(253, 224, 71, 0.15)",
-                border: "1px solid #FDE047",
-                borderRadius: "20px",
-                padding: "4px 12px",
-                fontSize: "0.75rem",
-                fontWeight: 900,
-                color: "#FEF08A",
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              ⭐ 100% TRANSPARENT PLAYER PROOFS
-            </span>
-            <h2
-              className="display"
-              style={{
-                fontSize: "clamp(1.5rem, 3.2vw, 2.2rem)",
-                fontWeight: 900,
-                color: "#FFFFFF",
-                margin: "10px 0 6px",
-              }}
-            >
-              Real Winners. Instant Video Payouts.
-            </h2>
-            <p style={{ color: "#94A3B8", fontSize: "0.9375rem", margin: 0 }}>
-              Hear directly from verified Ethiopian & Diaspora winners who watched their numbers drawn live.
-            </p>
-          </div>
-
           <TestimonialsNewsletter cmsTestimonials={testimonials} />
         </div>
       </section>

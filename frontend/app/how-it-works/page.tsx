@@ -1,97 +1,31 @@
-import type { Metadata } from "next";
+"use client";
+
+import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Ticket,
-  Users,
   CreditCard,
   Tv,
   Trophy,
   ShieldCheck,
-  CheckCircle2,
-  HelpCircle,
-  ArrowRight,
   Sparkles,
   Award,
-  Phone,
-  Send,
-  Lock,
-  Search,
   Check,
-  DollarSign,
-  ChevronRight,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { FAQSection } from "@/components/FAQSection";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export const metadata: Metadata = {
-  title: "How It Works & Complete Player Guide — Rimna Digital Lottery",
-  description:
-    "Complete official guide on how to choose tickets, buy via Telebirr or CBE, watch live founder draws, claim prizes, and verify cryptographic fairness on Rimna Digital Lottery.",
-};
-
-const STEPS = [
-  {
-    stepNumber: "01",
-    badge: "SELECT YOUR TIER",
-    title: "Pick Your Lucky Number & Pool Capacity",
-    description:
-      "Choose any 2-digit lucky number from 00 to 99, or click Quick Pick for an instant selection. Select your preferred ticket price (100, 200, 500, or 1,000 ETB) and capped participant pool (1K, 2K, 3K, or 5K).",
-    highlights: [
-      "Fixed, capped participant pool ensures your odds remain high (1 in 100).",
-      "Real-time calculations show total pool value and exact Top 10 prize amounts.",
-      "Instant multi-ticket purchasing with unique serial numbers.",
-    ],
-    icon: Ticket,
-    iconColor: "#FDE047",
-  },
-  {
-    stepNumber: "02",
-    badge: "INSTANT MOBILE PAYMENT",
-    title: "Pay Seamlessly via Telebirr, CBE, or Cards",
-    description:
-      "Complete your entry in seconds using Ethiopia's most trusted payment channels or international cards. Enter your phone number, submit payment, and receive your digital ticket with instant cryptographic verification.",
-    highlights: [
-      "Supported: Telebirr, CBE Birr, Awash, Bank of Abyssinia, Dashen, Visa & Mastercard.",
-      "Automated verification confirms your ticket in under 30 seconds.",
-      "Receive SMS confirmation and unique verifiable ticket stub.",
-    ],
-    icon: CreditCard,
-    iconColor: "#60A5FA",
-  },
-  {
-    stepNumber: "03",
-    badge: "100% TRANSPARENT BROADCAST",
-    title: "Watch Founders Draw Winners Live on Video",
-    description:
-      "No secret computer algorithms or automated backdoors. Company founders draw all winning numbers physically on live video stream. Each selected number is held up to the camera and announced publicly in real time.",
-    highlights: [
-      "Scheduled public video stream broadcast on Telegram & Web.",
-      "Founders physically pull winning balls from the illuminated lottery tumbler.",
-      "Draw video archive is permanently recorded and available for replay.",
-    ],
-    icon: Tv,
-    iconColor: "#34D399",
-  },
-  {
-    stepNumber: "04",
-    badge: "GUARANTEED PAYOUTS",
-    title: "Top 10 Guaranteed Winners Claim Instant Cash",
-    description:
-      "Every single draw awards guaranteed cash prizes across 10 distinct winning ranks totaling 100% of the player prize pool. Winnings are deposited directly into your Telebirr or bank account within minutes.",
-    highlights: [
-      "1st Rank (Jackpot): 30% of total prize pool.",
-      "2nd Rank: 20% · 3rd Rank: 15% · 4th Rank: 8% · 5th Rank: 6%.",
-      "6th–10th Ranks: 4%–5% guaranteed cash payouts.",
-    ],
-    icon: Trophy,
-    iconColor: "#F59E0B",
-  },
+const STEP_ICONS = [
+  { icon: Ticket, iconColor: "#FDE047" },
+  { icon: CreditCard, iconColor: "#60A5FA" },
+  { icon: Tv, iconColor: "#34D399" },
+  { icon: Trophy, iconColor: "#F59E0B" },
 ];
 
 export default function HowItWorksPage() {
+  const { t } = useLanguage();
+  const pageT = t.howItWorksPage;
+
   return (
     <div
       style={{
@@ -146,7 +80,7 @@ export default function HowItWorksPage() {
                 boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
               }}
             >
-              <Sparkles size={14} color="#FACC15" /> COMPLETE TRANSPARENCY & PLAYER GUIDE
+              <Sparkles size={14} color="#FACC15" /> {pageT?.badge || "COMPLETE TRANSPARENCY & PLAYER GUIDE"}
             </span>
           </div>
 
@@ -162,7 +96,7 @@ export default function HowItWorksPage() {
               textShadow: "0 2px 20px rgba(0, 0, 0, 0.8)",
             }}
           >
-            How Rimna Digital Lottery Works
+            {pageT?.title || "How Rimna Digital Lottery Works"}
           </h1>
 
           <p
@@ -175,7 +109,7 @@ export default function HowItWorksPage() {
               textShadow: "0 1px 8px rgba(0,0,0,0.8)",
             }}
           >
-            Built on 100% genuine public transparency. Learn how to configure your lucky numbers, complete instant mobile checkout, watch company founders draw the 10 guaranteed winners live on video, and claim verified cash payouts.
+            {pageT?.subtitle || "Built on 100% genuine public transparency. Learn how to configure your lucky numbers, complete instant mobile checkout, watch company founders draw the 10 guaranteed winners live on video, and claim verified cash payouts."}
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -193,7 +127,7 @@ export default function HowItWorksPage() {
                 boxShadow: "0 6px 18px rgba(220, 38, 38, 0.45)",
               }}
             >
-              <Ticket size={17} /> Choose Your Ticket Now
+              <Ticket size={17} /> {pageT?.chooseTicketCta || "Choose Your Ticket Now"}
             </Link>
             <Link
               href="/results"
@@ -212,7 +146,7 @@ export default function HowItWorksPage() {
                 gap: 8,
               }}
             >
-              <Award size={17} color="#FDE047" /> View Live & Past Results
+              <Award size={17} color="#FDE047" /> {pageT?.viewResultsCta || "View Live & Past Results"}
             </Link>
           </div>
         </section>
@@ -233,11 +167,12 @@ export default function HowItWorksPage() {
               gap: 24,
             }}
           >
-            {STEPS.map((step) => {
-              const IconComponent = step.icon;
+            {(pageT?.steps || []).map((step, index) => {
+              const iconObj = STEP_ICONS[index % STEP_ICONS.length];
+              const IconComponent = iconObj.icon;
               return (
                 <div
-                  key={step.stepNumber}
+                  key={step.stepNumber || index}
                   style={{
                     background: "rgba(15, 23, 42, 0.62)",
                     backdropFilter: "blur(24px) saturate(190%)",
@@ -292,14 +227,14 @@ export default function HowItWorksPage() {
                           height: 38,
                           borderRadius: "10px",
                           background: "rgba(0, 0, 0, 0.4)",
-                          border: `1.5px solid ${step.iconColor}`,
+                          border: `1.5px solid ${iconObj.iconColor}`,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           flexShrink: 0,
                         }}
                       >
-                        <IconComponent size={20} color={step.iconColor} />
+                        <IconComponent size={20} color={iconObj.iconColor} />
                       </div>
                       <h3
                         className="display"
@@ -359,10 +294,10 @@ export default function HowItWorksPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
               <div>
                 <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#FEF08A", textTransform: "uppercase", letterSpacing: "0.8px" }}>
-                  100% MATHEMATICAL GUARANTEE
+                  {pageT?.mathGuaranteeBadge || "100% MATHEMATICAL GUARANTEE"}
                 </span>
                 <h2 className="display" style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.85rem)", color: "#FFFFFF", fontWeight: 900, margin: "4px 0 0" }}>
-                  Top 10 Prize Payout Schedule
+                  {pageT?.scheduleTitle || "Top 10 Prize Payout Schedule"}
                 </h2>
               </div>
 
@@ -380,7 +315,7 @@ export default function HowItWorksPage() {
                   gap: 5,
                 }}
               >
-                <ShieldCheck size={14} color="#34D399" /> 100% Payout / No Rollover
+                <ShieldCheck size={14} color="#34D399" /> {pageT?.payoutNoRolloverBadge || "100% Payout / No Rollover"}
               </span>
             </div>
 
@@ -391,36 +326,31 @@ export default function HowItWorksPage() {
                 gap: 12,
               }}
             >
-              {[
-                { rank: "#1 Grand Jackpot", share: "30% of Pool", desc: "Top Cash / Luxury Reward", highlight: true },
-                { rank: "#2 Luxury Prize", share: "20% of Pool", desc: "Guaranteed High Cash", highlight: false },
-                { rank: "#3 High Cash", share: "15% of Pool", desc: "Guaranteed Cash", highlight: false },
-                { rank: "#4 Cash Winner", share: "8% of Pool", desc: "Direct Bank Transfer", highlight: false },
-                { rank: "#5 Cash Winner", share: "6% of Pool", desc: "Direct Bank Transfer", highlight: false },
-                { rank: "#6 Cash Winner", share: "5% of Pool", desc: "Direct Bank Transfer", highlight: false },
-                { rank: "#7–#10 (4 Winners)", share: "4% Each (16%)", desc: "Instant Mobile Deposit", highlight: false },
-              ].map((tier, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: tier.highlight ? "rgba(254, 240, 138, 0.2)" : "rgba(0, 0, 0, 0.35)",
-                    border: `1.5px solid ${tier.highlight ? "#FDE047" : "rgba(255, 255, 255, 0.12)"}`,
-                    borderRadius: "14px",
-                    padding: "14px 12px",
-                    textAlign: "center",
-                  }}
-                >
-                  <span style={{ fontSize: "0.6875rem", color: tier.highlight ? "#FEF08A" : "#94A3B8", fontWeight: 800, display: "block", marginBottom: 2 }}>
-                    {tier.rank}
-                  </span>
-                  <div className="display" style={{ fontSize: "1.15rem", fontWeight: 900, color: tier.highlight ? "#FDE047" : "#FFFFFF" }}>
-                    {tier.share}
+              {(pageT?.scheduleTiers || []).map((tier, idx) => {
+                const isFirst = idx === 0;
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      background: isFirst ? "rgba(254, 240, 138, 0.2)" : "rgba(0, 0, 0, 0.35)",
+                      border: `1.5px solid ${isFirst ? "#FDE047" : "rgba(255, 255, 255, 0.12)"}`,
+                      borderRadius: "14px",
+                      padding: "14px 12px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <span style={{ fontSize: "0.6875rem", color: isFirst ? "#FEF08A" : "#94A3B8", fontWeight: 800, display: "block", marginBottom: 2 }}>
+                      {tier.rank}
+                    </span>
+                    <div className="display" style={{ fontSize: "1.15rem", fontWeight: 900, color: isFirst ? "#FDE047" : "#FFFFFF" }}>
+                      {tier.share}
+                    </div>
+                    <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 4 }}>
+                      {tier.desc}
+                    </span>
                   </div>
-                  <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 4 }}>
-                    {tier.desc}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -446,15 +376,6 @@ export default function HowItWorksPage() {
               color: "#FFFFFF",
             }}
           >
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#FEF08A", textTransform: "uppercase", letterSpacing: "0.8px" }}>
-                QUESTIONS & ANSWERS
-              </span>
-              <h2 className="display" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: "#FFFFFF", fontWeight: 900, margin: "6px 0 0" }}>
-                Frequently Asked Questions
-              </h2>
-            </div>
-
             <FAQSection />
           </div>
         </section>
