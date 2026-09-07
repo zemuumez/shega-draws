@@ -11,18 +11,19 @@ interface LiveBroadcastBannerProps {
 }
 
 export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
-  const { language } = useLanguage();
+  const { language, getLocalized, t } = useLanguage();
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
   const title =
+    (language === "ti" && (cmsContent as any)?.titleTi) ||
     (language === "am" && cmsContent?.titleAm) ||
-    (language === "om" && cmsContent?.titleOm) ||
     cmsContent?.title ||
+    t.fairness.title ||
     "100% Live Video Winner Draws by Company Founders";
 
   const body =
+    (language === "ti" && (cmsContent as any)?.bodyTi) ||
     (language === "am" && cmsContent?.bodyAm) ||
-    (language === "om" && cmsContent?.bodyOm) ||
     cmsContent?.body;
 
   return (

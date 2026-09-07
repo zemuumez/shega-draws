@@ -76,7 +76,7 @@ interface InteractiveTicketConfiguratorProps {
 }
 
 export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicketConfiguratorProps) {
-  const { language } = useLanguage();
+  const { language, t, getLocalized } = useLanguage();
   const [currency, setCurrency] = useState<Currency>("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
@@ -123,16 +123,16 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
   const isUSD = currency === "USD";
   const currentPrices = isUSD ? usdPrices : etbPrices;
 
-  const isPriceEnabled = (val: number, curr: Currency) => {
+  const isPriceEnabled = React.useCallback((val: number, curr: Currency) => {
     const list = curr === "USD" ? usdPrices : etbPrices;
     const match = list.find((p) => p.value === val);
     return match ? match.isEnabled !== false : true;
-  };
+  }, [usdPrices, etbPrices]);
 
-  const isPoolEnabled = (size: number) => {
+  const isPoolEnabled = React.useCallback((size: number) => {
     const match = poolOptions.find((p) => p.size === size);
     return match ? match.isEnabled !== false : true;
-  };
+  }, [poolOptions]);
 
   // Automatically switch to first enabled price/pool if current is disabled or deleted
   React.useEffect(() => {
@@ -151,7 +151,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         setSelectedPool(firstEnabledPool.size);
       }
     }
-  }, [siteSettings, currency, selectedPrice, selectedPool, isUSD, usdPrices, etbPrices, poolOptions]);
+  }, [siteSettings, currency, selectedPrice, selectedPool, isUSD, usdPrices, etbPrices, poolOptions, isPriceEnabled, isPoolEnabled]);
 
   // Handle currency switch
   const handleCurrencyChange = (newCurr: Currency) => {
@@ -240,7 +240,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 textShadow: "0 2px 8px rgba(0,0,0,0.6)",
               }}
             >
-              Interactive Ticket Configurator
+              {t.quickPick.title || "Interactive Ticket Configurator"}
             </h2>
             <span
               className="mono"
@@ -253,7 +253,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 display: "block",
               }}
             >
-              Capped Pools · 10 Guaranteed Winners · 100% Video Draw
+              {t.fairness.title || "Capped Pools · 10 Guaranteed Winners · 100% Video Draw"}
             </span>
           </div>
         </div>

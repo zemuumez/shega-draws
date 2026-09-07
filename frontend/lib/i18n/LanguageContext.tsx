@@ -9,7 +9,9 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: Translations;
   /** Get a CMS translation by key, with fallback to hardcoded translations. */
-  tc: (key: string) => string;
+  tc: (key: string, fallback?: string) => string;
+  /** Resolve a localized field from a CMS document (e.g. title, titleAm, titleTi) */
+  getLocalized: (doc: any, fieldPrefix: string, fallback?: string) => string;
 }
 
 // CMS translation cache (populated on mount)
@@ -20,23 +22,33 @@ const LanguageContext = createContext<LanguageContextType>({
   setLanguage: () => {},
   t: translations.en,
   tc: () => "",
+  getLocalized: () => "",
 });
 
 export function LanguageProvider({
   children,
+  defaultLanguage = "en",
   cmsTranslations,
 }: {
   children: React.ReactNode;
-  cmsTranslations?: { key: string; en: string; am?: string; om?: string; ti?: string }[];
+  defaultLanguage?: Language | string;
+  cmsTranslations?: { key: string; en: string; am?: string; ti?: string }[];
 }) {
-  const [language, setLangState] = useState<Language>("en");
+  const initialLang: Language =
+    defaultLanguage === "am" || defaultLanguage === "ti" || defaultLanguage === "en"
+      ? (defaultLanguage as Language)
+      : "en";
+
+  const [language, setLangState] = useState<Language>(initialLang);
 
   useEffect(() => {
     const saved = localStorage.getItem("rimnalottery_lang") as Language | null;
-    if (saved && (saved === "en" || saved === "am" || saved === "om")) {
+    if (saved && (saved === "en" || saved === "am" || saved === "ti")) {
       setLangState(saved);
+    } else if (defaultLanguage && (defaultLanguage === "en" || defaultLanguage === "am" || defaultLanguage === "ti")) {
+      setLangState(defaultLanguage as Language);
     }
-  }, []);
+  }, [defaultLanguage]);
 
   // Build CMS lookup map once
   useEffect(() => {
@@ -46,7 +58,6 @@ export function LanguageProvider({
         map[t.key] = {
           en: t.en,
           ...(t.am ? { am: t.am } : {}),
-          ...(t.om ? { om: t.om } : {}),
           ...(t.ti ? { ti: t.ti } : {}),
         };
       }
@@ -61,17 +72,31 @@ export function LanguageProvider({
 
   const t = translations[language] ?? translations.en;
 
-  /** Look up CMS translation by dot-path key, falling back to empty string. */
-  const tc = (key: string): string => {
+  /** Look up CMS translation by dot-path key, falling back to default translation or provided fallback. */
+  const tc = (key: string, fallback?: string): string => {
     const cmsEntry = _cmsTranslations[key];
     if (cmsEntry) {
-      return cmsEntry[language] || cmsEntry["en"] || "";
+      if (language === "ti" && cmsEntry.ti) return cmsEntry.ti;
+      if (language === "am" && cmsEntry.am) return cmsEntry.am;
+      if (cmsEntry.en) return cmsEntry.en;
     }
-    return "";
+    return fallback || "";
+  };
+
+  /** Helper to extract localized field from any CMS document based on current language */
+  const getLocalized = (doc: any, fieldPrefix: string, fallback: string = ""): string => {
+    if (!doc) return fallback;
+    if (language === "ti" && doc[`${fieldPrefix}Ti`]) {
+      return doc[`${fieldPrefix}Ti`];
+    }
+    if (language === "am" && doc[`${fieldPrefix}Am`]) {
+      return doc[`${fieldPrefix}Am`];
+    }
+    return doc[fieldPrefix] || doc[`${fieldPrefix}En`] || fallback;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, tc }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, tc, getLocalized }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -87,7 +112,7 @@ export function LanguageSwitcher() {
   const options: { code: Language; label: string; flag: string }[] = [
     { code: "en", label: "English", flag: "EN" },
     { code: "am", label: "አማርኛ", flag: "አማ" },
-    { code: "om", label: "Afaan Oromoo", flag: "OM" },
+    { code: "ti", label: "ትግርኛ", flag: "ትግ" },
   ];
 
   return (
@@ -95,16 +120,16 @@ export function LanguageSwitcher() {
       style={{
         display: "inline-flex",
         alignItems: "center",
-        background: "rgba(255, 255, 255, 0.04)",
-        border: "1px solid var(--gray-line)",
-        borderRadius: "var(--radius-sm)",
+        background: "rgba(255, 255, 255, 0.05)",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        borderRadius: "var(--radius-sm, 8px)",
         padding: "3px",
-        gap: "2px",
+        gap: "3px",
       }}
       role="group"
       aria-label="Language Selector"
     >
-      <Globe size={14} color="var(--gold)" style={{ marginLeft: 6, marginRight: 2 }} />
+      <Globe size={14} color="var(--gold, #FACC15)" style={{ marginLeft: 6, marginRight: 2 }} />
       {options.map((opt) => {
         const active = language === opt.code;
         return (
@@ -112,15 +137,15 @@ export function LanguageSwitcher() {
             key={opt.code}
             onClick={() => setLanguage(opt.code)}
             style={{
-              background: active ? "var(--gold)" : "transparent",
-              color: active ? "var(--ink)" : "var(--gray)",
+              background: active ? "var(--gold, #FACC15)" : "transparent",
+              color: active ? "#0F172A" : "var(--gray, #94A3B8)",
               border: "none",
               borderRadius: 6,
               padding: "4px 8px",
               fontSize: "0.75rem",
-              fontWeight: active ? 700 : 500,
+              fontWeight: active ? 800 : 500,
               cursor: "pointer",
-              transition: "all var(--transition-fast)",
+              transition: "all 0.15s ease",
             }}
             title={opt.label}
           >

@@ -83,12 +83,14 @@ export function MigrationTool() {
             lineHeight: 1.5,
           }}
         >
-          💡 <strong>What this does:</strong> Populates <strong>{totalCount} core documents</strong> into your CMS:
+          💡 <strong>What this does:</strong> Populates <strong>{totalCount} core documents</strong> into your CMS with full <strong>English, Amharic (አማርኛ), and Tigrinya (ትግርኛ)</strong> localizations:
           <ul style={{ margin: "8px 0 0 18px", padding: 0 }}>
-            <li>⚙️ Official Site Settings, Hotline, & Merchant Accounts (Telebirr / CBE)</li>
-            <li>🎰 Active Draws with Live Countdown Timers (100, 200, 500, 1000 ETB & $50 USD)</li>
+            <li>⚙️ Official Site Settings, Default Language (EN / አማ / ትግ), & Merchant Accounts (Telebirr / CBE)</li>
+            <li>🌐 UI Translation Catalog for all headers, buttons, configurator, and modals</li>
+            <li>🎰 Multilingual Active Draws with Live Countdown Timers (100, 200, 500, 1000 ETB & $50 USD)</li>
             <li>🏆 Latest Live Draw Results with 10 Verified Winners</li>
-            <li>💬 Real Winner Testimonials & Verified Stories</li>
+            <li>💬 Real Winner Testimonials & Verified Stories in EN, Amharic, and Tigrinya</li>
+            <li>📢 Promotional Advertisements with localized headlines and descriptions</li>
           </ul>
         </div>
 

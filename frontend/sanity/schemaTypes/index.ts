@@ -6,6 +6,7 @@ import { siteSettingsType } from "./siteSettings";
 import { advertisementType } from "./advertisement";
 import { testimonialType } from "./testimonial";
 import { contactMessageType } from "./contactMessage";
+import { uiTranslationType } from "./uiTranslation";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -16,5 +17,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     advertisementType,
     testimonialType,
     contactMessageType,
+    uiTranslationType,
   ],
 };

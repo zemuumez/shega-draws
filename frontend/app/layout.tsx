@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { sanityClient } from "@/lib/sanity/client";
-import { SITE_SETTINGS_QUERY, type CMSSiteSettings } from "@/lib/sanity/queries";
+import { SITE_SETTINGS_QUERY, UI_TRANSLATIONS_QUERY, type CMSSiteSettings, type CMSUITranslation } from "@/lib/sanity/queries";
 
 export const metadata: Metadata = {
   title: { default: "Rimna International Digital Lottery — 100% Live Public Draws", template: "%s · Rimna Digital Lottery" },
@@ -28,17 +28,23 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const siteSettings = await sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null);
+  const [siteSettings, uiTranslations] = await Promise.all([
+    sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
+    sanityClient.fetch<CMSUITranslation[]>(UI_TRANSLATIONS_QUERY).catch(() => null),
+  ]);
 
   return (
-    <html lang="en">
+    <html lang={siteSettings?.defaultLanguage || "en"}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="bg-subtle-mesh">
-        <LanguageProvider>
+        <LanguageProvider
+          defaultLanguage={siteSettings?.defaultLanguage || "en"}
+          cmsTranslations={uiTranslations || []}
+        >
           <ScrollProgressBar />
           <Nav siteSettings={siteSettings} />
           <main id="main-content" className="page-content">

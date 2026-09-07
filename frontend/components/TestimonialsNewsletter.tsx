@@ -10,7 +10,7 @@ interface TestimonialsNewsletterProps {
 }
 
 export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewsletterProps) {
-  const { language } = useLanguage();
+  const { language, getLocalized } = useLanguage();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
@@ -21,25 +21,40 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
       _id: "fb1",
       name: "Tewodros Kassahun",
       location: "Addis Ababa",
+      locationAm: "አዲስ አበባ",
+      locationTi: "ኣዲስ ኣበባ",
       prizeWon: "80,000 ETB (1st Place Winner)",
+      prizeWonAm: "የ80,000 ብር (1ኛ ደረጃ) አሸናፊ",
+      prizeWonTi: "ናይ 80,000 ብር (1ይ ደረጃ) ተዓዋቲ",
       quote: "I watched the live video broadcast when my number was drawn! The CBE transfer arrived in my account in less than 20 minutes!",
-      rating: 5,
+      quoteAm: "መስራቾቹ ቁጥሬን በቀጥታ በቪዲዮ ሲያወጡ ተመለከትኩ። በ20 ደቂቃ ውስጥ ገንዘቡ በባንክ ሂሳቤ ደረሰኝ!",
+      quoteTi: "ቁጽረይ ብቀጥታ ብቪድዮ ክፍለጥ ከሎ ተዓዚበ። ኣብ ውሽጢ 20 ደቒቕ ብባንክ በጺሑኒ!",
     },
     {
       _id: "fb2",
       name: "Helen Mengistu",
       location: "Washington, DC (Diaspora)",
+      locationAm: "ዋሽንግተን ዲሲ (ዲያስፖራ)",
+      locationTi: "ዋሽንግተን ዲሲ (ዲያስፖራ)",
       prizeWon: "$15,000 USD (1st Place Winner)",
-      quote: "Playing from the USA was so seamless with my card. The 10 guaranteed winners structure gives real winning chances!",
-      rating: 5,
+      prizeWonAm: "የ$15,000 ዶላር አሸናፊ",
+      prizeWonTi: "ናይ $15,000 ዶላር ተዓዋቲት",
+      quote: "Playing from the USA was so seamless. The 10 guaranteed winners structure gives real winning chances!",
+      quoteAm: "ከአሜሪካ ሆኜ መሳተፍ በጣም ቀላል ነበር። የ10 አሸናፊዎች እድል እውነተኛ የማሸነፍ እድል ይሰጣል!",
+      quoteTi: "ካብ ኣመሪካ ኮይነ ምስታፍ ኣዝዩ ቀሊል ነይሩ። ናይ 10 ተዓወትቲ ዕድል ሓቀኛ ናይ ምዕዋት ተስፋ ይህብ!",
     },
     {
       _id: "fb3",
       name: "Yonas Birhane",
       location: "Hawassa",
+      locationAm: "ሀዋሳ",
+      locationTi: "ሓዋሳ",
       prizeWon: "65,000 ETB (2nd Place Winner)",
+      prizeWonAm: "የ65,000 ብር (2ኛ ደረጃ) አሸናፊ",
+      prizeWonTi: "ናይ 65,000 ብር (2ይ ደረጃ) ተዓዋቲ",
       quote: "Rimna is truly the most transparent lottery platform. You see your ticket number on the board and verify the outcome yourself.",
-      rating: 5,
+      quoteAm: "ሪምና እጅግ ግልጽ የሆነ የሎተሪ መድረክ ነው። ቲኬትዎን በሰሌዳው ላይ አይተው ውጤቱን ራስዎ ያረጋግጣሉ።",
+      quoteTi: "ሪምና ብሓቂ ኣዝዩ ግልጺ ዝኾነ ናይ ሎተሪ መድረኽ እዩ። ቲኬትኩም ኣብ ሰሌዳ ርኢኹም ውጽኢቱ ባዕልኹም ተረጋግጹ።",
     },
   ];
 
@@ -54,10 +69,9 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
   };
 
   const current = testimonials[testimonialIdx];
-  const currentQuote =
-    (language === "am" && current.quoteAm) ||
-    (language === "om" && current.quoteOm) ||
-    current.quote;
+  const currentQuote = getLocalized(current, "quote", current?.quote || "");
+  const currentLocation = getLocalized(current, "location", current?.location || "");
+  const currentPrize = getLocalized(current, "prizeWon", current?.prizeWon || "");
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,10 +183,10 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
 
           <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)", paddingTop: 12 }}>
             <strong style={{ color: "#FFFFFF", fontSize: "0.9375rem", display: "block" }}>
-              {current.name} · {current.location}
+              {current.name} · {currentLocation}
             </strong>
             <span className="mono" style={{ fontSize: "0.8125rem", color: "#FDE047", fontWeight: 800 }}>
-              🏆 Won {current.prizeWon}
+              🏆 {currentPrize}
               {current.drawTitle ? ` — ${current.drawTitle}` : ""}
             </span>
           </div>

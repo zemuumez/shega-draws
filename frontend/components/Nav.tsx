@@ -20,7 +20,7 @@ export function Nav({
   siteSettings?: CMSSiteSettings | null;
 }) {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, getLocalized } = useLanguage();
   const [currentUser, setCurrentUser] = useState<StoredUser | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -29,7 +29,7 @@ export function Nav({
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
   const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace("@", "")}`);
-  const siteName = siteSettings?.siteName || "Rimna International Digital Lottery";
+  const siteName = getLocalized(siteSettings, "siteName", "Rimna International Digital Lottery");
   const logoImage = siteSettings?.logoImageUrl || "/images/rimna-brand-logo.png";
 
   useEffect(() => {
@@ -49,15 +49,15 @@ export function Nav({
 
   // Left desktop links
   const leftNavItems = [
-    { href: "/",            label: "Draws",        icon: Home },
-    { href: "/how-it-works", label: "How It Works", icon: Sparkles },
-    { href: "/results",     label: "Results",      icon: ShieldCheck },
+    { href: "/",            label: t.nav.draws,        icon: Home },
+    { href: "/how-it-works", label: t.nav.howItWorks,   icon: Sparkles },
+    { href: "/results",     label: t.nav.results,      icon: ShieldCheck },
   ];
 
   // Right desktop links
   const rightNavItems = [
-    { href: "/entries",     label: "My Tickets",   icon: ListChecks },
-    { href: "/about",       label: "Why Rimna",    icon: Award },
+    { href: "/entries",     label: t.nav.myEntries,    icon: ListChecks },
+    { href: "/about",       label: t.howItWorks.title || "Why Rimna", icon: Award },
   ];
 
   // All navigation links for mobile drawer
@@ -277,7 +277,7 @@ export function Nav({
               marginLeft: 4,
             }}
           >
-            <Phone size={13} /> <span className="contact-btn-text">Contact Us</span>
+            <Phone size={13} /> <span className="contact-btn-text">{t.nav.contact || "Contact Us"}</span>
           </button>
         </div>
 
@@ -296,7 +296,7 @@ export function Nav({
               gap: 4,
             }}
           >
-            <Phone size={12} /> Contact
+            <Phone size={12} /> {t.nav.contact || "Contact"}
           </button>
         </div>
       </nav>

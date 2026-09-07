@@ -14,21 +14,17 @@ interface FooterProps {
 
 export function Footer({ siteSettings }: FooterProps) {
   const pathname = usePathname();
-  const { language, t } = useLanguage();
+  const { language, t, getLocalized } = useLanguage();
 
   if (pathname?.startsWith("/studio")) {
     return null;
   }
 
   // CMS values with hardcoded fallbacks
-  const siteName = siteSettings?.siteName || t.appName;
-  const footerDesc =
-    (language === "am" && siteSettings?.footerDescriptionAm) ||
-    (language === "om" && siteSettings?.footerDescriptionOm) ||
-    siteSettings?.footerDescription ||
-    t.footer.description;
+  const siteName = getLocalized(siteSettings, "siteName", t.appName);
+  const footerDesc = getLocalized(siteSettings, "footerDescription", t.footer.description);
   const phone1 = siteSettings?.contactPhone || "+251 911 000 000";
-  const phone2 = siteSettings?.contactPhoneSecondary || "0912 345 678";
+  const phone2 = "+251 920 000 000";
   const email = siteSettings?.supportEmail || "support@rimnalottery.com";
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
   const copyrightText = siteSettings?.copyrightText || t.footer.rights;

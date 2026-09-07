@@ -14,10 +14,22 @@ export const drawType = defineType({
     }),
     defineField({
       name: "title",
-      title: "Draw Title",
+      title: "Draw Title (English)",
       type: "string",
       placeholder: "e.g. 500 Birr Grand Multi-Pool Draw",
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "titleAm",
+      title: "Draw Title (Amharic - አማርኛ)",
+      type: "string",
+      placeholder: "e.g. የ500 ብር ታላቁ የብዙ-ተሳታፊ እጣ",
+    }),
+    defineField({
+      name: "titleTi",
+      title: "Draw Title (Tigrinya - ትግርኛ)",
+      type: "string",
+      placeholder: "e.g. ናይ 500 ብር ዓቢይ ናይ ብዙሕ-ተሳታፊ ዕጫ",
     }),
     defineField({
       name: "currency",

@@ -6,6 +6,11 @@ export const siteSettingsType = defineType({
   type: "document",
   fieldsets: [
     {
+      name: "localization",
+      title: "🌐 Language & Localization Settings",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
       name: "tierControls",
       title: "🎛️ Active Lottery Prices & Pool Capacities (Add, Edit, Delete, Toggle)",
       options: { collapsible: true, collapsed: false },
@@ -27,6 +32,24 @@ export const siteSettingsType = defineType({
     },
   ],
   fields: [
+    // ─── Localization Settings ─────────────────────────────────────────
+    defineField({
+      name: "defaultLanguage",
+      title: "Default Platform Language (Website Default)",
+      type: "string",
+      fieldset: "localization",
+      description: "Select which language is displayed by default when visitors open the website.",
+      options: {
+        list: [
+          { title: "🇬🇧 English (en)", value: "en" },
+          { title: "🇪🇹 አማርኛ / Amharic (am)", value: "am" },
+          { title: "🇪🇹 ትግርኛ / Tigrinya (ti)", value: "ti" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "en",
+      validation: (Rule) => Rule.required(),
+    }),
     // ─── Tier Controls (Manage, Add, Edit, Delete, Toggle Prices & Pools) ─
     defineField({
       name: "etbPrices",
@@ -202,10 +225,45 @@ export const siteSettingsType = defineType({
     // ─── Branding ────────────────────────────────────────────────────
     defineField({
       name: "siteName",
-      title: "Official Platform Name",
+      title: "Official Platform Name (English)",
       type: "string",
       fieldset: "branding",
       initialValue: "Rimna International Digital Lottery",
+    }),
+    defineField({
+      name: "siteNameAm",
+      title: "Official Platform Name (Amharic - አማርኛ)",
+      type: "string",
+      fieldset: "branding",
+      initialValue: "ሪምና ዓለም አቀፍ ዲጂታል ሎተሪ",
+    }),
+    defineField({
+      name: "siteNameTi",
+      title: "Official Platform Name (Tigrinya - ትግርኛ)",
+      type: "string",
+      fieldset: "branding",
+      initialValue: "ሪምና ዓለም ለኸ ዲጂታል ሎተሪ",
+    }),
+    defineField({
+      name: "tagline",
+      title: "Official Tagline (English)",
+      type: "string",
+      fieldset: "branding",
+      initialValue: "Provably Fair Digital Lottery & Guaranteed Live Public Draws",
+    }),
+    defineField({
+      name: "taglineAm",
+      title: "Official Tagline (Amharic - አማርኛ)",
+      type: "string",
+      fieldset: "branding",
+      initialValue: "ፍትሃዊ ዲጂታል ሎተሪ እና የቀጥታ ቪዲዮ እጣ ማውጣት",
+    }),
+    defineField({
+      name: "taglineTi",
+      title: "Official Tagline (Tigrinya - ትግርኛ)",
+      type: "string",
+      fieldset: "branding",
+      initialValue: "ፍትሓዊ ዲጂታል ሎተሪን ናይ ቀጥታ ቪድዮ ዕጫ ምውጻእን",
     }),
     defineField({
       name: "heroBannerImage",
@@ -272,11 +330,48 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: "diasporaWireInstructions",
-      title: "Diaspora USD Wire / Payment Instructions",
+      title: "Diaspora USD Wire / Payment Instructions (English)",
       type: "text",
       fieldset: "paymentAccounts",
       rows: 3,
       initialValue: "Contact official support via Telegram @RimnaLotteryOfficial or wire to our designated clearing bank.",
+    }),
+    defineField({
+      name: "diasporaWireInstructionsAm",
+      title: "Diaspora USD Wire / Payment Instructions (Amharic - አማርኛ)",
+      type: "text",
+      fieldset: "paymentAccounts",
+      rows: 3,
+      initialValue: "በቴሌግራም @RimnaLotteryOfficial የድጋፍ ቡድናችንን ያነጋግሩ ወይም በቀጥታ ወደ ዲያስፖራ የባንክ ሂሳባችን ያስተላልፉ።",
+    }),
+    defineField({
+      name: "diasporaWireInstructionsTi",
+      title: "Diaspora USD Wire / Payment Instructions (Tigrinya - ትግርኛ)",
+      type: "text",
+      fieldset: "paymentAccounts",
+      rows: 3,
+      initialValue: "ብቴሌግራም @RimnaLotteryOfficial ናይ ደገፍ ጉጅለና ኣዘራርቡ ወይ ቀጥታ ናብ ናይ ዲያስፖራ ባንክ ሕሳብና ኣመሓላልፉ።",
+    }),
+    defineField({
+      name: "footerDescription",
+      title: "Footer Description (English)",
+      type: "text",
+      rows: 2,
+      initialValue: "Rimna Digital Lottery is a transparent, live-video verified digital lottery platform with direct mobile wallet payouts.",
+    }),
+    defineField({
+      name: "footerDescriptionAm",
+      title: "Footer Description (Amharic - አማርኛ)",
+      type: "text",
+      rows: 2,
+      initialValue: "ሪምና ዲጂታል ሎተሪ ግልጽ፣ የቀጥታ ቪዲዮ ማረጋገጫ ያለው እና በቴሌብር ክፍያ የሚፈጽም የዲጂታል ሎተሪ መድረክ ነው።",
+    }),
+    defineField({
+      name: "footerDescriptionTi",
+      title: "Footer Description (Tigrinya - ትግርኛ)",
+      type: "text",
+      rows: 2,
+      initialValue: "ሪምና ዲጂታል ሎተሪ ግልጺ፣ ናይ ቀጥታ ቪድዮ ምርግጋጽ ዘለዎን ብቴሌብር ክፍሊት ዝፍጽምን ናይ ዲጂታል ሎተሪ መድረኽ እዩ።",
     }),
   ],
   preview: {

@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { FloatingParticlesCanvas } from "./FloatingParticlesCanvas";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
@@ -23,6 +24,7 @@ interface CinematicStadiumHeroProps {
 }
 
 export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicStadiumHeroProps) {
+  const { t, getLocalized } = useLanguage();
   const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
@@ -151,7 +153,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
               }}
             >
-              <ShieldCheck size={15} color="#FACC15" /> 100% Live Video Draws · Audited Broadcast
+              <ShieldCheck size={15} color="#FACC15" /> {t.hero.trustBadge || "100% Live Video Draws · Audited Broadcast"}
             </span>
           </div>
 
@@ -168,7 +170,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
               textShadow: "0 2px 20px rgba(0, 0, 0, 0.8)",
             }}
           >
-            Win Ethiopia&apos;s Biggest Live Digital Jackpot
+            {getLocalized(siteSettings, "tagline", t.hero.title)}
           </h1>
 
           {/* Subtitle */}
@@ -182,7 +184,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
               textShadow: "0 1px 8px rgba(0,0,0,0.8)",
             }}
           >
-            Pick your lucky number, choose your pool capacity, and watch our company founders draw the 10 winning numbers live on video with 100% transparent payouts.
+            {t.hero.subtitle}
           </p>
         </div>
 
@@ -530,7 +532,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 minHeight: 48,
               }}
             >
-              <span>Check Pool & Enter</span>
+              <span>{t.hero.enterCta || "Check Pool & Enter"}</span>
               <ArrowUpRight size={16} />
             </button>
           </div>

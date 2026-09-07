@@ -10,17 +10,17 @@ interface WhyRimnaLotteryProps {
 }
 
 export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   const title =
+    (language === "ti" && (cmsContent as any)?.titleTi) ||
     (language === "am" && cmsContent?.titleAm) ||
-    (language === "om" && cmsContent?.titleOm) ||
     cmsContent?.title ||
     "Why Rimna Digital Lottery?";
 
   const body =
+    (language === "ti" && (cmsContent as any)?.bodyTi) ||
     (language === "am" && cmsContent?.bodyAm) ||
-    (language === "om" && cmsContent?.bodyOm) ||
     cmsContent?.body;
 
   const features = cmsContent?.features && cmsContent.features.length > 0 ? cmsContent.features : null;
@@ -88,8 +88,8 @@ export function WhyRimnaLottery({ cmsContent }: WhyRimnaLotteryProps) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginTop: 10 }}>
           {features ? (
             features.map((f, i) => {
-              const fTitle = (language === "am" && f.titleAm) || (language === "om" && f.titleOm) || f.title;
-              const fDesc = (language === "am" && f.descriptionAm) || (language === "om" && f.descriptionOm) || f.description;
+              const fTitle = (language === "ti" && (f as any).titleTi) || (language === "am" && f.titleAm) || f.title;
+              const fDesc = (language === "ti" && (f as any).descriptionTi) || (language === "am" && f.descriptionAm) || f.description;
               const isGold = f.color === "gold" || i === 0;
               const isBlue = f.color === "blue" || i === 1;
 

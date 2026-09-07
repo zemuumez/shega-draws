@@ -11,6 +11,7 @@ import {
   Play,
   ArrowRight,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSAdvertisement } from "@/lib/sanity/queries";
 
 interface AdItem {
@@ -76,6 +77,7 @@ interface AdvertisementCarouselProps {
 }
 
 export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
+  const { t, getLocalized } = useLanguage();
   const [isPaused, setIsPaused] = useState<boolean>(false);
 
   // Map CMS ads or fallback to default
@@ -83,12 +85,12 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
     cmsAds && cmsAds.length > 0
       ? cmsAds.map((ad, idx) => ({
           id: ad._id || `ad-${idx}`,
-          badge: ad.badge || "📢 FEATURED REWARD",
-          title: ad.title,
-          subtitle: ad.subtitle,
+          badge: getLocalized(ad, "badge", ad.badge || "📢 FEATURED REWARD"),
+          title: getLocalized(ad, "title", ad.title),
+          subtitle: getLocalized(ad, "subtitle", ad.subtitle),
           estimatedValue: ad.estimatedValue || "Upcoming Reward",
           imageUrl: ad.imageUrl || DEFAULT_ADS[idx % DEFAULT_ADS.length].imageUrl,
-          statusTag: "⏳ COMING SOON",
+          statusTag: "⏳ " + (t.promo.limitedTime || "COMING SOON"),
         }))
       : DEFAULT_ADS;
 

@@ -5,6 +5,8 @@ export const ALL_DRAWS_QUERY = defineQuery(`
   *[_type == "draw"] | order(deadline desc) {
     _id,
     title,
+    titleAm,
+    titleTi,
     drawId,
     status,
     currency,
@@ -20,6 +22,8 @@ export const ACTIVE_DRAW_QUERY = defineQuery(`
   *[_type == "draw" && status == "open"][0] {
     _id,
     title,
+    titleAm,
+    titleTi,
     drawId,
     currency,
     ticketPrice,
@@ -46,10 +50,16 @@ export const LATEST_RESULTS_QUERY = defineQuery(`
   }
 `);
 
-/** Global site settings & official payment accounts */
+/** Global site settings, default language & official payment accounts */
 export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"] | order(_updatedAt desc)[0] {
+    defaultLanguage,
     siteName,
+    siteNameAm,
+    siteNameTi,
+    tagline,
+    taglineAm,
+    taglineTi,
     "heroBannerImageUrl": heroBannerImage.asset->url,
     "logoImageUrl": logoImage.asset->url,
     contactPhone,
@@ -59,6 +69,11 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     cbeAccountNumber,
     cbeAccountName,
     diasporaWireInstructions,
+    diasporaWireInstructionsAm,
+    diasporaWireInstructionsTi,
+    footerDescription,
+    footerDescriptionAm,
+    footerDescriptionTi,
     etbPrices[]{
       value,
       label,
@@ -84,9 +99,50 @@ export const TESTIMONIALS_QUERY = defineQuery(`
     _id,
     name,
     location,
+    locationAm,
+    locationTi,
     prizeWon,
+    prizeWonAm,
+    prizeWonTi,
     quote,
+    quoteAm,
+    quoteTi,
     "avatarUrl": avatar.asset->url
+  }
+`);
+
+/** Fetch promotional ads and big rewards for homepage carousel */
+export const ADVERTISEMENTS_QUERY = defineQuery(`
+  *[_type == "advertisement" && isActive == true] | order(order asc) {
+    _id,
+    title,
+    titleAm,
+    titleTi,
+    subtitle,
+    subtitleAm,
+    subtitleTi,
+    badge,
+    badgeAm,
+    badgeTi,
+    "imageUrl": image.asset->url,
+    estimatedValue,
+    targetDrawId,
+    ctaText,
+    ctaTextAm,
+    ctaTextTi,
+    order
+  }
+`);
+
+/** Fetch all UI translation strings from Sanity CMS */
+export const UI_TRANSLATIONS_QUERY = defineQuery(`
+  *[_type == "uiTranslation"] {
+    _id,
+    key,
+    category,
+    en,
+    am,
+    ti
   }
 `);
 
@@ -109,38 +165,42 @@ export const PLAYER_ENTRIES_QUERY = defineQuery(`
   }
 `);
 
-/** Fetch promotional ads and big rewards for homepage carousel */
-export const ADVERTISEMENTS_QUERY = defineQuery(`
-  *[_type == "advertisement" && isActive == true] | order(order asc) {
-    _id,
-    title,
-    subtitle,
-    badge,
-    "imageUrl": image.asset->url,
-    estimatedValue,
-    targetDrawId,
-    ctaText,
-    order
-  }
-`);
-
 // ── Types ─────────────────────────────────────────────────────────────
+
+export interface CMSUITranslation {
+  _id: string;
+  key: string;
+  category?: string;
+  en: string;
+  am?: string;
+  ti?: string;
+}
 
 export interface CMSAdvertisement {
   _id: string;
   title: string;
+  titleAm?: string;
+  titleTi?: string;
   subtitle: string;
+  subtitleAm?: string;
+  subtitleTi?: string;
   badge: string;
+  badgeAm?: string;
+  badgeTi?: string;
   imageUrl: string;
   estimatedValue?: string;
   targetDrawId?: string;
   ctaText?: string;
+  ctaTextAm?: string;
+  ctaTextTi?: string;
   order?: number;
 }
 
 export interface CMSDraw {
   _id: string;
   title: string;
+  titleAm?: string;
+  titleTi?: string;
   drawId: string;
   status: "open" | "closed" | "completed";
   currency: "ETB" | "USD";
@@ -178,8 +238,13 @@ export interface CMSPoolOption {
 }
 
 export interface CMSSiteSettings {
+  defaultLanguage?: "en" | "am" | "ti";
   siteName?: string;
+  siteNameAm?: string;
+  siteNameTi?: string;
   tagline?: string;
+  taglineAm?: string;
+  taglineTi?: string;
   heroBannerImageUrl?: string;
   logoImageUrl?: string;
   contactPhone?: string;
@@ -191,9 +256,11 @@ export interface CMSSiteSettings {
   cbeAccountNumber?: string;
   cbeAccountName?: string;
   diasporaWireInstructions?: string;
+  diasporaWireInstructionsAm?: string;
+  diasporaWireInstructionsTi?: string;
   footerDescription?: string;
   footerDescriptionAm?: string;
-  footerDescriptionOm?: string;
+  footerDescriptionTi?: string;
   copyrightText?: string;
   complianceText?: string;
   etbPrices?: CMSPriceOption[];
@@ -201,36 +268,40 @@ export interface CMSSiteSettings {
   poolSizes?: CMSPoolOption[];
 }
 
-export interface CMSTestimonial {
-  _id: string;
-  name: string;
-  location: string;
-  prizeWon: string;
-  quote: string;
-  quoteAm?: string;
-  quoteOm?: string;
-  avatarUrl?: string;
-  rating?: number;
-  drawTitle?: string;
-}
-
 export interface CMSSectionContent {
   _id?: string;
   title?: string;
   titleAm?: string;
-  titleOm?: string;
+  titleTi?: string;
   body?: string;
   bodyAm?: string;
-  bodyOm?: string;
+  bodyTi?: string;
   features?: Array<{
     title: string;
     titleAm?: string;
-    titleOm?: string;
+    titleTi?: string;
     description: string;
     descriptionAm?: string;
-    descriptionOm?: string;
+    descriptionTi?: string;
     color?: string;
   }>;
+}
+
+export interface CMSTestimonial {
+  _id: string;
+  name: string;
+  location: string;
+  locationAm?: string;
+  locationTi?: string;
+  prizeWon: string;
+  prizeWonAm?: string;
+  prizeWonTi?: string;
+  quote: string;
+  quoteAm?: string;
+  quoteTi?: string;
+  avatarUrl?: string;
+  rating?: number;
+  drawTitle?: string;
 }
 
 export interface CMSPlayerEntry {
