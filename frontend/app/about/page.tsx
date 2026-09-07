@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   description: "Learn why Rimna Digital Lottery is Ethiopia's most transparent lottery. 100% live video draws, fixed pools, and 10 guaranteed winners.",
 };
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AboutPage() {

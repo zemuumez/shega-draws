@@ -23,6 +23,9 @@ import {
 } from "lucide-react";
 import { FAQSection } from "@/components/FAQSection";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "How It Works & Complete Player Guide — Rimna Digital Lottery",
   description:

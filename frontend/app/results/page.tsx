@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: "Official audited live draw winning numbers announced on public broadcast stream.",
 };
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ResultsPage() {

@@ -22,6 +22,7 @@ export const metadata: Metadata = {
     "Ethiopia & Diaspora's premier transparent digital lottery. Real cash prizes drawn live on video by company founders. Top 10 guaranteed winners per draw.",
 };
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 function mapSanityDraw(s: any): DrawState {

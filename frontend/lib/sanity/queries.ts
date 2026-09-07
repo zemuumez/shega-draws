@@ -48,7 +48,7 @@ export const LATEST_RESULTS_QUERY = defineQuery(`
 
 /** Global site settings & official payment accounts */
 export const SITE_SETTINGS_QUERY = defineQuery(`
-  *[_type == "siteSettings"][0] {
+  *[_type == "siteSettings"] | order(_updatedAt desc)[0] {
     siteName,
     "heroBannerImageUrl": heroBannerImage.asset->url,
     "logoImageUrl": logoImage.asset->url,
