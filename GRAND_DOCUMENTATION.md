@@ -209,20 +209,23 @@ A structured 4-step wizard with persistent state:
 ```
 
 ### 6.1 `siteSettings` (Singleton Document)
-1. `siteName`: Platform brand title.
-2. `logoImage`: Official high-res logo/emblem.
-3. `heroBannerImage`: Panoramic stadium banner.
-4. `contactPhone`: 24/7 hotline telephone number.
-5. `telegramHandle`: Official Telegram handle.
-6. `telegramUrl`: Direct Telegram channel URL.
-7. `supportEmail`: Customer support email address.
-8. `telebirrMerchantCode`: Official Telebirr shortcode.
-9. `cbeAccountNumber`: Commercial Bank of Ethiopia account number.
-10. `cbeAccountName`: CBE official account holder name.
-11. `diasporaWireInstructions`: SWIFT/IBAN wiring instructions for USD transactions.
-12. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
-13. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
-14. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
+1. `siteName` / `siteNameAm` / `siteNameTi`: Trilingual platform brand title (EN/AM/TI).
+2. `tagline` / `taglineAm` / `taglineTi`: Trilingual platform tagline.
+3. `defaultLanguage`: Default platform locale (`en`, `am`, `ti`).
+4. `logoImage`: Official high-res logo/emblem displayed in navbar and footer.
+5. **Per-Page Panoramic Hero & Background Banners (`pageBanners` Fieldset)**:
+   - `heroBannerImage`: Official panoramic stadium banner for Homepage countdown & ticket configurator. Also acts as global fallback.
+   - `howItWorksHeroBannerImage`: Dedicated hero banner for `/how-it-works` complete player guide page.
+   - `resultsHeroBannerImage`: Dedicated hero banner for `/results` live broadcast stream and winners announcement page.
+   - `entriesHeroBannerImage`: Dedicated hero banner for `/entries` player ticket tracking dashboard.
+   - `aboutHeroBannerImage`: Dedicated hero banner for `/about` company transparency & founders mission page.
+6. `contactPhone` / `telegramHandle` / `telegramUrl` / `supportEmail`: 24/7 hotline and official support channels.
+7. `telebirrMerchantCode`: Official Telebirr shortcode.
+8. `cbeAccountNumber` & `cbeAccountName`: Commercial Bank of Ethiopia account number and recipient name.
+9. `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi`: Trilingual SWIFT/IBAN wire instructions for USD transactions.
+10. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
+11. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
+12. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
 
 ### 6.2 `playerEntry` (Receipts & Proofs)
 - Stores player full name, phone number, draw ID, lucky number, pool size, price paid, currency, payment method, submission timestamp, and admin verification status (`pending`, `confirmed`, `rejected`).

@@ -107,6 +107,10 @@ export function BackupView() {
           defined(proofScreenshot.asset) => proofScreenshot.asset->url,
           defined(logoImage.asset) => logoImage.asset->url,
           defined(heroBannerImage.asset) => heroBannerImage.asset->url,
+          defined(howItWorksHeroBannerImage.asset) => howItWorksHeroBannerImage.asset->url,
+          defined(resultsHeroBannerImage.asset) => resultsHeroBannerImage.asset->url,
+          defined(entriesHeroBannerImage.asset) => entriesHeroBannerImage.asset->url,
+          defined(aboutHeroBannerImage.asset) => aboutHeroBannerImage.asset->url,
           defined(bannerImage.asset) => bannerImage.asset->url,
           defined(avatar.asset) => avatar.asset->url,
           null

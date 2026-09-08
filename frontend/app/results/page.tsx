@@ -23,13 +23,18 @@ export default async function ResultsPage() {
   const drawState = draw.status === "fulfilled" ? draw.value : null;
   const siteSettings = siteSettingsRes.status === "fulfilled" ? siteSettingsRes.value : null;
 
+  const heroBannerUrl =
+    siteSettings?.resultsHeroBannerImageUrl ||
+    siteSettings?.heroBannerImageUrl ||
+    "/images/rimna-stadium-hero.jpg";
+
   return (
     <div
       style={{
         width: "100%",
         overflowX: "hidden",
         position: "relative",
-        backgroundImage: `url(${siteSettings?.heroBannerImageUrl || "/images/rimna-stadium-hero.jpg"})`,
+        backgroundImage: `url(${heroBannerUrl})`,
         backgroundAttachment: "fixed",
         backgroundPosition: "center top",
         backgroundSize: "cover",

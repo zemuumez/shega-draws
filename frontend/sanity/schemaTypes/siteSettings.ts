@@ -17,8 +17,13 @@ export const siteSettingsType = defineType({
     },
     {
       name: "branding",
-      title: "🎨 Official Branding & Banners",
+      title: "🎨 Official Branding & Logo",
       options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "pageBanners",
+      title: "🖼️ Hero & Background Banners (Per-Page Customization)",
+      options: { collapsible: true, collapsed: false },
     },
     {
       name: "contacts",
@@ -266,19 +271,54 @@ export const siteSettingsType = defineType({
       initialValue: "ፍትሓዊ ዲጂታል ሎተሪን ናይ ቀጥታ ቪድዮ ዕጫ ምውጻእን",
     }),
     defineField({
-      name: "heroBannerImage",
-      title: "Official Panoramic Hero Banner Image",
-      type: "image",
-      fieldset: "branding",
-      options: { hotspot: true },
-      description: "Upload your official high-resolution wide panoramic lottery banner.",
-    }),
-    defineField({
       name: "logoImage",
       title: "Official Logo / Emblem Image",
       type: "image",
       fieldset: "branding",
       options: { hotspot: true },
+      description: "Platform official logo displayed in the top navbar and footer.",
+    }),
+
+    // ─── Hero & Page Background Banners (Per-Page Customization) ────────
+    defineField({
+      name: "heroBannerImage",
+      title: "🏠 Homepage Panoramic Hero Banner Image",
+      type: "image",
+      fieldset: "pageBanners",
+      options: { hotspot: true },
+      description: "Official panoramic background banner for the Homepage countdown & ticket selection hero. Also serves as global fallback for other pages if unset.",
+    }),
+    defineField({
+      name: "howItWorksHeroBannerImage",
+      title: "📖 How It Works Page Hero Banner Image",
+      type: "image",
+      fieldset: "pageBanners",
+      options: { hotspot: true },
+      description: "Custom hero background banner displayed on the /how-it-works complete player guide page.",
+    }),
+    defineField({
+      name: "resultsHeroBannerImage",
+      title: "🏆 Results & Broadcast Page Hero Banner Image",
+      type: "image",
+      fieldset: "pageBanners",
+      options: { hotspot: true },
+      description: "Custom hero background banner displayed on the /results live stream & winner announcement page.",
+    }),
+    defineField({
+      name: "entriesHeroBannerImage",
+      title: "🎟️ My Tickets / Player Entries Page Hero Banner Image",
+      type: "image",
+      fieldset: "pageBanners",
+      options: { hotspot: true },
+      description: "Custom hero background banner displayed on the /entries user ticket dashboard.",
+    }),
+    defineField({
+      name: "aboutHeroBannerImage",
+      title: "💎 Why Rimna (About Us) Page Hero Banner Image",
+      type: "image",
+      fieldset: "pageBanners",
+      options: { hotspot: true },
+      description: "Custom hero background banner displayed on the /about company transparency & founders mission page.",
     }),
 
     // ─── Contacts ────────────────────────────────────────────────────

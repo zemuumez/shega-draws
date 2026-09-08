@@ -61,6 +61,10 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     taglineAm,
     taglineTi,
     "heroBannerImageUrl": heroBannerImage.asset->url,
+    "howItWorksHeroBannerImageUrl": howItWorksHeroBannerImage.asset->url,
+    "resultsHeroBannerImageUrl": resultsHeroBannerImage.asset->url,
+    "entriesHeroBannerImageUrl": entriesHeroBannerImage.asset->url,
+    "aboutHeroBannerImageUrl": aboutHeroBannerImage.asset->url,
     "logoImageUrl": logoImage.asset->url,
     contactPhone,
     telegramHandle,
@@ -246,6 +250,10 @@ export interface CMSSiteSettings {
   taglineAm?: string;
   taglineTi?: string;
   heroBannerImageUrl?: string;
+  howItWorksHeroBannerImageUrl?: string;
+  resultsHeroBannerImageUrl?: string;
+  entriesHeroBannerImageUrl?: string;
+  aboutHeroBannerImageUrl?: string;
   logoImageUrl?: string;
   contactPhone?: string;
   contactPhoneSecondary?: string;

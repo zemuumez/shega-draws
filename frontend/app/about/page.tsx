@@ -14,13 +14,18 @@ export const revalidate = 0;
 export default async function AboutPage() {
   const siteSettings = await sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null);
 
+  const heroBannerUrl =
+    siteSettings?.aboutHeroBannerImageUrl ||
+    siteSettings?.heroBannerImageUrl ||
+    "/images/rimna-stadium-hero.jpg";
+
   return (
     <div
       style={{
         width: "100%",
         overflowX: "hidden",
         position: "relative",
-        backgroundImage: `url(${siteSettings?.heroBannerImageUrl || "/images/rimna-stadium-hero.jpg"})`,
+        backgroundImage: `url(${heroBannerUrl})`,
         backgroundAttachment: "fixed",
         backgroundPosition: "center top",
         backgroundSize: "cover",
