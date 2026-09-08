@@ -25,6 +25,28 @@ const LanguageContext = createContext<LanguageContextType>({
   getLocalized: () => "",
 });
 
+// Recursive dynamic proxy that checks CMS overrides before falling back to static translations
+function createProxyTranslations(base: any, lang: Language, prefix = ""): any {
+  if (base === null || typeof base !== "object") return base;
+  return new Proxy(base, {
+    get(target, prop) {
+      if (typeof prop !== "string") return Reflect.get(target, prop);
+      const fullKey = prefix ? `${prefix}.${prop}` : prop;
+      const cmsEntry = _cmsTranslations[fullKey];
+      if (cmsEntry) {
+        if (lang === "ti" && cmsEntry.ti && cmsEntry.ti.trim()) return cmsEntry.ti;
+        if (lang === "am" && cmsEntry.am && cmsEntry.am.trim()) return cmsEntry.am;
+        if (cmsEntry.en && cmsEntry.en.trim()) return cmsEntry.en;
+      }
+      const rawVal = Reflect.get(target, prop);
+      if (typeof rawVal === "object" && rawVal !== null) {
+        return createProxyTranslations(rawVal, lang, fullKey);
+      }
+      return rawVal;
+    },
+  });
+}
+
 export function LanguageProvider({
   children,
   defaultLanguage = "en",
@@ -41,6 +63,19 @@ export function LanguageProvider({
 
   const [language, setLangState] = useState<Language>(initialLang);
 
+  // Initialize CMS lookup map from props
+  if (cmsTranslations && cmsTranslations.length > 0 && Object.keys(_cmsTranslations).length === 0) {
+    const map: Record<string, Record<string, string>> = {};
+    for (const t of cmsTranslations) {
+      map[t.key] = {
+        en: t.en,
+        ...(t.am ? { am: t.am } : {}),
+        ...(t.ti ? { ti: t.ti } : {}),
+      };
+    }
+    _cmsTranslations = map;
+  }
+
   useEffect(() => {
     const saved = localStorage.getItem("rimnalottery_lang") as Language | null;
     if (saved && (saved === "en" || saved === "am" || saved === "ti")) {
@@ -50,7 +85,7 @@ export function LanguageProvider({
     }
   }, [defaultLanguage]);
 
-  // Build CMS lookup map once
+  // Keep CMS lookup map synced on updates
   useEffect(() => {
     if (cmsTranslations && cmsTranslations.length > 0) {
       const map: Record<string, Record<string, string>> = {};
@@ -70,15 +105,16 @@ export function LanguageProvider({
     localStorage.setItem("rimnalottery_lang", lang);
   };
 
-  const t = translations[language] ?? translations.en;
+  const baseTranslations = translations[language] ?? translations.en;
+  const t = createProxyTranslations(baseTranslations, language) as Translations;
 
   /** Look up CMS translation by dot-path key, falling back to default translation or provided fallback. */
   const tc = (key: string, fallback?: string): string => {
     const cmsEntry = _cmsTranslations[key];
     if (cmsEntry) {
-      if (language === "ti" && cmsEntry.ti) return cmsEntry.ti;
-      if (language === "am" && cmsEntry.am) return cmsEntry.am;
-      if (cmsEntry.en) return cmsEntry.en;
+      if (language === "ti" && cmsEntry.ti && cmsEntry.ti.trim()) return cmsEntry.ti;
+      if (language === "am" && cmsEntry.am && cmsEntry.am.trim()) return cmsEntry.am;
+      if (cmsEntry.en && cmsEntry.en.trim()) return cmsEntry.en;
     }
     return fallback || "";
   };
