@@ -252,6 +252,22 @@ export interface Translations {
     badge: string;
     title: string;
     subtitle: string;
+    playerProfile: string;
+    verifiedBadge: string;
+    statsTotal: string;
+    statsActive: string;
+    statsPending: string;
+    statsWins: string;
+    tabAll: string;
+    tabActive: string;
+    tabPending: string;
+    receiptPreview: string;
+    drawRef: string;
+    luckyNumberBadge: string;
+    poolTier: string;
+    searchPlaceholder: string;
+    filterStatus: string;
+    liveBroadcastNotice: string;
     loginTitle: string;
     loginDesc: string;
     phoneLabel: string;
@@ -575,6 +591,22 @@ export const translations: Record<Language, Translations> = {
       badge: "MY OFFICIAL LOTTERY TICKETS",
       title: "My Purchased Tickets",
       subtitle: "Track your active tickets, verified lucky numbers, and live draw winning statuses.",
+      playerProfile: "Player Profile",
+      verifiedBadge: "Verified Ticket Holder",
+      statsTotal: "Total Tickets",
+      statsActive: "Active in Live Draw",
+      statsPending: "Pending Verification",
+      statsWins: "Guaranteed Payouts",
+      tabAll: "All Tickets",
+      tabActive: "Confirmed & Active",
+      tabPending: "Pending Approval",
+      receiptPreview: "View Payment Slip",
+      drawRef: "Draw Reference Code",
+      luckyNumberBadge: "Lucky Number",
+      poolTier: "Pool Capacity",
+      searchPlaceholder: "Search by Draw ID or lucky number...",
+      filterStatus: "All Statuses",
+      liveBroadcastNotice: "100% Live Audited Video Broadcast",
       loginTitle: "Sign In to View Your Tickets",
       loginDesc: "Enter your phone number used during ticket purchase to view all your confirmed entries.",
       phoneLabel: "Phone Number (e.g. 0911000000)",
@@ -897,6 +929,22 @@ export const translations: Record<Language, Translations> = {
       badge: "የእኔ ይፋዊ የሎተሪ ቲኬቶች",
       title: "የገዛኋቸው ቲኬቶች",
       subtitle: "ንቁ ቲኬቶችዎን፣ የተረጋገጡ ቁጥሮችዎን እና የቀጥታ እጣ ሁኔታዎችን ይከታተሉ።",
+      playerProfile: "የተጫዋች መለያ",
+      verifiedBadge: "የተረጋገጠ የቲኬት ባለቤት",
+      statsTotal: "ጠቅላላ ቲኬቶች",
+      statsActive: "በቀጥታ እጣ ላይ ያሉ",
+      statsPending: "ማረጋገጫ በመጠባበቅ ላይ",
+      statsWins: "የተረጋገጡ ሽልማቶች",
+      tabAll: "ሁሉም ቲኬቶች",
+      tabActive: "የተረጋገጡ እና ንቁ",
+      tabPending: "ማረጋገጫ የሚጠብቁ",
+      receiptPreview: "የክፍያ ደረሰኝ ይመልከቱ",
+      drawRef: "የእጣ መለያ ኮድ",
+      luckyNumberBadge: "እድለኛ ቁጥር",
+      poolTier: "የተሳታፊ መጠን",
+      searchPlaceholder: "በእጣ ኮድ ወይም በእድለኛ ቁጥር ይፈልጉ...",
+      filterStatus: "ሁሉም ሁኔታዎች",
+      liveBroadcastNotice: "100% የቀጥታ የቪዲዮ ስርጭት እጣ",
       loginTitle: "ቲኬቶችዎን ለማየት ይግቡ",
       loginDesc: "የገዟቸውን የተረጋገጡ ቲኬቶች በሙሉ ለመመልከት በቲኬት ግዢ ወቅት የተጠቀሙበትን ስልክ ቁጥር ያስገቡ።",
       phoneLabel: "ስልክ ቁጥር (ለምሳሌ 0911000000)",
@@ -1219,6 +1267,22 @@ export const translations: Record<Language, Translations> = {
       badge: "ናተይ ወግዓዊ ናይ ሎተሪ ቲኬታት",
       title: "ዝዓደግክዎም ቲኬታት",
       subtitle: "ንቑሓት ቲኬታትኩም፣ ዝተረጋገጹ ቁጽርታትኩምን ናይ ቀጥታ ዕጫ ኩነታትን ተኸታተሉ።",
+      playerProfile: "ናይ ተጻዋታይ መለያ",
+      verifiedBadge: "ዝተረጋገጸ ናይ ቲኬት ወናኒ",
+      statsTotal: "ጠቕላላ ቲኬታት",
+      statsActive: "ኣብ ቀጥታ ዕጫ ዘለዉ",
+      statsPending: "ምርግጋጽ ዝጽበዩ",
+      statsWins: "ዝተረጋገጹ ሽልማታት",
+      tabAll: "ኩሎም ቲኬታት",
+      tabActive: "ዝተረጋገጹን ንቑሓትን",
+      tabPending: "ምርግጋጽ ዝጽበዩ ዘለዉ",
+      receiptPreview: "ናይ ክፍሊት ደረሰኝ ርኣዩ",
+      drawRef: "ናይ ዕጫ መፍለዪ ኮድ",
+      luckyNumberBadge: "ዕድለኛ ቁጽሪ",
+      poolTier: "መጠን ተሳተፍቲ",
+      searchPlaceholder: "ብናይ ዕጫ ኮድ ወይ ዕድለኛ ቁጽሪ ድለዩ...",
+      filterStatus: "ኩሎም ኩነታት",
+      liveBroadcastNotice: "100% ብቀጥታ ቪድዮ ዝካየድ ፈነወ ዕጫ",
       loginTitle: "ቲኬታትኩም ንምርኣይ እተዉ",
       loginDesc: "ኩሎም ዝዓደግክዎም ዝተረጋገጹ ቲኬታት ንምርኣይ ኣብ እዋን ዕዳጋ ቲኬት ዝተጠቐምኩምሉ ቁጽሪ ስልኪ ኣእትዉ።",
       phoneLabel: "ቁጽሪ ስልኪ (ንኣብነት 0911000000)",

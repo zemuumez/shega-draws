@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck, Ticket } from "lucide-react";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
 import { submitEntry, getUser, type Currency } from "@/lib/api";
@@ -54,6 +54,7 @@ export function BuyTicketModal({
   // Form fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [pin, setPin] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [number, setNumber] = useState("7");
@@ -92,7 +93,9 @@ export function BuyTicketModal({
   };
 
   const canAdvance = [
-    name.trim().length >= 2 && phone.trim().length >= 7,
+    getUser()
+      ? name.trim().length >= 2 && phone.trim().length >= 7
+      : name.trim().length >= 2 && phone.trim().length >= 7 && pin.trim().length >= 4,
     number.trim().length > 0 && parseInt(number, 10) >= 0 && parseInt(number, 10) <= 99,
     !!proofFile && !!method,
   ];
@@ -118,6 +121,7 @@ export function BuyTicketModal({
       form.append("proof", proofFile);
       form.append("user_name", name.trim());
       form.append("user_phone", phone.trim());
+      if (pin) form.append("pin", pin.trim());
 
       await submitEntry(form);
       setStep(3); // Success step
@@ -301,6 +305,28 @@ export function BuyTicketModal({
           {/* STEP 1: Player Details */}
           {step === 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {getUser() && (
+                <div
+                  style={{
+                    background: "rgba(16, 185, 129, 0.15)",
+                    border: "1px solid #10B981",
+                    borderRadius: "12px",
+                    padding: "10px 14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    color: "#6EE7B7",
+                    fontSize: "0.8125rem",
+                    fontWeight: 800,
+                  }}
+                >
+                  <ShieldCheck size={16} color="#10B981" />
+                  <span>
+                    {language === "ti" ? `ብ ${name || phone} ተመዝጊብኩም ኣለኹም` : language === "am" ? `በ ${name || phone} ገብተዋል` : `Logged in as ${name || phone}`}
+                  </span>
+                </div>
+              )}
+
               <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: 0 }}>
                 {language === "ti"
                   ? "ዕጫ ምስ ተዛዘመ ሽልማትኩም ቀጥታ ክለኣኸልኩም ናይ ተሳታፊ ዝርዝርኩም ኣእትዉ:"
@@ -354,6 +380,38 @@ export function BuyTicketModal({
                   }}
                 />
               </div>
+
+              {!getUser() && (
+                <div>
+                  <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                    {language === "ti" ? "ናይ ድሕንነት ፒን ፍጠሩ (4 ድጂት)" : language === "am" ? "የደህንነት ፒን ይፍጠሩ (4 ዲጂት)" : "Create 4-Digit Security PIN"}
+                  </label>
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    placeholder="••••"
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "10px",
+                      color: "#FFFFFF",
+                      fontSize: "1rem",
+                      letterSpacing: "2px",
+                      boxSizing: "border-box",
+                      outline: "none",
+                    }}
+                  />
+                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8", marginTop: 4, display: "block" }}>
+                    {language === "ti" ? "ዝገዛእክዎም ቲኬታት ብድሕንነት ንምክትታል የገልግል" : language === "am" ? "የገዟቸውን ቲኬቶች በደህንነት ለመከታተል ያገለግላል" : "Used to securely sign in and view your tickets later"}
+                  </span>
+                </div>
+              )}
 
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#CBD5E1", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
@@ -584,14 +642,40 @@ export function BuyTicketModal({
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="casino-btn-gold"
-                style={{ padding: "12px 32px", fontSize: "0.9375rem", fontWeight: 900, cursor: "pointer" }}
-              >
-                {language === "ti" ? "ተዛዚሙ · ናብ ሰሌዳ ተመለስ" : language === "am" ? "ተጠናቀቀ · ወደ ሰሌዳ ተመለስ" : "Done & View Dashboard"}
-              </button>
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                <a
+                  href="/entries"
+                  className="casino-btn-red"
+                  style={{
+                    padding: "12px 24px",
+                    fontSize: "0.9375rem",
+                    fontWeight: 900,
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Ticket size={16} /> {language === "ti" ? "ናብ ቲኬታተይ ኪድ" : language === "am" ? "ወደ ቲኬቶቼ ይሂዱ" : "View in My Ticket History"}
+                </a>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "#E2E8F0",
+                    borderRadius: "10px",
+                    padding: "12px 22px",
+                    fontSize: "0.875rem",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                  }}
+                >
+                  {language === "ti" ? "ዕጾ" : language === "am" ? "ዝጋ" : "Close"}
+                </button>
+              </div>
             </div>
           )}
         </div>

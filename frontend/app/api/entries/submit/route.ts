@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 import { getSanityWriteClient } from "@/lib/sanity/client";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+function hashPin(pin: string, salt = "rimna_player_salt"): string {
+  return crypto.createHmac("sha256", salt).update(pin).digest("hex");
+}
+
+function cleanPhoneNumber(phone: string): string {
+  return phone.replace(/[\s\-()]/g, "").trim();
+}
 
 /**
  * Validates file buffer magic bytes to ensure file is genuinely a JPEG, PNG, or WEBP image.
@@ -45,8 +54,10 @@ function sanitizeFilename(originalName: string, fallbackExt = "jpg"): string {
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const playerName = (formData.get("name") as string) || "Anonymous Player";
-    const playerPhone = (formData.get("phone") as string) || "";
+    const playerName = (formData.get("name") as string) || (formData.get("user_name") as string) || "Anonymous Player";
+    const rawPhone = (formData.get("phone") as string) || (formData.get("user_phone") as string) || "";
+    const playerPhone = cleanPhoneNumber(rawPhone);
+    const pin = (formData.get("pin") as string) || "";
     const drawId = (formData.get("draw_id") as string) || "RDL-2026-08A";
     const luckyNumber = (formData.get("number") as string) || "";
     const poolCapacity = (formData.get("pool_capacity") as string) || "1,000 (1K)";
@@ -110,6 +121,29 @@ export async function POST(request: Request) {
 
     const writeClient = getSanityWriteClient();
     if (writeClient) {
+      // Create or update playerAccount if PIN provided or if account doesn't exist
+      if (playerPhone && pin && pin.length >= 4) {
+        try {
+          const existingAcc = await writeClient.fetch<{ _id: string }>(
+            `*[_type == "playerAccount" && phone == $phone][0]{ _id }`,
+            { phone: playerPhone }
+          );
+          if (!existingAcc) {
+            await writeClient.create({
+              _type: "playerAccount",
+              name: playerName,
+              phone: playerPhone,
+              pinHash: hashPin(pin),
+              status: "active",
+              registeredAt: new Date().toISOString(),
+            });
+            console.log(`✅ [CMS Auto-Create] Player Account Created during purchase: ${playerPhone}`);
+          }
+        } catch (accErr: any) {
+          console.warn("Player account check notice:", accErr.message);
+        }
+      }
+
       try {
         const createdDoc = await writeClient.create({
           _type: "playerEntry",

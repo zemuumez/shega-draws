@@ -86,43 +86,45 @@ async function refreshAccessToken(): Promise<boolean> {
 }
 
 // ── Auth API ─────────────────────────────────────────────────────────
-export interface RegisterInput { name: string; phone: string; }
-export interface LoginInput    { phone: string; password: string; }
+export interface RegisterInput { name: string; phone: string; pin?: string; }
+export interface LoginInput    { phone: string; pin?: string; password?: string; }
 
 export async function registerPlayer(input: RegisterInput) {
-  try {
-    const data = await apiFetch<{ access_token: string; user: StoredUser }>("/auth/register", {
-      method: "POST",
-      body: JSON.stringify(input),
-    });
+  const localRes = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+
+  const data = await localRes.json();
+  if (!localRes.ok) {
+    throw new Error(data.error || "Failed to register player account");
+  }
+
+  if (data.access_token && data.user) {
     setAccessToken(data.access_token);
     setUser(data.user);
-    return data;
-  } catch {
-    const fallbackUser: StoredUser = {
-      id: `usr-${Date.now().toString(36)}`,
-      name: input.name || "Verified Player",
-      phone: input.phone,
-      role: "player",
-    };
-    setAccessToken(`mock-jwt-${Date.now()}`);
-    setUser(fallbackUser);
-    return { access_token: `mock-jwt-${Date.now()}`, user: fallbackUser };
   }
+  return data;
 }
 
-export async function loginPlayer(phone: string, name?: string) {
-  try {
-    const data = await apiFetch<{ access_token: string; user: StoredUser }>("/auth/player-login", {
-      method: "POST",
-      body: JSON.stringify({ phone }),
-    });
+export async function loginPlayer(phone: string, pin?: string) {
+  const localRes = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone, pin }),
+  });
+
+  const data = await localRes.json();
+  if (!localRes.ok) {
+    throw new Error(data.error || "Failed to sign in");
+  }
+
+  if (data.access_token && data.user) {
     setAccessToken(data.access_token);
     setUser(data.user);
-    return data;
-  } catch {
-    return registerPlayer({ name: name || "Verified Player", phone });
   }
+  return data;
 }
 
 export async function loginAdmin(input: LoginInput) {
@@ -136,6 +138,7 @@ export async function loginAdmin(input: LoginInput) {
 }
 
 export async function logout() {
+  await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
   await apiFetch("/auth/logout", { method: "POST" }).catch(() => {});
   clearTokens();
 }
@@ -363,60 +366,168 @@ export async function revealDraw(drawId: string): Promise<DrawState> {
 export interface Entry {
   id: string;
   draw_id: string;
-  user_id: string;
+  user_id?: string;
+  user_name?: string;
+  user_phone?: string;
   number: string;
+  pool_capacity?: string;
   amount: number;
   currency?: Currency;
   method: string;
-  status: "pending" | "confirmed" | "rejected";
-  created_at: string;
-  user_name?: string;
+  proof_url?: string;
   proof_key?: string;
+  status: "pending" | "confirmed" | "rejected";
+  admin_notes?: string;
+  created_at: string;
+}
+
+const LOCAL_ENTRIES_KEY = "rimnalottery_local_entries";
+
+export function getLocalStoredEntries(): Entry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(LOCAL_ENTRIES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalEntry(entry: Entry): void {
+  if (typeof window === "undefined") return;
+  try {
+    const current = getLocalStoredEntries();
+    const updated = [entry, ...current.filter(e => e.id !== entry.id)];
+    localStorage.setItem(LOCAL_ENTRIES_KEY, JSON.stringify(updated.slice(0, 50)));
+  } catch (e) {
+    console.warn("Failed to persist ticket locally:", e);
+  }
 }
 
 export async function submitEntry(formData: FormData): Promise<Entry> {
+  const drawId = (formData.get("draw_id") as string) || "RDL-2026-08A";
+  const number = (formData.get("number") as string) || "00";
+  const amount = Number(formData.get("amount") || 100);
+  const currency = (formData.get("currency") as Currency) || "ETB";
+  const method = (formData.get("method") as string) || "telebirr";
+  const poolCapacity = (formData.get("pool_capacity") as string) || "1,000 (1K)";
+  const userName = (formData.get("name") as string) || (formData.get("user_name") as string) || "Verified Player";
+  const userPhone = (formData.get("phone") as string) || (formData.get("user_phone") as string) || "";
+
+  // If user entered phone during checkout, ensure they are logged in
+  if (userPhone && !getUser()) {
+    const newUser: StoredUser = {
+      id: `usr-${userPhone.replace(/[^0-9]/g, "").slice(-8) || Date.now().toString(36)}`,
+      name: userName,
+      phone: userPhone,
+      role: "player",
+    };
+    setUser(newUser);
+    setAccessToken(`token_${Date.now()}`);
+  }
+
+  let createdEntry: Entry = {
+    id: `entry-${Date.now()}`,
+    draw_id: drawId,
+    user_id: getUser()?.id || "user-1",
+    user_name: userName,
+    user_phone: userPhone,
+    number: number,
+    pool_capacity: poolCapacity,
+    amount: amount,
+    currency: currency,
+    method: method,
+    status: "pending",
+    created_at: new Date().toISOString(),
+  };
+
   try {
     const res = await fetch("/api/entries/submit", {
       method: "POST",
       body: formData,
     });
     if (res.ok) {
-      const data = await res.json();
-      return {
-        id: `entry-${Date.now()}`,
-        draw_id: (formData.get("draw_id") as string) || "RDL-2026-08A",
-        user_id: "user-1",
-        number: (formData.get("number") as string) || "00",
-        amount: Number(formData.get("amount") || 100),
-        currency: (formData.get("currency") as Currency) || "ETB",
-        method: (formData.get("method") as string) || "telebirr",
-        status: "pending",
-        created_at: new Date().toISOString(),
-      };
+      saveLocalEntry(createdEntry);
+      return createdEntry;
     }
   } catch (localErr) {
     console.warn("Local API submit notice:", localErr);
   }
 
   try {
-    return await apiFetch<Entry>("/entries", { method: "POST", body: formData });
+    const backendEntry = await apiFetch<Entry>("/entries", { method: "POST", body: formData });
+    if (backendEntry) {
+      createdEntry = { ...createdEntry, ...backendEntry };
+    }
   } catch {
-    return {
-      id: `entry-${Date.now()}`,
-      draw_id: (formData.get("draw_id") as string) || "RDL-2026-08A",
-      user_id: "user-1",
-      number: (formData.get("number") as string) || "00",
-      amount: Number(formData.get("amount") || 100),
-      currency: (formData.get("currency") as Currency) || "ETB",
-      method: (formData.get("method") as string) || "telebirr",
-      status: "pending",
-      created_at: new Date().toISOString(),
-    };
+    // Proceed with fallback created entry
   }
+
+  saveLocalEntry(createdEntry);
+  return createdEntry;
 }
 
-export async function getMyEntries(drawId: string): Promise<Entry[]> {
-  return apiFetch<Entry[]>(`/entries/mine?draw_id=${drawId}`);
+export async function getMyEntries(drawId?: string, phone?: string): Promise<Entry[]> {
+  const currentUser = getUser();
+  const targetPhone = phone || currentUser?.phone || "";
+  const localList = getLocalStoredEntries();
+
+  let fetchedEntries: Entry[] = [];
+
+  // 1. Fetch from Next.js / Sanity API
+  try {
+    const params = new URLSearchParams();
+    if (drawId) params.set("draw_id", drawId);
+    if (targetPhone) params.set("phone", targetPhone);
+
+    const res = await fetch(`/api/entries/mine?${params.toString()}`, {
+      headers: getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {},
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        fetchedEntries = data;
+      }
+    }
+  } catch (err) {
+    console.warn("Entries API warning:", err);
+  }
+
+  // 2. Fetch from Go backend if drawId provided
+  if (drawId && getAccessToken()) {
+    try {
+      const backendEntries = await apiFetch<Entry[]>(`/entries/mine?draw_id=${drawId}`).catch(() => []);
+      if (Array.isArray(backendEntries) && backendEntries.length > 0) {
+        const idMap = new Set(fetchedEntries.map(e => e.id));
+        for (const be of backendEntries) {
+          if (!idMap.has(be.id)) fetchedEntries.push(be);
+        }
+      }
+    } catch {
+      // Backend not reached
+    }
+  }
+
+  // 3. Merge with local storage entries for instant responsiveness
+  const combinedMap = new Map<string, Entry>();
+  for (const item of fetchedEntries) {
+    combinedMap.set(item.id, item);
+  }
+  for (const item of localList) {
+    if (!combinedMap.has(item.id)) {
+      if (!targetPhone || !item.user_phone || item.user_phone === targetPhone || item.user_phone.slice(-9) === targetPhone.slice(-9)) {
+        if (!drawId || item.draw_id === drawId) {
+          combinedMap.set(item.id, item);
+        }
+      }
+    }
+  }
+
+  const result = Array.from(combinedMap.values()).sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  return result;
 }
 
 export async function listAllEntries(drawId?: string, status?: string): Promise<Entry[]> {

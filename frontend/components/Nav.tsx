@@ -4,9 +4,23 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Home, Ticket, ListChecks, ShieldCheck, LogIn, Phone, Send, Menu, X, Award, Sparkles } from "lucide-react";
+import {
+  Home,
+  Ticket,
+  ListChecks,
+  ShieldCheck,
+  LogIn,
+  Phone,
+  Send,
+  Award,
+  Sparkles,
+  User,
+  LogOut,
+  ChevronDown,
+  UserCheck,
+} from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
-import { getUser, logout, type StoredUser } from "@/lib/api";
+import { getUser, logout, getLocalStoredEntries, type StoredUser } from "@/lib/api";
 import { SignInModal } from "./SignInModal";
 import { ContactUsModal } from "./ContactUsModal";
 
@@ -24,17 +38,28 @@ export function Nav({
   const [currentUser, setCurrentUser] = useState<StoredUser | null>(null);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [myTicketsCount, setMyTicketsCount] = useState<number>(pendingCount);
 
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
-  const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace("@", "")}`);
+  const telegramUrl =
+    siteSettings?.telegramUrl ||
+    (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace("@", "")}`);
   const siteName = getLocalized(siteSettings, "siteName", "Rimna International Digital Lottery");
   const logoImage = siteSettings?.logoImageUrl || "/images/rimna-brand-logo.png";
 
   useEffect(() => {
-    setCurrentUser(getUser());
-    setIsMobileMenuOpen(false);
+    const user = getUser();
+    setCurrentUser(user);
+    setIsProfileDropdownOpen(false);
+
+    if (user) {
+      const localTickets = getLocalStoredEntries();
+      if (localTickets.length > 0) {
+        setMyTicketsCount(localTickets.length);
+      }
+    }
   }, [pathname]);
 
   if (pathname?.startsWith("/studio")) {
@@ -44,6 +69,7 @@ export function Nav({
   const handleSignOut = async () => {
     await logout();
     setCurrentUser(null);
+    setIsProfileDropdownOpen(false);
     window.location.reload();
   };
 
@@ -60,7 +86,7 @@ export function Nav({
     { href: "/about",       label: t.howItWorks.title || "Why Rimna", icon: Award },
   ];
 
-  // All navigation links for mobile drawer
+  // All navigation links for mobile dock
   const allNavItems = [
     ...leftNavItems,
     ...rightNavItems,
@@ -117,23 +143,134 @@ export function Nav({
         </div>
 
         {/* Quick Login & Language */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, position: "relative" }}>
           <div className="hide-on-mobile">
             <LanguageSwitcher />
           </div>
           <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
+
           {currentUser ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span className="mono" style={{ color: "#FDE047", fontWeight: 800, fontSize: "0.6875rem" }}>
-                {currentUser.name || currentUser.phone}
-              </span>
+            <div style={{ position: "relative" }}>
               <button
                 type="button"
-                onClick={handleSignOut}
-                style={{ background: "none", border: "none", color: "#F87171", cursor: "pointer", fontSize: "0.6875rem", fontWeight: 800 }}
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                style={{
+                  background: "rgba(253, 224, 71, 0.15)",
+                  border: "1px solid rgba(253, 224, 71, 0.6)",
+                  borderRadius: "20px",
+                  padding: "3px 10px",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  fontSize: "0.75rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  cursor: "pointer",
+                }}
               >
-                {t.nav?.signOut || "Sign Out"}
+                <div
+                  style={{
+                    width: 18,
+                    height: 18,
+                    borderRadius: "50%",
+                    background: "#FDE047",
+                    color: "#111827",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.625rem",
+                    fontWeight: 900,
+                  }}
+                >
+                  {(currentUser.name || "P").charAt(0).toUpperCase()}
+                </div>
+                <span>{currentUser.name || currentUser.phone}</span>
+                <ChevronDown size={12} color="#FDE047" />
               </button>
+
+              {/* Profile Dropdown */}
+              {isProfileDropdownOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: 6,
+                    background: "#1E293B",
+                    border: "1.5px solid #FDE047",
+                    borderRadius: "14px",
+                    boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
+                    padding: "8px 0",
+                    minWidth: 190,
+                    zIndex: 9999,
+                  }}
+                >
+                  <div style={{ padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                    <div style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
+                      {currentUser.name || "Verified Player"}
+                    </div>
+                    <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                      {currentUser.phone}
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/entries"
+                    onClick={() => setIsProfileDropdownOpen(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "8px 14px",
+                      color: "#E2E8F0",
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <ListChecks size={14} color="#FDE047" /> {t.nav.myEntries || "My Tickets"}
+                  </Link>
+
+                  <Link
+                    href="/#choose-ticket"
+                    onClick={() => setIsProfileDropdownOpen(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "8px 14px",
+                      color: "#E2E8F0",
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <Ticket size={14} color="#FDE047" /> {t.nav.enter || "Buy Ticket"}
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "8px 14px",
+                      color: "#FCA5A5",
+                      fontSize: "0.8125rem",
+                      fontWeight: 800,
+                      background: "none",
+                      border: "none",
+                      borderTop: "1px solid rgba(255,255,255,0.1)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    <LogOut size={14} color="#EF4444" /> {t.nav.signOut || "Sign Out"}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <button
@@ -313,8 +450,8 @@ export function Nav({
             >
               <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon size={19} color={active ? "#FDE047" : "#9CA3AF"} />
-                {href === "/entries" && pendingCount > 0 && (
-                  <span className="mobile-bottom-nav-badge">{pendingCount}</span>
+                {href === "/entries" && myTicketsCount > 0 && (
+                  <span className="mobile-bottom-nav-badge">{myTicketsCount}</span>
                 )}
               </div>
               <span>{label}</span>
