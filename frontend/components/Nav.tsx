@@ -83,7 +83,7 @@ export function Nav({
   // Right desktop links
   const rightNavItems = [
     { href: "/entries",     label: t.nav.myEntries,    icon: ListChecks },
-    { href: "/about",       label: t.howItWorks.title || "Why Rimna", icon: Award },
+    { href: "/about",       label: t.nav.whyRimna || "Why Rimna", icon: Award },
   ];
 
   // All navigation links for mobile dock

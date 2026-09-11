@@ -10,6 +10,7 @@ export interface Translations {
     results: string;
     admin: string;
     howItWorks: string;
+    whyRimna: string;
     eventsDeals: string;
     contact: string;
     officialTelegram: string;
@@ -314,6 +315,7 @@ export const translations: Record<Language, Translations> = {
       results: "Results",
       admin: "Admin Portal",
       howItWorks: "How It Works",
+      whyRimna: "Why Rimna",
       eventsDeals: "Events & Deals",
       contact: "Contact Us",
       officialTelegram: "Official Telegram:",
@@ -652,7 +654,8 @@ export const translations: Record<Language, Translations> = {
       results: "ውጤቶች",
       admin: "የአስተዳዳሪ ፖርታል",
       howItWorks: "አሰራሩ እንዴት ነው?",
-      eventsDeals: "ልዩ ሽልማቶች",
+      whyRimna: "ለምን ሪምና?",
+      eventsDeals: "ልዩ ሁነቶች እና ቅናሾች",
       contact: "ያግኙን",
       officialTelegram: "ይፋዊ ቴሌግራም:",
       hotline247: "የ24/7 መስመር:",
@@ -988,9 +991,10 @@ export const translations: Record<Language, Translations> = {
       enter: "ቲኬት ዓድጉ",
       myEntries: "ናተይ ቲኬታት",
       results: "ውጽኢታት",
-      admin: "ናይ ኣመሓዳሪ ፖርታል",
+      admin: "ናይ ምምሕዳር ፖርታል",
       howItWorks: "ኣሰራርሕኡ ብኸመይ እዩ?",
-      eventsDeals: "ፍሉያት ሽልማታት",
+      whyRimna: "ስለምንታይ ሪምና?",
+      eventsDeals: "ፍሉይ መደባትን ቅናሳትን",
       contact: "ርኸቡና",
       officialTelegram: "ወግዓዊ ቴሌግራም:",
       hotline247: "ናይ 24/7 መስመር:",
