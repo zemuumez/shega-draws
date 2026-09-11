@@ -49,10 +49,13 @@ func NewAuthUseCase(
 	}
 }
 
+const dummyBcryptHash = "$2a$12$e8Yk2uRk2qT1.Hk2Vf9V.uO2qR8N5G9r4P5s6T7u8V9w0x1y2z3A4"
+
 // RegisterPlayerInput is the data needed to create a player account.
 type RegisterPlayerInput struct {
 	Name  string `validate:"required,min=2,max=100"`
 	Phone string `validate:"required,e164"`
+	PIN   string `validate:"required,len=4,numeric"`
 }
 
 // TokenPair holds both access and refresh tokens.
@@ -61,32 +64,30 @@ type TokenPair struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-// RegisterPlayer creates a phone-only player account or logs in existing player and issues tokens.
+// RegisterPlayer creates a player account with a bcrypt-hashed PIN and issues tokens.
 func (uc *AuthUseCase) RegisterPlayer(ctx context.Context, input RegisterPlayerInput) (*TokenPair, *domain.User, error) {
 	exists, err := uc.userRepo.ExistsByPhone(ctx, input.Phone)
 	if err != nil {
 		return nil, nil, fmt.Errorf("checking phone existence: %w", err)
 	}
 	if exists {
-		existing, err := uc.userRepo.FindByPhone(ctx, input.Phone)
-		if err != nil {
-			return nil, nil, fmt.Errorf("finding existing player: %w", err)
-		}
-		pair, err := uc.issueTokens(ctx, existing)
-		if err != nil {
-			return nil, nil, err
-		}
-		log.Info().Str("user_id", existing.ID.String()).Str("phone", existing.Phone).Msg("existing player authenticated")
-		return pair, existing, nil
+		return nil, nil, domain.ErrUserAlreadyExists
 	}
 
+	hashBytes, err := bcrypt.GenerateFromPassword([]byte(input.PIN), 12)
+	if err != nil {
+		return nil, nil, fmt.Errorf("hashing pin: %w", err)
+	}
+	hashStr := string(hashBytes)
+
 	user := &domain.User{
-		ID:        uuid.New(),
-		Name:      input.Name,
-		Phone:     input.Phone,
-		Role:      domain.RolePlayer,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:           uuid.New(),
+		Name:         input.Name,
+		Phone:        input.Phone,
+		Role:         domain.RolePlayer,
+		PasswordHash: &hashStr,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	created, err := uc.userRepo.Create(ctx, user)
@@ -103,15 +104,27 @@ func (uc *AuthUseCase) RegisterPlayer(ctx context.Context, input RegisterPlayerI
 	return pair, created, nil
 }
 
-// LoginPlayerInput is used for phone-only player login.
+// LoginPlayerInput is used for player login with 4-digit PIN.
 type LoginPlayerInput struct {
 	Phone string `validate:"required,e164"`
+	PIN   string `validate:"required,len=4,numeric"`
 }
 
-// LoginPlayer authenticates a player by phone number.
+// LoginPlayer authenticates a player by phone and bcrypt-hashed PIN with anti-enumeration protection.
 func (uc *AuthUseCase) LoginPlayer(ctx context.Context, input LoginPlayerInput) (*TokenPair, *domain.User, error) {
 	user, err := uc.userRepo.FindByPhone(ctx, input.Phone)
 	if err != nil {
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.PIN))
+		return nil, nil, domain.ErrInvalidCredentials
+	}
+
+	if user.PasswordHash == nil {
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.PIN))
+		return nil, nil, domain.ErrInvalidCredentials
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(input.PIN)); err != nil {
+		log.Warn().Str("phone", input.Phone).Msg("failed player login attempt")
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 
@@ -129,18 +142,21 @@ type LoginAdminInput struct {
 	Password string `validate:"required"`
 }
 
-// LoginAdmin validates credentials and issues tokens for admins.
+// LoginAdmin validates credentials and issues tokens for admins with anti-enumeration protection.
 func (uc *AuthUseCase) LoginAdmin(ctx context.Context, input LoginAdminInput) (*TokenPair, *domain.User, error) {
 	user, err := uc.userRepo.FindByPhone(ctx, input.Phone)
 	if err != nil {
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.Password))
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 
 	if !user.Role.AtLeast(domain.RoleAdmin) {
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.Password))
 		return nil, nil, domain.ErrForbidden
 	}
 
 	if user.PasswordHash == nil {
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.Password))
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 

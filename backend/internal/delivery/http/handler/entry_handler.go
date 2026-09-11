@@ -51,6 +51,15 @@ func (h *EntryHandler) SubmitEntry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	paymentRef := r.FormValue("payment_reference")
+	if paymentRef == "" {
+		paymentRef = r.FormValue("tx_ref")
+	}
+	if paymentRef == "" {
+		respondError(w, domain.ErrPaymentRefRequired)
+		return
+	}
+
 	// Extract proof image
 	file, header, err := r.FormFile("proof")
 	if err != nil {
@@ -66,13 +75,14 @@ func (h *EntryHandler) SubmitEntry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := usecase.SubmitEntryInput{
-		UserID:    userID,
-		DrawID:    drawID,
-		Number:    number,
-		Amount:    amount,
-		Method:    method,
-		ProofData: proofData,
-		ProofName: header.Filename,
+		UserID:           userID,
+		DrawID:           drawID,
+		Number:           number,
+		Amount:           amount,
+		Method:           method,
+		PaymentReference: paymentRef,
+		ProofData:        proofData,
+		ProofName:        header.Filename,
 	}
 
 	entry, err := h.entryUC.SubmitEntry(r.Context(), input)

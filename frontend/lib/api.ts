@@ -414,18 +414,6 @@ export async function submitEntry(formData: FormData): Promise<Entry> {
   const userName = (formData.get("name") as string) || (formData.get("user_name") as string) || "Verified Player";
   const userPhone = (formData.get("phone") as string) || (formData.get("user_phone") as string) || "";
 
-  // If user entered phone during checkout, ensure they are logged in
-  if (userPhone && !getUser()) {
-    const newUser: StoredUser = {
-      id: `usr-${userPhone.replace(/[^0-9]/g, "").slice(-8) || Date.now().toString(36)}`,
-      name: userName,
-      phone: userPhone,
-      role: "player",
-    };
-    setUser(newUser);
-    setAccessToken(`token_${Date.now()}`);
-  }
-
   let createdEntry: Entry = {
     id: `entry-${Date.now()}`,
     draw_id: drawId,
@@ -441,17 +429,14 @@ export async function submitEntry(formData: FormData): Promise<Entry> {
     created_at: new Date().toISOString(),
   };
 
-  try {
-    const res = await fetch("/api/entries/submit", {
-      method: "POST",
-      body: formData,
-    });
-    if (res.ok) {
-      saveLocalEntry(createdEntry);
-      return createdEntry;
-    }
-  } catch (localErr) {
-    console.warn("Local API submit notice:", localErr);
+  const res = await fetch("/api/entries/submit", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to submit ticket entry");
   }
 
   try {
@@ -460,7 +445,7 @@ export async function submitEntry(formData: FormData): Promise<Entry> {
       createdEntry = { ...createdEntry, ...backendEntry };
     }
   } catch {
-    // Proceed with fallback created entry
+    // Proceed with created entry if backend is offline
   }
 
   saveLocalEntry(createdEntry);

@@ -55,6 +55,7 @@ export function BuyTicketModal({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
+  const [paymentReference, setPaymentReference] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [number, setNumber] = useState("7");
@@ -69,6 +70,7 @@ export function BuyTicketModal({
       setError("");
       setProofFile(null);
       setProofPreview("");
+      setPaymentReference("");
       setPromoCode("");
       setPromoApplied(false);
       setNumber("7");
@@ -80,6 +82,7 @@ export function BuyTicketModal({
       } else {
         setName("");
         setPhone("");
+        setPin("");
       }
     }
   }, [isOpen]);
@@ -97,7 +100,7 @@ export function BuyTicketModal({
       ? name.trim().length >= 2 && phone.trim().length >= 7
       : name.trim().length >= 2 && phone.trim().length >= 7 && pin.trim().length >= 4,
     number.trim().length > 0 && parseInt(number, 10) >= 0 && parseInt(number, 10) <= 99,
-    !!proofFile && !!method,
+    !!proofFile && !!method && paymentReference.trim().length >= 6,
   ];
 
   function handleProof(file: File) {
@@ -118,6 +121,8 @@ export function BuyTicketModal({
       form.append("number", number);
       form.append("amount", String(ticketPrice));
       form.append("method", method);
+      form.append("payment_reference", paymentReference.trim().toUpperCase());
+      form.append("tx_ref", paymentReference.trim().toUpperCase());
       form.append("proof", proofFile);
       form.append("user_name", name.trim());
       form.append("user_phone", phone.trim());
@@ -573,6 +578,40 @@ export function BuyTicketModal({
                     Instant transfer supported across Awash, Dashen, Abyssinia, and all Ethiopian bank apps to {siteSettings?.siteName || "Rimna Digital Lottery"}.
                   </div>
                 )}
+              </div>
+
+              {/* Transaction Reference (TxID) Input */}
+              <div>
+                <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                  {language === "ti" ? "ናይ ዝውውር መፍለዪ ቁጽሪ (TxID / Receipt #)" : language === "am" ? "የዝውውር መለያ ቁጥር (TxID / ደረሰኝ ቁጥር)" : "Transaction Reference (TxID / Receipt #)"}
+                </label>
+                <input
+                  type="text"
+                  value={paymentReference}
+                  onChange={(e) => setPaymentReference(e.target.value)}
+                  placeholder={method === "telebirr" ? "e.g. TF240822.0911.A34981" : method === "cbe" ? "e.g. FT242319082" : "e.g. TXN-98472910"}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    background: "rgba(0, 0, 0, 0.5)",
+                    border: paymentReference.trim().length >= 6 ? "1.5px solid #10B981" : "1.5px solid rgba(255, 255, 255, 0.2)",
+                    borderRadius: "10px",
+                    color: "#FFFFFF",
+                    fontSize: "0.9375rem",
+                    fontFamily: "monospace",
+                    letterSpacing: "0.5px",
+                    boxSizing: "border-box",
+                    outline: "none",
+                  }}
+                />
+                <span style={{ fontSize: "0.6875rem", color: "#94A3B8", marginTop: 4, display: "block" }}>
+                  {language === "ti"
+                    ? "ካብ ቴሌብር ወይ ሲቢኢ ዝመጸልኩም ናይ ደረሰኝ መፍለዪ ኮድ ኣብዚ ኣእትዉ"
+                    : language === "am"
+                    ? "ከቴሌብር ወይም ንግድ ባንክ የመጣሎትን የደረሰኝ መለያ ኮድ እዚህ ያስገቡ"
+                    : "Enter the unique reference code from your payment SMS/receipt for instant verification."}
+                </span>
               </div>
 
               {/* Payment Proof Uploader */}

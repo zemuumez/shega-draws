@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
-import crypto from "crypto";
 import { getSanityWriteClient } from "@/lib/sanity/client";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-function hashPin(pin: string, salt = "rimna_player_salt"): string {
-  return crypto.createHmac("sha256", salt).update(pin).digest("hex");
-}
 
 function cleanPhoneNumber(phone: string): string {
   return phone.replace(/[\s\-()]/g, "").trim();
@@ -57,14 +52,43 @@ export async function POST(request: Request) {
     const playerName = (formData.get("name") as string) || (formData.get("user_name") as string) || "Anonymous Player";
     const rawPhone = (formData.get("phone") as string) || (formData.get("user_phone") as string) || "";
     const playerPhone = cleanPhoneNumber(rawPhone);
-    const pin = (formData.get("pin") as string) || "";
     const drawId = (formData.get("draw_id") as string) || "RDL-2026-08A";
     const luckyNumber = (formData.get("number") as string) || "";
     const poolCapacity = (formData.get("pool_capacity") as string) || "1,000 (1K)";
     const amount = Number(formData.get("amount") || 100);
     const currency = (formData.get("currency") as string) || "ETB";
     const paymentMethod = (formData.get("method") as string) || "telebirr";
+    const rawPaymentRef = (formData.get("payment_reference") as string) || (formData.get("tx_ref") as string) || "";
+    const paymentReference = rawPaymentRef.trim().toUpperCase();
     const proofFile = formData.get("proof") as File | null;
+
+    // Validate payment reference
+    if (!paymentReference || paymentReference.length < 6) {
+      return NextResponse.json(
+        { error: "A valid transaction reference (TxID / Receipt Number, min 6 chars) is required." },
+        { status: 400 }
+      );
+    }
+
+    const writeClient = getSanityWriteClient();
+
+    // Check for duplicate payment reference
+    if (writeClient) {
+      try {
+        const existingEntry = await writeClient.fetch<{ _id: string }>(
+          `*[_type == "playerEntry" && (paymentReference == $ref || upper(paymentReference) == $ref)][0]{ _id }`,
+          { ref: paymentReference }
+        );
+        if (existingEntry) {
+          return NextResponse.json(
+            { error: `Transaction reference "${paymentReference}" has already been submitted for an entry.` },
+            { status: 409 }
+          );
+        }
+      } catch (checkErr: any) {
+        console.warn("Payment reference duplicate check warning:", checkErr.message);
+      }
+    }
 
     let imageAssetRef = undefined;
 
@@ -99,7 +123,6 @@ export async function POST(request: Request) {
       // 4. Filename Sanitization
       const safeFilename = sanitizeFilename(proofFile.name || "receipt.jpg");
 
-      const writeClient = getSanityWriteClient();
       if (writeClient) {
         try {
           const asset = await writeClient.assets.upload("image", buffer, {
@@ -119,31 +142,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const writeClient = getSanityWriteClient();
     if (writeClient) {
-      // Create or update playerAccount if PIN provided or if account doesn't exist
-      if (playerPhone && pin && pin.length >= 4) {
-        try {
-          const existingAcc = await writeClient.fetch<{ _id: string }>(
-            `*[_type == "playerAccount" && phone == $phone][0]{ _id }`,
-            { phone: playerPhone }
-          );
-          if (!existingAcc) {
-            await writeClient.create({
-              _type: "playerAccount",
-              name: playerName,
-              phone: playerPhone,
-              pinHash: hashPin(pin),
-              status: "active",
-              registeredAt: new Date().toISOString(),
-            });
-            console.log(`✅ [CMS Auto-Create] Player Account Created during purchase: ${playerPhone}`);
-          }
-        } catch (accErr: any) {
-          console.warn("Player account check notice:", accErr.message);
-        }
-      }
-
       try {
         const createdDoc = await writeClient.create({
           _type: "playerEntry",
@@ -155,6 +154,7 @@ export async function POST(request: Request) {
           amount,
           currency,
           paymentMethod,
+          paymentReference,
           proofScreenshot: imageAssetRef,
           submittedAt: new Date().toISOString(),
           status: "pending",
@@ -167,7 +167,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Ticket entry & payment screenshot received for admin review.",
+      payment_reference: paymentReference,
+      message: "Ticket entry & payment screenshot received for verification.",
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to submit entry" }, { status: 500 });

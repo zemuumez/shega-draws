@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mime"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -52,13 +53,14 @@ func NewEntryUseCase(
 
 // SubmitEntryInput holds all data for a new entry submission.
 type SubmitEntryInput struct {
-	UserID    uuid.UUID
-	DrawID    uuid.UUID
-	Number    string              `validate:"required,len=2"`
-	Amount    int                 `validate:"required,gt=0"`
-	Method    domain.PaymentMethod `validate:"required,oneof=telebirr cbebirr bank"`
-	ProofData []byte              // Raw image bytes
-	ProofName string              // Original filename
+	UserID           uuid.UUID
+	DrawID           uuid.UUID
+	Number           string               `validate:"required,len=2"`
+	Amount           int                  `validate:"required,gt=0"`
+	Method           domain.PaymentMethod `validate:"required,oneof=telebirr cbebirr bank"`
+	PaymentReference string               `validate:"required,min=6,max=32"`
+	ProofData        []byte               // Raw image bytes
+	ProofName        string               // Original filename
 }
 
 // SubmitEntry validates a new entry, uploads the proof image to S3, and persists the entry.
@@ -72,7 +74,13 @@ func (uc *EntryUseCase) SubmitEntry(ctx context.Context, input SubmitEntryInput)
 		return nil, domain.ErrDrawNotOpen
 	}
 
-	// 2. Validate proof image
+	// 2. Validate payment reference
+	cleanRef := strings.ToUpper(strings.TrimSpace(input.PaymentReference))
+	if cleanRef == "" || len(cleanRef) < 6 {
+		return nil, domain.ErrPaymentRefRequired
+	}
+
+	// 3. Validate proof image
 	if len(input.ProofData) == 0 {
 		return nil, domain.ErrProofRequired
 	}
@@ -86,7 +94,7 @@ func (uc *EntryUseCase) SubmitEntry(ctx context.Context, input SubmitEntryInput)
 		return nil, domain.ErrProofInvalidType
 	}
 
-	// 3. Check number availability
+	// 4. Check number availability
 	taken, err := uc.entryRepo.IsNumberTaken(ctx, input.DrawID, input.Number)
 	if err != nil {
 		return nil, fmt.Errorf("checking number: %w", err)
@@ -95,34 +103,36 @@ func (uc *EntryUseCase) SubmitEntry(ctx context.Context, input SubmitEntryInput)
 		return nil, domain.ErrNumberTaken
 	}
 
-	// 4. Upload proof image to S3 with a UUID key (never trust user-provided filenames)
+	// 5. Upload proof image to S3 with a UUID key (never trust user-provided filenames)
 	proofKey := fmt.Sprintf("proofs/%s/%s/%s.jpg", input.DrawID, input.UserID, uuid.New().String())
 	if err := uc.uploader.Upload(ctx, proofKey, input.ProofData, parsedMIME); err != nil {
 		return nil, fmt.Errorf("uploading proof: %w", err)
 	}
 
-	// 5. Persist entry
+	// 6. Persist entry
 	entry := &domain.Entry{
-		ID:        uuid.New(),
-		DrawID:    input.DrawID,
-		UserID:    input.UserID,
-		Number:    input.Number,
-		Amount:    input.Amount,
-		Method:    input.Method,
-		ProofKey:  proofKey,
-		Status:    domain.EntryStatusPending,
-		CreatedAt: time.Now(),
+		ID:               uuid.New(),
+		DrawID:           input.DrawID,
+		UserID:           input.UserID,
+		Number:           input.Number,
+		Amount:           input.Amount,
+		Method:           input.Method,
+		PaymentReference: cleanRef,
+		ProofKey:         proofKey,
+		Status:           domain.EntryStatusPending,
+		CreatedAt:        time.Now(),
 	}
 
 	created, err := uc.entryRepo.Create(ctx, entry)
 	if err != nil {
-		return nil, fmt.Errorf("persisting entry: %w", err)
+		return nil, err
 	}
 
 	log.Info().
 		Str("entry_id", created.ID.String()).
 		Str("number", created.Number).
 		Str("draw_id", input.DrawID.String()).
+		Str("ref", cleanRef).
 		Msg("new entry submitted — awaiting payment confirmation")
 
 	return created, nil

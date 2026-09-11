@@ -41,13 +41,11 @@ func respondError(w http.ResponseWriter, err error) {
 		status = http.StatusForbidden
 	case errors.Is(err, domain.ErrUserNotFound), errors.Is(err, domain.ErrDrawNotFound), errors.Is(err, domain.ErrEntryNotFound):
 		status = http.StatusNotFound
-	case errors.Is(err, domain.ErrUserAlreadyExists):
-		status = http.StatusConflict
-	case errors.Is(err, domain.ErrNumberTaken):
+	case errors.Is(err, domain.ErrUserAlreadyExists), errors.Is(err, domain.ErrNumberTaken), errors.Is(err, domain.ErrPaymentRefDuplicate):
 		status = http.StatusConflict
 	case errors.Is(err, domain.ErrDrawNotOpen), errors.Is(err, domain.ErrDrawAlreadyOpen),
 		errors.Is(err, domain.ErrDrawNotClosed), errors.Is(err, domain.ErrDrawAlreadyRevld),
-		errors.Is(err, domain.ErrEntryAlreadyActed):
+		errors.Is(err, domain.ErrEntryAlreadyActed), errors.Is(err, domain.ErrPaymentRefRequired):
 		status = http.StatusBadRequest
 	case errors.Is(err, domain.ErrProofRequired), errors.Is(err, domain.ErrProofTooLarge), errors.Is(err, domain.ErrProofInvalidType):
 		status = http.StatusBadRequest

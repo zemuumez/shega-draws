@@ -1,5 +1,4 @@
 import { type SchemaTypeDefinition } from "sanity";
-import { playerAccountType } from "./playerAccount";
 import { playerEntryType } from "./playerEntry";
 import { drawType } from "./draw";
 import { drawResultType } from "./drawResult";
@@ -11,7 +10,6 @@ import { uiTranslationType } from "./uiTranslation";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
-    playerAccountType,
     playerEntryType,
     drawType,
     drawResultType,

@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/shega-draws/backend/internal/domain"
 	"github.com/shega-draws/backend/internal/repository"
@@ -25,17 +26,21 @@ func NewEntryRepository(pool *pgxpool.Pool) repository.EntryRepository {
 
 func (r *entryRepo) Create(ctx context.Context, entry *domain.Entry) (*domain.Entry, error) {
 	query := `
-		INSERT INTO entries (id, draw_id, user_id, number, amount, method, proof_key, status, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		RETURNING id, draw_id, user_id, number, amount, method, proof_key, status, created_at`
+		INSERT INTO entries (id, draw_id, user_id, number, amount, method, payment_reference, proof_key, status, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		RETURNING id, draw_id, user_id, number, amount, method, payment_reference, proof_key, status, created_at`
 
 	var e domain.Entry
 	err := r.pool.QueryRow(ctx, query,
 		entry.ID, entry.DrawID, entry.UserID, entry.Number,
-		entry.Amount, string(entry.Method), entry.ProofKey,
+		entry.Amount, string(entry.Method), entry.PaymentReference, entry.ProofKey,
 		string(entry.Status), entry.CreatedAt,
-	).Scan(&e.ID, &e.DrawID, &e.UserID, &e.Number, &e.Amount, &e.Method, &e.ProofKey, &e.Status, &e.CreatedAt)
+	).Scan(&e.ID, &e.DrawID, &e.UserID, &e.Number, &e.Amount, &e.Method, &e.PaymentReference, &e.ProofKey, &e.Status, &e.CreatedAt)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, domain.ErrPaymentRefDuplicate
+		}
 		return nil, fmt.Errorf("inserting entry: %w", err)
 	}
 	return &e, nil
@@ -43,7 +48,7 @@ func (r *entryRepo) Create(ctx context.Context, entry *domain.Entry) (*domain.En
 
 func (r *entryRepo) FindByID(ctx context.Context, id uuid.UUID) (*domain.Entry, error) {
 	query := `
-		SELECT e.id, e.draw_id, e.user_id, e.number, e.amount, e.method, e.proof_key,
+		SELECT e.id, e.draw_id, e.user_id, e.number, e.amount, e.method, e.payment_reference, e.proof_key,
 		       e.status, e.confirmed_by, e.rejected_by, e.created_at, e.confirmed_at, e.rejected_at,
 		       u.name, u.phone
 		FROM entries e
@@ -59,7 +64,7 @@ func (r *entryRepo) FindByID(ctx context.Context, id uuid.UUID) (*domain.Entry, 
 
 func (r *entryRepo) FindAll(ctx context.Context, filter repository.EntryFilter) ([]*domain.Entry, error) {
 	query := `
-		SELECT e.id, e.draw_id, e.user_id, e.number, e.amount, e.method, e.proof_key,
+		SELECT e.id, e.draw_id, e.user_id, e.number, e.amount, e.method, e.payment_reference, e.proof_key,
 		       e.status, e.confirmed_by, e.rejected_by, e.created_at, e.confirmed_at, e.rejected_at,
 		       u.name, u.phone
 		FROM entries e
@@ -138,7 +143,7 @@ func (r *entryRepo) scanEntry(row interface {
 }) (*domain.Entry, error) {
 	var e domain.Entry
 	err := row.Scan(
-		&e.ID, &e.DrawID, &e.UserID, &e.Number, &e.Amount, &e.Method, &e.ProofKey,
+		&e.ID, &e.DrawID, &e.UserID, &e.Number, &e.Amount, &e.Method, &e.PaymentReference, &e.ProofKey,
 		&e.Status, &e.ConfirmedBy, &e.RejectedBy, &e.CreatedAt, &e.ConfirmedAt, &e.RejectedAt,
 		&e.UserName, &e.UserPhone,
 	)
