@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck, Ticket } from "lucide-react";
+import { SignInModal } from "./SignInModal";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
-import { submitEntry, getUser, type Currency } from "@/lib/api";
+import { submitEntry, getUser, getCurrentPlayer, getCurrentDraw, type StoredUser, type DrawState, type Currency } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
@@ -43,8 +44,12 @@ export function BuyTicketModal({
 
   const currency: Currency = initialCurrency;
   const ticketPrice: number = initialPrice;
-  const poolSize: number = initialPoolSize;
-  const drawId: string = initialDrawId;
+  const poolSize = 100;
+  const [liveDraw, setLiveDraw] = useState<DrawState | null>(null);
+  const [player, setPlayer] = useState<StoredUser | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [unavailable, setUnavailable] = useState("");
+  const drawId: string = liveDraw?.id || initialDrawId;
 
   // Step state (0: Player Info, 1: Pick Number, 2: Pay & Confirm, 3: Success)
   const [step, setStep] = useState(0);
@@ -54,7 +59,6 @@ export function BuyTicketModal({
   // Form fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [pin, setPin] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
@@ -82,10 +86,26 @@ export function BuyTicketModal({
       } else {
         setName("");
         setPhone("");
-        setPin("");
       }
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    setChecking(true); setPlayer(null); setLiveDraw(null); setUnavailable("");
+    Promise.all([getCurrentPlayer().catch(error => { if (error.status === 401) return null; throw error; }), getCurrentDraw()]).then(([user, draw]) => {
+      if (cancelled) return;
+      if (!draw || initialCurrency !== "ETB" || draw.ticket_price !== initialPrice ||
+          (initialDrawId !== "RDL-ACTIVE" && initialDrawId !== `RDL-ETB-${initialPrice}` && initialDrawId !== draw.id && initialDrawId !== draw.draw_id)) {
+        setUnavailable("This ticket option is not available. Visit My Tickets to see the current draw.");
+      } else { setLiveDraw(draw); }
+      setPlayer(user);
+      if (user) { setName(user.name); setPhone(user.phone); }
+    }).catch(error => { if (!cancelled) setUnavailable(error.message); })
+      .finally(() => { if (!cancelled) setChecking(false); });
+    return () => { cancelled = true; };
+  }, [isOpen, initialCurrency, initialPrice, initialDrawId]);
 
   const isUSD = currency === "USD";
 
@@ -96,10 +116,8 @@ export function BuyTicketModal({
   };
 
   const canAdvance = [
-    getUser()
-      ? name.trim().length >= 2 && phone.trim().length >= 7
-      : name.trim().length >= 2 && phone.trim().length >= 7 && pin.trim().length >= 4,
-    number.trim().length > 0 && parseInt(number, 10) >= 0 && parseInt(number, 10) <= 99,
+    !!player,
+    /^\d{1,2}$/.test(number) && !liveDraw?.taken_numbers?.includes(number.padStart(2, "0")),
     !!proofFile && !!method && paymentReference.trim().length >= 6,
   ];
 
@@ -111,14 +129,14 @@ export function BuyTicketModal({
   }
 
   async function submit() {
-    if (!canAdvance[2] || !proofFile) return;
+    if (!canAdvance[2] || !proofFile || !player || !liveDraw) return;
     setLoading(true);
     setError("");
 
     try {
       const form = new FormData();
       form.append("draw_id", drawId);
-      form.append("number", number);
+      form.append("number", number.padStart(2, "0"));
       form.append("amount", String(ticketPrice));
       form.append("method", method);
       form.append("payment_reference", paymentReference.trim().toUpperCase());
@@ -126,7 +144,6 @@ export function BuyTicketModal({
       form.append("proof", proofFile);
       form.append("user_name", name.trim());
       form.append("user_phone", phone.trim());
-      if (pin) form.append("pin", pin.trim());
 
       await submitEntry(form);
       setStep(3); // Success step
@@ -138,6 +155,16 @@ export function BuyTicketModal({
   }
 
   if (!mounted || !isOpen) return null;
+  if (checking || unavailable) return createPortal(
+    <div role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,.85)", display: "grid", placeItems: "center" }}>
+      <div style={{ background: "#0F172A", color: "white", padding: 32, borderRadius: 16, maxWidth: 420 }}>
+        <p>{checking ? "Loading the current draw…" : unavailable}</p>
+        {!checking && <a href="/entries">View My Tickets</a>}
+        <button onClick={onClose} style={{ marginLeft: 16 }}>Close</button>
+      </div>
+    </div>, document.body);
+  if (!player) return <SignInModal isOpen={true} onClose={onClose} closeOnSuccess={false} onSuccess={user => { setPlayer(user); setName(user.name); setPhone(user.phone); }} />;
+
 
   return createPortal(
     <div
@@ -231,7 +258,7 @@ export function BuyTicketModal({
           >
             {isUSD
               ? (language === "ti" ? "ናይ ዲያስፖራ ዶላር ቲኬት" : language === "am" ? "የዲያስፖራ ዶላር ቲኬት" : "DIASPORA USD TICKET")
-              : (language === "ti" ? "ናይ ኢትዮጵያ ብር ቲኬት" : language === "am" ? "የኢትዮጵያ ብር ቲኬት" : "ETHIOPIA NATIONAL ETB TIER")} · #{drawId}
+              : (language === "ti" ? "ናይ ኢትዮጵያ ብር ቲኬት" : language === "am" ? "የኢትዮጵያ ብር ቲኬት" : "ETHIOPIA NATIONAL ETB TIER")} · #{liveDraw?.draw_id || drawId}
           </span>
 
           <h2
@@ -249,7 +276,7 @@ export function BuyTicketModal({
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.75rem", color: "#CBD5E1" }}>
             <span style={{ color: "#6EE7B7", fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
-              <Users size={12} /> {poolSize.toLocaleString()} {language === "ti" ? "ውሱን ተሳተፍቲ" : language === "am" ? "የተገደበ ተሳታፊ" : "Capped Pool"}
+              <Users size={12} /> {"100"} {language === "ti" ? "ውሱን ተሳተፍቲ" : language === "am" ? "የተገደበ ተሳታፊ" : "Capped Pool"}
             </span>
             <span>•</span>
             <span style={{ color: "#FEF08A", fontWeight: 800 }}>
@@ -347,7 +374,7 @@ export function BuyTicketModal({
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  readOnly
                   placeholder={language === "ti" ? "ንኣብነት ኣበበ ቢቂላ" : language === "am" ? "ለምሳሌ አበበ ቢቂላ" : "e.g. Abebe Bikila"}
                   style={{
                     width: "100%",
@@ -370,7 +397,7 @@ export function BuyTicketModal({
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  readOnly
                   placeholder="0911 00 00 00 or +1 202 555 0199"
                   style={{
                     width: "100%",
@@ -386,37 +413,6 @@ export function BuyTicketModal({
                 />
               </div>
 
-              {!getUser() && (
-                <div>
-                  <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                    {language === "ti" ? "ናይ ድሕንነት ፒን ፍጠሩ (4 ድጂት)" : language === "am" ? "የደህንነት ፒን ይፍጠሩ (4 ዲጂት)" : "Create 4-Digit Security PIN"}
-                  </label>
-                  <input
-                    type="password"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)}
-                    placeholder="••••"
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "12px 14px",
-                      background: "rgba(0, 0, 0, 0.5)",
-                      border: "1.5px solid rgba(255, 255, 255, 0.2)",
-                      borderRadius: "10px",
-                      color: "#FFFFFF",
-                      fontSize: "1rem",
-                      letterSpacing: "2px",
-                      boxSizing: "border-box",
-                      outline: "none",
-                    }}
-                  />
-                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8", marginTop: 4, display: "block" }}>
-                    {language === "ti" ? "ዝገዛእክዎም ቲኬታት ብድሕንነት ንምክትታል የገልግል" : language === "am" ? "የገዟቸውን ቲኬቶች በደህንነት ለመከታተል ያገለግላል" : "Used to securely sign in and view your tickets later"}
-                  </span>
-                </div>
-              )}
 
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#CBD5E1", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
@@ -471,7 +467,7 @@ export function BuyTicketModal({
                   ? "ከ00 እስከ 99 የሚወዱትን እድለኛ ቁጥር ይምረጡ:"
                   : "Select your lucky ticket number between 00 and 99:"}
               </p>
-              <NumberPicker value={number} onChange={setNumber} poolSize={poolSize} />
+              <NumberPicker value={number.padStart(2, "0")} onChange={setNumber} poolSize={poolSize} takenNumbers={liveDraw?.taken_numbers || []} />
             </div>
           )}
 
@@ -643,7 +639,7 @@ export function BuyTicketModal({
               </span>
 
               <h3 className="display" style={{ fontSize: "1.75rem", fontWeight: 900, color: "#FFFFFF", margin: "6px 0 10px" }}>
-                {language === "ti" ? `ዕድለኛ ቁጽሪ #${number} ተረጋጊጹ!` : language === "am" ? `እድለኛ ቁጥር #${number} ተረጋግጧል!` : `Lucky Number #${number} Confirmed!`}
+                {language === "ti" ? `ቲኬት #${number} ተላኢኹ። ክፍሊት ምርግጋጽ ይጽበ ኣሎ።` : language === "am" ? `ቲኬት #${number} ተልኳል። የክፍያ ማረጋገጫ በመጠባበቅ ላይ።` : `Ticket #${number.padStart(2, "0")} submitted`}
               </h3>
 
               <p style={{ fontSize: "0.875rem", color: "#CBD5E1", maxWidth: 440, margin: "0 auto 20px" }}>

@@ -9,7 +9,8 @@
     "lint": "next lint",
     "seed:cms": "node scripts/seed-sanity.mjs",
     "seed:cms:clear": "node scripts/seed-sanity.mjs --clear",
-    "migrate:cms": "node scripts/migrate-to-sanity.mjs"
+    "migrate:cms": "node scripts/migrate-to-sanity.mjs",
+    "test:player": "node --test tests/player-api.test.cjs"
   },
   "dependencies": {
     "@sanity/client": "^6.21.3",

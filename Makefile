@@ -6,7 +6,7 @@ help:
 	@echo "Shega Draws — development commands"
 	@echo "═══════════════════════════════════"
 	@echo "  make dev-up        Start PostgreSQL, Redis, MinIO (Docker)"
-	@echo "  make dev-down      Stop and remove containers"
+	@echo "  make dev-down      Stop and remove containers"f
 	@echo "  make migrate       Run database migrations"
 	@echo "  make backend-run   Run the Go API server"
 	@echo "  make frontend-run  Run the Next.js dev server"

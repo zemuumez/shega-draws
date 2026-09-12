@@ -29,8 +29,8 @@ type Entry struct {
 	ID               uuid.UUID     `json:"id"`
 	DrawID           uuid.UUID     `json:"draw_id"`
 	UserID           uuid.UUID     `json:"user_id"`
-	Number           string        `json:"number"`            // Zero-padded "00"–"99"
-	Amount           int           `json:"amount"`            // ETB
+	Number           string        `json:"number"` // Zero-padded "00"–"99"
+	Amount           int           `json:"amount"` // ETB
 	Method           PaymentMethod `json:"method"`
 	PaymentReference string        `json:"payment_reference"` // Unique Telebirr / CBE transaction ref
 	ProofKey         string        `json:"-"`                 // S3 object key — never expose directly
@@ -40,6 +40,9 @@ type Entry struct {
 	CreatedAt        time.Time     `json:"created_at"`
 	ConfirmedAt      *time.Time    `json:"confirmed_at,omitempty"`
 	RejectedAt       *time.Time    `json:"rejected_at,omitempty"`
+	DrawStatus       DrawStatus    `json:"draw_status"`
+	DrawLabel        string        `json:"draw_label"`
+	DrawDeadline     time.Time     `json:"draw_deadline"`
 	// Joined fields (not stored in entries table)
 	UserName  string `json:"user_name,omitempty"`
 	UserPhone string `json:"user_phone,omitempty"`

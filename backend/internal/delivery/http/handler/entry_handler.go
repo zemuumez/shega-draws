@@ -3,6 +3,7 @@ package handler
 import (
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -26,15 +27,25 @@ func NewEntryHandler(entryUC *usecase.EntryUseCase) *EntryHandler {
 
 // SubmitEntry handles POST /api/v1/entries — player only (multipart/form-data)
 func (h *EntryHandler) SubmitEntry(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, maxMultipartMemory)
 	// Parse multipart form (max 6 MB in memory)
 	if err := r.ParseMultipartForm(maxMultipartMemory); err != nil {
 		respond(w, http.StatusBadRequest, map[string]string{"error": "invalid multipart form"})
 		return
 	}
 
-	claims, _ := middleware.ClaimsFromContext(r.Context())
-	userID, _ := uuid.Parse(claims.UserID)
+	claims, ok := middleware.ClaimsFromContext(r.Context())
+	if !ok {
+		respondError(w, domain.ErrUnauthorized)
+		return
+	}
+	userID, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		respondError(w, domain.ErrUnauthorized)
+		return
+	}
 
+	defer r.MultipartForm.RemoveAll()
 	drawIDStr := r.FormValue("draw_id")
 	drawID, err := uuid.Parse(drawIDStr)
 	if err != nil {
@@ -95,20 +106,34 @@ func (h *EntryHandler) SubmitEntry(w http.ResponseWriter, r *http.Request) {
 
 // GetMyEntries handles GET /api/v1/entries/mine — player
 func (h *EntryHandler) GetMyEntries(w http.ResponseWriter, r *http.Request) {
-	claims, _ := middleware.ClaimsFromContext(r.Context())
-	userID, _ := uuid.Parse(claims.UserID)
-
-	drawIDStr := r.URL.Query().Get("draw_id")
-	drawID, err := uuid.Parse(drawIDStr)
-	if err != nil {
-		respond(w, http.StatusBadRequest, map[string]string{"error": "draw_id query param required"})
+	claims, ok := middleware.ClaimsFromContext(r.Context())
+	if !ok {
+		respondError(w, domain.ErrUnauthorized)
 		return
+	}
+	userID, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		respondError(w, domain.ErrUnauthorized)
+		return
+	}
+
+	var drawID *uuid.UUID
+	if value := r.URL.Query().Get("draw_id"); value != "" {
+		id, err := uuid.Parse(value)
+		if err != nil {
+			respond(w, http.StatusBadRequest, map[string]string{"error": "invalid draw_id"})
+			return
+		}
+		drawID = &id
 	}
 
 	entries, err := h.entryUC.GetMyEntries(r.Context(), userID, drawID)
 	if err != nil {
 		respondError(w, err)
 		return
+	}
+	if entries == nil {
+		entries = []*domain.Entry{}
 	}
 	respond(w, http.StatusOK, entries)
 }
@@ -132,6 +157,9 @@ func (h *EntryHandler) ListEntries(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		respondError(w, err)
 		return
+	}
+	if entries == nil {
+		entries = []*domain.Entry{}
 	}
 	respond(w, http.StatusOK, entries)
 }
@@ -173,15 +201,9 @@ func (h *EntryHandler) RejectEntry(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseInt(s string, out *int) (bool, error) {
-	if s == "" {
-		return false, nil
-	}
-	n := 0
-	for _, c := range s {
-		if c < '0' || c > '9' {
-			return false, errToUnauthorized("non-numeric amount")
-		}
-		n = n*10 + int(c-'0')
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return false, err
 	}
 	*out = n
 	return true, nil

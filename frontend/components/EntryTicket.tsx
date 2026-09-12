@@ -98,7 +98,7 @@ export function EntryTicket({ entry, prizes, winningNumbers }: EntryTicketProps)
               <Ticket size={13} color="#FDE047" />
             </div>
             <span style={{ fontSize: "0.8125rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              {entry.draw_id || "RDL-ACTIVE"}
+              {entry.draw_label || entry.draw_id}
             </span>
           </div>
 

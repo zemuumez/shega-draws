@@ -39,6 +39,9 @@ func (r *entryRepo) Create(ctx context.Context, entry *domain.Entry) (*domain.En
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			if pgErr.ConstraintName == "unique_confirmed_number_per_draw" {
+				return nil, domain.ErrNumberTaken
+			}
 			return nil, domain.ErrPaymentRefDuplicate
 		}
 		return nil, fmt.Errorf("inserting entry: %w", err)
@@ -50,9 +53,10 @@ func (r *entryRepo) FindByID(ctx context.Context, id uuid.UUID) (*domain.Entry, 
 	query := `
 		SELECT e.id, e.draw_id, e.user_id, e.number, e.amount, e.method, e.payment_reference, e.proof_key,
 		       e.status, e.confirmed_by, e.rejected_by, e.created_at, e.confirmed_at, e.rejected_at,
-		       u.name, u.phone
+		       u.name, u.phone, d.status, d.draw_id, d.deadline
 		FROM entries e
 		JOIN users u ON u.id = e.user_id
+ JOIN draws d ON d.id = e.draw_id
 		WHERE e.id = $1`
 
 	e, err := r.scanEntry(r.pool.QueryRow(ctx, query, id))
@@ -66,9 +70,10 @@ func (r *entryRepo) FindAll(ctx context.Context, filter repository.EntryFilter) 
 	query := `
 		SELECT e.id, e.draw_id, e.user_id, e.number, e.amount, e.method, e.payment_reference, e.proof_key,
 		       e.status, e.confirmed_by, e.rejected_by, e.created_at, e.confirmed_at, e.rejected_at,
-		       u.name, u.phone
+		       u.name, u.phone, d.status, d.draw_id, d.deadline
 		FROM entries e
 		JOIN users u ON u.id = e.user_id
+ JOIN draws d ON d.id = e.draw_id
 		WHERE ($1::uuid IS NULL OR e.draw_id = $1)
 		  AND ($2::uuid IS NULL OR e.user_id = $2)
 		  AND ($3::text IS NULL OR e.status = $3)
@@ -99,7 +104,7 @@ func (r *entryRepo) FindByUserAndDraw(ctx context.Context, userID, drawID uuid.U
 func (r *entryRepo) IsNumberTaken(ctx context.Context, drawID uuid.UUID, number string) (bool, error) {
 	var exists bool
 	err := r.pool.QueryRow(ctx,
-		`SELECT EXISTS(SELECT 1 FROM entries WHERE draw_id = $1 AND number = $2 AND status = 'confirmed')`,
+		`SELECT EXISTS(SELECT 1 FROM entries WHERE draw_id = $1 AND number = $2 AND status IN ('pending', 'confirmed'))`,
 		drawID, number,
 	).Scan(&exists)
 	return exists, err
@@ -145,7 +150,7 @@ func (r *entryRepo) scanEntry(row interface {
 	err := row.Scan(
 		&e.ID, &e.DrawID, &e.UserID, &e.Number, &e.Amount, &e.Method, &e.PaymentReference, &e.ProofKey,
 		&e.Status, &e.ConfirmedBy, &e.RejectedBy, &e.CreatedAt, &e.ConfirmedAt, &e.RejectedAt,
-		&e.UserName, &e.UserPhone,
+		&e.UserName, &e.UserPhone, &e.DrawStatus, &e.DrawLabel, &e.DrawDeadline,
 	)
 	if err != nil {
 		return nil, err

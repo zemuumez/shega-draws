@@ -20,7 +20,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
-import { getUser, logout, getLocalStoredEntries, type StoredUser } from "@/lib/api";
+import { getUser, logout, getMyEntries, type StoredUser } from "@/lib/api";
 import { SignInModal } from "./SignInModal";
 import { ContactUsModal } from "./ContactUsModal";
 
@@ -50,16 +50,19 @@ export function Nav({
   const logoImage = siteSettings?.logoImageUrl || "/images/rimna-brand-logo.png";
 
   useEffect(() => {
-    const user = getUser();
-    setCurrentUser(user);
-    setIsProfileDropdownOpen(false);
-
-    if (user) {
-      const localTickets = getLocalStoredEntries();
-      if (localTickets.length > 0) {
-        setMyTicketsCount(localTickets.length);
-      }
-    }
+    let cancelled = false;
+    const sync = () => {
+      const user = getUser();
+      setCurrentUser(user);
+      setIsProfileDropdownOpen(false);
+      setMyTicketsCount(0);
+      if (user?.role === "player") getMyEntries().then(entries => {
+        if (!cancelled && getUser()?.id === user.id) setMyTicketsCount(entries.length);
+      }).catch(() => {});
+    };
+    sync();
+    window.addEventListener("player-session-changed", sync);
+    return () => { cancelled = true; window.removeEventListener("player-session-changed", sync); };
   }, [pathname]);
 
   if (pathname?.startsWith("/studio")) {

@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/shega-draws/backend/internal/domain"
 	"github.com/shega-draws/backend/internal/repository"
+	"github.com/shega-draws/backend/pkg/validator"
 )
 
 const (
@@ -33,9 +34,9 @@ type FileUploader interface {
 
 // EntryUseCase handles entry submission, confirmation, and rejection.
 type EntryUseCase struct {
-	entryRepo  repository.EntryRepository
-	drawRepo   repository.DrawRepository
-	uploader   FileUploader
+	entryRepo repository.EntryRepository
+	drawRepo  repository.DrawRepository
+	uploader  FileUploader
 }
 
 // NewEntryUseCase constructs an EntryUseCase.
@@ -55,7 +56,7 @@ func NewEntryUseCase(
 type SubmitEntryInput struct {
 	UserID           uuid.UUID
 	DrawID           uuid.UUID
-	Number           string               `validate:"required,len=2"`
+	Number           string               `validate:"required,len=2,number"`
 	Amount           int                  `validate:"required,gt=0"`
 	Method           domain.PaymentMethod `validate:"required,oneof=telebirr cbebirr bank"`
 	PaymentReference string               `validate:"required,min=6,max=32"`
@@ -65,6 +66,13 @@ type SubmitEntryInput struct {
 
 // SubmitEntry validates a new entry, uploads the proof image to S3, and persists the entry.
 func (uc *EntryUseCase) SubmitEntry(ctx context.Context, input SubmitEntryInput) (*domain.Entry, error) {
+	if input.UserID == uuid.Nil {
+		return nil, domain.ErrUnauthorized
+	}
+	input.PaymentReference = strings.ToUpper(strings.TrimSpace(input.PaymentReference))
+	if err := validator.Validate(input); err != nil {
+		return nil, err
+	}
 	// 1. Validate draw is open
 	draw, err := uc.drawRepo.FindByID(ctx, input.DrawID)
 	if err != nil {
@@ -74,6 +82,9 @@ func (uc *EntryUseCase) SubmitEntry(ctx context.Context, input SubmitEntryInput)
 		return nil, domain.ErrDrawNotOpen
 	}
 
+	if input.Amount != draw.TicketPrice {
+		return nil, &validator.ValidationError{Fields: map[string]string{"amount": "must match the draw ticket price"}}
+	}
 	// 2. Validate payment reference
 	cleanRef := strings.ToUpper(strings.TrimSpace(input.PaymentReference))
 	if cleanRef == "" || len(cleanRef) < 6 {
@@ -139,8 +150,11 @@ func (uc *EntryUseCase) SubmitEntry(ctx context.Context, input SubmitEntryInput)
 }
 
 // GetMyEntries returns all entries for a player in a specific draw.
-func (uc *EntryUseCase) GetMyEntries(ctx context.Context, userID, drawID uuid.UUID) ([]*domain.Entry, error) {
-	return uc.entryRepo.FindByUserAndDraw(ctx, userID, drawID)
+func (uc *EntryUseCase) GetMyEntries(ctx context.Context, userID uuid.UUID, drawID *uuid.UUID) ([]*domain.Entry, error) {
+	if userID == uuid.Nil {
+		return nil, domain.ErrUnauthorized
+	}
+	return uc.entryRepo.FindAll(ctx, repository.EntryFilter{UserID: &userID, DrawID: drawID})
 }
 
 // ListAllEntries returns all entries (admin use) with optional filtering.

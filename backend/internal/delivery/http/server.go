@@ -12,8 +12,8 @@ import (
 	goredis "github.com/redis/go-redis/v9"
 	"github.com/shega-draws/backend/internal/delivery/http/handler"
 	"github.com/shega-draws/backend/internal/delivery/http/middleware"
-	redisinfra "github.com/shega-draws/backend/internal/infrastructure/redis"
 	"github.com/shega-draws/backend/internal/domain"
+	redisinfra "github.com/shega-draws/backend/internal/infrastructure/redis"
 	"github.com/shega-draws/backend/internal/usecase"
 	pkgjwt "github.com/shega-draws/backend/pkg/jwt"
 )
@@ -49,23 +49,23 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	r.Use(globalRL.Middleware)
 
 	// ── Handler construction ──
-	authH   := handler.NewAuthHandler(cfg.AuthUC, cfg.RefreshExpiry)
-	drawH   := handler.NewDrawHandler(cfg.DrawUC)
-	entryH  := handler.NewEntryHandler(cfg.EntryUC)
+	authH := handler.NewAuthHandler(cfg.AuthUC, cfg.RefreshExpiry)
+	drawH := handler.NewDrawHandler(cfg.DrawUC)
+	entryH := handler.NewEntryHandler(cfg.EntryUC)
 	healthH := handler.NewHealthHandler(cfg.Pool, cfg.RedisClient)
 
 	// ── Route-specific rate limiters ──
-	authRL  := redisinfra.NewRateLimiter(cfg.RedisClient, cfg.RateLimitAuth, 15*time.Minute, "auth")
+	authRL := redisinfra.NewRateLimiter(cfg.RedisClient, cfg.RateLimitAuth, 15*time.Minute, "auth")
 	entryRL := redisinfra.NewRateLimiter(cfg.RedisClient, cfg.RateLimitEntrySubmit, 10*time.Minute, "entry_submit")
 
 	// ── Auth middleware ──
-	authenticate     := middleware.Authenticate(cfg.JWTManager)
-	requirePlayer    := middleware.RequireRole(domain.RolePlayer)
-	requireAdmin     := middleware.RequireRole(domain.RoleAdmin)
+	authenticate := middleware.Authenticate(cfg.JWTManager)
+	requirePlayer := middleware.RequireRole(domain.RolePlayer)
+	requireAdmin := middleware.RequireRole(domain.RoleAdmin)
 	requireSuperAdmin := middleware.RequireRole(domain.RoleSuperAdmin)
 
 	// ── Health ──
-	r.Get("/health",       healthH.Liveness)
+	r.Get("/health", healthH.Liveness)
 	r.Get("/health/ready", healthH.Readiness)
 
 	// ── API v1 ──
@@ -77,13 +77,13 @@ func NewRouter(cfg RouterConfig) http.Handler {
 			r.With(authRL.Middleware).Post("/player-login", authH.LoginPlayer)
 			r.With(authRL.Middleware).Post("/login", authH.LoginAdmin)
 			r.Post("/refresh", authH.Refresh)
-			r.With(authenticate).Post("/logout", authH.Logout)
+			r.Post("/logout", authH.Logout)
 			r.With(authenticate).Get("/me", authH.Me)
 		})
 
 		// Draws
 		r.Route("/draws", func(r chi.Router) {
-			r.Get("/", drawH.ListDraws)          // Public — list all draws
+			r.Get("/", drawH.ListDraws)           // Public — list all draws
 			r.Get("/active", drawH.GetActiveDraw) // Public — current active draw
 
 			r.Group(func(r chi.Router) {

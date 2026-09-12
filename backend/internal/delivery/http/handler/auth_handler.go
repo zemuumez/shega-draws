@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"github.com/google/uuid"
+	"github.com/shega-draws/backend/internal/domain"
 	"net/http"
 	"time"
 
@@ -27,6 +29,7 @@ func (h *AuthHandler) RegisterPlayer(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &input) {
 		return
 	}
+	input.Phone = usecase.NormalizePhone(input.Phone)
 	if err := validator.Validate(input); err != nil {
 		respondError(w, err)
 		return
@@ -56,6 +59,7 @@ func (h *AuthHandler) LoginPlayer(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &input) {
 		return
 	}
+	input.Phone = usecase.NormalizePhone(input.Phone)
 	if err := validator.Validate(input); err != nil {
 		respondError(w, err)
 		return
@@ -129,13 +133,16 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("refresh_token")
 	if err == nil {
-		_ = h.authUC.Logout(r.Context(), cookie.Value)
+		if err := h.authUC.Logout(r.Context(), cookie.Value); err != nil {
+			respondError(w, err)
+			return
+		}
 	}
 	// Clear the cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
-		Path:     "/",
+		Path:     "/api/v1/auth",
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   true,
@@ -151,10 +158,17 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 		respondError(w, errToUnauthorized("not authenticated"))
 		return
 	}
-	respond(w, http.StatusOK, map[string]interface{}{
-		"user_id": claims.UserID,
-		"role":    claims.Role,
-	})
+	id, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		respondError(w, domain.ErrUnauthorized)
+		return
+	}
+	user, err := h.authUC.GetUser(r.Context(), id)
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	respond(w, http.StatusOK, user)
 }
 
 // setRefreshCookie writes the refresh token as a secure, httpOnly cookie.
@@ -164,8 +178,8 @@ func (h *AuthHandler) setRefreshCookie(w http.ResponseWriter, token string) {
 		Value:    token,
 		Path:     "/api/v1/auth",
 		MaxAge:   int(h.refreshExpiry.Seconds()),
-		HttpOnly: true,   // Not accessible by JavaScript — XSS protection
-		Secure:   true,   // HTTPS only
+		HttpOnly: true, // Not accessible by JavaScript — XSS protection
+		Secure:   true, // HTTPS only
 		SameSite: http.SameSiteStrictMode,
 	})
 }

@@ -10,9 +10,10 @@ interface SignInModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (user: StoredUser) => void;
+  closeOnSuccess?: boolean;
 }
 
-export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
+export function SignInModal({ isOpen, onClose, onSuccess, closeOnSuccess = true }: SignInModalProps) {
   const { t, language } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [phone, setPhone] = useState("");
@@ -26,6 +27,8 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => { if (isOpen) { setSuccess(false); setError(""); setPin(""); } }, [isOpen]);
 
   if (!isOpen || !mounted) return null;
 
@@ -42,7 +45,7 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
       return;
     }
 
-    if (!pin.trim() || pin.trim().length < 4) {
+    if (!/^\d{4}$/.test(pin)) {
       setError(
         language === "ti"
           ? "በጃኹም እንተወሓደ ናይ 4 ድጂት ናይ ድሕንነት ፒን (PIN) ኣእትዉ"
@@ -66,14 +69,14 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
         setSuccess(true);
         setTimeout(() => {
           onSuccess?.(res.user);
-          onClose();
+          if (closeOnSuccess) onClose();
         }, 700);
       } else {
         const res = await loginPlayer(phone.trim(), pin.trim());
         setSuccess(true);
         setTimeout(() => {
           onSuccess?.(res.user);
-          onClose();
+          if (closeOnSuccess) onClose();
         }, 700);
       }
     } catch (err: any) {
@@ -301,7 +304,7 @@ export function SignInModal({ isOpen, onClose, onSuccess }: SignInModalProps) {
                 <input
                   type="password"
                   inputMode="numeric"
-                  maxLength={6}
+                  maxLength={4}
                   className="input-base"
                   placeholder="••••"
                   value={pin}

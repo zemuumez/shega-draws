@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/shega-draws/backend/pkg/validator"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,14 +27,24 @@ func NewDrawUseCase(drawRepo repository.DrawRepository, entryRepo repository.Ent
 
 // CreateDrawInput contains data required to create a new draw.
 type CreateDrawInput struct {
-	DrawID   string    `validate:"required"`
-	SanityID string    `validate:"required"`
-	Deadline time.Time `validate:"required"`
+	DrawID      string    `json:"draw_id" validate:"required"`
+	SanityID    string    `json:"sanity_id" validate:"required"`
+	TicketPrice int       `json:"ticket_price" validate:"gt=0"`
+	Deadline    time.Time `validate:"required"`
 }
 
 // CreateDraw creates a new draw, generating a secret seed and publishing its commitment.
 // Only one active (open) draw can exist at a time.
 func (uc *DrawUseCase) CreateDraw(ctx context.Context, input CreateDrawInput, actorID uuid.UUID) (*domain.Draw, error) {
+	if input.TicketPrice == 0 {
+		input.TicketPrice = 100
+	}
+	if err := validator.Validate(input); err != nil {
+		return nil, err
+	}
+	if !input.Deadline.After(time.Now()) {
+		return nil, domain.ErrDrawNotOpen
+	}
 	// Check for existing open draw
 	if _, err := uc.drawRepo.FindActive(ctx); err == nil {
 		return nil, domain.ErrDrawAlreadyOpen
@@ -45,14 +57,15 @@ func (uc *DrawUseCase) CreateDraw(ctx context.Context, input CreateDrawInput, ac
 	commitment := crypto.SHA256Hex(seed)
 
 	draw := &domain.Draw{
-		ID:         uuid.New(),
-		DrawID:     input.DrawID,
-		SanityID:   input.SanityID,
-		Seed:       &seed,
-		Commitment: commitment,
-		Status:     domain.DrawStatusOpen,
-		Deadline:   input.Deadline,
-		CreatedAt:  time.Now(),
+		TicketPrice: input.TicketPrice,
+		ID:          uuid.New(),
+		DrawID:      input.DrawID,
+		SanityID:    input.SanityID,
+		Seed:        &seed,
+		Commitment:  commitment,
+		Status:      domain.DrawStatusOpen,
+		Deadline:    input.Deadline,
+		CreatedAt:   time.Now(),
 	}
 
 	created, err := uc.drawRepo.Create(ctx, draw)
@@ -72,7 +85,23 @@ func (uc *DrawUseCase) CreateDraw(ctx context.Context, input CreateDrawInput, ac
 func (uc *DrawUseCase) GetActiveDraw(ctx context.Context) (*domain.Draw, error) {
 	draw, err := uc.drawRepo.FindActive(ctx)
 	if err != nil {
+		if errors.Is(err, domain.ErrDrawNotFound) {
+			return nil, domain.ErrDrawNotFound
+		}
+		return nil, err
+	}
+	if !draw.IsOpen() {
 		return nil, domain.ErrDrawNotFound
+	}
+	entries, err := uc.entryRepo.FindAll(ctx, repository.EntryFilter{DrawID: &draw.ID})
+	if err != nil {
+		return nil, err
+	}
+	draw.TakenNumbers = []string{}
+	for _, entry := range entries {
+		if entry.Status != domain.EntryStatusRejected {
+			draw.TakenNumbers = append(draw.TakenNumbers, entry.Number)
+		}
 	}
 	// Never expose the seed before reveal
 	draw.Seed = nil

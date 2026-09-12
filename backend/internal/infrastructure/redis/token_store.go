@@ -30,12 +30,12 @@ func (s *tokenStore) StoreRefreshToken(ctx context.Context, userID, tokenID stri
 	return s.client.Set(ctx, s.key(userID, tokenID), "1", ttl).Err()
 }
 
-func (s *tokenStore) IsRefreshTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
-	result, err := s.client.Exists(ctx, s.key(userID, tokenID)).Result()
-	if err != nil {
-		return false, err
+func (s *tokenStore) ConsumeRefreshToken(ctx context.Context, userID, tokenID string) (bool, error) {
+	_, err := s.client.GetDel(ctx, s.key(userID, tokenID)).Result()
+	if err == goredis.Nil {
+		return false, nil
 	}
-	return result > 0, nil
+	return err == nil, err
 }
 
 func (s *tokenStore) RevokeRefreshToken(ctx context.Context, userID, tokenID string) error {
@@ -64,4 +64,13 @@ func NewClient(addr, password string, db int) (*goredis.Client, error) {
 
 	log.Info().Str("addr", addr).Msg("Redis connection established")
 	return client, nil
+}
+
+// A fixed per-account window prevents bypassing the PIN limit by changing IP.
+func (s *tokenStore) AllowPlayerLogin(ctx context.Context, phone string) (bool, error) {
+	count, err := s.client.Eval(ctx, `
+ local count = redis.call('INCR', KEYS[1])
+ if count == 1 then redis.call('EXPIRE', KEYS[1], 900) end
+ return count`, []string{"player_login:" + phone}).Int()
+	return count <= 5, err
 }

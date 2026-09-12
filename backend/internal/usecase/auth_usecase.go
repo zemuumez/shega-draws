@@ -5,7 +5,9 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,24 +15,26 @@ import (
 	"github.com/shega-draws/backend/internal/domain"
 	"github.com/shega-draws/backend/internal/repository"
 	"github.com/shega-draws/backend/pkg/jwt"
+	"github.com/shega-draws/backend/pkg/validator"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // TokenStore is an interface to Redis for refresh token management.
 type TokenStore interface {
+	AllowPlayerLogin(ctx context.Context, phone string) (bool, error)
 	// StoreRefreshToken saves a refresh token JTI with TTL.
 	StoreRefreshToken(ctx context.Context, userID, tokenID string, ttl time.Duration) error
-	// IsRefreshTokenValid checks existence (non-revoked) of a token JTI.
-	IsRefreshTokenValid(ctx context.Context, userID, tokenID string) (bool, error)
+	// ConsumeRefreshToken atomically validates and removes a token JTI.
+	ConsumeRefreshToken(ctx context.Context, userID, tokenID string) (bool, error)
 	// RevokeRefreshToken deletes a token JTI (logout).
 	RevokeRefreshToken(ctx context.Context, userID, tokenID string) error
 }
 
 // AuthUseCase handles all authentication flows.
 type AuthUseCase struct {
-	userRepo     repository.UserRepository
-	jwtManager   *jwt.Manager
-	tokenStore   TokenStore
+	userRepo      repository.UserRepository
+	jwtManager    *jwt.Manager
+	tokenStore    TokenStore
 	refreshExpiry time.Duration
 }
 
@@ -42,9 +46,9 @@ func NewAuthUseCase(
 	refreshExpiry time.Duration,
 ) *AuthUseCase {
 	return &AuthUseCase{
-		userRepo:     userRepo,
-		jwtManager:   jwtManager,
-		tokenStore:   tokenStore,
+		userRepo:      userRepo,
+		jwtManager:    jwtManager,
+		tokenStore:    tokenStore,
 		refreshExpiry: refreshExpiry,
 	}
 }
@@ -55,7 +59,7 @@ const dummyBcryptHash = "$2a$12$e8Yk2uRk2qT1.Hk2Vf9V.uO2qR8N5G9r4P5s6T7u8V9w0x1y
 type RegisterPlayerInput struct {
 	Name  string `validate:"required,min=2,max=100"`
 	Phone string `validate:"required,e164"`
-	PIN   string `validate:"required,len=4,numeric"`
+	PIN   string `validate:"required,len=4,number"`
 }
 
 // TokenPair holds both access and refresh tokens.
@@ -66,6 +70,12 @@ type TokenPair struct {
 
 // RegisterPlayer creates a player account with a bcrypt-hashed PIN and issues tokens.
 func (uc *AuthUseCase) RegisterPlayer(ctx context.Context, input RegisterPlayerInput) (*TokenPair, *domain.User, error) {
+	input.Phone = NormalizePhone(input.Phone)
+	input.Name = strings.TrimSpace(input.Name)
+	if err := validator.Validate(input); err != nil {
+		return nil, nil, err
+	}
+
 	exists, err := uc.userRepo.ExistsByPhone(ctx, input.Phone)
 	if err != nil {
 		return nil, nil, fmt.Errorf("checking phone existence: %w", err)
@@ -107,18 +117,34 @@ func (uc *AuthUseCase) RegisterPlayer(ctx context.Context, input RegisterPlayerI
 // LoginPlayerInput is used for player login with 4-digit PIN.
 type LoginPlayerInput struct {
 	Phone string `validate:"required,e164"`
-	PIN   string `validate:"required,len=4,numeric"`
+	PIN   string `validate:"required,len=4,number"`
 }
 
 // LoginPlayer authenticates a player by phone and bcrypt-hashed PIN with anti-enumeration protection.
 func (uc *AuthUseCase) LoginPlayer(ctx context.Context, input LoginPlayerInput) (*TokenPair, *domain.User, error) {
+	input.Phone = NormalizePhone(input.Phone)
+	if err := validator.Validate(input); err != nil {
+		return nil, nil, err
+	}
+
+	allowed, err := uc.tokenStore.AllowPlayerLogin(ctx, input.Phone)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !allowed {
+		return nil, nil, domain.ErrTooManyAttempts
+	}
+
 	user, err := uc.userRepo.FindByPhone(ctx, input.Phone)
 	if err != nil {
+		if !errors.Is(err, domain.ErrUserNotFound) {
+			return nil, nil, err
+		}
 		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.PIN))
 		return nil, nil, domain.ErrInvalidCredentials
 	}
 
-	if user.PasswordHash == nil {
+	if user.Role != domain.RolePlayer || user.PasswordHash == nil {
 		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.PIN))
 		return nil, nil, domain.ErrInvalidCredentials
 	}
@@ -146,6 +172,9 @@ type LoginAdminInput struct {
 func (uc *AuthUseCase) LoginAdmin(ctx context.Context, input LoginAdminInput) (*TokenPair, *domain.User, error) {
 	user, err := uc.userRepo.FindByPhone(ctx, input.Phone)
 	if err != nil {
+		if !errors.Is(err, domain.ErrUserNotFound) {
+			return nil, nil, err
+		}
 		_ = bcrypt.CompareHashAndPassword([]byte(dummyBcryptHash), []byte(input.Password))
 		return nil, nil, domain.ErrInvalidCredentials
 	}
@@ -186,13 +215,13 @@ func (uc *AuthUseCase) RefreshTokens(ctx context.Context, input RefreshInput) (*
 		return nil, err
 	}
 
-	valid, err := uc.tokenStore.IsRefreshTokenValid(ctx, claims.UserID, claims.TokenID)
-	if err != nil || !valid {
+	valid, err := uc.tokenStore.ConsumeRefreshToken(ctx, claims.UserID, claims.TokenID)
+	if err != nil {
+		return nil, err
+	}
+	if !valid {
 		return nil, domain.ErrTokenInvalid
 	}
-
-	// Revoke old token (rotation)
-	_ = uc.tokenStore.RevokeRefreshToken(ctx, claims.UserID, claims.TokenID)
 
 	userID, err := uuid.Parse(claims.UserID)
 	if err != nil {
@@ -233,4 +262,23 @@ func (uc *AuthUseCase) issueTokens(ctx context.Context, user *domain.User) (*Tok
 	}
 
 	return &TokenPair{AccessToken: accessToken, RefreshToken: refreshToken}, nil
+}
+
+// NormalizePhone accepts Ethiopian local numbers and international E.164 input.
+func NormalizePhone(phone string) string {
+	phone = strings.NewReplacer(" ", "", "-", "", "(", "", ")", "").Replace(strings.TrimSpace(phone))
+	if len(phone) == 10 && (strings.HasPrefix(phone, "09") || strings.HasPrefix(phone, "07")) {
+		return "+251" + phone[1:]
+	}
+	if strings.HasPrefix(phone, "00") {
+		return "+" + phone[2:]
+	}
+	if len(phone) == 12 && strings.HasPrefix(phone, "251") {
+		return "+" + phone
+	}
+	return phone
+}
+
+func (uc *AuthUseCase) GetUser(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+	return uc.userRepo.FindByID(ctx, id)
 }

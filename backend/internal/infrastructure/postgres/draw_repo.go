@@ -25,15 +25,15 @@ func NewDrawRepository(pool *pgxpool.Pool) repository.DrawRepository {
 
 func (r *drawRepo) Create(ctx context.Context, draw *domain.Draw) (*domain.Draw, error) {
 	query := `
-		INSERT INTO draws (id, draw_id, sanity_id, seed, commitment, status, deadline, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		RETURNING id, draw_id, sanity_id, commitment, status, deadline, created_at`
+		INSERT INTO draws (id, draw_id, sanity_id, seed, commitment, status, deadline, created_at, ticket_price)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		RETURNING id, draw_id, sanity_id, commitment, status, deadline, created_at, ticket_price`
 
 	var d domain.Draw
 	err := r.pool.QueryRow(ctx, query,
 		draw.ID, draw.DrawID, draw.SanityID, draw.Seed,
-		draw.Commitment, string(draw.Status), draw.Deadline, draw.CreatedAt,
-	).Scan(&d.ID, &d.DrawID, &d.SanityID, &d.Commitment, &d.Status, &d.Deadline, &d.CreatedAt)
+		draw.Commitment, string(draw.Status), draw.Deadline, draw.CreatedAt, draw.TicketPrice,
+	).Scan(&d.ID, &d.DrawID, &d.SanityID, &d.Commitment, &d.Status, &d.Deadline, &d.CreatedAt, &d.TicketPrice)
 	if err != nil {
 		return nil, fmt.Errorf("inserting draw: %w", err)
 	}
@@ -43,7 +43,7 @@ func (r *drawRepo) Create(ctx context.Context, draw *domain.Draw) (*domain.Draw,
 func (r *drawRepo) FindByID(ctx context.Context, id uuid.UUID) (*domain.Draw, error) {
 	query := `
 		SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,
-		       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by
+		       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by, ticket_price
 		FROM draws WHERE id = $1`
 
 	return r.scanDraw(r.pool.QueryRow(ctx, query, id))
@@ -55,13 +55,13 @@ func (r *drawRepo) List(ctx context.Context, status *domain.DrawStatus) ([]*doma
 	if status != nil {
 		query = `
 			SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,
-			       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by
+			       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by, ticket_price
 			FROM draws WHERE status = $1 ORDER BY created_at DESC`
 		args = append(args, string(*status))
 	} else {
 		query = `
 			SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,
-			       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by
+			       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by, ticket_price
 			FROM draws ORDER BY created_at DESC`
 	}
 
@@ -77,7 +77,7 @@ func (r *drawRepo) List(ctx context.Context, status *domain.DrawStatus) ([]*doma
 		var winningNumbersJSON []byte
 		err := rows.Scan(
 			&d.ID, &d.DrawID, &d.SanityID, &d.Seed, &d.Commitment, &d.Status, &d.Deadline,
-			&winningNumbersJSON, &d.CreatedAt, &d.ClosedAt, &d.RevealedAt, &d.ClosedBy, &d.RevealedBy,
+			&winningNumbersJSON, &d.CreatedAt, &d.ClosedAt, &d.RevealedAt, &d.ClosedBy, &d.RevealedBy, &d.TicketPrice,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("scanning draw in list: %w", err)
@@ -93,7 +93,7 @@ func (r *drawRepo) List(ctx context.Context, status *domain.DrawStatus) ([]*doma
 func (r *drawRepo) FindActive(ctx context.Context) (*domain.Draw, error) {
 	query := `
 		SELECT id, draw_id, sanity_id, seed, commitment, status, deadline,
-		       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by
+		       winning_numbers, created_at, closed_at, revealed_at, closed_by, revealed_by, ticket_price
 		FROM draws WHERE status = 'open' ORDER BY created_at DESC LIMIT 1`
 
 	draw, err := r.scanDraw(r.pool.QueryRow(ctx, query))
@@ -136,7 +136,7 @@ func (r *drawRepo) scanDraw(row pgx.Row) (*domain.Draw, error) {
 	var winningNumbersJSON []byte
 	err := row.Scan(
 		&d.ID, &d.DrawID, &d.SanityID, &d.Seed, &d.Commitment, &d.Status, &d.Deadline,
-		&winningNumbersJSON, &d.CreatedAt, &d.ClosedAt, &d.RevealedAt, &d.ClosedBy, &d.RevealedBy,
+		&winningNumbersJSON, &d.CreatedAt, &d.ClosedAt, &d.RevealedAt, &d.ClosedBy, &d.RevealedBy, &d.TicketPrice,
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, domain.ErrDrawNotFound

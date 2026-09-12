@@ -26,18 +26,20 @@ var roleOrder = map[Role]int{
 
 // AtLeast returns true if r has at least the same privilege level as min.
 func (r Role) AtLeast(min Role) bool {
-	return roleOrder[r] >= roleOrder[min]
+	rank, valid := roleOrder[r]
+	minimum, validMin := roleOrder[min]
+	return valid && validMin && rank >= minimum
 }
 
 // User is the core user entity.
 type User struct {
-	ID           uuid.UUID  `json:"id"`
-	Name         string     `json:"name"`
-	Phone        string     `json:"phone"`
-	Role         Role       `json:"role"`
-	PasswordHash *string    `json:"-"` // Only set for admin/superadmin
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Phone        string    `json:"phone"`
+	Role         Role      `json:"role"`
+	PasswordHash *string   `json:"-"` // Only set for admin/superadmin
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // IsAdmin returns true if the user has admin or higher privileges.

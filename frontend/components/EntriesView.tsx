@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
-import { getActiveDraw, getMyEntries, getUser, loginPlayer, registerPlayer, clearTokens, type Entry, type StoredUser } from "@/lib/api";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { getCurrentDraw, getCurrentPlayer, getMyEntries, getUser, loginPlayer, registerPlayer, logout, PlayerAPIError, type DrawState, type Entry, type StoredUser } from "@/lib/api";
+import { BuyTicketModal } from "@/components/BuyTicketModal";
 import { EntryTicket } from "@/components/EntryTicket";
 import {
   Ticket,
@@ -33,13 +34,17 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
   const { t, language } = useLanguage();
   const pageT = t.entriesPage;
 
+  const [activeDraw, setActiveDraw] = useState<DrawState | null>(null);
+  const [buyOpen, setBuyOpen] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const requestVersion = useRef(0);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [user, setUserState] = useState<StoredUser | null>(null);
 
-  // Active filter tab: 'all' | 'confirmed' | 'pending' | 'won'
-  const [activeTab, setActiveTab] = useState<"all" | "confirmed" | "pending" | "won">("all");
+  // Filter history by draw lifecycle or payment status.
+  const [activeTab, setActiveTab] = useState<"all" | "confirmed" | "pending" | "current" | "previous">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Login / Register Form state (when unauthenticated)
@@ -50,30 +55,46 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
 
-  const loadEntries = async (currentUser: StoredUser, isSilent = false) => {
+  const loadEntries = async (_currentUser?: StoredUser, isSilent = false) => {
+    const version = ++requestVersion.current;
     if (!isSilent) setLoading(true);
     else setRefreshing(true);
-
+    setLoadError("");
     try {
-      const active = await getActiveDraw().catch(() => null);
-      const userEntries = await getMyEntries(active?.id, currentUser.phone);
+      const verifiedUser = await getCurrentPlayer();
+      if (version !== requestVersion.current) return;
+      setUserState(verifiedUser);
+      const [userEntries, active] = await Promise.all([getMyEntries(), getCurrentDraw()]);
+      if (version !== requestVersion.current) return;
       setEntries(userEntries);
-    } catch (e: any) {
-      console.warn("Could not load remote entries:", e);
+      setActiveDraw(active);
+    } catch (error) {
+      if (version !== requestVersion.current) return;
+      setEntries([]);
+      setActiveDraw(null);
+      if (error instanceof PlayerAPIError && error.status === 401) setUserState(null);
+      else setLoadError(error instanceof Error ? error.message : "Unable to load tickets. Please try again.");
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (version === requestVersion.current) { setLoading(false); setRefreshing(false); }
     }
   };
 
   useEffect(() => {
-    const currentUser = getUser();
-    setUserState(currentUser);
-    if (currentUser) {
-      loadEntries(currentUser);
-    } else {
-      setLoading(false);
-    }
+    void loadEntries();
+    let sessionID = getUser()?.id;
+    const handleSession = () => {
+      const current = getUser();
+      if (current?.id === sessionID) return;
+      sessionID = current?.id;
+      ++requestVersion.current;
+      setUserState(null); setEntries([]); setActiveDraw(null); setBuyOpen(false);
+      setLoading(false); setRefreshing(false);
+      if (current) void loadEntries();
+    };
+    window.addEventListener("player-session-changed", handleSession);
+    window.addEventListener("storage", handleSession);
+    const invalidate = () => { ++requestVersion.current; };
+    return () => { invalidate(); window.removeEventListener("player-session-changed", handleSession); window.removeEventListener("storage", handleSession); };
   }, []);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -89,7 +110,7 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
       return;
     }
 
-    if (!loginPin.trim() || loginPin.trim().length < 4) {
+    if (!/^\d{4}$/.test(loginPin)) {
       setAuthError(
         language === "ti"
           ? "በጃኹም እንተወሓደ ናይ 4 ድጂት ናይ ድሕንነት ፒን (PIN) ኣእትዉ"
@@ -131,10 +152,9 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
     }
   };
 
-  const handleLogout = () => {
-    clearTokens();
-    setUserState(null);
-    setEntries([]);
+  const handleLogout = async () => {
+    try { await logout(); setUserState(null); setEntries([]); }
+    catch (error) { setLoadError(error instanceof Error ? error.message : "Unable to sign out"); }
   };
 
   // Stats calculation
@@ -146,6 +166,9 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
   // Filtered entries
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
+      // Draw lifecycle and payment status are independent filters.
+      if (activeTab === "current" && entry.draw_status === "revealed") return false;
+      if (activeTab === "previous" && entry.draw_status !== "revealed") return false;
       // Tab filter
       if (activeTab === "confirmed" && entry.status !== "confirmed") return false;
       if (activeTab === "pending" && (entry.status === "confirmed" || entry.status === "rejected")) return false;
@@ -154,7 +177,7 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         const matchesNumber = entry.number.includes(query);
-        const matchesDraw = (entry.draw_id || "").toLowerCase().includes(query);
+        const matchesDraw = (entry.draw_label || entry.draw_id || "").toLowerCase().includes(query);
         const matchesMethod = (entry.method || "").toLowerCase().includes(query);
         if (!matchesNumber && !matchesDraw && !matchesMethod) return false;
       }
@@ -165,6 +188,17 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
 
   return (
     <div style={{ position: "relative", zIndex: 2, paddingBottom: 90 }}>
+      {loadError && <div role="alert" style={{ padding: 20, color: "#FCA5A5" }}>{loadError} <button onClick={() => loadEntries()}>Try again</button></div>}
+      {user && !loading && !loadError && <section style={{ maxWidth: 1156, margin: "24px auto", padding: 24, background: "#0F172A", border: "1px solid #FDE047", borderRadius: 16, color: "white" }}>
+        <h2>Current draw</h2>
+        {activeDraw ? <>
+          <p>{activeDraw.draw_id} · {activeDraw.ticket_price} ETB per ticket</p>
+          <p>Entries close {new Date(activeDraw.deadline).toLocaleString()}</p>
+          <button className="casino-btn-red" onClick={() => setBuyOpen(true)}>Buy a ticket</button>
+        </> : <p>There is no draw open for ticket purchases right now.</p>}
+      </section>}
+      {activeDraw && <BuyTicketModal isOpen={buyOpen} onClose={() => { setBuyOpen(false); void loadEntries(undefined, true); }} initialDrawId={activeDraw.id} initialPrice={activeDraw.ticket_price} initialPoolSize={100} siteSettings={siteSettings} />}
+
       {/* ── 1. Dashboard Header Banner ─────────────────────────────────── */}
       <section
         style={{
@@ -407,7 +441,7 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
                 <input
                   type="password"
                   inputMode="numeric"
-                  maxLength={6}
+                  maxLength={4}
                   value={loginPin}
                   onChange={(e) => setLoginPin(e.target.value)}
                   placeholder="••••"
@@ -658,6 +692,8 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {[
                   { id: "all", label: `${pageT?.tabAll || "All Tickets"} (${totalCount})` },
+                  { id: "current", label: "Current tickets" },
+                  { id: "previous", label: "Previous tickets" },
                   { id: "confirmed", label: `🟢 ${pageT?.tabActive || "Confirmed"} (${confirmedCount})` },
                   { id: "pending", label: `🟡 ${pageT?.tabPending || "Pending"} (${pendingCount})` },
                 ].map((tab) => (
@@ -713,7 +749,7 @@ export function EntriesView({ siteSettings }: EntriesViewProps) {
                   {language === "ti" ? "ቲኬታት ይጽዓን ኣሎ..." : language === "am" ? "ቲኬቶችዎ በመጫን ላይ ናቸው..." : "Loading your confirmed draw tickets..."}
                 </p>
               </div>
-            ) : filteredEntries.length === 0 ? (
+            ) : loadError ? null : filteredEntries.length === 0 ? (
               <div
                 style={{
                   maxWidth: 500,

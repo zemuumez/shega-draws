@@ -13,7 +13,7 @@ interface NumberPickerProps {
 export function NumberPicker({
   value,
   onChange,
-  poolSize = 1000,
+  poolSize = 100,
   takenNumbers = [],
 }: NumberPickerProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,24 +23,16 @@ export function NumberPicker({
   const PAGE_SIZE = 100;
   const totalPages = Math.ceil(poolSize / PAGE_SIZE);
 
-  // Generate simulated realistic taken numbers if none passed (e.g. ~20% sold)
-  const effectiveTaken = useMemo(() => {
-    if (takenNumbers.length > 0) return new Set(takenNumbers);
-    const mockSet = new Set<string>();
-    const sample = [3, 7, 13, 21, 42, 77, 88, 99, 107, 142, 200, 250, 333, 404, 500, 666, 777, 888, 999, 1000, 1234, 1500, 1777, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
-    sample.forEach((n) => {
-      if (n <= poolSize) mockSet.add(String(n));
-    });
-    return mockSet;
-  }, [takenNumbers, poolSize]);
+  // Availability comes from the active draw; an empty list means no reservations.
+  const effectiveTaken = useMemo(() => new Set(takenNumbers.map(n => String(Number(n)).padStart(2, "0"))), [takenNumbers]);
 
   // Current page numbers
   const pageNumbers = useMemo(() => {
     if (searchQuery.trim()) {
       const q = searchQuery.trim();
       const results: number[] = [];
-      for (let i = 1; i <= poolSize; i++) {
-        if (String(i).includes(q)) {
+      for (let i = 0; i < poolSize; i++) {
+        if (String(i).padStart(2, "0").includes(q)) {
           results.push(i);
           if (results.length >= 200) break;
         }
@@ -48,8 +40,8 @@ export function NumberPicker({
       return results;
     }
 
-    const start = currentPage * PAGE_SIZE + 1;
-    const end = Math.min(poolSize, start + PAGE_SIZE - 1);
+    const start = currentPage * PAGE_SIZE;
+    const end = Math.min(poolSize - 1, start + PAGE_SIZE - 1);
     const nums: number[] = [];
     for (let i = start; i <= end; i++) {
       nums.push(i);
@@ -62,18 +54,18 @@ export function NumberPicker({
     setIsRolling(true);
     let count = 0;
     const interval = setInterval(() => {
-      const rand = Math.floor(Math.random() * poolSize) + 1;
-      onChange(String(rand));
+      const rand = Math.floor(Math.random() * poolSize);
+      onChange(String(rand).padStart(2, "0"));
       count++;
       if (count >= 10) {
         clearInterval(interval);
         setIsRolling(false);
-        let finalNum = Math.floor(Math.random() * poolSize) + 1;
-        while (effectiveTaken.has(String(finalNum)) && effectiveTaken.size < poolSize) {
-          finalNum = Math.floor(Math.random() * poolSize) + 1;
+        let finalNum = Math.floor(Math.random() * poolSize);
+        while (effectiveTaken.has(String(finalNum).padStart(2, "0")) && effectiveTaken.size < poolSize) {
+          finalNum = Math.floor(Math.random() * poolSize);
         }
-        onChange(String(finalNum));
-        setCurrentPage(Math.floor((finalNum - 1) / PAGE_SIZE));
+        onChange(String(finalNum).padStart(2, "0"));
+        setCurrentPage(Math.floor(finalNum / PAGE_SIZE));
       }
     }, 45);
   };
@@ -143,7 +135,7 @@ export function NumberPicker({
                 </div>
               ) : null}
               <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}>
-                Pool Range: #1 to #{poolSize.toLocaleString()}
+                Pool Range: #00 to #{poolSize - 1}
               </span>
             </div>
           </div>
@@ -176,7 +168,7 @@ export function NumberPicker({
           <Search size={14} color="#94A3B8" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
-            placeholder={`Type specific number (1 - ${poolSize.toLocaleString()})...`}
+            placeholder={`Type specific number (00 - ${poolSize - 1})...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -220,7 +212,7 @@ export function NumberPicker({
             </button>
 
             <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", padding: "0 6px" }}>
-              #{currentPage * PAGE_SIZE + 1} – #{Math.min(poolSize, (currentPage + 1) * PAGE_SIZE)}
+              #{currentPage * PAGE_SIZE} – #{Math.min(poolSize - 1, (currentPage + 1) * PAGE_SIZE - 1)}
             </span>
 
             <button
@@ -285,15 +277,15 @@ export function NumberPicker({
           }}
         >
           {pageNumbers.map((num) => {
-            const isSelected = String(num) === value;
-            const isTaken = effectiveTaken.has(String(num));
+            const isSelected = String(num).padStart(2, "0") === value;
+            const isTaken = effectiveTaken.has(String(num).padStart(2, "0"));
 
             return (
               <button
-                key={num}
+                key={String(num).padStart(2, "0")}
                 type="button"
                 disabled={isTaken}
-                onClick={() => onChange(String(num))}
+                onClick={() => onChange(String(num).padStart(2, "0"))}
                 style={{
                   height: 38,
                   borderRadius: 8,
@@ -316,7 +308,7 @@ export function NumberPicker({
                   transition: "all 150ms ease",
                 }}
               >
-                {num}
+                {String(num).padStart(2, "0")}
               </button>
             );
           })}

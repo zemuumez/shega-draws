@@ -30,9 +30,18 @@ func respondError(w http.ResponseWriter, err error) {
 		return
 	}
 
+	var de *domainErr
+	if errors.As(err, &de) {
+		respond(w, de.status, map[string]string{"error": de.msg})
+		return
+	}
+
 	// Domain sentinel errors
 	status := http.StatusInternalServerError
 	switch {
+	case errors.Is(err, domain.ErrTooManyAttempts):
+		status = http.StatusTooManyRequests
+		w.Header().Set("Retry-After", "900")
 	case errors.Is(err, domain.ErrInvalidCredentials):
 		status = http.StatusUnauthorized
 	case errors.Is(err, domain.ErrUnauthorized), errors.Is(err, domain.ErrTokenExpired), errors.Is(err, domain.ErrTokenInvalid):
@@ -51,7 +60,11 @@ func respondError(w http.ResponseWriter, err error) {
 		status = http.StatusBadRequest
 	}
 
-	respond(w, status, map[string]string{"error": err.Error()})
+	message := err.Error()
+	if status == http.StatusInternalServerError {
+		message = "internal server error"
+	}
+	respond(w, status, map[string]string{"error": message})
 }
 
 // decodeJSON decodes the request body into v, returning false and writing an error if it fails.

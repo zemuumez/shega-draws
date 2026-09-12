@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/server/require-admin";
 import { NextResponse } from "next/server";
 import { sanityClient, getSanityWriteClient } from "@/lib/sanity/client";
 
@@ -30,6 +31,8 @@ export interface ScreenshotEntrySummary {
  *  - status: pending | confirmed | rejected
  */
 export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(request.url);
     const drawId = searchParams.get("drawId");
@@ -128,6 +131,8 @@ export async function GET(request: Request) {
  * }
  */
 export async function DELETE(request: Request) {
+  const denied = await requireAdmin(request);
+  if (denied) return denied;
   try {
     const writeClient = getSanityWriteClient();
     if (!writeClient) {

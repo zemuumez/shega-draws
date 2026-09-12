@@ -5,6 +5,7 @@ import "errors"
 // Sentinel domain errors — use errors.Is() for matching.
 var (
 	// Auth
+	ErrTooManyAttempts    = errors.New("too many login attempts; please try again in 15 minutes")
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrUnauthorized       = errors.New("unauthorized")
 	ErrForbidden          = errors.New("forbidden: insufficient role")
@@ -23,14 +24,14 @@ var (
 	ErrDrawAlreadyRevld = errors.New("draw has already been revealed")
 
 	// Entry
-	ErrEntryNotFound        = errors.New("entry not found")
-	ErrNumberTaken          = errors.New("number already taken by a confirmed entry in this draw")
-	ErrEntryAlreadyActed    = errors.New("entry has already been confirmed or rejected")
-	ErrPaymentRefDuplicate  = errors.New("payment transaction reference has already been submitted")
-	ErrPaymentRefRequired   = errors.New("payment transaction reference is required")
-	ErrProofRequired        = errors.New("payment proof image is required")
-	ErrProofTooLarge        = errors.New("payment proof exceeds maximum allowed size (5 MB)")
-	ErrProofInvalidType     = errors.New("payment proof must be a JPEG, PNG, or WEBP image")
+	ErrEntryNotFound       = errors.New("entry not found")
+	ErrNumberTaken         = errors.New("number already taken by a confirmed entry in this draw")
+	ErrEntryAlreadyActed   = errors.New("entry has already been confirmed or rejected")
+	ErrPaymentRefDuplicate = errors.New("payment transaction reference has already been submitted")
+	ErrPaymentRefRequired  = errors.New("payment transaction reference is required")
+	ErrProofRequired       = errors.New("payment proof image is required")
+	ErrProofTooLarge       = errors.New("payment proof exceeds maximum allowed size (5 MB)")
+	ErrProofInvalidType    = errors.New("payment proof must be a JPEG, PNG, or WEBP image")
 
 	// General
 	ErrInternalServer = errors.New("internal server error")

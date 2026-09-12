@@ -29,10 +29,10 @@ type RefreshClaims struct {
 
 // Manager handles JWT operations with RS256 keys.
 type Manager struct {
-	privateKey          *rsa.PrivateKey
-	publicKey           *rsa.PublicKey
-	accessTokenExpiry   time.Duration
-	refreshTokenExpiry  time.Duration
+	privateKey         *rsa.PrivateKey
+	publicKey          *rsa.PublicKey
+	accessTokenExpiry  time.Duration
+	refreshTokenExpiry time.Duration
 }
 
 // NewManager initialises a JWT Manager from PEM key files.
@@ -104,7 +104,7 @@ func (m *Manager) ValidateAccessToken(tokenStr string) (*Claims, error) {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 		return m.publicKey, nil
-	})
+	}, gojwt.WithValidMethods([]string{"RS256"}), gojwt.WithIssuer("shega-draws"), gojwt.WithExpirationRequired())
 	if err != nil {
 		if errors.Is(err, gojwt.ErrTokenExpired) {
 			return nil, domain.ErrTokenExpired
@@ -113,6 +113,12 @@ func (m *Manager) ValidateAccessToken(tokenStr string) (*Claims, error) {
 	}
 	claims, ok := token.Claims.(*Claims)
 	if !ok || !token.Valid {
+		return nil, domain.ErrTokenInvalid
+	}
+	if _, err := uuid.Parse(claims.UserID); err != nil {
+		return nil, domain.ErrTokenInvalid
+	}
+	if claims.Role != domain.RolePlayer && claims.Role != domain.RoleAdmin && claims.Role != domain.RoleSuperAdmin {
 		return nil, domain.ErrTokenInvalid
 	}
 	return claims, nil
@@ -125,7 +131,7 @@ func (m *Manager) ValidateRefreshToken(tokenStr string) (*RefreshClaims, error) 
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 		return m.publicKey, nil
-	})
+	}, gojwt.WithValidMethods([]string{"RS256"}), gojwt.WithIssuer("shega-draws"), gojwt.WithExpirationRequired())
 	if err != nil {
 		if errors.Is(err, gojwt.ErrTokenExpired) {
 			return nil, domain.ErrTokenExpired
@@ -134,6 +140,12 @@ func (m *Manager) ValidateRefreshToken(tokenStr string) (*RefreshClaims, error) 
 	}
 	claims, ok := token.Claims.(*RefreshClaims)
 	if !ok || !token.Valid {
+		return nil, domain.ErrTokenInvalid
+	}
+	if _, err := uuid.Parse(claims.UserID); err != nil {
+		return nil, domain.ErrTokenInvalid
+	}
+	if _, err := uuid.Parse(claims.TokenID); err != nil {
 		return nil, domain.ErrTokenInvalid
 	}
 	return claims, nil

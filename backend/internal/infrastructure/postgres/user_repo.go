@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/shega-draws/backend/internal/domain"
 	"github.com/shega-draws/backend/internal/repository"
@@ -34,6 +35,10 @@ func (r *userRepo) Create(ctx context.Context, user *domain.User) (*domain.User,
 		user.PasswordHash, user.CreatedAt, user.UpdatedAt,
 	).Scan(&u.ID, &u.Name, &u.Phone, &u.Role, &u.PasswordHash, &u.CreatedAt, &u.UpdatedAt)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, domain.ErrUserAlreadyExists
+		}
 		return nil, fmt.Errorf("inserting user: %w", err)
 	}
 	return &u, nil

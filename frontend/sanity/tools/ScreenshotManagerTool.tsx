@@ -1,4 +1,5 @@
 "use client";
+import { getAccessToken } from "@/lib/api";
 
 import React, { useState, useEffect, useCallback } from "react";
 import JSZip from "jszip";
@@ -62,7 +63,7 @@ export function ScreenshotManagerTool() {
       if (selectedPrice !== "all") params.set("amount", selectedPrice);
       if (selectedStatus !== "all") params.set("status", selectedStatus);
 
-      const res = await fetch(`/api/admin/screenshots?${params.toString()}`);
+      const res = await fetch(`/api/admin/screenshots?${params.toString()}`, { headers: { Authorization: `Bearer ${getAccessToken() || ""}` } });
       const data = await res.json();
       if (data.success) {
         setItems(data.entries || []);
@@ -165,7 +166,7 @@ export function ScreenshotManagerTool() {
     try {
       const res = await fetch("/api/admin/screenshots", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getAccessToken() || ""}` },
         body: JSON.stringify({
           ...payload,
           deleteAssets: true,
