@@ -8,17 +8,17 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/config"
 )
 
 // S3Uploader wraps AWS S3 / MinIO for proof image management.
 type S3Uploader struct {
-	client         *s3.Client
-	presignClient  *s3.PresignClient
-	bucket         string
-	presignExpiry  time.Duration
+	client        *s3.Client
+	presignClient *s3.PresignClient
+	bucket        string
+	presignExpiry time.Duration
 }
 
 // NewS3Uploader creates an S3Uploader configured for S3-compatible storage (incl. MinIO).
@@ -59,8 +59,8 @@ func (u *S3Uploader) Upload(ctx context.Context, key string, data []byte, conten
 		Key:         aws.String(key),
 		Body:        bytes.NewReader(data),
 		ContentType: aws.String(contentType),
-		// Prevent public access — images only accessible via pre-signed URLs
-		ACL: "private",
+		// Access is controlled by the private bucket configuration. R2 and
+		// S3 buckets with ACLs disabled do not accept per-object ACL headers.
 	})
 	if err != nil {
 		return fmt.Errorf("uploading to S3: %w", err)

@@ -1,0 +1,8 @@
+.env
+.env.*
+keys/
+bin/
+tmp/
+.git/
+.DS_Store
+*.test
