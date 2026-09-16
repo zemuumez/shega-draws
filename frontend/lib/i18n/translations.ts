@@ -92,6 +92,10 @@ export interface Translations {
     totalPrizePool: string;
     firstJackpot: string;
     poolCapacity: string;
+    spotsRemaining: string;
+    spotsReserved: string;
+    checkingAvailability: string;
+    availabilityUnavailable: string;
     winningOdds: string;
     oddsValue: string;
     cashWinners: string;
@@ -397,6 +401,10 @@ export const translations: Record<Language, Translations> = {
       totalPrizePool: "TOTAL PRIZE POOL",
       firstJackpot: "1ST GRAND JACKPOT",
       poolCapacity: "POOL CAPACITY",
+      spotsRemaining: "spots remaining",
+      spotsReserved: "reserved",
+      checkingAvailability: "Checking available spots…",
+      availabilityUnavailable: "Count unavailable · retrying…",
       winningOdds: "WINNING ODDS",
       oddsValue: "1 in 100 (High Odds)",
       cashWinners: "CASH WINNERS",
@@ -736,6 +744,10 @@ export const translations: Record<Language, Translations> = {
       totalPrizePool: "ጠቅላላ የሽልማት መጠን",
       firstJackpot: "1ኛ ዋናው ታላቅ ጃክፖት",
       poolCapacity: "የተሳታፊዎች መጠን",
+      spotsRemaining: "ቦታዎች ይቀራሉ",
+      spotsReserved: "ተይዘዋል",
+      checkingAvailability: "ያሉ ቦታዎችን በማረጋገጥ ላይ…",
+      availabilityUnavailable: "ብዛቱ አልተገኘም · እንደገና በመሞከር ላይ…",
       winningOdds: "የማሸነፍ እድል",
       oddsValue: "1 በ 100 (ከፍተኛ እድል)",
       cashWinners: "የገንዘብ አሸናፊዎች",
@@ -1075,6 +1087,10 @@ export const translations: Record<Language, Translations> = {
       totalPrizePool: "ጠቕላላ መጠን ሽልማት",
       firstJackpot: "1ይ ዋና ዓቢይ ጃክፖት",
       poolCapacity: "መጠን ተሳተፍቲ",
+      spotsRemaining: "ቦታታት ተሪፎም",
+      spotsReserved: "ተታሒዞም",
+      checkingAvailability: "ዘለዉ ቦታታት ይረጋገጹ ኣለዉ…",
+      availabilityUnavailable: "ብዝሒ ኣይተረኽበን · ዳግማይ ይፍተን ኣሎ…",
       winningOdds: "ናይ ምዕዋት ዕድል",
       oddsValue: "1 ኣብ 100 (ልዑል ዕድል)",
       cashWinners: "ናይ ገንዘብ ተዓወትቲ",

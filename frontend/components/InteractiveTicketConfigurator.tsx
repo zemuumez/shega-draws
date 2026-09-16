@@ -20,6 +20,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { BuyTicketModal } from "./BuyTicketModal";
+import { PoolAvailability } from "./PoolAvailability";
 
 interface PriceOption {
   value: number;
@@ -697,6 +698,12 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
                 {selectedPool.toLocaleString()} {t.configurator?.people || "People"}
               </span>
+              <PoolAvailability
+                key={`${currency}-${selectedPrice}-${selectedPool}`}
+                currency={currency} price={selectedPrice} capacity={selectedPool}
+                enabled={isPriceEnabled(selectedPrice, currency) && isPoolEnabled(selectedPool)}
+                checkoutOpen={isBuyModalOpen}
+              />
             </div>
 
             {/* Stat 4: Winning Odds */}
