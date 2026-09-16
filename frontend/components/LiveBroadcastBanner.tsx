@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Tv, Send, Trophy, CheckCircle2, Ticket, Sparkles, ShieldCheck, Radio } from "lucide-react";
-import { BuyTicketModal } from "./BuyTicketModal";
+
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSectionContent } from "@/lib/sanity/queries";
 
@@ -12,7 +12,6 @@ interface LiveBroadcastBannerProps {
 
 export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
   const { language, getLocalized, t } = useLanguage();
-  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
 
   const title =
     (language === "ti" && (cmsContent as any)?.titleTi) ||
@@ -28,14 +27,6 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
 
   return (
     <>
-      <BuyTicketModal
-        isOpen={isBuyModalOpen}
-        onClose={() => setIsBuyModalOpen(false)}
-        initialCurrency="ETB"
-        initialPrice={100}
-        initialDrawId="RDL-ACTIVE"
-      />
-
       <div
         style={{
           background: "rgba(15, 23, 42, 0.62)",
@@ -102,7 +93,7 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
 
           <button
             type="button"
-            onClick={() => setIsBuyModalOpen(true)}
+            onClick={() => { window.location.href = "/#choose-ticket"; }}
             className="casino-btn-red"
             style={{
               fontSize: "0.875rem",

@@ -35,3 +35,6 @@ miniodata/
 RUN_GUIDE.md
 SYSTEM_ARCHITECTURE_GUIDE.md
 
+
+# Isolated local production verification
+frontend/.next-verify/

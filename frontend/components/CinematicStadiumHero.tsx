@@ -127,13 +127,13 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           padding: "clamp(48px, 8vw, 84px) clamp(16px, 3.5vw, 32px) clamp(24px, 4vw, 40px)",
           boxSizing: "border-box",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
           gap: "clamp(28px, 4.5vw, 56px)",
           alignItems: "center",
         }}
       >
         {/* Left Side: Headline & Mission */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div data-page-reveal style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           {/* Trust Pill */}
           <div style={{ display: "inline-flex" }}>
             <span
@@ -189,7 +189,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
         </div>
 
         {/* Right Side: Floating Translucent Glass Feature Card */}
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div data-page-reveal style={{ display: "flex", justifyContent: "flex-end" }}>
           <div
             style={{
               width: "100%",
@@ -302,7 +302,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
       </div>
 
       {/* ── 4. Bottom Overlapping Translucent Glass Quick-Tier Bar ── */}
-      <div
+      <div data-page-reveal
         style={{
           position: "relative",
           zIndex: 20,

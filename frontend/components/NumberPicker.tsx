@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Dice5, Grid, Search, Check, Lock, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 interface NumberPickerProps {
@@ -13,12 +13,12 @@ interface NumberPickerProps {
 export function NumberPicker({
   value,
   onChange,
-  poolSize = 100,
+  poolSize = 1000,
   takenNumbers = [],
 }: NumberPickerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const [isRolling, setIsRolling] = useState(false);
+  const isRolling = false;
 
   const PAGE_SIZE = 100;
   const totalPages = Math.ceil(poolSize / PAGE_SIZE);
@@ -31,7 +31,7 @@ export function NumberPicker({
     if (searchQuery.trim()) {
       const q = searchQuery.trim();
       const results: number[] = [];
-      for (let i = 0; i < poolSize; i++) {
+      for (let i = 1; i <= poolSize; i++) {
         if (String(i).padStart(2, "0").includes(q)) {
           results.push(i);
           if (results.length >= 200) break;
@@ -40,8 +40,8 @@ export function NumberPicker({
       return results;
     }
 
-    const start = currentPage * PAGE_SIZE;
-    const end = Math.min(poolSize - 1, start + PAGE_SIZE - 1);
+    const start = currentPage * PAGE_SIZE + 1;
+    const end = Math.min(poolSize, start + PAGE_SIZE - 1);
     const nums: number[] = [];
     for (let i = start; i <= end; i++) {
       nums.push(i);
@@ -49,25 +49,14 @@ export function NumberPicker({
     return nums;
   }, [currentPage, poolSize, searchQuery]);
 
-  // Roll random available number
+  useEffect(() => { setCurrentPage(0); setSearchQuery(""); }, [poolSize]);
+  const availableNumbers = useMemo(() => Array.from({length: poolSize}, (_, i) => i + 1).filter(n => !effectiveTaken.has(String(n).padStart(2, "0"))), [poolSize, effectiveTaken]);
   const rollRandom = () => {
-    setIsRolling(true);
-    let count = 0;
-    const interval = setInterval(() => {
-      const rand = Math.floor(Math.random() * poolSize);
-      onChange(String(rand).padStart(2, "0"));
-      count++;
-      if (count >= 10) {
-        clearInterval(interval);
-        setIsRolling(false);
-        let finalNum = Math.floor(Math.random() * poolSize);
-        while (effectiveTaken.has(String(finalNum).padStart(2, "0")) && effectiveTaken.size < poolSize) {
-          finalNum = Math.floor(Math.random() * poolSize);
-        }
-        onChange(String(finalNum).padStart(2, "0"));
-        setCurrentPage(Math.floor(finalNum / PAGE_SIZE));
-      }
-    }, 45);
+    if (!availableNumbers.length) return;
+    const chosen = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+    onChange(String(chosen).padStart(2, "0"));
+    setSearchQuery("");
+    setCurrentPage(Math.floor((chosen - 1) / PAGE_SIZE));
   };
 
   const isCurrentValueTaken = effectiveTaken.has(value);
@@ -135,7 +124,7 @@ export function NumberPicker({
                 </div>
               ) : null}
               <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}>
-                Pool Range: #00 to #{poolSize - 1}
+                Pool Range: #1 to #{poolSize.toLocaleString()}
               </span>
             </div>
           </div>
@@ -145,7 +134,7 @@ export function NumberPicker({
         <button
           type="button"
           onClick={rollRandom}
-          disabled={isRolling}
+          disabled={isRolling || !availableNumbers.length}
           className="casino-btn-gold"
           style={{
             padding: "10px 18px",
@@ -168,7 +157,7 @@ export function NumberPicker({
           <Search size={14} color="#94A3B8" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
-            placeholder={`Type specific number (00 - ${poolSize - 1})...`}
+            placeholder={`Type specific number (1 - ${poolSize})...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -212,7 +201,7 @@ export function NumberPicker({
             </button>
 
             <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", padding: "0 6px" }}>
-              #{currentPage * PAGE_SIZE} – #{Math.min(poolSize - 1, (currentPage + 1) * PAGE_SIZE - 1)}
+              #{currentPage * PAGE_SIZE + 1} – #{Math.min(poolSize, (currentPage + 1) * PAGE_SIZE)}
             </span>
 
             <button

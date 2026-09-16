@@ -22,7 +22,7 @@ export function AboutView({ siteSettings }: AboutViewProps) {
   return (
     <div style={{ position: "relative", zIndex: 2, paddingBottom: 80 }}>
       {/* ── 1. Page Header ────────────────────────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto",
@@ -119,7 +119,7 @@ export function AboutView({ siteSettings }: AboutViewProps) {
       </section>
 
       {/* ── 2. Why Rimna Core Pillars Showcase ────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto 36px",
@@ -131,7 +131,7 @@ export function AboutView({ siteSettings }: AboutViewProps) {
       </section>
 
       {/* ── 3. 24/7 Dedicated Player Care Hub ─────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto",

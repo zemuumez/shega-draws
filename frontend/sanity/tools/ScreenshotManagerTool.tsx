@@ -1,769 +1,110 @@
 "use client";
-import { getAccessToken } from "@/lib/api";
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {useClient} from 'sanity';
+import {playersWorkbook, reviewArchive, type PlayerReceipt} from '@/lib/exports/players';
 
-import React, { useState, useEffect, useCallback } from "react";
-import JSZip from "jszip";
-
-interface ScreenshotItem {
-  _id: string;
-  playerName: string;
-  playerPhone: string;
-  drawId?: string;
-  luckyNumber?: string;
-  poolCapacity?: string;
-  amount?: number;
-  currency?: string;
-  paymentMethod?: string;
-  submittedAt?: string;
-  status?: "pending" | "confirmed" | "rejected";
-  assetId?: string;
-  imageUrl?: string;
-  assetSize?: number;
-  mimeType?: string;
-  originalFilename?: string;
+const inputStyle: React.CSSProperties = {padding: '10px 12px', borderRadius: 6, border: '1px solid #8a8a8a', background: 'transparent', color: 'inherit'};
+const buttonStyle: React.CSSProperties = {...inputStyle, cursor: 'pointer', fontWeight: 600};
+function download(data: Uint8Array, filename: string, type: string) {
+  const blob = new Blob([new Uint8Array(data)], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
-
-interface StatsData {
-  draws: string[];
-  poolSizes: string[];
-  prices: number[];
-  totalStorageBytes: number;
-}
-
 export function ScreenshotManagerTool() {
-  const [items, setItems] = useState<ScreenshotItem[]>([]);
-  const [stats, setStats] = useState<StatsData>({
-    draws: [],
-    poolSizes: [],
-    prices: [],
-    totalStorageBytes: 0,
-  });
+  const client = useClient({apiVersion: '2024-01-01'});
+  const [entries, setEntries] = useState<PlayerReceipt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
-
-  // Filters
-  const [selectedDraw, setSelectedDraw] = useState<string>("all");
-  const [selectedPool, setSelectedPool] = useState<string>("all");
-  const [selectedPrice, setSelectedPrice] = useState<string>("all");
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
-
-  // Selection for bulk actions
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
-  // Lightbox preview modal
-  const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [filters, setFilters] = useState({drawId: '', poolCapacity: '', amount: '', currency: '', status: ''});
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [visibleCount, setVisibleCount] = useState(100);
+  const [preview, setPreview] = useState<PlayerReceipt | null>(null);
+  const refresh = useCallback(async () => {
+    setLoading(true); setError('');
     try {
-      const params = new URLSearchParams();
-      if (selectedDraw !== "all") params.set("drawId", selectedDraw);
-      if (selectedPool !== "all") params.set("poolCapacity", selectedPool);
-      if (selectedPrice !== "all") params.set("amount", selectedPrice);
-      if (selectedStatus !== "all") params.set("status", selectedStatus);
-
-      const res = await fetch(`/api/admin/screenshots?${params.toString()}`, { headers: { Authorization: `Bearer ${getAccessToken() || ""}` } });
-      const data = await res.json();
-      if (data.success) {
-        setItems(data.entries || []);
-        if (data.stats) setStats(data.stats);
+      const all: PlayerReceipt[] = [];
+      let after = '';
+      // Stable ID pagination includes datasets larger than one query page.
+      const before = new Date().toISOString();
+      for (;;) {
+        const page = await client.fetch<PlayerReceipt[]>(`*[_type == "playerEntry" && !(_id in path("drafts.**")) && !(_id in path("versions.**")) && _id > $after && _createdAt <= $before] | order(_id asc)[0...1000]{_id, _rev, playerName, playerPhone, drawId, luckyNumber, poolCapacity, amount, currency, paymentMethod, paymentReference, submittedAt, status, adminNotes, "imageUrl": proofScreenshot.asset->url, "mimeType": proofScreenshot.asset->mimeType}`, {after, before}, {perspective: 'raw'});
+        all.push(...page);
+        if (page.length < 1000) break;
+        after = page[page.length - 1]._id;
       }
-    } catch (err: any) {
-      console.error("Error loading screenshots:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedDraw, selectedPool, selectedPrice, selectedStatus]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === items.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(items.map((i) => i._id)));
-    }
-  };
-
-  const toggleSelectItem = (id: string) => {
-    const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelectedIds(next);
-  };
-
-  // Bulk Download using JSZip
-  const handleBulkDownload = async (targetItems: ScreenshotItem[]) => {
-    if (targetItems.length === 0) {
-      alert("No screenshots selected or matching current filter to download.");
-      return;
-    }
-
-    const itemsWithImages = targetItems.filter((i) => i.imageUrl);
-    if (itemsWithImages.length === 0) {
-      alert("None of the selected entries have an uploaded screenshot image.");
-      return;
-    }
-
-    setActionLoading(true);
-    setActionMessage(`Downloading and packaging ${itemsWithImages.length} screenshots into ZIP...`);
-
+      setEntries(all.sort((a, b) => (b.submittedAt || '').localeCompare(a.submittedAt || '')));
+      setSelected(new Set());
+    } catch { setError('Could not load receipts. Check your Sanity login and dataset permissions, then refresh.'); setEntries([]); }
+    finally { setLoading(false); }
+  }, [client]);
+  useEffect(() => { void refresh(); }, [refresh]);
+  const filtered = useMemo(() => entries.filter(e => Object.entries(filters).every(([key, value]) => !value || String(key === 'status' ? e.status || 'pending' : e[key as keyof PlayerReceipt] ?? '') === value)), [entries, filters]);
+  useEffect(() => { setSelected(new Set()); setVisibleCount(100); }, [filters]);
+  const chosen = filtered.filter(e => selected.has(e._id));
+  async function exportItems(items: PlayerReceipt[], withScreenshots: boolean) {
+    if (!items.length) return;
+    setBusy(true); setMessage('Preparing export…'); setError('');
     try {
-      const zip = new JSZip();
-      const folder = zip.folder("rimna_payment_screenshots");
-
-      let count = 0;
-      for (const item of itemsWithImages) {
-        if (!item.imageUrl) continue;
-        try {
-          const resp = await fetch(item.imageUrl);
-          const blob = await resp.blob();
-          const ext = item.mimeType?.includes("png") ? "png" : item.mimeType?.includes("webp") ? "webp" : "jpg";
-          const filename = `${item.drawId || "DRAW"}_${item.luckyNumber || "NUM"}_${item.playerName.replace(/[^a-zA-Z0-9]/g, "_")}_${item._id.slice(0, 8)}.${ext}`;
-          folder?.file(filename, blob);
-          count++;
-          setActionMessage(`Packaging ${count} / ${itemsWithImages.length} images...`);
-        } catch (fetchErr) {
-          console.warn("Failed to fetch image for zip:", item.imageUrl);
-        }
-      }
-
-      const zipContent = await zip.generateAsync({ type: "blob" });
-      const downloadUrl = URL.createObjectURL(zipContent);
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      const dateStr = new Date().toISOString().slice(0, 10);
-      link.download = `rimna_screenshots_${selectedDraw !== "all" ? selectedDraw : "bulk"}_${dateStr}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(downloadUrl);
-
-      setActionMessage(`🎉 Successfully downloaded ${count} screenshots!`);
-      setTimeout(() => setActionMessage(null), 4000);
-    } catch (err: any) {
-      alert(`ZIP Download failed: ${err.message}`);
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // Bulk Delete
-  const handleBulkDelete = async (payload: { ids?: string[]; drawId?: string; poolCapacity?: string; amount?: string }) => {
-    const isIds = payload.ids && payload.ids.length > 0;
-    const confirmPrompt = isIds
-      ? `Permanently delete ${payload.ids?.length} selected receipts AND purge their image files from Sanity storage? This cannot be undone.`
-      : `Permanently delete all receipts matching this filter and delete their image assets to free server storage? This cannot be undone.`;
-
-    if (!window.confirm(confirmPrompt)) return;
-
-    setActionLoading(true);
-    setActionMessage("Deleting documents and purging image assets from storage...");
-
-    try {
-      const res = await fetch("/api/admin/screenshots", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getAccessToken() || ""}` },
-        body: JSON.stringify({
-          ...payload,
-          deleteAssets: true,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setActionMessage(data.message);
-        setSelectedIds(new Set());
-        await fetchData();
-        setTimeout(() => setActionMessage(null), 5000);
+      const date = new Date().toISOString().slice(0, 10);
+      if (withScreenshots) {
+        const result = await reviewArchive(items, (done, total) => setMessage(`Downloading screenshot ${done} of ${total}…`));
+        download(result.data, `rimna-review-${date}.zip`, 'application/zip');
+        setMessage(`Exported ${items.length} players with ${items.length - result.failures.length} screenshots.`);
+        if (result.failures.length) setError(`${result.failures.length} screenshots are missing. The Excel file and README inside the ZIP identify them; refresh and retry these entries.`);
       } else {
-        alert(data.error || "Failed to delete");
+        download(await playersWorkbook(items), `rimna-players-${date}.xlsx`, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        setMessage(`Exported ${items.length} players to Excel.`);
       }
-    } catch (err: any) {
-      alert(`Error during deletion: ${err.message}`);
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const formatBytes = (bytes: number) => {
-    if (!bytes || bytes === 0) return "0 MB";
-    const mb = bytes / (1024 * 1024);
-    return `${mb.toFixed(2)} MB`;
-  };
-
-  return (
-    <div
-      style={{
-        padding: "24px",
-        maxWidth: 1300,
-        margin: "0 auto",
-        fontFamily: "Inter, system-ui, sans-serif",
-        color: "#F8FAFC",
-        minHeight: "100vh",
-      }}
-    >
-      {/* Lightbox Modal */}
-      {previewImage && (
-        <div
-          onClick={() => setPreviewImage(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.85)",
-            zIndex: 9999,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#1E293B",
-              borderRadius: 16,
-              padding: 16,
-              maxWidth: 700,
-              width: "100%",
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-              border: "1.5px solid #FDE047",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <div style={{ fontWeight: 800, color: "#FEF08A", fontSize: "0.9375rem" }}>{previewImage.title}</div>
-              <button
-                onClick={() => setPreviewImage(null)}
-                style={{
-                  background: "#334155",
-                  border: "none",
-                  borderRadius: "50%",
-                  width: 32,
-                  height: 32,
-                  color: "#FFFFFF",
-                  cursor: "pointer",
-                  fontWeight: 900,
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={previewImage.url}
-              alt="Payment proof high resolution"
-              style={{
-                width: "100%",
-                maxHeight: "70vh",
-                objectFit: "contain",
-                borderRadius: 8,
-                background: "#0F172A",
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Header Banner */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
-          border: "1.5px solid #334155",
-          borderRadius: 16,
-          padding: "24px 28px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-          marginBottom: 20,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: "1.75rem" }}>📸</span>
-              <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 900, color: "#FDE047", letterSpacing: "-0.5px" }}>
-                Screenshot & Storage Manager
-              </h1>
-            </div>
-            <p style={{ margin: "6px 0 0 0", color: "#94A3B8", fontSize: "0.875rem", lineHeight: 1.5 }}>
-              Manage, filter, bulk download receipts as ZIP, and permanently delete screenshot assets from completed draws or specific pools to save server disk and cloud storage.
-            </p>
-          </div>
-
-          {/* Storage Metric Pill */}
-          <div
-            style={{
-              background: "rgba(253, 224, 71, 0.1)",
-              border: "1.5px solid #FDE047",
-              borderRadius: 12,
-              padding: "10px 18px",
-              textAlign: "right",
-            }}
-          >
-            <div style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 800, textTransform: "uppercase" }}>
-              Total Storage In Use
-            </div>
-            <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#FFFFFF" }}>
-              {formatBytes(stats.totalStorageBytes)}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Action Notification Banner */}
-      {actionMessage && (
-        <div
-          style={{
-            background: "linear-gradient(90deg, #1E3A8A 0%, #1D4ED8 100%)",
-            border: "1px solid #60A5FA",
-            borderRadius: 12,
-            padding: "12px 20px",
-            color: "#EFF6FF",
-            fontWeight: 700,
-            fontSize: "0.875rem",
-            marginBottom: 20,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>{actionMessage}</span>
-          {actionLoading && <span className="animate-spin">⏳</span>}
-        </div>
-      )}
-
-      {/* Filter & Bulk Action Toolbar */}
-      <div
-        style={{
-          background: "#1E293B",
-          border: "1px solid #334155",
-          borderRadius: 14,
-          padding: "16px 20px",
-          marginBottom: 20,
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 14,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Filter Dropdowns */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-          {/* Draw Filter */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 700, marginBottom: 4 }}>
-              FILTER BY DRAW
-            </label>
-            <select
-              value={selectedDraw}
-              onChange={(e) => setSelectedDraw(e.target.value)}
-              style={{
-                background: "#0F172A",
-                color: "#FFFFFF",
-                border: "1px solid #475569",
-                borderRadius: 8,
-                padding: "6px 12px",
-                fontSize: "0.8125rem",
-                fontWeight: 700,
-              }}
-            >
-              <option value="all">All Draws</option>
-              {stats.draws.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Pool Size Filter */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 700, marginBottom: 4 }}>
-              FILTER BY POOL SIZE
-            </label>
-            <select
-              value={selectedPool}
-              onChange={(e) => setSelectedPool(e.target.value)}
-              style={{
-                background: "#0F172A",
-                color: "#FFFFFF",
-                border: "1px solid #475569",
-                borderRadius: 8,
-                padding: "6px 12px",
-                fontSize: "0.8125rem",
-                fontWeight: 700,
-              }}
-            >
-              <option value="all">All Pool Sizes</option>
-              {stats.poolSizes.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Price Filter */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 700, marginBottom: 4 }}>
-              FILTER BY PRICE TIER
-            </label>
-            <select
-              value={selectedPrice}
-              onChange={(e) => setSelectedPrice(e.target.value)}
-              style={{
-                background: "#0F172A",
-                color: "#FFFFFF",
-                border: "1px solid #475569",
-                borderRadius: 8,
-                padding: "6px 12px",
-                fontSize: "0.8125rem",
-                fontWeight: 700,
-              }}
-            >
-              <option value="all">All Prices</option>
-              {stats.prices.map((pr) => (
-                <option key={pr} value={pr.toString()}>
-                  {pr}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Status Filter */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 700, marginBottom: 4 }}>
-              FILTER BY STATUS
-            </label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              style={{
-                background: "#0F172A",
-                color: "#FFFFFF",
-                border: "1px solid #475569",
-                borderRadius: 8,
-                padding: "6px 12px",
-                fontSize: "0.8125rem",
-                fontWeight: 700,
-              }}
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">🟡 Pending Verification</option>
-              <option value="confirmed">🟢 Confirmed</option>
-              <option value="rejected">🔴 Rejected</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Bulk Action Buttons */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-          {/* Download Filtered ZIP */}
-          <button
-            type="button"
-            disabled={actionLoading || items.length === 0}
-            onClick={() => {
-              const targets = selectedIds.size > 0 ? items.filter((i) => selectedIds.has(i._id)) : items;
-              handleBulkDownload(targets);
-            }}
-            style={{
-              background: "#10B981",
-              border: "none",
-              borderRadius: 8,
-              padding: "8px 16px",
-              color: "#FFFFFF",
-              fontSize: "0.8125rem",
-              fontWeight: 800,
-              cursor: actionLoading || items.length === 0 ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              opacity: items.length === 0 ? 0.6 : 1,
-            }}
-          >
-            📦 Download {selectedIds.size > 0 ? `Selected (${selectedIds.size})` : "All"} as ZIP
-          </button>
-
-          {/* Delete Selected or Filtered */}
-          {selectedIds.size > 0 ? (
-            <button
-              type="button"
-              disabled={actionLoading}
-              onClick={() => handleBulkDelete({ ids: Array.from(selectedIds) })}
-              style={{
-                background: "#EF4444",
-                border: "none",
-                borderRadius: 8,
-                padding: "8px 16px",
-                color: "#FFFFFF",
-                fontSize: "0.8125rem",
-                fontWeight: 800,
-                cursor: actionLoading ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              🗑️ Delete {selectedIds.size} Selected & Purge Storage
-            </button>
-          ) : (
-            selectedDraw !== "all" || selectedPool !== "all" || selectedPrice !== "all" ? (
-              <button
-                type="button"
-                disabled={actionLoading || items.length === 0}
-                onClick={() =>
-                  handleBulkDelete({
-                    drawId: selectedDraw,
-                    poolCapacity: selectedPool,
-                    amount: selectedPrice,
-                  })
-                }
-                style={{
-                  background: "#DC2626",
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "8px 16px",
-                  color: "#FFFFFF",
-                  fontSize: "0.8125rem",
-                  fontWeight: 800,
-                  cursor: actionLoading || items.length === 0 ? "not-allowed" : "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: items.length === 0 ? 0.6 : 1,
-                }}
-              >
-                🗑️ Purge All in Filter ({items.length}) & Free Storage
-              </button>
-            ) : null
-          )}
-        </div>
-      </div>
-
-      {/* Items Table / Cards */}
-      {loading ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#94A3B8" }}>
-          <div style={{ fontSize: "1.5rem", marginBottom: 10 }}>⏳</div>
-          Loading player receipts and screenshots...
-        </div>
-      ) : items.length === 0 ? (
-        <div
-          style={{
-            background: "#1E293B",
-            border: "1px dashed #475569",
-            borderRadius: 16,
-            padding: "48px 24px",
-            textAlign: "center",
-            color: "#94A3B8",
-          }}
-        >
-          <div style={{ fontSize: "2rem", marginBottom: 8 }}>📭</div>
-          <div style={{ fontSize: "1.125rem", fontWeight: 800, color: "#F8FAFC" }}>No Screenshot Receipts Found</div>
-          <p style={{ fontSize: "0.875rem", margin: "6px 0 0 0" }}>
-            No player entries match the selected filters ({selectedDraw}, {selectedPool}, {selectedPrice}, {selectedStatus}).
-          </p>
-        </div>
-      ) : (
-        <div style={{ background: "#1E293B", border: "1px solid #334155", borderRadius: 16, overflow: "hidden" }}>
-          {/* Table Header */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "40px 100px 1.5fr 1fr 1fr 100px 100px 110px",
-              padding: "12px 18px",
-              background: "#0F172A",
-              borderBottom: "1px solid #334155",
-              fontSize: "0.6875rem",
-              fontWeight: 900,
-              color: "#94A3B8",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <input
-                type="checkbox"
-                checked={selectedIds.size === items.length && items.length > 0}
-                onChange={toggleSelectAll}
-                style={{ cursor: "pointer" }}
-              />
-            </div>
-            <div>Proof</div>
-            <div>Player / Phone</div>
-            <div>Draw ID</div>
-            <div>Pool / Number</div>
-            <div>Amount</div>
-            <div>Status</div>
-            <div style={{ textAlign: "right" }}>Action</div>
-          </div>
-
-          {/* Table Body */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {items.map((item) => {
-              const isSelected = selectedIds.has(item._id);
-              const statusColor =
-                item.status === "confirmed" ? "#10B981" : item.status === "rejected" ? "#EF4444" : "#F59E0B";
-
-              return (
-                <div
-                  key={item._id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "40px 100px 1.5fr 1fr 1fr 100px 100px 110px",
-                    padding: "12px 18px",
-                    borderBottom: "1px solid #334155",
-                    background: isSelected ? "rgba(253, 224, 71, 0.05)" : "transparent",
-                    alignItems: "center",
-                    fontSize: "0.8125rem",
-                    transition: "background 150ms ease",
-                  }}
-                >
-                  <div>
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleSelectItem(item._id)}
-                      style={{ cursor: "pointer" }}
-                    />
-                  </div>
-
-                  {/* Screenshot Thumbnail */}
-                  <div>
-                    {item.imageUrl ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPreviewImage({
-                            url: item.imageUrl!,
-                            title: `Screenshot: ${item.playerName} (#${item.luckyNumber})`,
-                          })
-                        }
-                        style={{
-                          background: "none",
-                          border: "1.5px solid #FDE047",
-                          borderRadius: 8,
-                          padding: 0,
-                          cursor: "pointer",
-                          overflow: "hidden",
-                          display: "inline-block",
-                          width: 52,
-                          height: 52,
-                        }}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.imageUrl}
-                          alt="Thumbnail"
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        />
-                      </button>
-                    ) : (
-                      <span style={{ fontSize: "0.6875rem", color: "#64748B" }}>No image</span>
-                    )}
-                  </div>
-
-                  {/* Player Name & Phone */}
-                  <div>
-                    <div style={{ fontWeight: 800, color: "#FFFFFF" }}>{item.playerName}</div>
-                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{item.playerPhone}</div>
-                  </div>
-
-                  {/* Draw ID */}
-                  <div>
-                    <span
-                      style={{
-                        background: "#0F172A",
-                        border: "1px solid #334155",
-                        borderRadius: 6,
-                        padding: "3px 8px",
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
-                        color: "#FEF08A",
-                      }}
-                    >
-                      {item.drawId || "N/A"}
-                    </span>
-                  </div>
-
-                  {/* Pool & Lucky Number */}
-                  <div>
-                    <div style={{ fontWeight: 800, color: "#FDE047" }}>#{item.luckyNumber || "??"}</div>
-                    <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{item.poolCapacity || "Standard"}</div>
-                  </div>
-
-                  {/* Amount Paid */}
-                  <div style={{ fontWeight: 800, color: "#34D399" }}>
-                    {item.amount || 0} {item.currency || "ETB"}
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "3px 8px",
-                        borderRadius: 6,
-                        fontSize: "0.6875rem",
-                        fontWeight: 900,
-                        textTransform: "uppercase",
-                        background: `${statusColor}20`,
-                        color: statusColor,
-                        border: `1px solid ${statusColor}`,
-                      }}
-                    >
-                      {item.status || "pending"}
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
-                    {item.imageUrl && (
-                      <a
-                        href={item.imageUrl}
-                        download
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          background: "#334155",
-                          border: "none",
-                          borderRadius: 6,
-                          padding: "5px 8px",
-                          color: "#F8FAFC",
-                          fontSize: "0.6875rem",
-                          fontWeight: 700,
-                          textDecoration: "none",
-                        }}
-                      >
-                        ⬇️
-                      </a>
-                    )}
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => handleBulkDelete({ ids: [item._id] })}
-                      style={{
-                        background: "rgba(239, 68, 68, 0.2)",
-                        border: "1px solid #EF4444",
-                        borderRadius: 6,
-                        padding: "4px 8px",
-                        color: "#FCA5A5",
-                        fontSize: "0.6875rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+    } catch { setError('Export failed. Try a smaller selection or refresh and retry.'); setMessage(''); }
+    finally { setBusy(false); }
+  }
+  return <div style={{padding: '28px', height: '100%', overflow: 'auto', boxSizing: 'border-box'}}>
+    <h1>Players & payment receipts</h1>
+    <p>Download the players list in Excel, or download Excel and matching screenshots together in a ZIP. Confirm or reject payments in Submitted Ticket Receipts after reviewing them.</p>
+    <p>All submitted numbers stay reserved, including rejected receipts. Delete a receipt in Studio only when you intend to release its number.</p>
+    <div style={{display: 'flex', gap: 12, flexWrap: 'wrap', margin: '20px 0'}}>
+      {(Object.keys(filters) as (keyof typeof filters)[]).map(key => <label key={key} style={{display: 'grid', gap: 6}}>
+        {{drawId: 'Draw', poolCapacity: 'Pool capacity', amount: 'Price', currency: 'Currency', status: 'Review status'}[key]}
+        <select aria-label={key} disabled={busy} style={inputStyle} value={filters[key]} onChange={e => setFilters({...filters, [key]: e.target.value})}>
+          <option value="">All</option>
+          {Array.from(new Set(entries.map(e => String(key === 'status' ? e.status || 'pending' : e[key] ?? '')).filter(Boolean))).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).map(value => <option key={value} value={value}>{value}</option>)}
+        </select>
+      </label>)}
+      <button style={buttonStyle} onClick={refresh} disabled={loading || busy}>Refresh</button>
     </div>
-  );
+    <div style={{display: 'flex', gap: 10, flexWrap: 'wrap'}}>
+      <button style={buttonStyle} disabled={loading || busy || !filtered.length} onClick={() => exportItems(filtered, false)}>Excel — filtered ({filtered.length})</button>
+      <button style={buttonStyle} disabled={loading || busy || !filtered.length} onClick={() => exportItems(filtered, true)}>Excel + screenshots ZIP — filtered</button>
+      <button style={buttonStyle} disabled={loading || busy || !chosen.length} onClick={() => exportItems(chosen, false)}>Excel — selected ({chosen.length})</button>
+      <button style={buttonStyle} disabled={loading || busy || !chosen.length} onClick={() => exportItems(chosen, true)}>Excel + screenshots ZIP — selected</button>
+    </div>
+    {message && <p role="status">{message}</p>}
+    {error && <p role="alert" style={{color: '#e45c5c'}}>{error}</p>}
+    {loading ? <p role="status">Loading receipts…</p> : <>
+      <p>{filtered.length} matching receipts · {chosen.length} selected</p>
+      <div style={{overflowX: 'auto'}}><table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'left'}}>
+        <thead><tr><th><input type="checkbox" aria-label="Select all filtered players" disabled={busy || !filtered.length} checked={filtered.length > 0 && chosen.length === filtered.length} onChange={e => setSelected(e.target.checked ? new Set(filtered.map(x => x._id)) : new Set())}/></th>
+          {['Player', 'Phone', 'Draw / pool', 'Number', 'Payment', 'Reference', 'Status', 'Screenshot'].map(h => <th key={h} style={{padding: 12}}>{h}</th>)}
+        </tr></thead>
+        <tbody>{filtered.slice(0, visibleCount).map(e => <tr key={e._id} style={{borderTop: '1px solid #8885'}}>
+          <td><input type="checkbox" disabled={busy} aria-label={`Select ${e.playerName || e._id}`} checked={selected.has(e._id)} onChange={() => setSelected(prev => {const next = new Set(prev); next.has(e._id) ? next.delete(e._id) : next.add(e._id); return next;})}/></td>
+          <td style={{padding: 12}}>{e.playerName}</td><td>{e.playerPhone}</td><td>{e.drawId}<br/>{e.poolCapacity} slots</td><td>{e.luckyNumber}</td><td>{e.amount} {e.currency}<br/>{e.paymentMethod}</td><td>{e.paymentReference || '—'}</td><td>{e.status || 'pending'}</td>
+          <td>{e.imageUrl ? <button style={buttonStyle} onClick={() => setPreview(e)}>View</button> : 'Missing'}</td>
+        </tr>)}</tbody>
+      </table></div>
+      {!filtered.length && <p>No receipts match these filters.</p>}
+      {visibleCount < filtered.length && <button style={buttonStyle} onClick={() => setVisibleCount(n => n + 100)}>Show next 100 (exports include all filtered rows)</button>}
+    </>}
+    {preview && <div role="dialog" aria-modal="true" aria-label="Payment screenshot" style={{position: 'fixed', inset: 0, background: '#000d', zIndex: 9999, display: 'grid', placeItems: 'center'}} onClick={() => setPreview(null)}>
+      <div style={{maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto'}} onClick={e => e.stopPropagation()}>
+        <button style={{...buttonStyle, background: '#fff', color: '#111'}} onClick={() => setPreview(null)}>Close screenshot</button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={preview.imageUrl} alt={`Payment receipt for ${preview.playerName}`} style={{display: 'block', maxWidth: '85vw', maxHeight: '80vh', objectFit: 'contain'}}/>
+      </div>
+    </div>}
+  </div>;
 }

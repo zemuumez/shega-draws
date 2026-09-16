@@ -27,33 +27,7 @@ interface PriceOption {
   isEnabled?: boolean;
 }
 
-const ETB_PRICES: PriceOption[] = [
-  { value: 100, label: "100" },
-  { value: 200, label: "200" },
-  { value: 500, label: "500" },
-  { value: 1000, label: "1,000" },
-];
-
-const USD_PRICES: PriceOption[] = [
-  { value: 25, label: "25" },
-  { value: 50, label: "50" },
-  { value: 100, label: "100" },
-  { value: 250, label: "250" },
-];
-
-interface PoolOption {
-  size: number;
-  label: string;
-  ticketsCount: string;
-  isEnabled?: boolean;
-}
-
-const POOLS: PoolOption[] = [
-  { size: 1000, label: "1K", ticketsCount: "1,000 tickets" },
-  { size: 2000, label: "2K", ticketsCount: "2,000 tickets" },
-  { size: 3000, label: "3K", ticketsCount: "3,000 tickets" },
-  { size: 5000, label: "5K", ticketsCount: "5,000 tickets" },
-];
+interface PoolOption { size: number; label: string; ticketsCount: string; isEnabled?: boolean; }
 
 // All 10 Guaranteed Prize distribution percentages (Sums to 100%)
 const ALL_10_PRIZES = [
@@ -72,10 +46,11 @@ const ALL_10_PRIZES = [
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
 interface InteractiveTicketConfiguratorProps {
+  draws: import("@/lib/tickets").TicketDraw[];
   siteSettings?: CMSSiteSettings | null;
 }
 
-export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicketConfiguratorProps) {
+export function InteractiveTicketConfigurator({ siteSettings, draws }: InteractiveTicketConfiguratorProps) {
   const { language, t, getLocalized } = useLanguage();
   const [currency, setCurrency] = useState<Currency>("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
@@ -83,7 +58,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
   const [isBuyModalOpen, setIsBuyModalOpen] = useState<boolean>(false);
   const [showAllPrizes, setShowAllPrizes] = useState<boolean>(false);
 
-  // Derive dynamic ETB Prices from CMS or fallback to default
+  // Derive dynamic ETB Prices from published CMS settings
   const etbPrices: PriceOption[] = React.useMemo(() => {
     if (siteSettings?.etbPrices && siteSettings.etbPrices.length > 0) {
       return siteSettings.etbPrices.map((p) => ({
@@ -92,10 +67,10 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         isEnabled: p.isEnabled !== false,
       }));
     }
-    return ETB_PRICES;
+    return [];
   }, [siteSettings]);
 
-  // Derive dynamic USD Prices from CMS or fallback to default
+  // Derive dynamic USD Prices from published CMS settings
   const usdPrices: PriceOption[] = React.useMemo(() => {
     if (siteSettings?.usdPrices && siteSettings.usdPrices.length > 0) {
       return siteSettings.usdPrices.map((p) => ({
@@ -104,10 +79,10 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         isEnabled: p.isEnabled !== false,
       }));
     }
-    return USD_PRICES;
+    return [];
   }, [siteSettings]);
 
-  // Derive dynamic Pool Sizes from CMS or fallback to default
+  // Derive dynamic Pool Sizes from published CMS settings
   const poolOptions: PoolOption[] = React.useMemo(() => {
     if (siteSettings?.poolSizes && siteSettings.poolSizes.length > 0) {
       return siteSettings.poolSizes.map((p) => ({
@@ -117,21 +92,23 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         isEnabled: p.isEnabled !== false,
       }));
     }
-    return POOLS;
+    return [];
   }, [siteSettings]);
 
   const isUSD = currency === "USD";
+  const selectedDraw = draws.find(d => d.status === "open" && d.currency === currency && d.ticketPrice === selectedPrice && d.poolCapacity === selectedPool && (!d.deadline || Date.parse(d.deadline) > Date.now()));
+
   const currentPrices = isUSD ? usdPrices : etbPrices;
 
   const isPriceEnabled = React.useCallback((val: number, curr: Currency) => {
     const list = curr === "USD" ? usdPrices : etbPrices;
     const match = list.find((p) => p.value === val);
-    return match ? match.isEnabled !== false : true;
+    return match ? match.isEnabled !== false : false;
   }, [usdPrices, etbPrices]);
 
   const isPoolEnabled = React.useCallback((size: number) => {
     const match = poolOptions.find((p) => p.size === size);
-    return match ? match.isEnabled !== false : true;
+    return match ? match.isEnabled !== false : false;
   }, [poolOptions]);
 
   // Automatically switch to first enabled price/pool if current is disabled or deleted
@@ -204,7 +181,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
       }}
     >
       {/* ── 1. Compact Glass Header Bar ────────────────────────────── */}
-      <div
+      <div data-page-reveal
         style={{
           marginBottom: 14,
           display: "flex",
@@ -301,13 +278,13 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(310px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 310px), 1fr))",
           gap: "clamp(12px, 2vw, 18px)",
           alignItems: "stretch",
         }}
       >
         {/* ── LEFT COLUMN: Translucent Frosted Glass Controls ───── */}
-        <div
+        <div data-page-reveal
           style={{
             background: "rgba(0, 0, 0, 0.35)",
             backdropFilter: "blur(16px)",
@@ -631,7 +608,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         </div>
 
         {/* ── RIGHT COLUMN: Translucent Floating Summary Card & Stat Grid ── */}
-        <div
+        <div data-page-reveal
           style={{
             background: "rgba(0, 0, 0, 0.4)",
             backdropFilter: "blur(20px)",
@@ -748,7 +725,7 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
                 {t.configurator?.drawBroadcast || "DRAW BROADCAST"}
               </span>
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
-                Sep 3, 2026
+                {selectedDraw?.deadline ? new Date(selectedDraw.deadline).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Addis_Ababa"}) : "To be announced"}
               </span>
             </div>
           </div>
@@ -757,7 +734,9 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
           <div style={{ padding: "10px 14px 12px", borderTop: "1px solid rgba(255, 255, 255, 0.12)", background: "rgba(15, 23, 42, 0.7)" }}>
             <button
               type="button"
+              disabled={!isPriceEnabled(selectedPrice, currency) || !isPoolEnabled(selectedPool)}
               onClick={() => setIsBuyModalOpen(true)}
+              aria-haspopup="dialog"
               className="casino-btn-red"
               style={{
                 width: "100%",
@@ -811,56 +790,6 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         </div>
       </div>
 
-      {/* ── MOBILE STICKY FLOATING BOTTOM BAR ── */}
-      <div
-        className="mobile-only-floating-bar"
-        style={{
-          position: "fixed",
-          bottom: 12,
-          left: 12,
-          right: 12,
-          background: "#111827",
-          border: "2px solid #F59E0B",
-          borderRadius: "16px",
-          padding: "8px 14px",
-          display: "none",
-          alignItems: "center",
-          justifyContent: "space-between",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-          zIndex: 99,
-        }}
-      >
-        <div>
-          <div className="display" style={{ fontSize: "1.1rem", fontWeight: 900, color: "#FFFFFF", lineHeight: 1.1 }}>
-            {formatMoney(selectedPrice)}
-          </div>
-          <div style={{ fontSize: "0.6875rem", color: "#10B981", fontWeight: 800 }}>
-            Rimna Lottery · {currentPoolObj.label} pool
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsBuyModalOpen(true)}
-          style={{
-            background: "#FFFFFF",
-            color: "#111827",
-            border: "none",
-            borderRadius: "10px",
-            padding: "8px 16px",
-            fontWeight: 900,
-            fontSize: "0.8125rem",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            cursor: "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-          }}
-        >
-          {t.configurator?.buyTicketBtn || "Buy ticket"} <ArrowUpRight size={14} />
-        </button>
-      </div>
-
       {/* Buy Ticket Modal */}
       <BuyTicketModal
         isOpen={isBuyModalOpen}
@@ -868,7 +797,6 @@ export function InteractiveTicketConfigurator({ siteSettings }: InteractiveTicke
         initialCurrency={currency}
         initialPrice={selectedPrice}
         initialPoolSize={selectedPool}
-        initialDrawId={`RDL-${currency}-${selectedPrice}`}
         siteSettings={siteSettings}
       />
     </div>

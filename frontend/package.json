@@ -10,7 +10,7 @@
     "seed:cms": "node scripts/seed-sanity.mjs",
     "seed:cms:clear": "node scripts/seed-sanity.mjs --clear",
     "migrate:cms": "node scripts/migrate-to-sanity.mjs",
-    "test:player": "node --test tests/player-api.test.cjs"
+    "test": "node --test tests/*.test.cjs"
   },
   "dependencies": {
     "@sanity/client": "^6.21.3",
@@ -18,7 +18,6 @@
     "@sanity/vision": "^3.99.0",
     "@types/jszip": "^3.4.0",
     "@types/three": "^0.185.4",
-    "bcryptjs": "^3.0.3",
     "jszip": "^3.10.1",
     "lucide-react": "^0.414.0",
     "next": "14.2.5",
@@ -30,7 +29,6 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

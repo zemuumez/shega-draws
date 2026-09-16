@@ -5,8 +5,11 @@ export const drawType = defineType({
   title: "🎰 Active Draws & Countdown",
   type: "document",
   fields: [
+    defineField({name: "lastEntryAt", type: "datetime", hidden: true, readOnly: true}),
+
     defineField({
       name: "drawId",
+      readOnly: ({document}) => !!document?.lastEntryAt,
       title: "Draw Reference Code",
       type: "string",
       placeholder: "e.g. RDL-ETB-500-2K",
@@ -33,6 +36,7 @@ export const drawType = defineType({
     }),
     defineField({
       name: "currency",
+      readOnly: ({document}) => !!document?.lastEntryAt,
       title: "Currency",
       type: "string",
       options: {
@@ -45,6 +49,7 @@ export const drawType = defineType({
     }),
     defineField({
       name: "ticketPrice",
+      readOnly: ({document}) => !!document?.lastEntryAt,
       title: "Ticket Price",
       type: "number",
       initialValue: 100,
@@ -52,16 +57,11 @@ export const drawType = defineType({
     }),
     defineField({
       name: "poolCapacity",
+      readOnly: ({document}) => !!document?.lastEntryAt,
       title: "Pool Capacity (Tickets)",
       type: "number",
-      options: {
-        list: [
-          { title: "1,000 People (1K)", value: 1000 },
-          { title: "2,000 People (2K)", value: 2000 },
-          { title: "3,000 People (3K)", value: 3000 },
-          { title: "5,000 People (5K)", value: 5000 },
-        ],
-      },
+      description: "Total ticket slots: 1 through this number. Add the same enabled capacity under Site Settings. A 25K pool uses 25000.",
+      validation: (Rule) => Rule.required().integer().min(1).max(100000),
       initialValue: 1000,
     }),
     defineField({

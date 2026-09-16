@@ -1,3 +1,5 @@
+> Historical documentation: player login, Go API, PostgreSQL/Redis and the old number limits have been retired. See [README.md](README.md) for the current Vercel + Sanity guest purchase and employee export workflow.
+
 # 🏛️ RIMNA INTERNATIONAL DIGITAL LOTTERY
 ## Comprehensive Master System Specification, Architecture & Living Documentation
 > **Document Version**: 2.4.0 • **Last Updated**: September 2026 • **Status**: Living Active Master Document  

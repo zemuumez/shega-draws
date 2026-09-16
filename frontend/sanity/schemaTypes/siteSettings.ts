@@ -37,6 +37,8 @@ export const siteSettingsType = defineType({
     },
   ],
   fields: [
+    defineField({name: "lastEntryAt", type: "datetime", hidden: true, readOnly: true}),
+
     // ─── Localization Settings ─────────────────────────────────────────
     defineField({
       name: "defaultLanguage",
@@ -188,7 +190,7 @@ export const siteSettingsType = defineType({
               name: "size",
               title: "Total Participant Count (e.g. 1000, 2000, 3000, 5000)",
               type: "number",
-              validation: (Rule) => Rule.required().positive(),
+              validation: (Rule) => Rule.required().integer().min(1).max(100000),
             },
             {
               name: "label",

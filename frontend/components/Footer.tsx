@@ -71,7 +71,7 @@ export function Footer({ siteSettings }: FooterProps) {
               <Link href="/entries" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.myEntries}</Link>
               <Link href="/results" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.results}</Link>
               <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Why Rimna</Link>
-              <Link href="/admin/login" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.admin}</Link>
+              <Link href="/studio" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.admin}</Link>
             </div>
           </div>
 

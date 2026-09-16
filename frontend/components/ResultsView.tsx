@@ -48,7 +48,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
   return (
     <div style={{ position: "relative", zIndex: 2, paddingBottom: 80 }}>
       {/* ── 1. Page Header ────────────────────────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto",
@@ -108,7 +108,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
       </section>
 
       {/* ── 2. Live Broadcast Showcase ────────────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto 36px",
@@ -120,7 +120,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
       </section>
 
       {/* ── 3. Top 10 Winning Numbers Glass Grid ──────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto 36px",
@@ -306,7 +306,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
       </section>
 
       {/* ── 4. 24/7 Support Hotline ───────────────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto",

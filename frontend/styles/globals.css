@@ -827,13 +827,6 @@ h1, h2, h3, h4, h5 {
   filter: brightness(1.08);
 }
 
-/* Mobile Sticky Action Bar for Ticket Configurator */
-@media (max-width: 768px) {
-  .mobile-only-floating-bar {
-    display: flex !important;
-  }
-}
-
 /* ── Responsive Navbar & Mobile Breadcrumb Drawer ───────────────────── */
 .desktop-nav-links {
   display: flex;
@@ -965,3 +958,24 @@ h1, h2, h3, h4, h5 {
   }
 }
 
+
+/* Branded entry and route loading animation. */
+.rimna-page-loader { position: fixed; inset: 0; z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; background: #0b1424; color: #fef08a; font-size: 14px; letter-spacing: .05em; }
+.rimna-loader-orbit { position: relative; width: 250px; height: 250px; display: grid; place-items: center; }
+.rimna-loader-orbit::before { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #facc1526; border-top-color: #facc15; border-right-color: #facc15; animation: rimna-orbit 1.2s linear infinite; }
+.rimna-loader-orbit img { object-fit: contain; filter: drop-shadow(0 0 14px #facc1530); animation: rimna-breathe 1.6s ease-in-out infinite alternate; }
+@keyframes rimna-orbit { to { transform: rotate(360deg); } }
+@keyframes rimna-breathe { from { opacity: .65; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .rimna-loader-orbit::before, .rimna-loader-orbit img { animation: none; } }
+
+.ticket-availability-overlay { position: fixed; inset: 0; z-index: 99999; padding: 20px; box-sizing: border-box; display: grid; place-items: center; background: rgba(11,15,25,.88); backdrop-filter: blur(12px); }
+.ticket-availability-card { position: relative; box-sizing: border-box; width: 100%; max-width: 460px; padding: 32px 24px; border-radius: 24px; border: 1px solid #facc1570; background: #0f172a; color: #e2e8f0; box-shadow: 0 24px 80px #0008; animation: ticket-availability-enter .35s cubic-bezier(.22,1,.36,1); }
+.ticket-availability-card h2 { margin: 16px 0 8px; color: white; font-size: 1.4rem; }
+.ticket-availability-card p { font-size: .9rem; line-height: 1.6; }
+.ticket-availability-card .ticket-selection-summary { color: #fde047; font-weight: 700; }
+.ticket-availability-close { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #ffffff10; color: white; cursor: pointer; }
+.ticket-availability-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.ticket-availability-actions button { min-height: 44px; padding: 10px 16px; }
+.ticket-availability-retry { background: transparent; color: white; border: 1px solid #ffffff40; border-radius: 8px; cursor: pointer; }
+@keyframes ticket-availability-enter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ticket-availability-card { animation: none; } }

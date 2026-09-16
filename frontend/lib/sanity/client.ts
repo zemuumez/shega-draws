@@ -36,6 +36,7 @@ export function getSanityWriteClient(): SanityClient | null {
       apiVersion,
       token,
       useCdn: false,
+      perspective: "raw",
     });
   }
   return _writeClient;

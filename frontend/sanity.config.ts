@@ -11,7 +11,7 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 
 const screenshotManagerTool: Tool = {
   name: "screenshot-manager",
-  title: "Storage & Screenshots",
+  title: "Players & Exports",
   icon: () => "📸",
   component: ScreenshotManagerTool,
 };

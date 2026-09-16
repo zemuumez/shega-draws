@@ -1,3 +1,5 @@
+> Historical documentation: player login, Go API, PostgreSQL/Redis and the old number limits have been retired. See [README.md](README.md) for the current Vercel + Sanity guest purchase and employee export workflow.
+
 # Sanity CMS Structure & Strategy: Player Screenshot Verification Guide
 
 > **Purpose:** Step-by-step documentation on how player payment screenshots are submitted from the website and how you view, inspect, and approve them inside Sanity Studio.

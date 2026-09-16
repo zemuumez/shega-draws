@@ -10,7 +10,7 @@ interface PaymentProofUploaderProps {
 }
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB
 
 export function PaymentProofUploader({ onChange, preview, fileName }: PaymentProofUploaderProps) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -29,7 +29,7 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
     // 2. Check file size
     if (file.size > MAX_FILE_SIZE) {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-      setErrorMessage(`File is too large (${sizeMb} MB). Maximum allowed size is 5 MB.`);
+      setErrorMessage(`File is too large (${sizeMb} MB). Maximum allowed size is 3 MB.`);
       return;
     }
 
@@ -128,7 +128,7 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
             <Upload size={20} color="#FDE047" />
             <span>
               Tap or drag payment receipt here<br />
-              <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>JPEG, PNG, or WEBP (Max 5MB)</span>
+              <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>JPEG, PNG, or WEBP (Max 3MB)</span>
             </span>
           </div>
         )}

@@ -27,6 +27,12 @@ export const playerEntryType = defineType({
     },
   ],
   fields: [
+    defineField({name: "selectionKey", title: "Ticket Pool Reference", type: "string", readOnly: true}),
+    defineField({name: "submissionId", type: "string", hidden: true, readOnly: true}),
+    defineField({name: "submissionFingerprint", type: "string", hidden: true, readOnly: true}),
+
+    defineField({name: "drawDocumentId", title: "CMS Draw ID", type: "string", readOnly: true}),
+    defineField({name: "paymentReference", title: "Payment Reference", type: "string", readOnly: true}),
     // ─── 1. Player Info ──────────────────────────────────────────────
     defineField({
       name: "playerName",
@@ -38,7 +44,7 @@ export const playerEntryType = defineType({
     }),
     defineField({
       name: "playerPhone",
-      title: "Player Mobile Phone (Login ID)",
+      title: "Player Phone",
       type: "string",
       fieldset: "playerInfo",
       validation: (Rule) => Rule.required(),
@@ -55,7 +61,7 @@ export const playerEntryType = defineType({
     }),
     defineField({
       name: "luckyNumber",
-      title: "Selected Lucky Number (00-99)",
+      title: "Selected Ticket Number",
       type: "string",
       fieldset: "ticketDetails",
       validation: (Rule) => Rule.required(),
@@ -66,7 +72,7 @@ export const playerEntryType = defineType({
       title: "Participant Pool Size",
       type: "string",
       fieldset: "ticketDetails",
-      placeholder: "1,000 (1K), 2,000 (2K), 3,000 (3K), 5,000 (5K)",
+      placeholder: "e.g. 25000",
       readOnly: true,
     }),
     defineField({
@@ -106,7 +112,8 @@ export const playerEntryType = defineType({
       options: {
         list: [
           { title: "Telebirr SuperApp", value: "telebirr" },
-          { title: "Commercial Bank of Ethiopia (CBE)", value: "cbebirr" },
+          { title: "Commercial Bank of Ethiopia (CBE)", value: "cbe" },
+          { title: "CBE (legacy)", value: "cbebirr" },
           { title: "Awash Bank", value: "awash" },
           { title: "Dashen Bank", value: "dashen" },
           { title: "Credit / Debit Card", value: "card" },

@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep verification builds separate when the development server is running.
+  distDir: process.env.RIMNA_BUILD_DIR || ".next",
   compiler: {
     styledComponents: true,
   },
@@ -18,7 +20,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https://cdn.sanity.io https://*.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
-              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"} https://*.sanity.io https://*.sanity.work https://*.sanity.dev https://api.sanity.io https://auth.sanity.io wss://*.sanity.io`,
+              `connect-src 'self' https://*.sanity.io https://*.sanity.work https://*.sanity.dev https://api.sanity.io https://auth.sanity.io wss://*.sanity.io`,
               "frame-src 'self' https://*.sanity.io https://auth.sanity.io",
               "worker-src 'self' blob:",
               "frame-ancestors 'none'",

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
+import { PageEntrance } from "@/components/ui/PageEntrance";
+import { PageLoader } from "@/components/PageLoader";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
@@ -36,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={siteSettings?.defaultLanguage || "en"}>
       <head>
+        <link rel="preload" as="image" href="/images/rimna-loader-logo.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -45,10 +48,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           defaultLanguage={siteSettings?.defaultLanguage || "en"}
           cmsTranslations={uiTranslations || []}
         >
+          <PageLoader initial />
           <ScrollProgressBar />
           <Nav siteSettings={siteSettings} />
           <main id="main-content" className="page-content">
-            {children}
+            <PageEntrance>{children}</PageEntrance>
           </main>
           <Footer siteSettings={siteSettings} />
         </LanguageProvider>

@@ -34,7 +34,7 @@ export function HowItWorksView({ siteSettings }: HowItWorksViewProps) {
   return (
     <div style={{ position: "relative", zIndex: 2, paddingBottom: 80 }}>
       {/* ── 1. Cinematic Hero Header Banner ──────────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto",
@@ -132,7 +132,7 @@ export function HowItWorksView({ siteSettings }: HowItWorksViewProps) {
       </section>
 
       {/* ── 2. 4-Step Interactive Visual Journey ─────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto 48px",
@@ -251,7 +251,7 @@ export function HowItWorksView({ siteSettings }: HowItWorksViewProps) {
       </section>
 
       {/* ── 3. Prize Breakdown & Odds Transparency Table ─────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto 48px",
@@ -336,7 +336,7 @@ export function HowItWorksView({ siteSettings }: HowItWorksViewProps) {
       </section>
 
       {/* ── 4. Frequently Asked Questions Section ────────────────── */}
-      <section
+      <section data-page-reveal
         style={{
           maxWidth: 1220,
           margin: "0 auto",
