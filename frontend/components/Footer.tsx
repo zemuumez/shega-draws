@@ -20,24 +20,34 @@ export function Footer({ siteSettings }: FooterProps) {
     return null;
   }
 
-  // CMS values with localized fallbacks
+  // Site name from siteSettings with fallback to appName
   const siteName = getLocalized(siteSettings, "siteName", t.appName);
-  const footerDesc = getLocalized(siteSettings, "footerDescription", t.footer.description);
-  const quickLinksTitle = getLocalized(siteSettings, "footerQuickLinksTitle", t.footer.quickLinks);
-  const poolTransparencyTitle = getLocalized(siteSettings, "footerPoolTransparencyTitle", t.footer.poolTransparencyTitle);
-  const poolFeature1 = getLocalized(siteSettings, "footerFeature1", t.footer.poolFeature1);
-  const poolFeature2 = getLocalized(siteSettings, "footerFeature2", t.footer.poolFeature2);
-  const poolFeature3 = getLocalized(siteSettings, "footerFeature3", t.footer.poolFeature3);
-  const supportTitle = getLocalized(siteSettings, "footerSupportTitle", t.footer.customerSupportTitle);
-  const telegramLabel = getLocalized(siteSettings, "footerTelegramLabel", t.footer.officialTelegramLabel);
+
+  // Footer UI texts dynamically resolved via CMS UI Translations (category: footer) with local language fallbacks
+  const footerDesc = t.footer.description;
+  const quickLinksTitle = t.footer.quickLinks;
+  const poolTransparencyTitle = t.footer.poolTransparencyTitle;
+  const poolFeature1 = t.footer.poolFeature1;
+  const poolFeature2 = t.footer.poolFeature2;
+  const poolFeature3 = t.footer.poolFeature3;
+  const supportTitle = t.footer.customerSupportTitle;
+  const telegramLabel = t.footer.officialTelegramLabel;
+  const copyrightText = t.footer.rights;
+  const complianceText = t.footer.compliance;
+
+  // Footer navigation links (customizable in UI Translations under footer or nav)
+  const linkDraws = t.footer.linkDraws || t.nav.draws;
+  const linkHowItWorks = t.footer.linkHowItWorks || t.nav.howItWorks;
+  const linkResults = t.footer.linkResults || t.nav.results;
+  const linkWhyRimna = t.footer.linkWhyRimna || t.nav.whyRimna;
+
+  // Official contact information from siteSettings
   const phone1 = siteSettings?.contactPhone || "+251 911 000 000";
   const phone2 = siteSettings?.contactPhoneSecondary;
   const email = siteSettings?.supportEmail || "support@rimnalottery.com";
   const email2 = siteSettings?.supportEmailSecondary;
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
   const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace(/^@/, "")}`);
-  const copyrightText = getLocalized(siteSettings, "copyrightText", t.footer.rights);
-  const complianceText = getLocalized(siteSettings, "complianceText", t.footer.compliance);
 
   return (
     <footer
@@ -75,10 +85,10 @@ export function Footer({ siteSettings }: FooterProps) {
               {quickLinksTitle}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem" }}>
-              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.draws}</Link>
-              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.howItWorks}</Link>
-              <Link href="/results" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.results}</Link>
-              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.whyRimna}</Link>
+              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{linkDraws}</Link>
+              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{linkHowItWorks}</Link>
+              <Link href="/results" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{linkResults}</Link>
+              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{linkWhyRimna}</Link>
             </div>
           </div>
 

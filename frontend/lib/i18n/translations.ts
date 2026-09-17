@@ -204,6 +204,10 @@ export interface Translations {
     poolFeature3: string;
     customerSupportTitle: string;
     officialTelegramLabel: string;
+    linkDraws?: string;
+    linkHowItWorks?: string;
+    linkResults?: string;
+    linkWhyRimna?: string;
   };
   howItWorksPage: {
     badge: string;
@@ -511,6 +515,10 @@ export const translations: Record<Language, Translations> = {
       poolFeature3: "10-Tier Fixed Guaranteed Prizes",
       customerSupportTitle: "Customer Support",
       officialTelegramLabel: "Official Telegram:",
+      linkDraws: "Draws",
+      linkHowItWorks: "How It Works",
+      linkResults: "Results",
+      linkWhyRimna: "Why Rimna",
     },
     howItWorksPage: {
       badge: "COMPLETE TRANSPARENCY & PLAYER GUIDE",
@@ -860,6 +868,10 @@ export const translations: Record<Language, Translations> = {
       poolFeature3: "10 ደረጃዎች ያሉት ቋሚ ሽልማቶች",
       customerSupportTitle: "የደንበኞች አገልግሎት",
       officialTelegramLabel: "ኦፊሴላዊ ቴሌግራም፦",
+      linkDraws: "እጣዎች",
+      linkHowItWorks: "አሰራሩ እንዴት ነው?",
+      linkResults: "ውጤቶች",
+      linkWhyRimna: "ለምን ሪምና?",
     },
     howItWorksPage: {
       badge: "ሙሉ ግልጽነት እና የተሳታፊዎች መመሪያ",
@@ -1209,6 +1221,10 @@ export const translations: Record<Language, Translations> = {
       poolFeature3: "10 ደረጃ ዘለዎም ቀወምቲ ሽልማታት",
       customerSupportTitle: "ናይ ዓማዊል ደገፍ",
       officialTelegramLabel: "ወግዓዊ ቴሌግራም፦",
+      linkDraws: "ዕጫታት",
+      linkHowItWorks: "ኣሰራርሕኡ ብኸመይ እዩ?",
+      linkResults: "ውጽኢታት",
+      linkWhyRimna: "ስለምንታይ ሪምና?",
     },
     howItWorksPage: {
       badge: "ምሉእ ግልጽነትን ናይ ተሳተፍቲ መምርሒን",

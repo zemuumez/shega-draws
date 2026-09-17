@@ -225,24 +225,28 @@ A structured 4-step wizard with persistent state:
    - `contactPhone` & `contactPhoneSecondary`: Primary and secondary 24/7 hotline numbers.
    - `supportEmail` & `supportEmailSecondary`: Primary and secondary customer support email addresses.
    - `telegramHandle` & `telegramUrl`: Official Telegram handle and direct link URL.
+8. `telebirrMerchantCode`: Official Telebirr shortcode.
 9. `cbeAccountNumber` & `cbeAccountName`: Commercial Bank of Ethiopia account number and recipient name.
 10. `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi`: Trilingual SWIFT/IBAN wire instructions for USD transactions.
 11. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
 12. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
 13. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
-14. **Footer Trilingual Customization (`footer` Fieldset)**:
-    - `footerDescription` / `footerDescriptionAm` / `footerDescriptionTi`: Platform summary paragraph in footer.
-    - `footerQuickLinksTitle` / `footerQuickLinksTitleAm` / `footerQuickLinksTitleTi`: Column header for navigation links.
-    - `footerPoolTransparencyTitle` / `footerPoolTransparencyTitleAm` / `footerPoolTransparencyTitleTi`: Column header for transparency features.
-    - `footerFeature1` / `footerFeature1Am` / `footerFeature1Ti`: Dynamic pool capacity feature line.
-    - `footerFeature2` / `footerFeature2Am` / `footerFeature2Ti`: Live video draw feature line.
-    - `footerFeature3` / `footerFeature3Am` / `footerFeature3Ti`: Fixed prize tier feature line.
-    - `footerSupportTitle` / `footerSupportTitleAm` / `footerSupportTitleTi`: Customer support column header.
-    - `footerTelegramLabel` / `footerTelegramLabelAm` / `footerTelegramLabelTi`: Official Telegram prefix label.
-    - `copyrightText` / `copyrightTextAm` / `copyrightTextTi`: Bottom bar copyright statement.
-    - `complianceText` / `complianceTextAm` / `complianceTextTi`: Bottom bar compliance & verification badge text.
 
-### 6.2 `playerEntry` (Receipts & Proofs)
+### 6.2 Website UI Translations (`uiTranslation` Documents)
+All static and dynamic platform copywriting across all 3 supported languages (**English 🇬🇧**, **Amharic 🇪🇹 አማርኛ**, and **Tigrinya 🇪🇹 ትግርኛ**) is managed under **"🌐 Website UI Translations"** with categorized folders:
+- **`📌 Footer & Legal` (`footer`)**:
+  - `footer.description`: Trilingual platform summary paragraph.
+  - `footer.quickLinks`: Quick links column title.
+  - `footer.poolTransparencyTitle`: Transparency column header.
+  - `footer.poolFeature1`, `footer.poolFeature2`, `footer.poolFeature3`: Feature bullet points (Capacities, Live Video Draws, Fixed Prizes).
+  - `footer.customerSupportTitle`: Customer support column header.
+  - `footer.officialTelegramLabel`: Telegram prefix label.
+  - `footer.rights`: Copyright statement.
+  - `footer.compliance`: Verification and compliance badge text.
+  - `footer.linkDraws`, `footer.linkHowItWorks`, `footer.linkResults`, `footer.linkWhyRimna`: Navigation link texts.
+- **Other UI Categories**: `🧭 Navigation`, `🌟 Hero`, `🎟️ Tickets`, `🎰 Draws`, `🛡️ Fairness`, `🏆 Winners`, `❓ FAQs`, `💬 Testimonials`, `💳 Payments`.
+
+### 6.3 `playerEntry` (Receipts & Proofs)
 - Stores player full name, phone number, draw ID, lucky number, pool size, price paid, currency, payment method, submission timestamp, and admin verification status (`pending`, `confirmed`, `rejected`).
 - Structured in Sanity Studio with categorized filter lists:
   - 📋 All Submitted Receipts

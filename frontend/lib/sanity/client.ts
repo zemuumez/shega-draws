@@ -48,7 +48,6 @@ export const sanityClient = {
     if (!client) return null;
     return client.fetch<T>(query, params, {
       cache: "no-store",
-      next: { revalidate: 0 },
     });
   },
   create: async <T extends { _type: string; [key: string]: any }>(doc: T): Promise<any> => {

@@ -79,36 +79,6 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     diasporaWireInstructions,
     diasporaWireInstructionsAm,
     diasporaWireInstructionsTi,
-    footerDescription,
-    footerDescriptionAm,
-    footerDescriptionTi,
-    footerQuickLinksTitle,
-    footerQuickLinksTitleAm,
-    footerQuickLinksTitleTi,
-    footerPoolTransparencyTitle,
-    footerPoolTransparencyTitleAm,
-    footerPoolTransparencyTitleTi,
-    footerFeature1,
-    footerFeature1Am,
-    footerFeature1Ti,
-    footerFeature2,
-    footerFeature2Am,
-    footerFeature2Ti,
-    footerFeature3,
-    footerFeature3Am,
-    footerFeature3Ti,
-    footerSupportTitle,
-    footerSupportTitleAm,
-    footerSupportTitleTi,
-    footerTelegramLabel,
-    footerTelegramLabelAm,
-    footerTelegramLabelTi,
-    copyrightText,
-    copyrightTextAm,
-    copyrightTextTi,
-    complianceText,
-    complianceTextAm,
-    complianceTextTi,
     etbPrices[]{
       value,
       label,
@@ -299,36 +269,6 @@ export interface CMSSiteSettings {
   diasporaWireInstructions?: string;
   diasporaWireInstructionsAm?: string;
   diasporaWireInstructionsTi?: string;
-  footerDescription?: string;
-  footerDescriptionAm?: string;
-  footerDescriptionTi?: string;
-  footerQuickLinksTitle?: string;
-  footerQuickLinksTitleAm?: string;
-  footerQuickLinksTitleTi?: string;
-  footerPoolTransparencyTitle?: string;
-  footerPoolTransparencyTitleAm?: string;
-  footerPoolTransparencyTitleTi?: string;
-  footerFeature1?: string;
-  footerFeature1Am?: string;
-  footerFeature1Ti?: string;
-  footerFeature2?: string;
-  footerFeature2Am?: string;
-  footerFeature2Ti?: string;
-  footerFeature3?: string;
-  footerFeature3Am?: string;
-  footerFeature3Ti?: string;
-  footerSupportTitle?: string;
-  footerSupportTitleAm?: string;
-  footerSupportTitleTi?: string;
-  footerTelegramLabel?: string;
-  footerTelegramLabelAm?: string;
-  footerTelegramLabelTi?: string;
-  copyrightText?: string;
-  copyrightTextAm?: string;
-  copyrightTextTi?: string;
-  complianceText?: string;
-  complianceTextAm?: string;
-  complianceTextTi?: string;
   etbPrices?: CMSPriceOption[];
   usdPrices?: CMSPriceOption[];
   poolSizes?: CMSPoolOption[];
