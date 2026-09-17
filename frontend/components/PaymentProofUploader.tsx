@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+
 
 import { useRef, useState } from "react";
 import { Upload, CheckCircle, AlertCircle, Image as ImageIcon } from "lucide-react";
@@ -13,6 +15,7 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB
 
 export function PaymentProofUploader({ onChange, preview, fileName }: PaymentProofUploaderProps) {
+  const { text } = useLanguage();
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -28,8 +31,7 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
 
     // 2. Check file size
     if (file.size > MAX_FILE_SIZE) {
-      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-      setErrorMessage(`File is too large (${sizeMb} MB). Maximum allowed size is 3 MB.`);
+      setErrorMessage("Maximum file size is 3 MB.");
       return;
     }
 
@@ -60,9 +62,7 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
           textTransform: "uppercase",
           letterSpacing: "0.5px",
         }}
-      >
-        Payment Screenshot / SMS Proof
-      </label>
+      > {text("Payment Screenshot / SMS Proof")} </label>
 
       {errorMessage && (
         <div
@@ -81,14 +81,14 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
           }}
         >
           <AlertCircle size={14} color="#EF4444" style={{ flexShrink: 0 }} />
-          <span>{errorMessage}</span>
+          <span>{text(errorMessage)}</span>
         </div>
       )}
 
       <div
         role="button"
         tabIndex={0}
-        aria-label="Upload payment screenshot"
+        aria-label={text("Upload payment screenshot")}
         onClick={() => fileRef.current?.click()}
         onKeyDown={(e) => e.key === "Enter" && fileRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -113,22 +113,20 @@ export function PaymentProofUploader({ onChange, preview, fileName }: PaymentPro
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={preview}
-              alt="Payment proof preview"
+              alt={text("Payment proof preview")}
               style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1.5px solid #FDE047" }}
             />
             <div style={{ textAlign: "left" }}>
               <div style={{ color: "#FFFFFF", fontSize: "0.875rem", fontWeight: 700 }}>{fileName || "screenshot.png"}</div>
               <div style={{ color: "#6EE7B7", fontSize: "0.75rem", display: "flex", alignItems: "center", gap: 4, marginTop: 2, fontWeight: 800 }}>
-                <CheckCircle size={13} color="#34D399" /> Proof Ready to Submit
-              </div>
+                <CheckCircle size={13} color="#34D399" /> {text("Proof Ready to Submit")} </div>
             </div>
           </div>
         ) : (
           <div style={{ color: "#CBD5E1", fontSize: "0.875rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
             <Upload size={20} color="#FDE047" />
-            <span>
-              Tap or drag payment receipt here<br />
-              <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>JPEG, PNG, or WEBP (Max 3MB)</span>
+            <span> {text("Tap or drag payment receipt here")}<br />
+              <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{text("JPEG, PNG, or WEBP (Max 3MB)")}</span>
             </span>
           </div>
         )}

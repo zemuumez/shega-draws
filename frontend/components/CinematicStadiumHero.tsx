@@ -24,7 +24,7 @@ interface CinematicStadiumHeroProps {
 }
 
 export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicStadiumHeroProps) {
-  const { t, getLocalized } = useLanguage();
+  const { text, t, getLocalized } = useLanguage();
   const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
@@ -338,9 +338,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 letterSpacing: "0.8px",
                 textShadow: "0 1px 4px rgba(0,0,0,0.5)",
               }}
-            >
-              CHOOSE YOUR LUCKY TIER FAST
-            </span>
+            > {text("CHOOSE YOUR LUCKY TIER FAST")} </span>
           </div>
 
           {/* 4 Interactive Selector Slots + Action Button */}
@@ -367,9 +365,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                CURRENCY
-              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("CURRENCY")} </span>
               <div style={{ display: "flex", gap: 4, marginTop: 2 }}>
                 <button
                   type="button"
@@ -425,9 +421,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                TICKET PRICE
-              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("TICKET PRICE")} </span>
               <select
                 value={selectedPrice}
                 onChange={(e) => setSelectedPrice(Number(e.target.value))}
@@ -465,9 +459,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                POOL CAPACITY
-              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("POOL CAPACITY")} </span>
               <select
                 value={selectedPool}
                 onChange={(e) => setSelectedPool(Number(e.target.value))}
@@ -484,8 +476,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
               >
                 {poolOptions.map((p) => (
                   <option key={p.size} value={p.size} style={{ background: "#0F172A", color: "#FFFFFF" }}>
-                    {p.label} People
-                  </option>
+                    {p.label} {text("People")} </option>
                 ))}
               </select>
             </div>
@@ -505,12 +496,8 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
-                WINNING ODDS
-              </span>
-              <span style={{ fontSize: "0.875rem", fontWeight: 900, color: "#FDE047" }}>
-                1 in {selectedPool / 10} Odds · 10 Winners
-              </span>
+              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("WINNING ODDS")} </span>
+              <span style={{ fontSize: "0.875rem", fontWeight: 900, color: "#FDE047" }}> {text("1 in")} {selectedPool / 10} {text("Odds · 10 Winners")} </span>
             </div>
 
             {/* Action CTA Button: Signature Casino Red */}

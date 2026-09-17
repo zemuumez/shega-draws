@@ -52,7 +52,7 @@ interface InteractiveTicketConfiguratorProps {
 }
 
 export function InteractiveTicketConfigurator({ siteSettings, draws }: InteractiveTicketConfiguratorProps) {
-  const { language, t, getLocalized } = useLanguage();
+  const { text, language, t, getLocalized } = useLanguage();
   const [currency, setCurrency] = useState<Currency>("ETB");
   const [selectedPrice, setSelectedPrice] = useState<number>(100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
@@ -711,8 +711,7 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
               <span style={{ fontSize: "0.625rem", color: "#6EE7B7", fontWeight: 800, display: "block" }}>
                 {t.configurator?.winningOdds || "WINNING ODDS"}
               </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#34D399" }}>
-                1 in {oddsRatio} ({t.configurator?.oddsValue || "High Odds"})
+              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#34D399" }}> {text("1 in")} {oddsRatio} ({text("High Odds")})
               </span>
             </div>
 
@@ -732,7 +731,7 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                 {t.configurator?.drawBroadcast || "DRAW BROADCAST"}
               </span>
               <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
-                {selectedDraw?.deadline ? new Date(selectedDraw.deadline).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Addis_Ababa"}) : "To be announced"}
+                {selectedDraw?.deadline ? new Date(selectedDraw.deadline).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Addis_Ababa"}) : text("To be announced")}
               </span>
             </div>
           </div>

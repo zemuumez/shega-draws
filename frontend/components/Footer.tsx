@@ -14,7 +14,7 @@ interface FooterProps {
 
 export function Footer({ siteSettings }: FooterProps) {
   const pathname = usePathname();
-  const { language, t, getLocalized } = useLanguage();
+  const { text, language, t, getLocalized } = useLanguage();
 
   if (pathname?.startsWith("/studio")) {
     return null;
@@ -66,38 +66,31 @@ export function Footer({ siteSettings }: FooterProps) {
               {t.footer.quickLinks}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem" }}>
-              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Choose Tickets</Link>
-              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>How It Works</Link>
+              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{text("Choose Tickets")}</Link>
+              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{text("How It Works")}</Link>
               <Link href="/entries" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.myEntries}</Link>
               <Link href="/results" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.results}</Link>
-              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Why Rimna</Link>
+              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{text("Why Rimna")}</Link>
               <Link href="/studio" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.admin}</Link>
             </div>
           </div>
 
           {/* Pool Sizes & Transparency */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
-              Pool Sizes & Transparency
-            </h4>
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}> {text("Pool Sizes & Transparency")} </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Users size={14} color="var(--blue-royal)" /> 1K, 2K, 3K, and 5K Ticket Capacities
-              </div>
+                <Users size={14} color="var(--blue-royal)" /> {text("1K, 2K, 3K, and 5K Ticket Capacities")} </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <ShieldCheck size={14} color="var(--teal)" /> 100% Live Video Broadcast Draws
-              </div>
+                <ShieldCheck size={14} color="var(--teal)" /> {text("100% Live Video Broadcast Draws")} </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Award size={14} color="var(--gold-dark)" /> 10-Tier Fixed Guaranteed Prizes
-              </div>
+                <Award size={14} color="var(--gold-dark)" /> {text("10-Tier Fixed Guaranteed Prizes")} </div>
             </div>
           </div>
 
           {/* Contact & Support */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
-              Customer Support
-            </h4>
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}> {text("Customer Support")} </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Phone size={14} color="var(--blue-navy)" /> {phone1} / {phone2}
@@ -106,7 +99,7 @@ export function Footer({ siteSettings }: FooterProps) {
                 <Mail size={14} color="var(--blue-navy)" /> {email}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Send size={14} color="#2A65E6" /> Official Telegram: {telegramHandle}
+                <Send size={14} color="#2A65E6" /> {text("Official Telegram:")} {telegramHandle}
               </div>
             </div>
           </div>

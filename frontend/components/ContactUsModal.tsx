@@ -13,11 +13,13 @@ interface ContactUsModalProps {
 }
 
 export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModalProps) {
-  const { t, language } = useLanguage();
+  const { t, language, text } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
@@ -32,22 +34,15 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.trim() && message.trim()) {
-      try {
-        await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, phone, message }),
-        });
-      } catch (err) {
-        console.warn("Contact submit error:", err);
-      }
+    if (sending || !phone.trim() || !message.trim()) return;
+    setSending(true); setError("");
+    try {
+      const response = await fetch("/api/contact", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,phone,message})});
+      if (!response.ok) throw new Error("save failed");
       setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        onClose();
-      }, 2000);
-    }
+    } catch {setError("Your message could not be saved. Please try again.");}
+    finally {setSending(false);}
+
   };
 
   return createPortal(
@@ -183,6 +178,7 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
           </a>
         </div>
 
+        {error && <p role="alert">{text(error)}</p>}
         {submitted ? (
           <div style={{ textAlign: "center", padding: "24px 0", color: "var(--teal-dark)" }}>
             <CheckCircle2 size={36} color="var(--teal)" style={{ margin: "0 auto 8px" }} />
@@ -240,11 +236,12 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
             </div>
 
             <button
+              disabled={sending}
               type="submit"
               className="btn-base btn-primary"
               style={{ width: "100%", padding: "11px", fontSize: "0.875rem", fontWeight: 800, justifyContent: "center", marginTop: 4 }}
             >
-              {language === "ti" ? "መልእኽቲ ስደዱ" : language === "am" ? "መልእክት ይላኩ" : "Send Message"}
+              {sending ? text("Saving…") : language === "ti" ? "መልእኽቲ ስደዱ" : language === "am" ? "መልእክት ይላኩ" : "Send Message"}
             </button>
           </form>
         )}

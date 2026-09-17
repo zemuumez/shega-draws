@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -57,6 +59,7 @@ const FEATURED_CARDS: CardData[] = [
 ];
 
 export function FeaturedJackpotCards() {
+  const { text } = useLanguage();
   const [countdownString, setCountdownString] = useState("02d 14h 21m 45s");
 
   useEffect(() => {
@@ -209,9 +212,7 @@ export function FeaturedJackpotCards() {
                   marginBottom: 14,
                 }}
               >
-                <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#111827", textTransform: "uppercase" }}>
-                  POOLS:
-                </span>
+                <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#111827", textTransform: "uppercase" }}> {text("POOLS:")} </span>
                 {card.pools.map((p) => (
                   <span
                     key={p}
@@ -254,8 +255,7 @@ export function FeaturedJackpotCards() {
                     fontWeight: 800,
                     color: "#111827",
                   }}
-                >
-                  Live Draw:<span style={{ color: "#DC2626", marginLeft: 4 }}>{countdownString}</span>
+                > {text("Live Draw:")}<span style={{ color: "#DC2626", marginLeft: 4 }}>{countdownString}</span>
                 </span>
               </div>
             </div>
@@ -298,8 +298,7 @@ export function FeaturedJackpotCards() {
                   onMouseEnter={(e) => (e.currentTarget.style.background = "#1E293B")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "#0F172A")}
                 >
-                  <HelpCircle size={13} /> How to Buy
-                </Link>
+                  <HelpCircle size={13} /> {text("How to Buy")} </Link>
 
                 <button
                   type="button"
@@ -329,8 +328,7 @@ export function FeaturedJackpotCards() {
                     e.currentTarget.style.boxShadow = "0 4px 10px rgba(220, 38, 38, 0.4)";
                   }}
                 >
-                  <Ticket size={14} /> Buy Now
-                </button>
+                  <Ticket size={14} /> {text("Buy Now")} </button>
               </div>
             </div>
           </div>

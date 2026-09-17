@@ -15,7 +15,7 @@ export function HeroJackpotSection({
   onBuyNowClick,
   deadline = new Date(Date.now() + 2 * 86400000 + 12 * 3600000 + 27 * 60000).toISOString(),
 }: HeroJackpotSectionProps) {
-  const { language } = useLanguage();
+  const { text, language } = useLanguage();
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 12, minutes: 27, seconds: 24 });
 
   useEffect(() => {
@@ -81,8 +81,7 @@ export function HeroJackpotSection({
                 letterSpacing: "0.3px",
               }}
             >
-              <Trophy size={13} color="#D97706" /> 10 GUARANTEED WINNERS PER DRAW
-            </span>
+              <Trophy size={13} color="#D97706" /> {text("10 GUARANTEED WINNERS PER DRAW")} </span>
 
             <span
               style={{
@@ -97,8 +96,7 @@ export function HeroJackpotSection({
                 gap: 5,
               }}
             >
-              <CheckCircle2 size={14} color="#10B981" /> PUBLIC VIDEO BROADCAST
-            </span>
+              <CheckCircle2 size={14} color="#10B981" /> {text("PUBLIC VIDEO BROADCAST")} </span>
           </div>
 
           {/* Main Title */}
@@ -112,9 +110,7 @@ export function HeroJackpotSection({
               margin: "4px 0 0",
               letterSpacing: "-0.5px",
             }}
-          >
-            100 Birr Classic Multi-Pool Draw
-          </h1>
+          > {text("100 Birr Classic Multi-Pool Draw")} </h1>
 
           {/* Subtitle */}
           <p
@@ -125,9 +121,7 @@ export function HeroJackpotSection({
               margin: 0,
               maxWidth: 520,
             }}
-          >
-            Pick your lucky number, choose your pool capacity, and watch our founders draw the 10 winning numbers live on video stream.
-          </p>
+          > {text("Pick your lucky number, choose your pool capacity, and watch our founders draw the 10 winning numbers live on video stream.")} </p>
 
           {/* CTA Buttons */}
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginTop: 8 }}>
@@ -156,9 +150,7 @@ export function HeroJackpotSection({
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = "0 6px 18px rgba(234, 179, 8, 0.4)";
               }}
-            >
-              BUY NOW
-            </button>
+            > {text("BUY NOW")} </button>
 
             <Link
               href="/results"
@@ -186,8 +178,7 @@ export function HeroJackpotSection({
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              <Trophy size={16} color="#FACC15" /> View Results & Live Stream
-            </Link>
+              <Trophy size={16} color="#FACC15" /> {text("View Results & Live Stream")} </Link>
           </div>
         </div>
 
@@ -250,8 +241,7 @@ export function HeroJackpotSection({
                     boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
                   }}
                 >
-                  <Trophy size={11} color="#D97706" /> 100% Guaranteed Payouts
-                </span>
+                  <Trophy size={11} color="#D97706" /> {text("100% Guaranteed Payouts")} </span>
 
                 <span
                   style={{
@@ -264,9 +254,7 @@ export function HeroJackpotSection({
                     gap: 4,
                   }}
                 >
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#EF4444" }} />
-                  Live Video Draw
-                </span>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#EF4444" }} /> {text("Live Video Draw")} </span>
               </div>
             </div>
 

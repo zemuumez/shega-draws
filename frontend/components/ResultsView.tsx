@@ -14,7 +14,7 @@ interface ResultsViewProps {
 }
 
 export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsViewProps) {
-  const { t, language } = useLanguage();
+  const { t, language, text } = useLanguage();
   const pageT = t.resultsPage;
 
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
@@ -22,7 +22,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
   const telegramUrl = siteSettings?.telegramUrl || `https://t.me/${telegramHandle.replace("@", "")}`;
 
   const latestResult = cmsResults && cmsResults.length > 0 ? cmsResults[0] : null;
-  const defaultWinningNumbers = { 1: "42", 2: "89", 3: "07", 4: "15", 5: "63", 6: "77", 7: "21", 8: "94", 9: "38", 10: "50" };
+
 
   const winningNumbersList = latestResult?.winningNumbers?.length
     ? latestResult.winningNumbers.map((w) => ({
@@ -30,8 +30,9 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
         num: w.luckyNumber,
         prize: w.prizeAmount,
         winner: w.winnerName,
+        payoutStatus: w.payoutStatus,
       }))
-    : Object.entries(drawState?.winning_numbers ?? defaultWinningNumbers).map(([rank, num]) => ({
+    : Object.entries(drawState?.winning_numbers ?? {}).map(([rank, num]) => ({
         rank,
         num: String(num),
         prize:
@@ -43,6 +44,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
             ? (pageT?.rankLabels?.third || "🥉 3rd Place")
             : `${pageT?.rankLabels?.other || "Rank #"}#${rank}`,
         winner: undefined,
+        payoutStatus: undefined,
       }));
 
   return (
@@ -128,7 +130,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
           boxSizing: "border-box",
         }}
       >
-        <div
+        {!winningNumbersList.length ? <p role="status">{text("No results published yet.")}</p> : <div
           style={{
             background: "rgba(15, 23, 42, 0.62)",
             backdropFilter: "blur(24px) saturate(190%)",
@@ -278,11 +280,14 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
                   >
                     {item.prize || `${pageT?.rankLabels?.other || "Rank #"} ${item.rank}`}
                   </span>
+                  {item.winner && <p>{item.winner}</p>}
+                  <span>{text(item.payoutStatus === "paid" ? "Paid" : item.payoutStatus === "processing" ? "Processing" : "Pending")}</span>
                 </div>
               );
             })}
           </div>
 
+          {latestResult?.broadcastVideoUrl && /^https?:\/\//.test(latestResult.broadcastVideoUrl) && <p><a href={latestResult.broadcastVideoUrl} target="_blank" rel="noopener noreferrer">{text("Watch draw recording")}</a></p>}
           {/* Payout Guarantee Banner */}
           <div
             style={{
@@ -302,7 +307,7 @@ export function ResultsView({ cmsResults, drawState, siteSettings }: ResultsView
               {pageT?.payoutNotice || "All payouts are automatically transferred within 30 minutes of live draw completion to the winner's verified CBE or Telebirr account."}
             </span>
           </div>
-        </div>
+        </div>}
       </section>
 
       {/* ── 4. 24/7 Support Hotline ───────────────────────────────── */}

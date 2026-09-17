@@ -27,7 +27,7 @@ export function BuyTicketModal({
   initialPoolSize = 1000,
   siteSettings,
 }: BuyTicketModalProps) {
-  const { t, language } = useLanguage();
+  const { text, t, language, getLocalized } = useLanguage();
   const [mounted, setMounted] = useState(false);
 
   const STEP_LABELS = [
@@ -159,16 +159,16 @@ export function BuyTicketModal({
 
   if (!mounted || !isOpen) return null;
   if (step !== 3 && (checking || unavailable)) return createPortal(
-    <div role="dialog" aria-modal="true" aria-label="Buy a ticket" className="ticket-availability-overlay">
+    <div role="dialog" aria-modal="true" aria-label={text("Buy a ticket")} className="ticket-availability-overlay">
       <div className="ticket-availability-card">
-        <button aria-label="Close ticket form" className="ticket-availability-close" onClick={onClose}><X size={20}/></button>
+        <button aria-label={text("Close ticket form")} className="ticket-availability-close" onClick={onClose}><X size={20}/></button>
         <Ticket size={32} color="#FDE047" aria-hidden="true"/>
-        <h2>{checking ? "Checking your ticket…" : "Ticket availability"}</h2>
-        <p className="ticket-selection-summary">{ticketPrice} {currency} · {poolSize.toLocaleString()} pool</p>
-        <p role={checking ? "status" : "alert"}>{checking ? "Finding available numbers for your selection." : unavailable}</p>
+        <h2>{checking ? text("Checking your ticket…") : text("Ticket availability")}</h2>
+        <p className="ticket-selection-summary">{ticketPrice} {currency} · {poolSize.toLocaleString()} {text("pool")}</p>
+        <p role={checking ? "status" : "alert"}>{checking ? text("Finding available numbers for your selection.") : text(unavailable)}</p>
         {checking ? <Loader2 className="animate-spin" aria-hidden="true"/> : <div className="ticket-availability-actions">
-          <button className="casino-btn-red" onClick={onClose}>Choose another ticket</button>
-          <button className="ticket-availability-retry" onClick={() => setAvailabilityAttempt(n => n + 1)}>Check again</button>
+          <button className="casino-btn-red" onClick={onClose}>{text("Choose another ticket")}</button>
+          <button className="ticket-availability-retry" onClick={() => setAvailabilityAttempt(n => n + 1)}>{text("Check again")}</button>
         </div>}
       </div>
     </div>, document.body);
@@ -196,7 +196,7 @@ export function BuyTicketModal({
     >
       <div
         role="dialog"
-        aria-label="Buy a ticket"
+        aria-label={text("Buy a ticket")}
         aria-modal="true"
         style={{
           width: "100%",
@@ -233,7 +233,7 @@ export function BuyTicketModal({
           {/* Close Button */}
           <button
             type="button"
-            aria-label="Close ticket form"
+            aria-label={text("Close ticket form")}
             disabled={loading}
             onClick={() => { if (!loading) onClose(); }}
             style={{
@@ -365,7 +365,7 @@ export function BuyTicketModal({
                   value={name}
                   onChange={e => setName(e.target.value)}
                   maxLength={120}
-                  aria-label="Full name"
+                  aria-label={text("Full name")}
                   autoComplete="name"
                   placeholder={language === "ti" ? "ንኣብነት ኣበበ ቢቂላ" : language === "am" ? "ለምሳሌ አበበ ቢቂላ" : "e.g. Abebe Bikila"}
                   style={{
@@ -391,7 +391,7 @@ export function BuyTicketModal({
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   maxLength={30}
-                  aria-label="Phone number"
+                  aria-label={text("Phone number")}
                   autoComplete="tel"
                   placeholder="0911 00 00 00 or +1 202 555 0199"
                   style={{
@@ -415,14 +415,12 @@ export function BuyTicketModal({
           {/* STEP 2: Lucky Number Selection */}
           {step === 1 && (
             <div>
-              <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: "0 0 14px" }}>
-                Choose a number from 1 to {poolSize.toLocaleString()}. Submitted numbers are disabled.
-              </p>
+              <p style={{ fontSize: "0.875rem", color: "#CBD5E1", margin: "0 0 14px" }}> {text("Choose a number from 1 to")} {poolSize.toLocaleString()}{text(". Submitted numbers are disabled.")} </p>
               <NumberPicker value={number.padStart(2, "0")} onChange={setNumber} poolSize={poolSize} takenNumbers={takenNumbers} />
             </div>
           )}
 
-          {step === 2 && !numberAvailable && <p role="alert" style={{color: "#FCA5A5"}}>This number is now taken. Go back and choose another available number. Keep your payment reference and screenshot.</p>}
+          {step === 2 && !numberAvailable && <p role="alert" style={{color: "#FCA5A5"}}>{text("This number is now taken. Go back and choose another available number. Keep your payment reference and screenshot.")}</p>}
 
           {/* STEP 3: Payment & Proof Verification */}
           {step === 2 && (
@@ -451,9 +449,7 @@ export function BuyTicketModal({
                       }}
                     >
                       <div>{m.label}</div>
-                      <span style={{ fontSize: "0.625rem", color: method === m.id ? "#FDE047" : "#94A3B8" }}>
-                        Manual review
-                      </span>
+                      <span style={{ fontSize: "0.625rem", color: method === m.id ? "#FDE047" : "#94A3B8" }}> {text("Manual review")} </span>
                     </button>
                   ))}
                 </div>
@@ -476,26 +472,22 @@ export function BuyTicketModal({
                 </div>
                 {method === "telebirr" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <div>
-                      Telebirr Merchant Code: <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.telebirrMerchantCode}</strong>
+                    <div> {text("Telebirr Merchant Code:")} <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.telebirrMerchantCode}</strong>
                     </div>
-                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                      Merchant: {siteSettings?.siteName || "Rimna International Digital Lottery"} • Hotline: {siteSettings?.contactPhone || "+251 911 000 000"}
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}> {text("Merchant:")} {siteSettings?.siteName || "Rimna International Digital Lottery"} {text("• Hotline:")} {siteSettings?.contactPhone || "+251 911 000 000"}
                     </div>
                   </div>
                 )}
                 {method === "cbe" && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <div>
-                      Commercial Bank of Ethiopia (CBE) Account: <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.cbeAccountNumber}</strong>
+                    <div> {text("Commercial Bank of Ethiopia (CBE) Account:")} <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.cbeAccountNumber}</strong>
                     </div>
-                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                      Account Holder: <strong style={{ color: "#FFFFFF" }}>{siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC"}</strong>
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}> {text("Account Holder:")} <strong style={{ color: "#FFFFFF" }}>{siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC"}</strong>
                     </div>
                   </div>
                 )}
-                {method === "wire" && <div style={{whiteSpace: "pre-line"}}>{siteSettings?.diasporaWireInstructions}</div>}
-                {availableMethods.length === 0 && <p role="alert">Payment instructions have not been configured for this currency. Please contact support.</p>}
+                {method === "wire" && <div style={{whiteSpace: "pre-line"}}>{getLocalized(siteSettings, "diasporaWireInstructions")}</div>}
+                {availableMethods.length === 0 && <p role="alert">{text("Payment instructions have not been configured for this currency. Please contact support.")}</p>}
 
               </div>
 
@@ -507,7 +499,7 @@ export function BuyTicketModal({
                 <input
                   type="text"
                   value={paymentReference}
-                  aria-label="Payment reference"
+                  aria-label={text("Payment reference")}
                   maxLength={120}
                   onChange={(e) => setPaymentReference(e.target.value)}
                   placeholder={method === "telebirr" ? "e.g. TF240822.0911.A34981" : method === "cbe" ? "e.g. FT242319082" : "e.g. TXN-98472910"}
@@ -559,19 +551,15 @@ export function BuyTicketModal({
                 <CheckCircle2 size={32} color="#34D399" />
               </div>
 
-              <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#FEF08A", textTransform: "uppercase" }}>
-                PAYMENT RECEIPT SUBMITTED
-              </span>
+              <span style={{ fontSize: "0.6875rem", fontWeight: 900, color: "#FEF08A", textTransform: "uppercase" }}> {text("PAYMENT RECEIPT SUBMITTED")} </span>
 
               <h3 className="display" style={{ fontSize: "1.75rem", fontWeight: 900, color: "#FFFFFF", margin: "6px 0 10px" }}>
                 {language === "ti" ? `ቲኬት #${number} ተላኢኹ። ክፍሊት ምርግጋጽ ይጽበ ኣሎ።` : language === "am" ? `ቲኬት #${number} ተልኳል። የክፍያ ማረጋገጫ በመጠባበቅ ላይ።` : `Ticket #${number.padStart(2, "0")} submitted`}
               </h3>
 
-              <p style={{ fontSize: "0.875rem", color: "#CBD5E1", maxWidth: 440, margin: "0 auto 20px" }}>
-                Your screenshot is saved and your number is reserved. Our team will manually check your payment before confirming your ticket. Save this reference for support.
-              </p>
+              <p style={{ fontSize: "0.875rem", color: "#CBD5E1", maxWidth: 440, margin: "0 auto 20px" }}> {text("Your screenshot is saved and your number is reserved. Our team will manually check your payment before confirming your ticket. Save this reference for support.")} </p>
 
-              <p style={{overflowWrap: "anywhere", fontSize: 12}}>Reference: {receiptId}</p>
+              <p style={{overflowWrap: "anywhere", fontSize: 12}}>{text("Reference:")} {receiptId}</p>
               <div
                 style={{
                   background: "rgba(0, 0, 0, 0.5)",

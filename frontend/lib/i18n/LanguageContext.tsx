@@ -1,11 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { type Language, type Translations, translations } from "./translations";
+import { copyByEnglish } from "./uiCopy";
 import { Globe } from "lucide-react";
 
 interface LanguageContextType {
   language: Language;
+  text: (english: string) => string;
   setLanguage: (lang: Language) => void;
   t: Translations;
   /** Get a CMS translation by key, with fallback to hardcoded translations. */
@@ -14,11 +16,13 @@ interface LanguageContextType {
   getLocalized: (doc: any, fieldPrefix: string, fallback?: string) => string;
 }
 
-// CMS translation cache (populated on mount)
-let _cmsTranslations: Record<string, Record<string, string>> = {};
+type CMSTranslation = { key: string; en: string; am?: string; ti?: string };
+const LANGUAGE_PREFERENCE_KEY = "rimnalottery_language_preference";
+const isLanguage = (value: unknown): value is Language => value === "en" || value === "am" || value === "ti";
 
 const LanguageContext = createContext<LanguageContextType>({
   language: "en",
+  text: (english) => english,
   setLanguage: () => {},
   t: translations.en,
   tc: () => "",
@@ -26,21 +30,17 @@ const LanguageContext = createContext<LanguageContextType>({
 });
 
 // Recursive dynamic proxy that checks CMS overrides before falling back to static translations
-function createProxyTranslations(base: any, lang: Language, prefix = ""): any {
+function createProxyTranslations(base: any, lang: Language, cms: Record<string, CMSTranslation>, prefix = ""): any {
   if (base === null || typeof base !== "object") return base;
   return new Proxy(base, {
     get(target, prop) {
       if (typeof prop !== "string") return Reflect.get(target, prop);
       const fullKey = prefix ? `${prefix}.${prop}` : prop;
-      const cmsEntry = _cmsTranslations[fullKey];
-      if (cmsEntry) {
-        if (lang === "ti" && cmsEntry.ti && cmsEntry.ti.trim()) return cmsEntry.ti;
-        if (lang === "am" && cmsEntry.am && cmsEntry.am.trim()) return cmsEntry.am;
-        if (cmsEntry.en && cmsEntry.en.trim()) return cmsEntry.en;
-      }
+      const cmsEntry = cms[fullKey];
+      if (cmsEntry?.[lang]?.trim()) return cmsEntry[lang];
       const rawVal = Reflect.get(target, prop);
       if (typeof rawVal === "object" && rawVal !== null) {
-        return createProxyTranslations(rawVal, lang, fullKey);
+        return createProxyTranslations(rawVal, lang, cms, fullKey);
       }
       return rawVal;
     },
@@ -54,69 +54,54 @@ export function LanguageProvider({
 }: {
   children: React.ReactNode;
   defaultLanguage?: Language | string;
-  cmsTranslations?: { key: string; en: string; am?: string; ti?: string }[];
+  cmsTranslations?: CMSTranslation[];
 }) {
-  const initialLang: Language =
-    defaultLanguage === "am" || defaultLanguage === "ti" || defaultLanguage === "en"
-      ? (defaultLanguage as Language)
-      : "en";
-
-  const [language, setLangState] = useState<Language>(initialLang);
-
-  // Initialize CMS lookup map from props
-  if (cmsTranslations && cmsTranslations.length > 0 && Object.keys(_cmsTranslations).length === 0) {
-    const map: Record<string, Record<string, string>> = {};
-    for (const t of cmsTranslations) {
-      map[t.key] = {
-        en: t.en,
-        ...(t.am ? { am: t.am } : {}),
-        ...(t.ti ? { ti: t.ti } : {}),
-      };
-    }
-    _cmsTranslations = map;
-  }
-
-  useEffect(() => {
-    const saved = localStorage.getItem("rimnalottery_lang") as Language | null;
-    if (saved && (saved === "en" || saved === "am" || saved === "ti")) {
-      setLangState(saved);
-    } else if (defaultLanguage && (defaultLanguage === "en" || defaultLanguage === "am" || defaultLanguage === "ti")) {
-      setLangState(defaultLanguage as Language);
-    }
-  }, [defaultLanguage]);
-
-  // Keep CMS lookup map synced on updates
-  useEffect(() => {
-    if (cmsTranslations && cmsTranslations.length > 0) {
-      const map: Record<string, Record<string, string>> = {};
-      for (const t of cmsTranslations) {
-        map[t.key] = {
-          en: t.en,
-          ...(t.am ? { am: t.am } : {}),
-          ...(t.ti ? { ti: t.ti } : {}),
-        };
-      }
-      _cmsTranslations = map;
-    }
+  const initialLang: Language = isLanguage(defaultLanguage) ? defaultLanguage : "en";
+  // Bind an explicit visitor choice to the CMS default under which it was made.
+  // A newly published default supersedes old preferences on the next page load.
+  const [preference, setPreference] = useState<{ language: Language; defaultLanguage: Language } | null>(null);
+  const language = preference?.defaultLanguage === initialLang ? preference.language : initialLang;
+  const cms = useMemo(() => {
+    const map: Record<string, CMSTranslation> = Object.create(null);
+    for (const entry of cmsTranslations || []) map[entry.key] = entry;
+    return map;
   }, [cmsTranslations]);
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LANGUAGE_PREFERENCE_KEY) || "null");
+      if (isLanguage(saved?.language) && saved.defaultLanguage === initialLang) {
+        setPreference(saved);
+      } else {
+        setPreference(null);
+        localStorage.removeItem(LANGUAGE_PREFERENCE_KEY);
+      }
+      // Legacy preferences have no default attached and can mask CMS changes forever.
+      localStorage.removeItem("rimnalottery_lang");
+    } catch {
+      setPreference(null);
+    }
+  }, [initialLang]);
+
+  useEffect(() => { document.documentElement.lang = language; }, [language]);
+
   const setLanguage = (lang: Language) => {
-    setLangState(lang);
-    localStorage.setItem("rimnalottery_lang", lang);
+    if (!isLanguage(lang)) return;
+    const next = { language: lang, defaultLanguage: initialLang };
+    setPreference(next);
+    try { localStorage.setItem(LANGUAGE_PREFERENCE_KEY, JSON.stringify(next)); } catch {
+      // Language switching still works when browser storage is blocked.
+    }
   };
 
-  const baseTranslations = translations[language] ?? translations.en;
-  const t = createProxyTranslations(baseTranslations, language) as Translations;
+  const baseTranslations = translations[language];
+  const t = createProxyTranslations(baseTranslations, language, cms) as Translations;
 
-  /** Look up CMS translation by dot-path key, falling back to default translation or provided fallback. */
   const tc = (key: string, fallback?: string): string => {
-    const cmsEntry = _cmsTranslations[key];
-    if (cmsEntry) {
-      if (language === "ti" && cmsEntry.ti && cmsEntry.ti.trim()) return cmsEntry.ti;
-      if (language === "am" && cmsEntry.am && cmsEntry.am.trim()) return cmsEntry.am;
-      if (cmsEntry.en && cmsEntry.en.trim()) return cmsEntry.en;
-    }
-    return fallback || "";
+    const localized = cms[key]?.[language];
+    if (localized?.trim()) return localized;
+    const builtIn = key.split(".").reduce((value: any, part) => value?.[part], baseTranslations);
+    return (typeof builtIn === "string" ? builtIn : fallback) || cms[key]?.en || "";
   };
 
   /** Helper to extract localized field from any CMS document based on current language */
@@ -132,7 +117,7 @@ export function LanguageProvider({
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, tc, getLocalized }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, tc, getLocalized, text: (english) => { const copy = copyByEnglish[english]; return copy ? tc(copy.key, copy[language]) : english; } }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -183,6 +168,7 @@ export function LanguageSwitcher() {
               cursor: "pointer",
               transition: "all 0.15s ease",
             }}
+            aria-pressed={active}
             title={opt.label}
           >
             {opt.flag}

@@ -32,7 +32,7 @@ export function Nav({
   siteSettings?: CMSSiteSettings | null;
 }) {
   const pathname = usePathname();
-  const { t, getLocalized } = useLanguage();
+  const { text, t, getLocalized } = useLanguage();
   const [isContactOpen, setIsContactOpen] = useState(false);
 
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
@@ -115,7 +115,7 @@ export function Nav({
           </div>
           <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
 
-          <Link href="/#choose-ticket" style={{color: "#FDE047", fontWeight: 800}}>Buy a ticket</Link>
+          <Link href="/#choose-ticket" style={{color: "#FDE047", fontWeight: 800}}>{text("Buy a ticket")}</Link>
         </div>
       </div>
 

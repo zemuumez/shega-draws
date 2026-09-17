@@ -48,3 +48,17 @@ Standard Sanity Content Lake asset URLs are publicly accessible to anyone with t
 ## Checks
 
 `make test` runs guest submission, availability, concurrency and export tests. `cd frontend && npx tsc --noEmit --incremental false` checks TypeScript. `make frontend-build` builds the website.
+
+## CMS backup and restore
+
+Studio → **CMS Complete Backup & Export** offers a full ZIP with content plus media files, or a smaller JSON containing content and media references. Exports include published documents, drafts, translations and private receipt/contact records. Project configuration, permissions, users and revision history are outside this content backup.
+
+Restore accepts the new ZIP/JSON format and earlier Rimna JSON backups. It validates documents, media checksums and required references before writing. ZIP restores upload missing media and remap references; JSON restores require referenced media to remain in the destination dataset. Existing matching document IDs are replaced; unrelated documents are retained. Large restores run in batches and can be retried after an interruption; errors report partial progress rather than claiming success. Browser imports are limited to 500 MB. Content Releases require native Sanity dataset tools.
+
+Pause sales and content edits while exporting/restoring for a consistent snapshot. Download a current ZIP before replacing content. Use the authenticated Studio account with dataset read/write access.
+
+## Website translations
+
+Studio → **Website UI Translations** lists built-in keys by category, with English, Amharic and Tigrinya defaults ready to edit. Publish individual edits and reload the website to apply them. The previous Content & Language Sync tool has been removed; opening a translation does not bulk-import or overwrite other content. Custom existing translation documents remain under All UI Translation Keys. The published default language supersedes older saved visitor choices; manual choices remain saved until that default changes.
+
+Contact forms and community registrations save to **Player Contact Messages** and report storage failures. Community registrations are available for staff follow-up; automated email/SMS delivery is not configured. Results and testimonials show published CMS content rather than invented fallback winners.

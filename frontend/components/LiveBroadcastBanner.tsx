@@ -11,7 +11,7 @@ interface LiveBroadcastBannerProps {
 }
 
 export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
-  const { language, getLocalized, t } = useLanguage();
+  const { text, language, getLocalized, t } = useLanguage();
 
   const title =
     (language === "ti" && (cmsContent as any)?.titleTi) ||
@@ -72,9 +72,7 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
                   letterSpacing: "0.8px",
                   textTransform: "uppercase",
                 }}
-              >
-                OFFICIAL PUBLIC BROADCAST
-              </span>
+              > {text("OFFICIAL PUBLIC BROADCAST")} </span>
             </div>
 
             <h2
@@ -101,15 +99,12 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
               cursor: "pointer",
             }}
           >
-            <Ticket size={15} /> Enter Active Draw Now
-          </button>
+            <Ticket size={15} /> {text("Enter Active Draw Now")} </button>
         </div>
 
         <p style={{ color: "#E2E8F0", fontSize: "0.9375rem", lineHeight: 1.65, margin: "0 0 20px" }}>
           {body || (
-            <>
-              There are no hidden algorithms or automated backdoors. The company founders host every scheduled live public draw on video, pulling each physical winning number from the illuminated lottery tumbler and showing every ticket directly to viewers in real time!
-            </>
+            <> {text("There are no hidden algorithms or automated backdoors. The company founders host every scheduled live public draw on video, pulling each physical winning number from the illuminated lottery tumbler and showing every ticket directly to viewers in real time!")} </>
           )}
         </p>
 
@@ -130,11 +125,8 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FEF08A", fontWeight: 800, fontSize: "0.875rem", marginBottom: 4 }}>
-              <Tv size={16} color="#FDE047" /> Live Stream Schedule
-            </div>
-            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
-              Every Friday & Sunday at 8:00 PM EAT (Addis Ababa Time).
-            </span>
+              <Tv size={16} color="#FDE047" /> {text("Live Stream Schedule")} </div>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}> {text("Every Friday & Sunday at 8:00 PM EAT (Addis Ababa Time).")} </span>
           </div>
 
           <div
@@ -146,11 +138,8 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6EE7B7", fontWeight: 800, fontSize: "0.875rem", marginBottom: 4 }}>
-              <CheckCircle2 size={16} color="#34D399" /> 10 Guaranteed Winners
-            </div>
-            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
-              100% of the player prize pool is awarded in every single draw without rollovers.
-            </span>
+              <CheckCircle2 size={16} color="#34D399" /> {text("10 Guaranteed Winners")} </div>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}> {text("100% of the player prize pool is awarded in every single draw without rollovers.")} </span>
           </div>
 
           <div
@@ -162,11 +151,8 @@ export function LiveBroadcastBanner({ cmsContent }: LiveBroadcastBannerProps) {
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#93C5FD", fontWeight: 800, fontSize: "0.875rem", marginBottom: 4 }}>
-              <Send size={16} color="#60A5FA" /> Official Telegram Stream
-            </div>
-            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
-              Join @RimnaLottery to watch the live video and chat with fellow participants.
-            </span>
+              <Send size={16} color="#60A5FA" /> {text("Official Telegram Stream")} </div>
+            <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}> {text("Join @RimnaLottery to watch the live video and chat with fellow participants.")} </span>
           </div>
         </div>
       </div>

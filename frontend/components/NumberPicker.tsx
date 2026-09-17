@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+
 
 import React, { useState, useMemo, useEffect } from "react";
 import { Dice5, Grid, Search, Check, Lock, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
@@ -16,6 +18,7 @@ export function NumberPicker({
   poolSize = 1000,
   takenNumbers = [],
 }: NumberPickerProps) {
+  const { text } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const isRolling = false;
@@ -59,7 +62,7 @@ export function NumberPicker({
     setCurrentPage(Math.floor((chosen - 1) / PAGE_SIZE));
   };
 
-  const isCurrentValueTaken = effectiveTaken.has(value);
+  const isCurrentValueTaken = effectiveTaken.has(String(Number(value)).padStart(2, "0"));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -88,9 +91,7 @@ export function NumberPicker({
               letterSpacing: "0.8px",
               display: "block",
             }}
-          >
-            SELECTED LUCKY TICKET NUMBER
-          </span>
+          > {text("SELECTED LUCKY TICKET NUMBER")} </span>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
             <div
@@ -116,15 +117,12 @@ export function NumberPicker({
             <div>
               {value && !isCurrentValueTaken ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#6EE7B7", fontSize: "0.8125rem", fontWeight: 800 }}>
-                  <Check size={15} color="#34D399" /> Available to Pick
-                </div>
+                  <Check size={15} color="#34D399" /> {text("Available to Pick")} </div>
               ) : value && isCurrentValueTaken ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#FCA5A5", fontSize: "0.8125rem", fontWeight: 800 }}>
-                  <Lock size={14} color="#EF4444" /> Already Taken
-                </div>
+                  <Lock size={14} color="#EF4444" /> {text("Already Taken")} </div>
               ) : null}
-              <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}>
-                Pool Range: #1 to #{poolSize.toLocaleString()}
+              <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}> {text("Pool Range: #1 to #")}{poolSize.toLocaleString()}
               </span>
             </div>
           </div>
@@ -146,9 +144,7 @@ export function NumberPicker({
             gap: 7,
           }}
         >
-          <Dice5 size={17} className={isRolling ? "animate-spin" : ""} color="#111827" />
-          Pick Random Number
-        </button>
+          <Dice5 size={17} className={isRolling ? "animate-spin" : ""} color="#111827" /> {text("Pick Random Number")} </button>
       </div>
 
       {/* ── Search & Range Jump Filter ────────────────────────────── */}
@@ -157,7 +153,8 @@ export function NumberPicker({
           <Search size={14} color="#94A3B8" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input
             type="text"
-            placeholder={`Type specific number (1 - ${poolSize})...`}
+            aria-label={text("Search number")}
+            placeholder={`${text("Search number")} (1 - ${poolSize})`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -195,7 +192,7 @@ export function NumberPicker({
                 cursor: currentPage === 0 ? "not-allowed" : "pointer",
                 opacity: currentPage === 0 ? 0.4 : 1,
               }}
-              aria-label="Previous range"
+              aria-label={text("Previous range")}
             >
               <ChevronLeft size={16} />
             </button>
@@ -222,7 +219,7 @@ export function NumberPicker({
                 cursor: currentPage >= totalPages - 1 ? "not-allowed" : "pointer",
                 opacity: currentPage >= totalPages - 1 ? 0.4 : 1,
               }}
-              aria-label="Next range"
+              aria-label={text("Next range")}
             >
               <ChevronRight size={16} />
             </button>
@@ -242,19 +239,14 @@ export function NumberPicker({
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, fontSize: "0.6875rem", color: "#CBD5E1" }}>
-          <span style={{ fontWeight: 800, color: "#FEF08A" }}>
-            SELECTABLE NUMBERS ({poolSize.toLocaleString()} TOTAL POOL SLOTS)
-          </span>
+          <span style={{ fontWeight: 800, color: "#FEF08A" }}> {text("SELECTABLE NUMBERS (")}{poolSize.toLocaleString()} {text("TOTAL POOL SLOTS)")} </span>
           <div style={{ display: "flex", gap: 10 }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255, 255, 255, 0.2)" }} /> Available
-            </span>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255, 255, 255, 0.2)" }} /> {text("Available")} </span>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#FCA5A5" }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444" }} /> Taken
-            </span>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444" }} /> {text("Taken")} </span>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#FEF08A" }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#FDE047" }} /> Selected
-            </span>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#FDE047" }} /> {text("Selected")} </span>
           </div>
         </div>
 
@@ -266,7 +258,7 @@ export function NumberPicker({
           }}
         >
           {pageNumbers.map((num) => {
-            const isSelected = String(num).padStart(2, "0") === value;
+            const isSelected = Number(num) === Number(value);
             const isTaken = effectiveTaken.has(String(num).padStart(2, "0"));
 
             return (

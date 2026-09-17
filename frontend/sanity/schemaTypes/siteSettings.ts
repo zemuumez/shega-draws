@@ -45,7 +45,7 @@ export const siteSettingsType = defineType({
       title: "Default Platform Language (Website Default)",
       type: "string",
       fieldset: "localization",
-      description: "Select which language is displayed by default when visitors open the website.",
+      description: "Publish to apply this language when visitors next load the website. Changing the default resets older saved language choices; visitors can still switch languages.",
       options: {
         list: [
           { title: "🇬🇧 English (en)", value: "en" },

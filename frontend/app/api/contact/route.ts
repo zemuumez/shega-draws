@@ -1,37 +1,16 @@
-import { NextResponse } from "next/server";
-import { sanityClient } from "@/lib/sanity/client";
-
+import {NextResponse} from 'next/server';
+import {getSanityWriteClient} from '@/lib/sanity/client';
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { name, phone, email, topic, message } = body;
-
-    if (!phone || !message) {
-      return NextResponse.json({ error: "Phone number and message are required" }, { status: 400 });
-    }
-
-    const doc = {
-      _type: "contactMessage",
-      name: name || "Anonymous User",
-      phone: phone.trim(),
-      email: email?.trim() || "",
-      topic: topic || "general",
-      message: message.trim(),
-      submittedAt: new Date().toISOString(),
-      status: "new",
-    };
-
-    // Attempt to write to Sanity if token configured, otherwise succeed gracefully
-    try {
-      if (process.env.SANITY_API_TOKEN) {
-        await sanityClient.create(doc);
-      }
-    } catch (sanityErr) {
-      console.warn("Sanity create warning (falling back to mock save):", sanityErr);
-    }
-
-    return NextResponse.json({ success: true, message: "Inquiry recorded successfully" });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to process contact submission" }, { status: 500 });
+  let body: any;
+  try {body = await request.json();} catch {return NextResponse.json({error:'Invalid message.'}, {status:400});}
+  const {name = '', phone, email = '', topic = 'general', message} = body || {};
+  if (typeof phone !== 'string' || !/^\+?[\d ()-]{7,30}$/.test(phone.trim()) || phone.replace(/\D/g,'').length < 7 || typeof message !== 'string' || !message.trim() || message.length > 5000 || typeof name !== 'string' || name.length > 120 || typeof email !== 'string' || email.length > 254 || (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) || typeof topic !== 'string' || topic.length > 100) {
+    return NextResponse.json({error:'Enter a valid phone number and message (up to 5,000 characters).'}, {status:400});
   }
+  const client = getSanityWriteClient();
+  if (!client) return NextResponse.json({error:'Messages are temporarily unavailable. Please contact us by phone.'}, {status:503});
+  try {
+    await client.create({_id:`private.contact.${crypto.randomUUID()}`, _type:'contactMessage', name:name.trim() || 'Anonymous User', phone:phone.trim(), email:email.trim(), subject:topic, message:message.trim(), submittedAt:new Date().toISOString(), status:'unread'});
+    return NextResponse.json({success:true});
+  } catch {return NextResponse.json({error:'Your message could not be saved. Please try again.'}, {status:503});}
 }

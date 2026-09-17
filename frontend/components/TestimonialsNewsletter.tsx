@@ -10,74 +10,38 @@ interface TestimonialsNewsletterProps {
 }
 
 export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewsletterProps) {
-  const { language, t, getLocalized } = useLanguage();
+  const { text, language, t, getLocalized } = useLanguage();
   const [email, setEmail] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [subscribeError, setSubscribeError] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
-  // Fallback hardcoded testimonials
-  const fallbackTestimonials: CMSTestimonial[] = [
-    {
-      _id: "fb1",
-      name: "Tewodros Kassahun",
-      location: "Addis Ababa",
-      locationAm: "አዲስ አበባ",
-      locationTi: "ኣዲስ ኣበባ",
-      prizeWon: "80,000 ETB (1st Place Winner)",
-      prizeWonAm: "የ80,000 ብር (1ኛ ደረጃ) አሸናፊ",
-      prizeWonTi: "ናይ 80,000 ብር (1ይ ደረጃ) ተዓዋቲ",
-      quote: "I watched the live video broadcast when my number was drawn! The CBE transfer arrived in my account in less than 20 minutes!",
-      quoteAm: "መስራቾቹ ቁጥሬን በቀጥታ በቪዲዮ ሲያወጡ ተመለከትኩ። በ20 ደቂቃ ውስጥ ገንዘቡ በባንክ ሂሳቤ ደረሰኝ!",
-      quoteTi: "ቁጽረይ ብቀጥታ ብቪድዮ ክፍለጥ ከሎ ተዓዚበ። ኣብ ውሽጢ 20 ደቒቕ ብባንክ በጺሑኒ!",
-    },
-    {
-      _id: "fb2",
-      name: "Helen Mengistu",
-      location: "Washington, DC (Diaspora)",
-      locationAm: "ዋሽንግተን ዲሲ (ዲያስፖራ)",
-      locationTi: "ዋሽንግተን ዲሲ (ዲያስፖራ)",
-      prizeWon: "$15,000 USD (1st Place Winner)",
-      prizeWonAm: "የ$15,000 ዶላር አሸናፊ",
-      prizeWonTi: "ናይ $15,000 ዶላር ተዓዋቲት",
-      quote: "Playing from the USA was so seamless. The 10 guaranteed winners structure gives real winning chances!",
-      quoteAm: "ከአሜሪካ ሆኜ መሳተፍ በጣም ቀላል ነበር። የ10 አሸናፊዎች እድል እውነተኛ የማሸነፍ እድል ይሰጣል!",
-      quoteTi: "ካብ ኣመሪካ ኮይነ ምስታፍ ኣዝዩ ቀሊል ነይሩ። ናይ 10 ተዓወትቲ ዕድል ሓቀኛ ናይ ምዕዋት ተስፋ ይህብ!",
-    },
-    {
-      _id: "fb3",
-      name: "Yonas Birhane",
-      location: "Hawassa",
-      locationAm: "ሀዋሳ",
-      locationTi: "ሓዋሳ",
-      prizeWon: "65,000 ETB (2nd Place Winner)",
-      prizeWonAm: "የ65,000 ብር (2ኛ ደረጃ) አሸናፊ",
-      prizeWonTi: "ናይ 65,000 ብር (2ይ ደረጃ) ተዓዋቲ",
-      quote: "Rimna is truly the most transparent lottery platform. You see your ticket number on the board and verify the outcome yourself.",
-      quoteAm: "ሪምና እጅግ ግልጽ የሆነ የሎተሪ መድረክ ነው። ቲኬትዎን በሰሌዳው ላይ አይተው ውጤቱን ራስዎ ያረጋግጣሉ።",
-      quoteTi: "ሪምና ብሓቂ ኣዝዩ ግልጺ ዝኾነ ናይ ሎተሪ መድረኽ እዩ። ቲኬትኩም ኣብ ሰሌዳ ርኢኹም ውጽኢቱ ባዕልኹም ተረጋግጹ።",
-    },
-  ];
-
-  const testimonials = cmsTestimonials && cmsTestimonials.length > 0 ? cmsTestimonials : fallbackTestimonials;
+  const testimonials = cmsTestimonials || [];
 
   const handleNext = () => {
-    setTestimonialIdx((prev) => (prev + 1) % testimonials.length);
+    if (testimonials.length) setTestimonialIdx((prev) => (prev + 1) % testimonials.length);
   };
 
   const handlePrev = () => {
-    setTestimonialIdx((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    if (testimonials.length) setTestimonialIdx((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  const current = testimonials[testimonialIdx];
+  const current = testimonials[testimonialIdx % (testimonials.length || 1)];
   const currentQuote = getLocalized(current, "quote", current?.quote || "");
   const currentLocation = getLocalized(current, "location", current?.location || "");
   const currentPrize = getLocalized(current, "prizeWon", current?.prizeWon || "");
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
+    if (saving || !email.trim()) return;
+    setSaving(true); setSubscribeError("");
+    try {
+      const response = await fetch("/api/subscribe", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({contact:email})});
+      if (!response.ok) throw new Error("save failed");
       setSubscribed(true);
-    }
+    } catch {setSubscribeError("Subscription could not be saved. Please try again.");}
+    finally {setSaving(false);}
   };
 
   return (
@@ -127,7 +91,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
         }}
       >
         {/* ── 1. Verified Winner Stories Card ────────────────────── */}
-        <div
+        {current && <div
           style={{
             background: "rgba(255, 255, 255, 0.06)",
             backdropFilter: "blur(12px)",
@@ -166,7 +130,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
             <div style={{ display: "flex", gap: 6 }}>
               <button
                 type="button"
-                aria-label="Previous testimonial"
+                aria-label={text("Previous testimonial")}
                 onClick={handlePrev}
                 style={{
                   width: 32,
@@ -186,7 +150,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
               </button>
               <button
                 type="button"
-                aria-label="Next testimonial"
+                aria-label={text("Next testimonial")}
                 onClick={handleNext}
                 style={{
                   width: 32,
@@ -228,7 +192,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
               </span>
             </div>
           </div>
-        </div>
+        </div>}
 
         {/* ── 2. Official Community & Live Alerts Box ─────────── */}
         <div
@@ -267,13 +231,14 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
               </h4>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#CBD5E1", lineHeight: 1.55, margin: "8px 0 20px" }}>
-              {t.testimonialsSection?.communityDesc || "Get instant Telegram and SMS notifications when a new jackpot pool opens or winning numbers are drawn live on video."}
+              {text("Register your email or Telegram handle for community draw updates.")}
             </p>
           </div>
 
+          {subscribeError && <p role="alert">{text(subscribeError)}</p>}
           {subscribed ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399", fontWeight: 800, fontSize: "0.9375rem", padding: "10px 0" }}>
-              <CheckCircle2 size={20} color="#34D399" /> {t.testimonialsSection?.subscribedMsg || "Subscribed! You will receive draw notifications."}
+              <CheckCircle2 size={20} color="#34D399" /> {text("Registration saved. Our team will use your contact for community updates.")}
             </div>
           ) : (
             <form onSubmit={handleSubscribe} style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -297,6 +262,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
               />
               <button
                 type="submit"
+                disabled={saving}
                 className="casino-btn-red"
                 style={{
                   padding: "11px 20px",
@@ -308,7 +274,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
                   boxShadow: "0 4px 14px rgba(220, 38, 38, 0.4)",
                 }}
               >
-                {t.testimonialsSection?.joinAlertsBtn || "Join Alerts"}
+                {saving ? text("Saving…") : t.testimonialsSection?.joinAlertsBtn || "Join Alerts"}
               </button>
             </form>
           )}

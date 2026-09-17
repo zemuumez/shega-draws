@@ -8,8 +8,9 @@ export const uiTranslationType = defineType({
     defineField({
       name: "key",
       title: "Translation Key Identifier",
+      readOnly: ({document}) => !!document?._createdAt,
       type: "string",
-      description: "Unique dot-notation key (e.g. 'nav.buyTicket', 'hero.enterCta', 'faq.q1')",
+      description: "Open a key from its category to start with built-in translations. Publish to show edits on the website. Keep this identifier unchanged.",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
