@@ -57,6 +57,11 @@ test('guest can buy an enabled ticket without a draw ID or draw document', async
   const client=fakeClient();const receipt=await createTicket(client,form());const doc=client.docs.get(receipt.id);
   assert.equal(receipt.status,'pending');assert.match(receipt.id,/^private\.entry\./);assert.equal(doc.playerPhone,'0911000000');assert.equal(doc.luckyNumber,'25000');assert.equal(doc.poolCapacity,'25000');assert.equal(doc.amount,100);assert.equal(doc.paymentReference,'TF123456');assert.equal(doc.proofScreenshot.asset._ref,'image-proof');assert.equal(doc.selectionKey,selection.key);assert.equal(doc.drawDocumentId,undefined);
 });
+test('ticket purchase captures and normalizes advertiser promo code', async () => {
+  const client=fakeClient();const f=form('1');f.set('promo_code',' tiktok_influencer_50 ');
+  const receipt=await createTicket(client,f);const doc=client.docs.get(receipt.id);
+  assert.equal(receipt.status,'pending');assert.equal(doc.promoCode,'TIKTOK_INFLUENCER_50');
+});
 test('25 USD / 25K checkout and submission succeed using the CMS switches', async () => {
   const client=fakeClient();const {GET}=load('app/api/entries/availability/route.ts', {'@/lib/sanity/client':{getSanityWriteClient:()=>client}});
   const response=await GET(new Request('https://example.test/api/entries/availability?currency=USD&price=25&pool=25000&draw_id=closed-old-draw'));

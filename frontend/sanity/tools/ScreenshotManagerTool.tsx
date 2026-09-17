@@ -57,6 +57,7 @@ export function ScreenshotManagerTool() {
     amount: "",
     currency: "",
     status: "",
+    promoCode: "",
   });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(100);
@@ -90,6 +91,7 @@ export function ScreenshotManagerTool() {
             currency,
             paymentMethod,
             paymentReference,
+            promoCode,
             submittedAt,
             status,
             adminNotes,
@@ -132,6 +134,11 @@ export function ScreenshotManagerTool() {
         if (key === "status") {
           return (e.status || "pending") === value;
         }
+        if (key === "promoCode") {
+          if (value === "__WITH_PROMO__") return Boolean(e.promoCode);
+          if (value === "__NO_PROMO__") return !e.promoCode;
+          return (e.promoCode || "").toUpperCase() === value.toUpperCase();
+        }
         return String(e[key as keyof PlayerReceipt] ?? "") === value;
       });
       if (!matchesDropdowns) return false;
@@ -144,6 +151,7 @@ export function ScreenshotManagerTool() {
         (e.playerPhone || "").toLowerCase().includes(q) ||
         (e.luckyNumber || "").toLowerCase().includes(q) ||
         (e.paymentReference || "").toLowerCase().includes(q) ||
+        (e.promoCode || "").toLowerCase().includes(q) ||
         (e.drawId || "").toLowerCase().includes(q) ||
         (e.paymentMethod || "").toLowerCase().includes(q)
       );
@@ -182,6 +190,7 @@ export function ScreenshotManagerTool() {
       amount: "",
       currency: "",
       status: "",
+      promoCode: "",
     });
   };
 
@@ -800,6 +809,50 @@ export function ScreenshotManagerTool() {
             </select>
           </div>
 
+          {/* Promo Code Filter */}
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                color: "#FEF08A",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
+              Promo Code
+            </label>
+            <select
+              aria-label="Promo code filter"
+              disabled={busy}
+              value={filters.promoCode}
+              onChange={(e) => setFilters({ ...filters, promoCode: e.target.value })}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                background: "rgba(0, 0, 0, 0.4)",
+                border: filters.promoCode ? "1.5px solid #FDE047" : "1.5px solid rgba(255, 255, 255, 0.15)",
+                borderRadius: 8,
+                color: filters.promoCode ? "#FEF08A" : "#FFFFFF",
+                fontSize: "0.875rem",
+                boxSizing: "border-box",
+                outline: "none",
+              }}
+            >
+              <option value="">All (Any/None)</option>
+              <option value="__WITH_PROMO__">🏷️ With Promo Code</option>
+              <option value="__NO_PROMO__">🚫 Without Promo Code</option>
+              {Array.from(new Set(entries.map((e) => e.promoCode).filter(Boolean)))
+                .sort()
+                .map((val) => (
+                  <option key={val} value={val}>
+                    🏷️ {val}
+                  </option>
+                ))}
+            </select>
+          </div>
+
           {/* Reset button */}
           {hasActiveFilters && (
             <div>
@@ -1123,6 +1176,7 @@ export function ScreenshotManagerTool() {
                   <th style={{ padding: "14px 16px" }}>Lucky #</th>
                   <th style={{ padding: "14px 16px" }}>Price & Gateway</th>
                   <th style={{ padding: "14px 16px" }}>Reference</th>
+                  <th style={{ padding: "14px 16px" }}>Promo Code</th>
                   <th style={{ padding: "14px 16px" }}>Status</th>
                   <th style={{ padding: "14px 16px", textAlign: "right" }}>
                     Receipt Image
@@ -1204,7 +1258,7 @@ export function ScreenshotManagerTool() {
                                 background: "transparent",
                                 border: "none",
                                 color:
-                                  copiedId === `phone-${e._id}`
+                                   copiedId === `phone-${e._id}`
                                     ? "#34D399"
                                     : "#64748B",
                                 cursor: "pointer",
@@ -1327,6 +1381,31 @@ export function ScreenshotManagerTool() {
                           </div>
                         ) : (
                           <span style={{ color: "#64748B" }}>—</span>
+                        )}
+                      </td>
+
+                      {/* Promo Code */}
+                      <td style={{ padding: "12px 16px" }}>
+                        {e.promoCode ? (
+                          <span
+                            style={{
+                              background: "rgba(253, 224, 71, 0.15)",
+                              border: "1px solid rgba(253, 224, 71, 0.35)",
+                              color: "#FEF08A",
+                              padding: "3px 8px",
+                              borderRadius: 6,
+                              fontSize: "0.75rem",
+                              fontWeight: 800,
+                              fontFamily: "monospace",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            🏷️ {e.promoCode}
+                          </span>
+                        ) : (
+                          <span style={{ color: "#64748B", fontSize: "0.75rem" }}>—</span>
                         )}
                       </td>
 
@@ -1454,8 +1533,28 @@ export function ScreenshotManagerTool() {
                 <h3 style={{ margin: "0 0 2px", fontSize: "1rem", fontWeight: 800, color: "#FFFFFF" }}>
                   Payment Proof: {preview.playerName || "Player"}
                 </h3>
-                <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                  {preview.playerPhone} · {preview.amount} {preview.currency} ({preview.paymentMethod}) · Ref: {preview.paymentReference || "N/A"}
+                <div style={{ fontSize: "0.75rem", color: "#94A3B8", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <span>{preview.playerPhone}</span>
+                  <span>·</span>
+                  <span>{preview.amount} {preview.currency} ({preview.paymentMethod})</span>
+                  <span>·</span>
+                  <span>Ref: {preview.paymentReference || "N/A"}</span>
+                  {preview.promoCode && (
+                    <span
+                      style={{
+                        background: "rgba(253, 224, 71, 0.15)",
+                        border: "1px solid #FDE047",
+                        color: "#FEF08A",
+                        padding: "1px 6px",
+                        borderRadius: 4,
+                        fontSize: "0.6875rem",
+                        fontWeight: 800,
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      🏷️ Promo: {preview.promoCode}
+                    </span>
+                  )}
                 </div>
               </div>
 

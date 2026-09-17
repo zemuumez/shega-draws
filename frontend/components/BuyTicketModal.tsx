@@ -2,13 +2,54 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck, Ticket, Copy, Check } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck, Ticket, Copy, Check, ChevronDown, Search, Tag, Globe } from "lucide-react";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
 import { submitEntry, type Currency } from "@/lib/api";
 import { paymentMethods, validNumber } from "@/lib/tickets";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
+
+interface CountryDialInfo {
+  code: string;
+  name: string;
+  dial: string;
+  flag: string;
+}
+
+const COUNTRIES: CountryDialInfo[] = [
+  { code: "ET", name: "Ethiopia", dial: "+251", flag: "🇪🇹" },
+  { code: "US", name: "United States", dial: "+1", flag: "🇺🇸" },
+  { code: "CA", name: "Canada", dial: "+1", flag: "🇨🇦" },
+  { code: "GB", name: "United Kingdom", dial: "+44", flag: "🇬🇧" },
+  { code: "SA", name: "Saudi Arabia", dial: "+966", flag: "🇸🇦" },
+  { code: "AE", name: "United Arab Emirates", dial: "+971", flag: "🇦🇪" },
+  { code: "SE", name: "Sweden", dial: "+46", flag: "🇸🇪" },
+  { code: "DE", name: "Germany", dial: "+49", flag: "🇩🇪" },
+  { code: "IT", name: "Italy", dial: "+39", flag: "🇮🇹" },
+  { code: "IL", name: "Israel", dial: "+972", flag: "🇮🇱" },
+  { code: "KE", name: "Kenya", dial: "+254", flag: "🇰🇪" },
+  { code: "SD", name: "Sudan", dial: "+249", flag: "🇸🇩" },
+  { code: "ER", name: "Eritrea", dial: "+291", flag: "🇪🇷" },
+  { code: "AU", name: "Australia", dial: "+61", flag: "🇦🇺" },
+  { code: "ZA", name: "South Africa", dial: "+27", flag: "🇿🇦" },
+  { code: "NO", name: "Norway", dial: "+47", flag: "🇳🇴" },
+  { code: "CH", name: "Switzerland", dial: "+41", flag: "🇨🇭" },
+  { code: "NL", name: "Netherlands", dial: "+31", flag: "🇳🇱" },
+  { code: "FR", name: "France", dial: "+33", flag: "🇫🇷" },
+  { code: "BE", name: "Belgium", dial: "+32", flag: "🇧🇪" },
+  { code: "QA", name: "Qatar", dial: "+974", flag: "🇶🇦" },
+  { code: "KW", name: "Kuwait", dial: "+965", flag: "🇰🇼" },
+  { code: "BH", name: "Bahrain", dial: "+973", flag: "🇧🇭" },
+  { code: "OM", name: "Oman", dial: "+968", flag: "🇴🇲" },
+  { code: "EG", name: "Egypt", dial: "+20", flag: "🇪🇬" },
+  { code: "TR", name: "Turkey", dial: "+90", flag: "🇹🇷" },
+  { code: "CN", name: "China", dial: "+86", flag: "🇨🇳" },
+  { code: "IN", name: "India", dial: "+91", flag: "🇮🇳" },
+  { code: "JP", name: "Japan", dial: "+81", flag: "🇯🇵" },
+  { code: "BR", name: "Brazil", dial: "+55", flag: "🇧🇷" },
+  { code: "MX", name: "Mexico", dial: "+52", flag: "🇲🇽" },
+];
 
 interface BuyTicketModalProps {
   isOpen: boolean;
@@ -43,10 +84,11 @@ export function BuyTicketModal({
   const currency: Currency = initialCurrency;
   const ticketPrice: number = initialPrice;
   const poolSize = initialPoolSize;
+
   const [takenNumbers, setTakenNumbers] = useState<string[]>([]);
   const [submissionId, setSubmissionId] = useState("");
   const [receiptId, setReceiptId] = useState("");
-  const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(false);
   const [unavailable, setUnavailable] = useState("");
   const [selectionKey, setSelectionKey] = useState("");
   const [availabilityAttempt, setAvailabilityAttempt] = useState(0);
@@ -59,6 +101,11 @@ export function BuyTicketModal({
   // Form fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneLocal, setPhoneLocal] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState<CountryDialInfo>(COUNTRIES[0]);
+  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [promoCode, setPromoCode] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
   const [number, setNumber] = useState("7");
   const [method, setMethod] = useState("");
@@ -77,6 +124,37 @@ export function BuyTicketModal({
     }
   };
 
+  const handlePhoneLocalChange = (val: string, country = selectedCountry) => {
+    setPhoneLocal(val);
+    const clean = val.trim();
+    if (!clean) {
+      setPhone("");
+      return;
+    }
+    if (clean.startsWith("+")) {
+      setPhone(clean);
+    } else if (clean.startsWith("0") && country.dial === "+251") {
+      setPhone(clean);
+    } else {
+      setPhone(`${country.dial} ${clean.replace(/^0+/, "")}`);
+    }
+  };
+
+  const handleCountryChange = (country: CountryDialInfo) => {
+    setSelectedCountry(country);
+    handlePhoneLocalChange(phoneLocal, country);
+  };
+
+  const filteredCountries = COUNTRIES.filter((c) => {
+    if (!countrySearch.trim()) return true;
+    const q = countrySearch.toLowerCase();
+    return (
+      c.name.toLowerCase().includes(q) ||
+      c.dial.includes(q) ||
+      c.code.toLowerCase().includes(q)
+    );
+  });
+
   // Each new purchase has a stable retry reference.
   useEffect(() => {
     if (isOpen) {
@@ -92,6 +170,9 @@ export function BuyTicketModal({
 
       setName("");
       setPhone("");
+      setPhoneLocal("");
+      setPromoCode("");
+      setSelectedCountry(currency === "USD" ? (COUNTRIES.find((c) => c.code === "US") || COUNTRIES[1]) : COUNTRIES[0]);
     }
   }, [isOpen, currency, siteSettings]);
 
@@ -158,8 +239,13 @@ export function BuyTicketModal({
       form.append("proof", proofFile);
       form.append("user_name", name.trim());
       form.append("user_phone", phone.trim());
+      if (promoCode.trim()) {
+        form.append("promo_code", promoCode.trim().toUpperCase());
+      }
 
       const receipt = await submitEntry(form);
+      setReceiptId(receipt.id);
+      setStep(3); // Success stepreceipt = await submitEntry(form);
       setReceiptId(receipt.id);
       setStep(3); // Success step
     } catch (e: any) {
@@ -394,26 +480,166 @@ export function BuyTicketModal({
                 />
               </div>
 
+              {/* Phone Input with Country Code Selector */}
               <div>
                 <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                  {t.ticketModal?.phoneNumber || "Phone Number (for Telebirr / CBE / Instant Payouts)"}
+                  {t.ticketModal?.phoneNumber || "Phone Number"}
+                </label>
+                <div style={{ display: "flex", gap: 8, position: "relative" }}>
+                  {/* Country Selector Trigger */}
+                  <div style={{ position: "relative" }}>
+                    <button
+                      type="button"
+                      onClick={() => setCountryPickerOpen(!countryPickerOpen)}
+                      style={{
+                        height: "100%",
+                        padding: "0 12px",
+                        background: "rgba(0, 0, 0, 0.6)",
+                        border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                        borderRadius: "10px",
+                        color: "#FFFFFF",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        cursor: "pointer",
+                        fontSize: "0.875rem",
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                        minWidth: 100,
+                        boxSizing: "border-box",
+                      }}
+                    >
+                      <span style={{ fontSize: "1.1rem" }}>{selectedCountry.flag}</span>
+                      <span style={{ fontFamily: "monospace", color: "#FEF08A" }}>{selectedCountry.dial}</span>
+                      <ChevronDown size={14} color="#94A3B8" />
+                    </button>
+
+                    {/* Country Picker Dropdown */}
+                    {countryPickerOpen && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 6px)",
+                          left: 0,
+                          width: 290,
+                          maxHeight: 280,
+                          background: "#0F172A",
+                          border: "1.5px solid rgba(253, 224, 71, 0.5)",
+                          borderRadius: "12px",
+                          boxShadow: "0 16px 40px rgba(0,0,0,0.85)",
+                          zIndex: 99999,
+                          display: "flex",
+                          flexDirection: "column",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {/* Search in Dropdown */}
+                        <div style={{ padding: "8px", borderBottom: "1px solid rgba(255, 255, 255, 0.1)", background: "rgba(0,0,0,0.3)" }}>
+                          <input
+                            type="text"
+                            placeholder="Search country (+251, +1, Ethiopia)..."
+                            value={countrySearch}
+                            onChange={(e) => setCountrySearch(e.target.value)}
+                            autoFocus
+                            style={{
+                              width: "100%",
+                              padding: "6px 10px",
+                              background: "rgba(255, 255, 255, 0.08)",
+                              border: "1px solid rgba(255, 255, 255, 0.15)",
+                              borderRadius: "6px",
+                              color: "#FFFFFF",
+                              fontSize: "0.8125rem",
+                              outline: "none",
+                              boxSizing: "border-box",
+                            }}
+                          />
+                        </div>
+
+                        {/* Country List */}
+                        <div style={{ overflowY: "auto", flex: 1 }}>
+                          {filteredCountries.map((c) => (
+                            <button
+                              key={c.code + c.dial}
+                              type="button"
+                              onClick={() => {
+                                handleCountryChange(c);
+                                setCountryPickerOpen(false);
+                                setCountrySearch("");
+                              }}
+                              style={{
+                                width: "100%",
+                                padding: "8px 12px",
+                                background: selectedCountry.code === c.code && selectedCountry.dial === c.dial ? "rgba(253, 224, 71, 0.15)" : "transparent",
+                                border: "none",
+                                borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                                color: "#FFFFFF",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                cursor: "pointer",
+                                fontSize: "0.8125rem",
+                                textAlign: "left",
+                              }}
+                            >
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                                <span style={{ fontSize: "1rem" }}>{c.flag}</span>
+                                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
+                              </div>
+                              <span style={{ fontFamily: "monospace", color: "#FEF08A", fontWeight: 700, marginLeft: 8 }}>{c.dial}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Local Phone Number Input */}
+                  <input
+                    type="tel"
+                    value={phoneLocal}
+                    onChange={(e) => handlePhoneLocalChange(e.target.value)}
+                    maxLength={25}
+                    aria-label={text("Phone number")}
+                    autoComplete="tel"
+                    placeholder={selectedCountry.dial === "+251" ? "911 23 45 67 or 0911..." : "202 555 0199"}
+                    style={{
+                      flex: 1,
+                      padding: "12px 14px",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                      borderRadius: "10px",
+                      color: "#FFFFFF",
+                      fontSize: "0.9375rem",
+                      boxSizing: "border-box",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Promo Code Input (Optional) */}
+              <div>
+                <label style={{ fontSize: "0.75rem", fontWeight: 800, color: "#FEF08A", textTransform: "uppercase", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span>🏷️ {language === "ti" ? "ናይ ፕሮሞሽን ኮድ" : language === "am" ? "የማስተዋወቂያ ኮድ" : "Promo Code"}</span>
+                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 600, textTransform: "none" }}>{language === "ti" ? "(ኣማራጺ)" : language === "am" ? "(አማራጭ)" : "(Optional)"}</span>
                 </label>
                 <input
-                  type="tel"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  maxLength={30}
-                  aria-label={text("Phone number")}
-                  autoComplete="tel"
-                  placeholder="0911 00 00 00 or +1 202 555 0199"
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, ""))}
+                  maxLength={25}
+                  placeholder={language === "ti" ? "ንኣብነት ABEL2026 ወይ TIKTOK50" : language === "am" ? "ለምሳሌ ABEL2026 ወይም TIKTOK50" : "e.g. ABEL2026 or TIKTOK50"}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
                     background: "rgba(0, 0, 0, 0.5)",
-                    border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                    border: promoCode ? "1.5px solid #FDE047" : "1.5px solid rgba(255, 255, 255, 0.2)",
                     borderRadius: "10px",
-                    color: "#FFFFFF",
+                    color: promoCode ? "#FEF08A" : "#FFFFFF",
                     fontSize: "0.9375rem",
+                    fontFamily: promoCode ? "monospace" : "inherit",
+                    fontWeight: promoCode ? 800 : 400,
+                    letterSpacing: promoCode ? "1px" : "normal",
                     boxSizing: "border-box",
                     outline: "none",
                   }}

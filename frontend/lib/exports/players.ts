@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 export interface PlayerReceipt {
   _id: string; _rev?: string; playerName?: string; playerPhone?: string; drawId?: string;
   luckyNumber?: string; poolCapacity?: string; amount?: number; currency?: string;
-  paymentMethod?: string; paymentReference?: string; submittedAt?: string; status?: string;
+  paymentMethod?: string; paymentReference?: string; promoCode?: string; submittedAt?: string; status?: string;
   adminNotes?: string; imageUrl?: string; mimeType?: string;
 }
 export function screenshotFilename(entry: PlayerReceipt) {
@@ -19,15 +19,15 @@ function column(index: number) {
 }
 // Inline string cells preserve leading zeroes, +phone prefixes and untrusted text as text.
 export async function playersWorkbook(entries: PlayerReceipt[], downloads?: Map<string, string>) {
-  const headers = ['Submission ID', 'Player name', 'Phone', 'Draw', 'Ticket number', 'Pool capacity', 'Amount', 'Currency', 'Payment method', 'Payment reference', 'Submitted at (UTC)', 'Review status', 'Staff notes', 'Screenshot file', 'Screenshot download'];
-  const rows: unknown[][] = [headers, ...entries.map(e => [e._id, e.playerName, e.playerPhone, e.drawId, e.luckyNumber, e.poolCapacity, e.amount, e.currency, e.paymentMethod, e.paymentReference, e.submittedAt, e.status || 'pending', e.adminNotes, e.imageUrl ? screenshotFilename(e) : '', downloads?.get(e._id) || (e.imageUrl ? 'Not included (Excel only)' : 'No screenshot')])];
+  const headers = ['Submission ID', 'Player name', 'Phone', 'Draw', 'Ticket number', 'Pool capacity', 'Amount', 'Currency', 'Payment method', 'Payment reference', 'Promo code', 'Submitted at (UTC)', 'Review status', 'Staff notes', 'Screenshot file', 'Screenshot download'];
+  const rows: unknown[][] = [headers, ...entries.map(e => [e._id, e.playerName, e.playerPhone, e.drawId, e.luckyNumber, e.poolCapacity, e.amount, e.currency, e.paymentMethod, e.paymentReference, e.promoCode || '', e.submittedAt, e.status || 'pending', e.adminNotes, e.imageUrl ? screenshotFilename(e) : '', downloads?.get(e._id) || (e.imageUrl ? 'Not included (Excel only)' : 'No screenshot')])];
   const zip = new JSZip();
   zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
   zip.file('_rels/.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
   zip.file('xl/workbook.xml', '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Players" sheetId="1" r:id="rId1"/></sheets></workbook>');
   zip.file('xl/_rels/workbook.xml.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>');
   const data = rows.map((row, i) => `<row r="${i + 1}">${row.map((cell, j) => typeof cell === 'number' && Number.isFinite(cell) ? `<c r="${column(j)}${i + 1}"><v>${cell}</v></c>` : `<c r="${column(j)}${i + 1}" t="inlineStr"><is><t xml:space="preserve">${xml(cell)}</t></is></c>`).join('')}</row>`).join('');
-  zip.file('xl/worksheets/sheet1.xml', `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="15" width="24" customWidth="1"/></cols><sheetData>${data}</sheetData><autoFilter ref="A1:O${rows.length}"/></worksheet>`);
+  zip.file('xl/worksheets/sheet1.xml', `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="16" width="24" customWidth="1"/></cols><sheetData>${data}</sheetData><autoFilter ref="A1:P${rows.length}"/></worksheet>`);
   return zip.generateAsync({type: 'uint8array', compression: 'DEFLATE'});
 }
 export async function reviewArchive(entries: PlayerReceipt[], progress?: (done: number, total: number) => void) {

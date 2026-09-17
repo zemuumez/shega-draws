@@ -96,6 +96,22 @@ export const playerEntryType = defineType({
       readOnly: true,
     }),
     defineField({
+      name: "promoCode",
+      title: "Referral / Promo Code",
+      type: "string",
+      fieldset: "ticketDetails",
+      description: "Influencer/Advertiser promo code used during ticket checkout.",
+      readOnly: true,
+    }),
+    defineField({
+      name: "advertiser",
+      title: "Referred Advertiser",
+      type: "reference",
+      to: [{ type: "advertiser" }],
+      fieldset: "ticketDetails",
+      description: "Matched advertiser record based on promo code.",
+    }),
+    defineField({
       name: "submittedAt",
       title: "Submitted At",
       type: "datetime",
@@ -167,13 +183,15 @@ export const playerEntryType = defineType({
       number: "luckyNumber",
       amount: "amount",
       currency: "currency",
+      promoCode: "promoCode",
       status: "status",
       media: "proofScreenshot",
     },
-    prepare({ name, phone, drawId, number, amount, currency, status, media }) {
+    prepare({ name, phone, drawId, number, amount, currency, promoCode, status, media }) {
       const statusIcon = status === "confirmed" ? "🟢" : status === "rejected" ? "🔴" : "🟡";
+      const promoBadge = promoCode ? ` [🏷️ ${promoCode}]` : "";
       return {
-        title: `${statusIcon} #${number || "??"} — ${name || "Anonymous"} (${phone || ""})`,
+        title: `${statusIcon} #${number || "??"} — ${name || "Anonymous"} (${phone || ""})${promoBadge}`,
         subtitle: `${drawId || ""} · ${amount || 0} ${currency || "ETB"} [${(status || "PENDING").toUpperCase()}]`,
         media,
       };

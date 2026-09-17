@@ -47,6 +47,10 @@ export async function createTicket(client: SanityClient, form: FormData) {
   const number = field(form, 'number', 1, 6);
   const method = field(form, 'method', 1, 30);
   const reference = field(form, 'payment_reference', 6, 120);
+  const rawPromo = form.get('promo_code');
+  const promoCode = typeof rawPromo === 'string' && rawPromo.trim().length > 0
+    ? rawPromo.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 30)
+    : undefined;
   const proof = form.get('proof');
   if (!proof || typeof proof === 'string' || proof.size === 0 || proof.size > MAX_PROOF_BYTES) throw new TicketError('Upload a payment screenshot up to 3 MB.');
   const bytes = Buffer.from(await proof.arrayBuffer());
@@ -55,7 +59,7 @@ export async function createTicket(client: SanityClient, form: FormData) {
     bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP' ? 'image/webp' : '';
   if (!mime || proof.type !== mime) throw new TicketError('Upload a valid PNG, JPEG or WebP screenshot.');
   const id = entryId(key, number);
-  const fingerprint = createHash('sha256').update(JSON.stringify({key, number: Number(number), name, phone, method, reference})).update(bytes).digest('hex');
+  const fingerprint = createHash('sha256').update(JSON.stringify({key, number: Number(number), name, phone, method, reference, promoCode: promoCode || ''})).update(bytes).digest('hex');
   const existing = await client.getDocument<{_id: string; submissionId?: string; submissionFingerprint?: string; status: string}>(id);
   if (existing) {
     if (existing.submissionId === submissionId && existing.submissionFingerprint === fingerprint) return {id, status: existing.status};
@@ -76,6 +80,7 @@ export async function createTicket(client: SanityClient, form: FormData) {
           playerName: name, playerPhone: phone, selectionKey: key, drawId: selection.label,
           luckyNumber: String(Number(number)), poolCapacity: String(selection.poolCapacity),
           amount: selection.ticketPrice, currency: selection.currency, paymentMethod: method, paymentReference: reference,
+          ...(promoCode ? {promoCode} : {}),
           submittedAt: new Date().toISOString(), status: 'pending',
           proofScreenshot: {_type: 'image', asset: {_type: 'reference', _ref: asset._id}},
         }).commit({visibility: 'sync'});

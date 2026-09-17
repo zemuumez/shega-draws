@@ -248,16 +248,27 @@ All static and dynamic platform copywriting across all 3 supported languages (**
 - **Other UI Categories**: `🧭 Navigation`, `🌟 Hero`, `🎟️ Tickets`, `🎰 Draws`, `🛡️ Fairness`, `🏆 Winners`, `❓ FAQs`, `💬 Testimonials`, `💳 Payments`.
 
 ### 6.3 `playerEntry` (Receipts & Proofs)
-- Stores player full name, phone number, draw ID, lucky number, pool size, price paid, currency, payment method, submission timestamp, and admin verification status (`pending`, `confirmed`, `rejected`).
+- Stores player full name, phone number (with country code), draw ID, lucky number, pool size, price paid, currency, payment method, promo code (`promoCode`), submission timestamp, and admin verification status (`pending`, `confirmed`, `rejected`).
 - Structured in Sanity Studio with categorized filter lists:
   - 📋 All Submitted Receipts
   - 🟡 Pending Verification
   - 🟢 Confirmed & Approved
   - 🔴 Rejected Proofs
+  - 🏷️ Receipts with Promo Code
 
-### 6.3 Studio Tab Order & Custom Tools
+### 6.4 `advertiser` (Influencer & Affiliate Management)
+- **Profile**: Full Name / Stage Name, Primary Platform (TikTok, Telegram, YouTube, Instagram, Facebook, etc.), Social Media Handle/URL, Phone, Email.
+- **Promo Code**: Auto-generated or custom uppercase alphanumeric code (e.g. `ABEL2026`, `TIKTOK50`).
+- **Commission & Rates**: Payout amount per ticket (e.g., 50 ETB / $1 USD) and currency.
+- **Payout Accounts**: Preferred payout method (Telebirr Phone / CBE Bank Account Number / Name).
+- **Status**: `active`, `paused`, `inactive`.
+
+### 6.5 Studio Tab Order & Custom Tools
 Sanity Studio header navigation tabs are strictly ordered:
-1. **`Structure`** (`/studio/structure`): Complete CMS management hierarchy including ticket receipts, active draws, results, site settings, ads, testimonials, and backup manager.
+1. **`Structure`** (`/studio/structure`): Complete CMS management hierarchy including ticket receipts, advertisers & promo codes, active draws, results, site settings, ads, testimonials, and backup manager.
+2. **`📸 Players & Exports`** (`/studio/tool/screenshot-manager`): Interactive receipts management suite with search, status filtering, promo code filtering, proof lightbox modal, and 1-click Excel/ZIP export.
+3. **`🏆 Affiliate Leaderboard`** (`/studio/tool/advertisers-leaderboard`): Real-time advertiser performance rankings (🥇, 🥈, 🥉), total ticket sales generated per creator, revenue volume, calculated commission payouts, and 1-click promo code copying.
+4. **`Vision`** (`/studio/vision`): GROQ query sandbox.
 2. **`Players & Exports`** (`/studio/screenshot-manager`): Modern luxury auditing dashboard featuring live KPI counters (Total, Pending, Confirmed, Rejected, Screenshots), multi-field search and filter suite, 1-click single/batch Excel and ZIP archive exports, and interactive receipt screenshot preview modals.
 3. **`Vision`** (`/studio/vision`): GROQ testing console.
 

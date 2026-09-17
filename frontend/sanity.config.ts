@@ -3,6 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schema } from "./sanity/schemaTypes";
 import { ScreenshotManagerTool } from "./sanity/tools/ScreenshotManagerTool";
+import { AdvertiserLeaderboardTool } from "./sanity/tools/AdvertiserLeaderboardTool";
 import { translationCatalog } from "./lib/i18n/catalog";
 import { BackupView } from "./sanity/components/BackupView";
 
@@ -14,6 +15,13 @@ const screenshotManagerTool: Tool = {
   title: "Players & Exports",
   icon: () => "📸",
   component: ScreenshotManagerTool,
+};
+
+const advertiserLeaderboardTool: Tool = {
+  name: "advertisers-leaderboard",
+  title: "Affiliate Leaderboard",
+  icon: () => "🏆",
+  component: AdvertiserLeaderboardTool,
 };
 
 export default defineConfig({
@@ -30,6 +38,7 @@ export default defineConfig({
     return [
       ...(structure ? [structure] : []),
       screenshotManagerTool,
+      advertiserLeaderboardTool,
       ...(vision ? [vision] : []),
       ...others,
     ];
@@ -71,16 +80,27 @@ export default defineConfig({
                           .title("🔴 Rejected Proofs")
                           .filter('_type == "playerEntry" && status == "rejected"')
                       ),
+                    S.listItem()
+                      .title("🏷️ Receipts with Promo Code")
+                      .child(
+                        S.documentList()
+                          .title("🏷️ Receipts with Promo Code")
+                          .filter('_type == "playerEntry" && defined(promoCode)')
+                      ),
                   ])
               ),
 
+            // 2. Advertisers & Influencer Promo Codes
+            S.documentTypeListItem("advertiser")
+              .title("📢 Advertisers & Promo Codes"),
+
             S.divider(),
 
-            // 2. Active Draws & Countdown Settings
+            // 3. Active Draws & Countdown Settings
             S.documentTypeListItem("draw")
               .title("🎰 Active Draws & Live Countdown"),
 
-            // 3. Recorded 10 Live Draw Winners
+            // 4. Recorded 10 Live Draw Winners
             S.documentTypeListItem("drawResult")
               .title("🏆 Draw Results & 10 Winners"),
 
