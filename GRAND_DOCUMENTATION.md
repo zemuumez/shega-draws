@@ -240,7 +240,7 @@ A structured 4-step wizard with persistent state:
 ### 6.3 Studio Tab Order & Custom Tools
 Sanity Studio header navigation tabs are strictly ordered:
 1. **`Structure`** (`/studio/structure`): Complete CMS management hierarchy including ticket receipts, active draws, results, site settings, ads, testimonials, and backup manager.
-2. **`Storage & Screenshots`** (`/studio/screenshot-manager`): Dedicated dashboard for disk storage metrics, proof filtering, 1-click batch ZIP downloads, and storage-saving asset purges.
+2. **`Players & Exports`** (`/studio/screenshot-manager`): Modern luxury auditing dashboard featuring live KPI counters (Total, Pending, Confirmed, Rejected, Screenshots), multi-field search and filter suite, 1-click single/batch Excel and ZIP archive exports, and interactive receipt screenshot preview modals.
 3. **`Vision`** (`/studio/vision`): GROQ testing console.
 
 ### 6.4 Full CMS Backup & Restore Manager (`BackupView.tsx`)
