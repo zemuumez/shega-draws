@@ -90,9 +90,10 @@ export function PaymentLogosFarm() {
 
       <div
         style={{
-          maxWidth: 1360,
-          margin: "0 auto",
-          padding: "0 clamp(12px, 3vw, 24px)",
+          width: "100%",
+          maxWidth: "100%",
+          margin: "0",
+          padding: "0 clamp(16px, 4vw, 56px)",
           boxSizing: "border-box",
           position: "relative",
         }}

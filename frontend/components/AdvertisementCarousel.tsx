@@ -100,9 +100,10 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
   return (
     <section
       style={{
-        maxWidth: 1360,
-        margin: "0 auto",
-        padding: "0 clamp(12px, 3vw, 24px)",
+        width: "100%",
+        maxWidth: "100%",
+        margin: "0",
+        padding: "0",
         boxSizing: "border-box",
         overflow: "hidden",
       }}
@@ -134,9 +135,12 @@ export function AdvertisementCarousel({ cmsAds }: AdvertisementCarouselProps) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
-          marginBottom: 16,
+          marginBottom: 18,
           flexWrap: "wrap",
           gap: 10,
+          padding: "0 clamp(16px, 4vw, 56px)",
+          maxWidth: "100%",
+          boxSizing: "border-box",
         }}
       >
         <div>
