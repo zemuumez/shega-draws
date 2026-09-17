@@ -126,8 +126,8 @@ body {
 .display { font-family: var(--font-display); }
 .mono    { font-family: var(--font-mono); }
 
-h1, h2, h3, h4, h5 {
-  color: var(--text-main);
+h1, h2, h3, h4, h5, h6 {
+  color: inherit;
   font-weight: 700;
   letter-spacing: -0.015em;
 }
@@ -979,3 +979,43 @@ h1, h2, h3, h4, h5 {
 .ticket-availability-retry { background: transparent; color: white; border: 1px solid #ffffff40; border-radius: 8px; cursor: pointer; }
 @keyframes ticket-availability-enter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ticket-availability-card { animation: none; } }
+
+/* ── Sanity Studio Dark Theme High-Contrast Typography Overrides ── */
+[data-sanity] h1,
+[data-sanity] h2,
+[data-sanity] h3,
+[data-sanity] h4,
+[data-sanity] h5,
+[data-sanity] h6,
+[data-ui="Heading"],
+[data-testid="document-pane"] h1,
+[data-testid="document-pane"] h2,
+[data-testid="document-pane"] h3,
+[data-testid="document-pane"] h4,
+[data-testid="document-pane"] h5,
+[data-testid="document-pane"] h6,
+[data-testid="pane-header"] h1,
+[data-testid="pane-header"] h2,
+[data-testid="pane-header"] h3,
+[data-testid="pane-header"] h4,
+[data-testid="pane-header"] [data-ui="Heading"],
+[data-testid="document-panel-portal"] h1,
+[data-testid="document-panel-portal"] h2,
+[data-testid="document-panel-portal"] h3,
+[data-testid="document-panel-portal"] h4,
+.sanity-studio h1,
+.sanity-studio h2,
+.sanity-studio h3,
+.sanity-studio h4,
+.sanity-studio h5,
+.sanity-studio h6 {
+  color: #F8FAFC !important;
+}
+
+[data-sanity] [data-ui="Text"],
+[data-sanity] [data-ui="FormField"] label,
+[data-sanity] [data-ui="Field"] label,
+[data-sanity] legend,
+[data-testid*="field-"] label {
+  color: #F1F5F9 !important;
+}
