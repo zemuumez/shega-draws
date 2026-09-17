@@ -214,7 +214,8 @@ A structured 4-step wizard with persistent state:
 1. `siteName` / `siteNameAm` / `siteNameTi`: Trilingual platform brand title (EN/AM/TI).
 2. `tagline` / `taglineAm` / `taglineTi`: Trilingual platform tagline.
 3. `defaultLanguage`: Default platform locale (`en`, `am`, `ti`).
-4. `logoImage`: Official high-res logo/emblem displayed in navbar and footer.
+4. `defaultCurrency`: Default homepage currency tab (`ETB` or `USD`). When published by admin, pre-selects the chosen currency on the homepage hero and ticket configurator.
+5. `logoImage`: Official high-res logo/emblem displayed in navbar and footer.
 5. **Per-Page Panoramic Hero & Background Banners (`pageBanners` Fieldset)**:
    - `heroBannerImage`: Official panoramic stadium banner for Homepage countdown & ticket configurator. Also acts as global fallback.
    - `howItWorksHeroBannerImage`: Dedicated hero banner for `/how-it-works` complete player guide page.

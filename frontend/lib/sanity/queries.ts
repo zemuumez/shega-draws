@@ -54,6 +54,7 @@ export const LATEST_RESULTS_QUERY = defineQuery(`
 export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"] | order(_updatedAt desc)[0] {
     defaultLanguage,
+    defaultCurrency,
     siteName,
     siteNameAm,
     siteNameTi,
@@ -243,6 +244,7 @@ export interface CMSPoolOption {
 
 export interface CMSSiteSettings {
   defaultLanguage?: "en" | "am" | "ti";
+  defaultCurrency?: "ETB" | "USD";
   siteName?: string;
   siteNameAm?: string;
   siteNameTi?: string;

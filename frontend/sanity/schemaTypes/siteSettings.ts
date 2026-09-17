@@ -39,7 +39,7 @@ export const siteSettingsType = defineType({
   fields: [
     defineField({name: "lastEntryAt", type: "datetime", hidden: true, readOnly: true}),
 
-    // ─── Localization Settings ─────────────────────────────────────────
+    // ─── Localization & Default Preferences ────────────────────────────
     defineField({
       name: "defaultLanguage",
       title: "Default Platform Language (Website Default)",
@@ -55,6 +55,22 @@ export const siteSettingsType = defineType({
         layout: "radio",
       },
       initialValue: "en",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "defaultCurrency",
+      title: "Default Platform Currency (Website Default)",
+      type: "string",
+      fieldset: "localization",
+      description: "Select which currency (ETB or USD) is pre-selected by default on the homepage ticket configurator and hero countdown.",
+      options: {
+        list: [
+          { title: "🇪🇹 Ethiopian Birr (ETB)", value: "ETB" },
+          { title: "🇺🇸 US Dollar (USD)", value: "USD" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "ETB",
       validation: (Rule) => Rule.required(),
     }),
     // ─── Tier Controls (Manage, Add, Edit, Delete, Toggle Prices & Pools) ─

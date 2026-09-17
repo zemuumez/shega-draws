@@ -52,11 +52,20 @@ interface InteractiveTicketConfiguratorProps {
 
 export function InteractiveTicketConfigurator({ siteSettings, draws }: InteractiveTicketConfiguratorProps) {
   const { text, language, t, getLocalized } = useLanguage();
-  const [currency, setCurrency] = useState<Currency>("ETB");
-  const [selectedPrice, setSelectedPrice] = useState<number>(100);
+  const initialCurrency = (siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB") as Currency;
+  const [currency, setCurrency] = useState<Currency>(initialCurrency);
+  const [selectedPrice, setSelectedPrice] = useState<number>(initialCurrency === "USD" ? 50 : 100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState<boolean>(false);
   const [showAllPrizes, setShowAllPrizes] = useState<boolean>(false);
+
+  // Sync with published CMS defaultCurrency
+  React.useEffect(() => {
+    if (siteSettings?.defaultCurrency) {
+      const targetCurr = (siteSettings.defaultCurrency === "USD" ? "USD" : "ETB") as Currency;
+      setCurrency(targetCurr);
+    }
+  }, [siteSettings?.defaultCurrency]);
 
   // Derive dynamic ETB Prices from published CMS settings
   const etbPrices: PriceOption[] = React.useMemo(() => {

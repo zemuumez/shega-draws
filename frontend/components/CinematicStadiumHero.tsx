@@ -25,9 +25,26 @@ interface CinematicStadiumHeroProps {
 
 export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicStadiumHeroProps) {
   const { text, t, getLocalized } = useLanguage();
-  const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">("ETB");
-  const [selectedPrice, setSelectedPrice] = useState<number>(100);
+  const initialCurrency = siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB";
+  const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">(initialCurrency);
+  const [selectedPrice, setSelectedPrice] = useState<number>(initialCurrency === "USD" ? 50 : 100);
   const [selectedPool, setSelectedPool] = useState<number>(1000);
+
+  // Sync with published CMS defaultCurrency when settings update
+  React.useEffect(() => {
+    if (siteSettings?.defaultCurrency) {
+      const curr = siteSettings.defaultCurrency === "USD" ? "USD" : "ETB";
+      setSelectedCurrency(curr);
+      const available = curr === "USD"
+        ? siteSettings.usdPrices && siteSettings.usdPrices.length > 0
+          ? siteSettings.usdPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
+          : [25, 50, 100, 250]
+        : siteSettings.etbPrices && siteSettings.etbPrices.length > 0
+        ? siteSettings.etbPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
+        : [100, 200, 500, 1000];
+      setSelectedPrice(available[0] || (curr === "USD" ? 50 : 100));
+    }
+  }, [siteSettings?.defaultCurrency]);
 
   const isUSD = selectedCurrency === "USD";
 
