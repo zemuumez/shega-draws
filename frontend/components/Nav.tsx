@@ -108,14 +108,9 @@ export function Nav({
           </a>
         </div>
 
-        {/* Quick Login & Language */}
+        {/* Language Selector */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, position: "relative" }}>
-          <div className="hide-on-mobile">
-            <LanguageSwitcher />
-          </div>
-          <span className="hide-on-mobile" style={{ color: "#4B5563" }}>|</span>
-
-          <Link href="/#choose-ticket" style={{color: "#FDE047", fontWeight: 800}}>{text("Buy a ticket")}</Link>
+          <LanguageSwitcher />
         </div>
       </div>
 

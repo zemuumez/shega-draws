@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { type Currency } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -194,20 +193,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
           paddingBottom: 10,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Image
-            src={siteSettings?.logoImageUrl || "/images/rimna-logo.png"}
-            alt={siteSettings?.siteName || "Rimna Emblem"}
-            width={30}
-            height={30}
-            style={{
-              borderRadius: "50%",
-              objectFit: "cover",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-            }}
-          />
-          <div>
-            <h2
+        <div>
+          <h2
               className="display"
               style={{
                 fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
@@ -233,7 +220,6 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
             >
               {t.configurator?.subtitle || "Capped Pools · 10 Guaranteed Winners · 100% Video Draw"}
             </span>
-          </div>
         </div>
 
         {/* Header Badges */}
