@@ -221,9 +221,10 @@ A structured 4-step wizard with persistent state:
    - `howItWorksHeroBannerImage`: Dedicated hero banner for `/how-it-works` complete player guide page.
    - `resultsHeroBannerImage`: Dedicated hero banner for `/results` live broadcast stream and winners announcement page.
    - `entriesHeroBannerImage`: Dedicated hero banner for `/entries` player ticket tracking dashboard.
-   - `aboutHeroBannerImage`: Dedicated hero banner for `/about` company transparency & founders mission page.
-7. `contactPhone` (Primary) & `contactPhoneSecondary` (Secondary) / `telegramHandle` / `telegramUrl` / `supportEmail`: 24/7 hotline and official support channels.
-8. `telebirrMerchantCode`: Official Telebirr shortcode.
+7. **Contacts & Customer Support (`contacts` Fieldset)**:
+   - `contactPhone` & `contactPhoneSecondary`: Primary and secondary 24/7 hotline numbers.
+   - `supportEmail` & `supportEmailSecondary`: Primary and secondary customer support email addresses.
+   - `telegramHandle` & `telegramUrl`: Official Telegram handle and direct link URL.
 9. `cbeAccountNumber` & `cbeAccountName`: Commercial Bank of Ethiopia account number and recipient name.
 10. `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi`: Trilingual SWIFT/IBAN wire instructions for USD transactions.
 11. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.

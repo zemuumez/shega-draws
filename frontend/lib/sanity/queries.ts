@@ -70,7 +70,9 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     contactPhone,
     contactPhoneSecondary,
     telegramHandle,
+    telegramUrl,
     supportEmail,
+    supportEmailSecondary,
     telebirrMerchantCode,
     cbeAccountNumber,
     cbeAccountName,
@@ -290,6 +292,7 @@ export interface CMSSiteSettings {
   telegramHandle?: string;
   telegramUrl?: string;
   supportEmail?: string;
+  supportEmailSecondary?: string;
   telebirrMerchantCode?: string;
   cbeAccountNumber?: string;
   cbeAccountName?: string;

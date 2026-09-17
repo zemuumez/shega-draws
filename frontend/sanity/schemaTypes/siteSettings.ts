@@ -27,8 +27,8 @@ export const siteSettingsType = defineType({
     },
     {
       name: "contacts",
-      title: "📞 24/7 Hotline & Social Channels",
-      options: { collapsible: true, collapsed: true },
+      title: "📞 24/7 Hotline, Customer Support & Telegram (Header & Footer)",
+      options: { collapsible: true, collapsed: false },
     },
     {
       name: "paymentAccounts",
@@ -344,34 +344,53 @@ export const siteSettingsType = defineType({
       description: "Custom hero background banner displayed on the /about company transparency & founders mission page.",
     }),
 
-    // ─── Contacts ────────────────────────────────────────────────────
+    // ─── Contacts & Customer Support (Header & Footer) ───────────────
     defineField({
       name: "contactPhone",
-      title: "24/7 Official Hotline Phone (Primary)",
+      title: "📞 24/7 Primary Support & Hotline Phone",
       type: "string",
       fieldset: "contacts",
       initialValue: "+251 911 000 000",
+      description: "Primary support hotline phone number displayed in the footer, top nav, and result pages.",
     }),
     defineField({
       name: "contactPhoneSecondary",
-      title: "24/7 Official Hotline Phone (Secondary)",
+      title: "📞 24/7 Secondary Support & Hotline Phone",
       type: "string",
       fieldset: "contacts",
       initialValue: "+251 920 000 000",
-    }),
-    defineField({
-      name: "telegramHandle",
-      title: "Official Telegram Channel / Handle",
-      type: "string",
-      fieldset: "contacts",
-      initialValue: "@RimnaLotteryOfficial",
+      description: "Secondary / backup support hotline phone number displayed in the footer.",
     }),
     defineField({
       name: "supportEmail",
-      title: "Customer Support Email",
+      title: "✉️ Primary Customer Support Email",
       type: "string",
       fieldset: "contacts",
       initialValue: "support@rimnalottery.com",
+      description: "Official customer support email address displayed in the footer.",
+    }),
+    defineField({
+      name: "supportEmailSecondary",
+      title: "✉️ Secondary Customer Support Email (Optional)",
+      type: "string",
+      fieldset: "contacts",
+      description: "Optional secondary / inquiries email address for the footer.",
+    }),
+    defineField({
+      name: "telegramHandle",
+      title: "✈️ Official Telegram Channel / Handle",
+      type: "string",
+      fieldset: "contacts",
+      initialValue: "@RimnaLotteryOfficial",
+      description: "Official Telegram channel handle (e.g. @RimnaLotteryOfficial) displayed in the footer and top bar.",
+    }),
+    defineField({
+      name: "telegramUrl",
+      title: "🔗 Official Telegram Direct Link URL",
+      type: "url",
+      fieldset: "contacts",
+      initialValue: "https://t.me/RimnaLotteryOfficial",
+      description: "Direct URL to the official Telegram channel or support bot.",
     }),
 
     // ─── Payment Accounts ────────────────────────────────────────────

@@ -31,9 +31,11 @@ export function Footer({ siteSettings }: FooterProps) {
   const supportTitle = getLocalized(siteSettings, "footerSupportTitle", t.footer.customerSupportTitle);
   const telegramLabel = getLocalized(siteSettings, "footerTelegramLabel", t.footer.officialTelegramLabel);
   const phone1 = siteSettings?.contactPhone || "+251 911 000 000";
-  const phone2 = siteSettings?.contactPhoneSecondary || "+251 920 000 000";
+  const phone2 = siteSettings?.contactPhoneSecondary;
   const email = siteSettings?.supportEmail || "support@rimnalottery.com";
+  const email2 = siteSettings?.supportEmailSecondary;
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
+  const telegramUrl = siteSettings?.telegramUrl || (telegramHandle.startsWith("http") ? telegramHandle : `https://t.me/${telegramHandle.replace(/^@/, "")}`);
   const copyrightText = getLocalized(siteSettings, "copyrightText", t.footer.rights);
   const complianceText = getLocalized(siteSettings, "complianceText", t.footer.compliance);
 
@@ -103,16 +105,62 @@ export function Footer({ siteSettings }: FooterProps) {
             <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
               {supportTitle}
             </h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Phone size={14} color="var(--blue-navy)" /> {phone1} / {phone2}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Mail size={14} color="var(--blue-navy)" /> {email}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Send size={14} color="#2A65E6" /> {telegramLabel} {telegramHandle}
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+              {phone1 && (
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <Phone size={14} color="var(--blue-navy)" style={{ flexShrink: 0, marginTop: 3 }} />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <a
+                      href={`tel:${phone1.replace(/[^+\d]/g, "")}`}
+                      style={{ color: "var(--text-muted)", textDecoration: "none" }}
+                    >
+                      {phone1}
+                    </a>
+                    {phone2 && phone2.trim() !== "" && phone2 !== phone1 && (
+                      <a
+                        href={`tel:${phone2.replace(/[^+\d]/g, "")}`}
+                        style={{ color: "var(--text-muted)", textDecoration: "none", opacity: 0.9 }}
+                      >
+                        {phone2}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+              {email && (
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <Mail size={14} color="var(--blue-navy)" style={{ flexShrink: 0, marginTop: 3 }} />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <a
+                      href={`mailto:${email}`}
+                      style={{ color: "var(--text-muted)", textDecoration: "none", wordBreak: "break-all" }}
+                    >
+                      {email}
+                    </a>
+                    {email2 && email2.trim() !== "" && email2 !== email && (
+                      <a
+                        href={`mailto:${email2}`}
+                        style={{ color: "var(--text-muted)", textDecoration: "none", wordBreak: "break-all", opacity: 0.9 }}
+                      >
+                        {email2}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+              {telegramHandle && (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Send size={14} color="#2A65E6" style={{ flexShrink: 0 }} />
+                  <a
+                    href={telegramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#2A65E6", textDecoration: "none", fontWeight: 600 }}
+                  >
+                    {telegramLabel} {telegramHandle}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
