@@ -33,7 +33,7 @@ export const siteSettingsType = defineType({
     {
       name: "paymentAccounts",
       title: "💳 Official Bank & Telebirr Payment Accounts",
-      options: { collapsible: true, collapsed: true },
+      options: { collapsible: true, collapsed: false },
     },
   ],
   fields: [
@@ -388,18 +388,42 @@ export const siteSettingsType = defineType({
       description: "Direct URL to the official Telegram channel or support bot.",
     }),
 
-    // ─── Payment Accounts ────────────────────────────────────────────
+    // ─── Payment Accounts (Telebirr, CBE & International IBAN) ──────
+    defineField({
+      name: "telebirrReceiverPhone",
+      title: "📱 Telebirr Recipient Phone Number",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "+251 911 000 000",
+      description: "Official phone number players transfer to when paying via Telebirr.",
+    }),
     defineField({
       name: "telebirrMerchantCode",
-      title: "Telebirr Merchant Code / Shortcode",
+      title: "🏪 Telebirr Merchant Code / Shortcode",
       type: "string",
       fieldset: "paymentAccounts",
       initialValue: "884729",
-      description: "Displayed to players when purchasing tickets via Telebirr.",
+      description: "Official shortcode / merchant code displayed to players for Telebirr pay-way.",
+    }),
+    defineField({
+      name: "telebirrAccountName",
+      title: "👤 Telebirr Recipient Account Name",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "Rimna International Digital Lottery PLC",
+      description: "Official name shown to confirm Telebirr transfer recipient.",
+    }),
+
+    defineField({
+      name: "cbeBankName",
+      title: "🏦 Domestic Bank Name",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "Commercial Bank of Ethiopia (CBE)",
     }),
     defineField({
       name: "cbeAccountNumber",
-      title: "Commercial Bank of Ethiopia (CBE) Account Number",
+      title: "💳 CBE Account Number",
       type: "string",
       fieldset: "paymentAccounts",
       initialValue: "1000 1234 5678",
@@ -407,10 +431,40 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: "cbeAccountName",
-      title: "CBE Account Holder Name",
+      title: "👤 CBE Account Holder Name",
       type: "string",
       fieldset: "paymentAccounts",
       initialValue: "Rimna International Digital Lottery PLC",
+    }),
+
+    defineField({
+      name: "diasporaBankName",
+      title: "🏦 Recipient Bank Name (USD / International)",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "Commercial Bank of Ethiopia (International & Diaspora Banking)",
+    }),
+    defineField({
+      name: "diasporaIban",
+      title: "🌐 IBAN / International Account Number",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "ET64CBET000100012345678",
+      description: "International Bank Account Number (IBAN) for USD remittance.",
+    }),
+    defineField({
+      name: "diasporaAccountName",
+      title: "👤 Recipient / Account Holder Name (USD)",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "Rimna International Digital Lottery PLC",
+    }),
+    defineField({
+      name: "diasporaSwiftBic",
+      title: "⚡ SWIFT / BIC Code (Optional)",
+      type: "string",
+      fieldset: "paymentAccounts",
+      initialValue: "CBETETAA",
     }),
     defineField({
       name: "diasporaWireInstructions",
@@ -418,7 +472,7 @@ export const siteSettingsType = defineType({
       type: "text",
       fieldset: "paymentAccounts",
       rows: 3,
-      initialValue: "Contact official support via Telegram @RimnaLotteryOfficial or wire to our designated clearing bank.",
+      initialValue: "Send USD remittance via Western Union, Remitly, or wire transfer using the recipient IBAN and name above.",
     }),
     defineField({
       name: "diasporaWireInstructionsAm",
@@ -426,7 +480,7 @@ export const siteSettingsType = defineType({
       type: "text",
       fieldset: "paymentAccounts",
       rows: 3,
-      initialValue: "በቴሌግራም @RimnaLotteryOfficial የድጋፍ ቡድናችንን ያነጋግሩ ወይም በቀጥታ ወደ ዲያስፖራ የባንክ ሂሳባችን ያስተላልፉ።",
+      initialValue: "ከላይ በተጠቀሰው የIBAN ቁጥር እና የስም ዝርዝር በዌስተርን ዩኒየን፣ በሬሚትሊ ወይም በቀጥታ የባንክ ዝውውር ይክፈሉ።",
     }),
     defineField({
       name: "diasporaWireInstructionsTi",
@@ -434,7 +488,7 @@ export const siteSettingsType = defineType({
       type: "text",
       fieldset: "paymentAccounts",
       rows: 3,
-      initialValue: "ብቴሌግራም @RimnaLotteryOfficial ናይ ደገፍ ጉጅለና ኣዘራርቡ ወይ ቀጥታ ናብ ናይ ዲያስፖራ ባንክ ሕሳብና ኣመሓላልፉ።",
+      initialValue: "ኣብ ላዕሊ ብዝተጠቕሰ ናይ IBAN ቁጽርን ሽምን ብዌስተርን ዩንየን፣ ሬሚትሊ ወይ ቀጥታ ናይ ባንክ ዝውውር ክፈሉ።",
     }),
   ],
   preview: {

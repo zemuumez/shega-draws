@@ -225,12 +225,13 @@ A structured 4-step wizard with persistent state:
    - `contactPhone` & `contactPhoneSecondary`: Primary and secondary 24/7 hotline numbers.
    - `supportEmail` & `supportEmailSecondary`: Primary and secondary customer support email addresses.
    - `telegramHandle` & `telegramUrl`: Official Telegram handle and direct link URL.
-8. `telebirrMerchantCode`: Official Telebirr shortcode.
-9. `cbeAccountNumber` & `cbeAccountName`: Commercial Bank of Ethiopia account number and recipient name.
-10. `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi`: Trilingual SWIFT/IBAN wire instructions for USD transactions.
-11. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
-12. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
-13. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
+8. **Official Recipient Payment Accounts (`paymentAccounts` Fieldset)**:
+   - **Telebirr**: `telebirrReceiverPhone` (Phone number for P2P transfer), `telebirrMerchantCode` (Merchant shortcode for pay-way), `telebirrAccountName` (Recipient account name).
+   - **CBE Bank**: `cbeBankName` (Bank Name), `cbeAccountNumber` (Account Number), `cbeAccountName` (Account holder/company name).
+   - **International USD / Diaspora Wire**: `diasporaBankName` (Bank Name), `diasporaIban` (IBAN / International account number), `diasporaAccountName` (Account holder name), `diasporaSwiftBic` (SWIFT / BIC Code), `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi` (Trilingual remittance/wire notes).
+9. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
+10. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
+11. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
 
 ### 6.2 Website UI Translations (`uiTranslation` Documents)
 All static and dynamic platform copywriting across all 3 supported languages (**English 🇬🇧**, **Amharic 🇪🇹 አማርኛ**, and **Tigrinya 🇪🇹 ትግርኛ**) is managed under **"🌐 Website UI Translations"** with categorized folders:

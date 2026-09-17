@@ -73,9 +73,16 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     telegramUrl,
     supportEmail,
     supportEmailSecondary,
+    telebirrReceiverPhone,
     telebirrMerchantCode,
+    telebirrAccountName,
+    cbeBankName,
     cbeAccountNumber,
     cbeAccountName,
+    diasporaBankName,
+    diasporaIban,
+    diasporaAccountName,
+    diasporaSwiftBic,
     diasporaWireInstructions,
     diasporaWireInstructionsAm,
     diasporaWireInstructionsTi,
@@ -263,9 +270,16 @@ export interface CMSSiteSettings {
   telegramUrl?: string;
   supportEmail?: string;
   supportEmailSecondary?: string;
+  telebirrReceiverPhone?: string;
   telebirrMerchantCode?: string;
+  telebirrAccountName?: string;
+  cbeBankName?: string;
   cbeAccountNumber?: string;
   cbeAccountName?: string;
+  diasporaBankName?: string;
+  diasporaIban?: string;
+  diasporaAccountName?: string;
+  diasporaSwiftBic?: string;
   diasporaWireInstructions?: string;
   diasporaWireInstructionsAm?: string;
   diasporaWireInstructionsTi?: string;

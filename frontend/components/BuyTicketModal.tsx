@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck, Ticket } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Loader2, CheckCircle2, Users, ShieldCheck, Ticket, Copy, Check } from "lucide-react";
 import { NumberPicker } from "./NumberPicker";
 import { PaymentProofUploader } from "./PaymentProofUploader";
 import { submitEntry, type Currency } from "@/lib/api";
@@ -64,6 +64,18 @@ export function BuyTicketModal({
   const [method, setMethod] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string>("");
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const handleCopy = (value: string, fieldKey: string) => {
+    if (!value) return;
+    try {
+      navigator.clipboard.writeText(value);
+      setCopiedField(fieldKey);
+      setTimeout(() => setCopiedField((cur) => (cur === fieldKey ? null : cur)), 2000);
+    } catch {
+      // Fallback
+    }
+  };
 
   // Each new purchase has a stable retry reference.
   useEffect(() => {
@@ -458,37 +470,504 @@ export function BuyTicketModal({
               {/* Payment Transfer Instructions Box */}
               <div
                 style={{
-                  background: "rgba(0, 0, 0, 0.45)",
-                  border: "1.5px solid rgba(253, 224, 71, 0.4)",
+                  background: "rgba(10, 18, 36, 0.75)",
+                  border: "1.5px solid rgba(253, 224, 71, 0.45)",
                   borderRadius: "14px",
-                  padding: "14px 16px",
+                  padding: "16px",
                   fontSize: "0.8125rem",
                   color: "#E2E8F0",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
                 }}
               >
-                <div style={{ fontWeight: 800, color: "#FEF08A", marginBottom: 4 }}>
-                  {language === "ti" ? "ልክዕ መጠን ዝውውር ግበሩ:" : language === "am" ? "ትክክለኛውን መጠን ያስተላልፉ:" : "Transfer Exact Amount:"}{" "}
-                  <span style={{ fontSize: "1rem", color: "#FFFFFF" }}>{isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`}</span>
+                {/* Header: Amount to Pay */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    paddingBottom: 10,
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                  }}
+                >
+                  <span style={{ fontWeight: 800, color: "#FEF08A" }}>
+                    {language === "ti" ? "ልክዕ መጠን ዝውውር ግበሩ:" : language === "am" ? "ትክክለኛውን መጠን ያስተላልፉ:" : "Transfer Exact Amount:"}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "1.125rem",
+                      fontWeight: 900,
+                      color: "#10B981",
+                      background: "rgba(16, 185, 129, 0.15)",
+                      border: "1px solid rgba(16, 185, 129, 0.4)",
+                      padding: "3px 10px",
+                      borderRadius: "8px",
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    {isUSD ? `$${ticketPrice} USD` : `${ticketPrice} ETB`}
+                  </span>
                 </div>
-                {method === "telebirr" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <div> {text("Telebirr Merchant Code:")} <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.telebirrMerchantCode}</strong>
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}> {text("Merchant:")} {siteSettings?.siteName || "Rimna International Digital Lottery"} {text("• Hotline:")} {siteSettings?.contactPhone || "+251 911 000 000"}
-                    </div>
-                  </div>
-                )}
-                {method === "cbe" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <div> {text("Commercial Bank of Ethiopia (CBE) Account:")} <strong style={{ color: "#FDE047", fontSize: "0.9375rem" }}>{siteSettings?.cbeAccountNumber}</strong>
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}> {text("Account Holder:")} <strong style={{ color: "#FFFFFF" }}>{siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC"}</strong>
-                    </div>
-                  </div>
-                )}
-                {method === "wire" && <div style={{whiteSpace: "pre-line"}}>{getLocalized(siteSettings, "diasporaWireInstructions")}</div>}
-                {availableMethods.length === 0 && <p role="alert">{text("Payment instructions have not been configured for this currency. Please contact support.")}</p>}
 
+                {/* Method 1: Telebirr */}
+                {method === "telebirr" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8", lineHeight: 1.4 }}>
+                      {language === "ti"
+                        ? "ኣብ ቴሌብር መተግበሪኹም ገንዘብ ኣመሓላልፉ ወይ ብነጋዳይ ኮድ ብምጥቃም ክፍሊትኩም ፈጽሙ።"
+                        : language === "am"
+                        ? "በቴሌብር መተግበሪያዎ ገንዘብ ያስተላልፉ ወይም በነጋዴ ኮድ በመጠቀም ክፍያዎን ይፈጽሙ።"
+                        : "Open your Telebirr app, select Send Money or Pay Merchant, and transfer using the details below:"}
+                    </div>
+
+                    {/* Telebirr Phone Number */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(253, 224, 71, 0.3)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#FEF08A", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "📱 ናይ ቴሌብር ተቐባሊ ስልኪ" : language === "am" ? "📱 የቴሌብር ተቀባይ ስልክ" : "📱 Telebirr Phone Number"}
+                        </span>
+                        <span style={{ fontSize: "1rem", color: "#FFFFFF", fontFamily: "monospace", fontWeight: 800 }}>
+                          {siteSettings?.telebirrReceiverPhone || siteSettings?.contactPhone || "+251 911 000 000"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.telebirrReceiverPhone || siteSettings?.contactPhone || "+251 911 000 000", "telebirrPhone")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "telebirrPhone" ? "rgba(16, 185, 129, 0.25)" : "rgba(253, 224, 71, 0.15)",
+                          border: copiedField === "telebirrPhone" ? "1px solid #10B981" : "1px solid rgba(253, 224, 71, 0.4)",
+                          borderRadius: "8px",
+                          color: copiedField === "telebirrPhone" ? "#10B981" : "#FEF08A",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "telebirrPhone" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "telebirrPhone" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* Recipient / Account Name */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "👤 ናይ ተቐባሊ ሽም" : language === "am" ? "👤 የተቀባይ ስም" : "👤 Recipient / Account Name"}
+                        </span>
+                        <span style={{ fontSize: "0.875rem", color: "#FFFFFF", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {siteSettings?.telebirrAccountName || siteSettings?.siteName || "Rimna International Digital Lottery PLC"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.telebirrAccountName || siteSettings?.siteName || "Rimna International Digital Lottery PLC", "telebirrName")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "telebirrName" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.1)",
+                          border: copiedField === "telebirrName" ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                          borderRadius: "8px",
+                          color: copiedField === "telebirrName" ? "#10B981" : "#FFFFFF",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "telebirrName" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "telebirrName" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* Merchant Code (if available) */}
+                    {siteSettings?.telebirrMerchantCode && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 8,
+                          background: "rgba(0, 0, 0, 0.4)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          borderRadius: "10px",
+                          padding: "10px 12px",
+                        }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                          <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                            {language === "ti" ? "🏪 ናይ ነጋዳይ መፍለዪ ኮድ (Merchant Code)" : language === "am" ? "🏪 የነጋዴ መለያ ኮድ (Merchant Code)" : "🏪 Telebirr Merchant Code"}
+                          </span>
+                          <span style={{ fontSize: "0.9375rem", color: "#FDE047", fontFamily: "monospace", fontWeight: 800 }}>
+                            {siteSettings.telebirrMerchantCode}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(siteSettings.telebirrMerchantCode!, "telebirrCode")}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 5,
+                            padding: "6px 12px",
+                            background: copiedField === "telebirrCode" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.1)",
+                            border: copiedField === "telebirrCode" ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                            borderRadius: "8px",
+                            color: copiedField === "telebirrCode" ? "#10B981" : "#FFFFFF",
+                            fontSize: "0.75rem",
+                            fontWeight: 800,
+                            cursor: "pointer",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {copiedField === "telebirrCode" ? <Check size={13} /> : <Copy size={13} />}
+                          <span>{copiedField === "telebirrCode" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Method 2: CBE Bank */}
+                {method === "cbe" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8", lineHeight: 1.4 }}>
+                      {language === "ti"
+                        ? "ኣብ CBE ሞባይል ባንኪንግ ወይ ሲቢኢ ብር ብምጥቃም ናብዚ ዝስዕብ ናይ ሕሳብ ቁጽሪ ገንዘብ ኣመሓላልፉ:"
+                        : language === "am"
+                        ? "በCBE ሞባይል ባንኪንግ ወይም በሲቢኢ ብር በመጠቀም ወደሚከተለው የሂሳብ ቁጥር ገንዘብ ያስተላልፉ:"
+                        : "Transfer to the official Commercial Bank of Ethiopia (CBE) account below:"}
+                    </div>
+
+                    {/* CBE Account Number */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(253, 224, 71, 0.3)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#FEF08A", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "💳 ናይ CBE ሕሳብ ቁጽሪ (Account Number)" : language === "am" ? "💳 የCBE ሂሳብ ቁጥር (Account Number)" : "💳 CBE Account Number"}
+                        </span>
+                        <span style={{ fontSize: "1rem", color: "#FFFFFF", fontFamily: "monospace", fontWeight: 800 }}>
+                          {siteSettings?.cbeAccountNumber || "1000 1234 5678"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.cbeAccountNumber || "1000 1234 5678", "cbeAccount")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "cbeAccount" ? "rgba(16, 185, 129, 0.25)" : "rgba(253, 224, 71, 0.15)",
+                          border: copiedField === "cbeAccount" ? "1px solid #10B981" : "1px solid rgba(253, 224, 71, 0.4)",
+                          borderRadius: "8px",
+                          color: copiedField === "cbeAccount" ? "#10B981" : "#FEF08A",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "cbeAccount" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "cbeAccount" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* Account Holder Name */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "👤 ናይ ሕሳብ ዋና ሽም (Account Holder)" : language === "am" ? "👤 የሂሳብ ባለቤት ስም (Account Holder)" : "👤 Account Holder Name"}
+                        </span>
+                        <span style={{ fontSize: "0.875rem", color: "#FFFFFF", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC", "cbeName")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "cbeName" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.1)",
+                          border: copiedField === "cbeName" ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                          borderRadius: "8px",
+                          color: copiedField === "cbeName" ? "#10B981" : "#FFFFFF",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "cbeName" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "cbeName" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* Bank Name */}
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                      🏦 {siteSettings?.cbeBankName || "Commercial Bank of Ethiopia (CBE)"}
+                    </div>
+                  </div>
+                )}
+
+                {/* Method 3: International Transfer / USD Wire (IBAN, Name, SWIFT) */}
+                {method === "wire" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: "0.75rem", color: "#94A3B8", lineHeight: 1.4 }}>
+                      {language === "ti"
+                        ? "ኣብ ናይ ባንክ መተግበሪኹም፣ ዌስተርን ዩንየን ወይ ሬሚትሊ ብምጥቃም በዚ ዝስዕብ ናይ IBAN ቁጽርን ሽምን ክፍሊትኩም ፈጽሙ:"
+                        : language === "am"
+                        ? "በሞባይል ባንኪንግዎ፣ በዌስተርን ዩኒየን ወይም በሬሚትሊ በመጠቀም በሚከተለው የIBAN ቁጥር እና ስም ክፍያዎን ይፈጽሙ:"
+                        : "Use the recipient IBAN and name below in your banking app, Western Union, Remitly, or wire transfer:"}
+                    </div>
+
+                    {/* IBAN / International Account Number */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(253, 224, 71, 0.3)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#FEF08A", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "🌐 ናይ IBAN / ሕሳብ ቁጽሪ" : language === "am" ? "🌐 የIBAN / ሂሳብ ቁጥር" : "🌐 Recipient IBAN / Account #"}
+                        </span>
+                        <span style={{ fontSize: "0.9375rem", color: "#FFFFFF", fontFamily: "monospace", fontWeight: 800, wordBreak: "break-all" }}>
+                          {siteSettings?.diasporaIban || "ET64CBET000100012345678"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.diasporaIban || "ET64CBET000100012345678", "wireIban")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "wireIban" ? "rgba(16, 185, 129, 0.25)" : "rgba(253, 224, 71, 0.15)",
+                          border: copiedField === "wireIban" ? "1px solid #10B981" : "1px solid rgba(253, 224, 71, 0.4)",
+                          borderRadius: "8px",
+                          color: copiedField === "wireIban" ? "#10B981" : "#FEF08A",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "wireIban" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "wireIban" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* Recipient / Account Holder Name */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "👤 ናይ ተቐባሊ ሽም (Recipient Name)" : language === "am" ? "👤 የተቀባይ ስም (Recipient Name)" : "👤 Recipient / Account Holder Name"}
+                        </span>
+                        <span style={{ fontSize: "0.875rem", color: "#FFFFFF", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {siteSettings?.diasporaAccountName || siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.diasporaAccountName || siteSettings?.cbeAccountName || "Rimna International Digital Lottery PLC", "wireName")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "wireName" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.1)",
+                          border: copiedField === "wireName" ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                          borderRadius: "8px",
+                          color: copiedField === "wireName" ? "#10B981" : "#FFFFFF",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "wireName" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "wireName" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* Recipient Bank Name */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: "10px",
+                        padding: "10px 12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                          {language === "ti" ? "🏦 ተቐባሊ ባንክ" : language === "am" ? "🏦 ተቀባይ ባንክ" : "🏦 Recipient Bank"}
+                        </span>
+                        <span style={{ fontSize: "0.8125rem", color: "#FFFFFF", fontWeight: 600 }}>
+                          {siteSettings?.diasporaBankName || "Commercial Bank of Ethiopia (International & Diaspora Banking)"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(siteSettings?.diasporaBankName || "Commercial Bank of Ethiopia (International & Diaspora Banking)", "wireBank")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "6px 12px",
+                          background: copiedField === "wireBank" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.1)",
+                          border: copiedField === "wireBank" ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                          borderRadius: "8px",
+                          color: copiedField === "wireBank" ? "#10B981" : "#FFFFFF",
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {copiedField === "wireBank" ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedField === "wireBank" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                      </button>
+                    </div>
+
+                    {/* SWIFT / BIC Code (if available) */}
+                    {siteSettings?.diasporaSwiftBic && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 8,
+                          background: "rgba(0, 0, 0, 0.4)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          borderRadius: "10px",
+                          padding: "10px 12px",
+                        }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                          <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.5px" }}>
+                            {language === "ti" ? "⚡ SWIFT / BIC ኮድ" : language === "am" ? "⚡ SWIFT / BIC ኮድ" : "⚡ SWIFT / BIC Code"}
+                          </span>
+                          <span style={{ fontSize: "0.9375rem", color: "#FDE047", fontFamily: "monospace", fontWeight: 800 }}>
+                            {siteSettings.diasporaSwiftBic}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(siteSettings.diasporaSwiftBic!, "wireSwift")}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 5,
+                            padding: "6px 12px",
+                            background: copiedField === "wireSwift" ? "rgba(16, 185, 129, 0.25)" : "rgba(255, 255, 255, 0.1)",
+                            border: copiedField === "wireSwift" ? "1px solid #10B981" : "1px solid rgba(255, 255, 255, 0.25)",
+                            borderRadius: "8px",
+                            color: copiedField === "wireSwift" ? "#10B981" : "#FFFFFF",
+                            fontSize: "0.75rem",
+                            fontWeight: 800,
+                            cursor: "pointer",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {copiedField === "wireSwift" ? <Check size={13} /> : <Copy size={13} />}
+                          <span>{copiedField === "wireSwift" ? (language === "ti" ? "ተቐዲሑ!" : language === "am" ? "ተቀድቷል!" : "Copied!") : (language === "ti" ? "ቅዳሕ" : language === "am" ? "ቅዳ" : "Copy")}</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Additional Transfer Notes */}
+                    {getLocalized(siteSettings, "diasporaWireInstructions") && (
+                      <div style={{ fontSize: "0.75rem", color: "#CBD5E1", background: "rgba(0, 0, 0, 0.3)", padding: "8px 10px", borderRadius: "8px", borderLeft: "3px solid #FDE047", whiteSpace: "pre-line" }}>
+                        {getLocalized(siteSettings, "diasporaWireInstructions")}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {availableMethods.length === 0 && (
+                  <p role="alert" style={{ color: "#F87171", margin: 0 }}>
+                    {text("Payment instructions have not been configured for this currency. Please contact support.")}
+                  </p>
+                )}
               </div>
 
               {/* Transaction Reference (TxID) Input */}

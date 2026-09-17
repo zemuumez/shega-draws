@@ -61,21 +61,22 @@ const CORE_INITIAL_DOCUMENTS = [
     contactPhone: "+251 911 000 000",
     telegramHandle: "@RimnaLotteryOfficial",
     supportEmail: "support@rimnalottery.com",
+    telebirrReceiverPhone: "+251 911 000 000",
     telebirrMerchantCode: "884729",
+    telebirrAccountName: "Rimna International Digital Lottery PLC",
+    cbeBankName: "Commercial Bank of Ethiopia (CBE)",
     cbeAccountNumber: "1000 1234 5678",
     cbeAccountName: "Rimna International Digital Lottery PLC",
+    diasporaBankName: "Commercial Bank of Ethiopia (International & Diaspora Banking)",
+    diasporaIban: "ET64CBET000100012345678",
+    diasporaAccountName: "Rimna International Digital Lottery PLC",
+    diasporaSwiftBic: "CBETETAA",
     diasporaWireInstructions:
-      "Send USD remittance via Western Union, Remitly, or wire transfer to our official diaspora account.",
+      "Send USD remittance via Western Union, Remitly, or wire transfer using the recipient IBAN and name above.",
     diasporaWireInstructionsAm:
-      "በቴሌግራም @RimnaLotteryOfficial የድጋፍ ቡድናችንን ያነጋግሩ ወይም በቀጥታ ወደ ዲያስፖራ የባንክ ሂሳባችን ያስተላልፉ።",
+      "ከላይ በተጠቀሰው የIBAN ቁጥር እና የስም ዝርዝር በዌስተርን ዩኒየን፣ በሬሚትሊ ወይም በቀጥታ የባንክ ዝውውር ይክፈሉ።",
     diasporaWireInstructionsTi:
-      "ብቴሌግራም @RimnaLotteryOfficial ናይ ደገፍ ጉጅለና ኣዘራርቡ ወይ ቀጥታ ናብ ናይ ዲያስፖራ ባንክ ሕሳብና ኣመሓላልፉ።",
-    footerDescription:
-      "Rimna Digital Lottery is a transparent, live-video verified digital lottery platform with direct mobile wallet payouts.",
-    footerDescriptionAm:
-      "ሪምና ዲጂታል ሎተሪ በቀጥታ ቪዲዮ ማረጋገጫ እና በግልጽ አሰራር ላይ የተመሰረተ ዘመናዊ የዲጂታል ሎተሪ አገልግሎት ነው።",
-    footerDescriptionTi:
-      "ሪምና ዲጂታል ሎተሪ ብናይ ቀጥታ ቪድዮ ምርግጋጽን ብግልጺ ኣሰራርሓን ዝቖመ ዘመናዊ ናይ ዲጂታል ሎተሪ ኣገልግሎት እዩ።",
+      "ኣብ ላዕሊ ብዝተጠቕሰ ናይ IBAN ቁጽርን ሽምን ብዌስተርን ዩንየን፣ ሬሚትሊ ወይ ቀጥታ ናይ ባንክ ዝውውር ክፈሉ።",
     etbPrices: [
       { value: 100, label: "100", isEnabled: true },
       { value: 200, label: "200", isEnabled: true },
