@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Ticket, ShieldCheck, Phone, Mail, Send, Award, Users } from "lucide-react";
+import { ShieldCheck, Phone, Mail, Send, Award, Users } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
 
@@ -14,21 +14,28 @@ interface FooterProps {
 
 export function Footer({ siteSettings }: FooterProps) {
   const pathname = usePathname();
-  const { text, language, t, getLocalized } = useLanguage();
+  const { language, t, getLocalized } = useLanguage();
 
   if (pathname?.startsWith("/studio")) {
     return null;
   }
 
-  // CMS values with hardcoded fallbacks
+  // CMS values with localized fallbacks
   const siteName = getLocalized(siteSettings, "siteName", t.appName);
   const footerDesc = getLocalized(siteSettings, "footerDescription", t.footer.description);
+  const quickLinksTitle = getLocalized(siteSettings, "footerQuickLinksTitle", t.footer.quickLinks);
+  const poolTransparencyTitle = getLocalized(siteSettings, "footerPoolTransparencyTitle", t.footer.poolTransparencyTitle);
+  const poolFeature1 = getLocalized(siteSettings, "footerFeature1", t.footer.poolFeature1);
+  const poolFeature2 = getLocalized(siteSettings, "footerFeature2", t.footer.poolFeature2);
+  const poolFeature3 = getLocalized(siteSettings, "footerFeature3", t.footer.poolFeature3);
+  const supportTitle = getLocalized(siteSettings, "footerSupportTitle", t.footer.customerSupportTitle);
+  const telegramLabel = getLocalized(siteSettings, "footerTelegramLabel", t.footer.officialTelegramLabel);
   const phone1 = siteSettings?.contactPhone || "+251 911 000 000";
-  const phone2 = "+251 920 000 000";
+  const phone2 = siteSettings?.contactPhoneSecondary || "+251 920 000 000";
   const email = siteSettings?.supportEmail || "support@rimnalottery.com";
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
-  const copyrightText = siteSettings?.copyrightText || t.footer.rights;
-  const complianceText = siteSettings?.complianceText || t.footer.compliance;
+  const copyrightText = getLocalized(siteSettings, "copyrightText", t.footer.rights);
+  const complianceText = getLocalized(siteSettings, "complianceText", t.footer.compliance);
 
   return (
     <footer
@@ -63,34 +70,39 @@ export function Footer({ siteSettings }: FooterProps) {
           {/* Navigation Links */}
           <div>
             <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
-              {t.footer.quickLinks}
+              {quickLinksTitle}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.875rem" }}>
-              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{text("Choose Tickets")}</Link>
-              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{text("How It Works")}</Link>
-              <Link href="/entries" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.myEntries}</Link>
+              <Link href="/#choose-ticket" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.draws}</Link>
+              <Link href="/how-it-works" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.howItWorks}</Link>
               <Link href="/results" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.results}</Link>
-              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{text("Why Rimna")}</Link>
-              <Link href="/studio" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.admin}</Link>
+              <Link href="/about" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{t.nav.whyRimna}</Link>
             </div>
           </div>
 
           {/* Pool Sizes & Transparency */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}> {text("Pool Sizes & Transparency")} </h4>
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
+              {poolTransparencyTitle}
+            </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Users size={14} color="var(--blue-royal)" /> {text("1K, 2K, 3K, and 5K Ticket Capacities")} </div>
+                <Users size={14} color="var(--blue-royal)" /> {poolFeature1}
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <ShieldCheck size={14} color="var(--teal)" /> {text("100% Live Video Broadcast Draws")} </div>
+                <ShieldCheck size={14} color="var(--teal)" /> {poolFeature2}
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Award size={14} color="var(--gold-dark)" /> {text("10-Tier Fixed Guaranteed Prizes")} </div>
+                <Award size={14} color="var(--gold-dark)" /> {poolFeature3}
+              </div>
             </div>
           </div>
 
           {/* Contact & Support */}
           <div>
-            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}> {text("Customer Support")} </h4>
+            <h4 className="mono" style={{ fontSize: "0.75rem", color: "var(--blue-navy)", textTransform: "uppercase", marginBottom: 14, letterSpacing: "0.5px", fontWeight: 800 }}>
+              {supportTitle}
+            </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.8125rem", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Phone size={14} color="var(--blue-navy)" /> {phone1} / {phone2}
@@ -99,7 +111,7 @@ export function Footer({ siteSettings }: FooterProps) {
                 <Mail size={14} color="var(--blue-navy)" /> {email}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Send size={14} color="#2A65E6" /> {text("Official Telegram:")} {telegramHandle}
+                <Send size={14} color="#2A65E6" /> {telegramLabel} {telegramHandle}
               </div>
             </div>
           </div>

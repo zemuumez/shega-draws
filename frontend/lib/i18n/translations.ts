@@ -198,6 +198,12 @@ export interface Translations {
     transparency: string;
     quickLinks: string;
     social: string;
+    poolTransparencyTitle: string;
+    poolFeature1: string;
+    poolFeature2: string;
+    poolFeature3: string;
+    customerSupportTitle: string;
+    officialTelegramLabel: string;
   };
   howItWorksPage: {
     badge: string;
@@ -499,6 +505,12 @@ export const translations: Record<Language, Translations> = {
       transparency: "Live Transparency",
       quickLinks: "Platform Navigation",
       social: "Official Channels",
+      poolTransparencyTitle: "Pool Sizes & Transparency",
+      poolFeature1: "1K, 2K, 3K, and 5K Ticket Capacities",
+      poolFeature2: "100% Live Video Broadcast Draws",
+      poolFeature3: "10-Tier Fixed Guaranteed Prizes",
+      customerSupportTitle: "Customer Support",
+      officialTelegramLabel: "Official Telegram:",
     },
     howItWorksPage: {
       badge: "COMPLETE TRANSPARENCY & PLAYER GUIDE",
@@ -842,6 +854,12 @@ export const translations: Record<Language, Translations> = {
       transparency: "ግልጽ አሰራር",
       quickLinks: "ፈጣን አገናኞች",
       social: "ማህበራዊ ገጾቻችን",
+      poolTransparencyTitle: "የእጣ መጠን እና ግልጸኝነት",
+      poolFeature1: "1ሺህ፣ 2ሺህ፣ 3ሺህ እና 5ሺህ የቲኬት አቅም",
+      poolFeature2: "100% የቀጥታ ቪዲዮ እጣ ማውጣት",
+      poolFeature3: "10 ደረጃዎች ያሉት ቋሚ ሽልማቶች",
+      customerSupportTitle: "የደንበኞች አገልግሎት",
+      officialTelegramLabel: "ኦፊሴላዊ ቴሌግራም፦",
     },
     howItWorksPage: {
       badge: "ሙሉ ግልጽነት እና የተሳታፊዎች መመሪያ",
@@ -1185,6 +1203,12 @@ export const translations: Record<Language, Translations> = {
       transparency: "ግልጺ ኣሰራርሓ",
       quickLinks: "ቕልጡፍ መላግቦታት",
       social: "ማሕበራዊ ገጻትና",
+      poolTransparencyTitle: "መጠንን ግልጽነትን ዕጫታት",
+      poolFeature1: "1ሺሕ፣ 2ሺሕ፣ 3ሺሕን 5ሺሕን ናይ ቲኬት ዓቕሚ",
+      poolFeature2: "100% ናይ ቀጥታ ቪድዮ ዕጫ ምውጻእ",
+      poolFeature3: "10 ደረጃ ዘለዎም ቀወምቲ ሽልማታት",
+      customerSupportTitle: "ናይ ዓማዊል ደገፍ",
+      officialTelegramLabel: "ወግዓዊ ቴሌግራም፦",
     },
     howItWorksPage: {
       badge: "ምሉእ ግልጽነትን ናይ ተሳተፍቲ መምርሒን",

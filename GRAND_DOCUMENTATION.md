@@ -216,19 +216,30 @@ A structured 4-step wizard with persistent state:
 3. `defaultLanguage`: Default platform locale (`en`, `am`, `ti`).
 4. `defaultCurrency`: Default homepage currency tab (`ETB` or `USD`). When published by admin, pre-selects the chosen currency on the homepage hero and ticket configurator.
 5. `logoImage`: Official high-res logo/emblem displayed in navbar and footer.
-5. **Per-Page Panoramic Hero & Background Banners (`pageBanners` Fieldset)**:
+6. **Per-Page Panoramic Hero & Background Banners (`pageBanners` Fieldset)**:
    - `heroBannerImage`: Official panoramic stadium banner for Homepage countdown & ticket configurator. Also acts as global fallback.
    - `howItWorksHeroBannerImage`: Dedicated hero banner for `/how-it-works` complete player guide page.
    - `resultsHeroBannerImage`: Dedicated hero banner for `/results` live broadcast stream and winners announcement page.
    - `entriesHeroBannerImage`: Dedicated hero banner for `/entries` player ticket tracking dashboard.
    - `aboutHeroBannerImage`: Dedicated hero banner for `/about` company transparency & founders mission page.
-6. `contactPhone` / `telegramHandle` / `telegramUrl` / `supportEmail`: 24/7 hotline and official support channels.
-7. `telebirrMerchantCode`: Official Telebirr shortcode.
-8. `cbeAccountNumber` & `cbeAccountName`: Commercial Bank of Ethiopia account number and recipient name.
-9. `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi`: Trilingual SWIFT/IBAN wire instructions for USD transactions.
-10. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
-11. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
-12. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
+7. `contactPhone` (Primary) & `contactPhoneSecondary` (Secondary) / `telegramHandle` / `telegramUrl` / `supportEmail`: 24/7 hotline and official support channels.
+8. `telebirrMerchantCode`: Official Telebirr shortcode.
+9. `cbeAccountNumber` & `cbeAccountName`: Commercial Bank of Ethiopia account number and recipient name.
+10. `diasporaWireInstructions` / `diasporaWireInstructionsAm` / `diasporaWireInstructionsTi`: Trilingual SWIFT/IBAN wire instructions for USD transactions.
+11. `etbPrices`: Dynamic array of ETB price tiers with enable/disable switches.
+12. `usdPrices`: Dynamic array of USD price tiers with enable/disable switches.
+13. `poolSizes`: Dynamic array of participant pool sizes (1K, 2K, 3K, 5K, etc.).
+14. **Footer Trilingual Customization (`footer` Fieldset)**:
+    - `footerDescription` / `footerDescriptionAm` / `footerDescriptionTi`: Platform summary paragraph in footer.
+    - `footerQuickLinksTitle` / `footerQuickLinksTitleAm` / `footerQuickLinksTitleTi`: Column header for navigation links.
+    - `footerPoolTransparencyTitle` / `footerPoolTransparencyTitleAm` / `footerPoolTransparencyTitleTi`: Column header for transparency features.
+    - `footerFeature1` / `footerFeature1Am` / `footerFeature1Ti`: Dynamic pool capacity feature line.
+    - `footerFeature2` / `footerFeature2Am` / `footerFeature2Ti`: Live video draw feature line.
+    - `footerFeature3` / `footerFeature3Am` / `footerFeature3Ti`: Fixed prize tier feature line.
+    - `footerSupportTitle` / `footerSupportTitleAm` / `footerSupportTitleTi`: Customer support column header.
+    - `footerTelegramLabel` / `footerTelegramLabelAm` / `footerTelegramLabelTi`: Official Telegram prefix label.
+    - `copyrightText` / `copyrightTextAm` / `copyrightTextTi`: Bottom bar copyright statement.
+    - `complianceText` / `complianceTextAm` / `complianceTextTi`: Bottom bar compliance & verification badge text.
 
 ### 6.2 `playerEntry` (Receipts & Proofs)
 - Stores player full name, phone number, draw ID, lucky number, pool size, price paid, currency, payment method, submission timestamp, and admin verification status (`pending`, `confirmed`, `rejected`).
