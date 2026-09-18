@@ -54,6 +54,7 @@ export function NumberPicker({
 
   useEffect(() => { setCurrentPage(0); setSearchQuery(""); }, [poolSize]);
   const availableNumbers = useMemo(() => Array.from({length: poolSize}, (_, i) => i + 1).filter(n => !effectiveTaken.has(String(n).padStart(2, "0"))), [poolSize, effectiveTaken]);
+
   const rollRandom = () => {
     if (!availableNumbers.length) return;
     const chosen = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
@@ -62,26 +63,45 @@ export function NumberPicker({
     setCurrentPage(Math.floor((chosen - 1) / PAGE_SIZE));
   };
 
+  // Sync currentPage whenever valid value changes
+  useEffect(() => {
+    if (value && Number(value) >= 1 && Number(value) <= poolSize) {
+      setCurrentPage(Math.floor((Number(value) - 1) / PAGE_SIZE));
+    }
+  }, [value, poolSize, PAGE_SIZE]);
+
+  // If current value is missing or taken, auto-select a random available number
+  useEffect(() => {
+    if (availableNumbers.length > 0) {
+      const isTaken = effectiveTaken.has(String(Number(value)).padStart(2, "0"));
+      const isInvalid = !value || Number(value) < 1 || Number(value) > poolSize;
+      if (isTaken || isInvalid) {
+        const chosen = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+        onChange(String(chosen).padStart(2, "0"));
+      }
+    }
+  }, [availableNumbers, effectiveTaken, poolSize, value, onChange]);
+
   const isCurrentValueTaken = effectiveTaken.has(String(Number(value)).padStart(2, "0"));
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", boxSizing: "border-box" }}>
       {/* ── Top Wheel & Selected Number Display ───────────────────── */}
       <div
         style={{
           background: "rgba(0, 0, 0, 0.45)",
           border: "1.5px solid rgba(253, 224, 71, 0.75)",
           borderRadius: "16px",
-          padding: "16px 20px",
+          padding: "clamp(12px, 3.5vw, 18px)",
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 14,
+          flexDirection: "column",
+          gap: 12,
           boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.15)",
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
-        <div>
+        <div style={{ width: "100%" }}>
           <span
             style={{
               fontSize: "0.6875rem",
@@ -90,39 +110,53 @@ export function NumberPicker({
               fontWeight: 900,
               letterSpacing: "0.8px",
               display: "block",
+              marginBottom: 6,
             }}
-          > {text("SELECTED LUCKY TICKET NUMBER")} </span>
+          >
+            {text("SELECTED LUCKY TICKET NUMBER")}
+          </span>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
             <div
               className="display"
               style={{
-                fontSize: "2.4rem",
+                fontSize: "clamp(1.5rem, 5vw, 2.2rem)",
                 fontWeight: 900,
                 color: isCurrentValueTaken ? "#FCA5A5" : "#FDE047",
                 background: "rgba(0, 0, 0, 0.6)",
                 border: isCurrentValueTaken ? "2px solid #EF4444" : "2px solid #FDE047",
                 borderRadius: 12,
-                padding: "2px 16px",
+                padding: "4px 14px",
                 boxShadow: isCurrentValueTaken ? "0 0 14px rgba(239, 68, 68, 0.4)" : "0 0 16px rgba(253, 224, 71, 0.35)",
                 lineHeight: 1.15,
-                minWidth: 90,
                 textAlign: "center",
                 textShadow: "0 2px 10px rgba(0,0,0,0.8)",
+                display: "inline-block",
               }}
             >
               #{value || "---"}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0, textAlign: "right" }}>
               {value && !isCurrentValueTaken ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#6EE7B7", fontSize: "0.8125rem", fontWeight: 800 }}>
-                  <Check size={15} color="#34D399" /> {text("Available to Pick")} </div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#6EE7B7", fontSize: "0.8125rem", fontWeight: 800 }}>
+                  <Check size={15} color="#34D399" /> {text("Available to Pick")}
+                </div>
               ) : value && isCurrentValueTaken ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#FCA5A5", fontSize: "0.8125rem", fontWeight: 800 }}>
-                  <Lock size={14} color="#EF4444" /> {text("Already Taken")} </div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#FCA5A5", fontSize: "0.8125rem", fontWeight: 800 }}>
+                  <Lock size={14} color="#EF4444" /> {text("Already Taken")}
+                </div>
               ) : null}
-              <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}> {text("Pool Range: #1 to #")}{poolSize.toLocaleString()}
+              <span style={{ fontSize: "0.6875rem", color: "#CBD5E1", display: "block", marginTop: 2 }}>
+                {text("Pool Range: #1 to #")}{poolSize.toLocaleString()}
               </span>
             </div>
           </div>
@@ -135,16 +169,21 @@ export function NumberPicker({
           disabled={isRolling || !availableNumbers.length}
           className="casino-btn-gold"
           style={{
-            padding: "10px 18px",
+            width: "100%",
+            padding: "11px 16px",
             fontSize: "0.875rem",
             fontWeight: 900,
             cursor: "pointer",
-            display: "inline-flex",
+            display: "flex",
             alignItems: "center",
-            gap: 7,
+            justifyContent: "center",
+            gap: 8,
+            boxSizing: "border-box",
           }}
         >
-          <Dice5 size={17} className={isRolling ? "animate-spin" : ""} color="#111827" /> {text("Pick Random Number")} </button>
+          <Dice5 size={18} className={isRolling ? "animate-spin" : ""} color="#111827" />
+          {text("Pick Random Number")}
+        </button>
       </div>
 
       {/* ── Search & Range Jump Filter ────────────────────────────── */}
@@ -238,9 +277,9 @@ export function NumberPicker({
           overflowY: "auto",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, fontSize: "0.6875rem", color: "#CBD5E1" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 10, fontSize: "0.6875rem", color: "#CBD5E1" }}>
           <span style={{ fontWeight: 800, color: "#FEF08A" }}> {text("SELECTABLE NUMBERS (")}{poolSize.toLocaleString()} {text("TOTAL POOL SLOTS)")} </span>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255, 255, 255, 0.2)" }} /> {text("Available")} </span>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#FCA5A5" }}>

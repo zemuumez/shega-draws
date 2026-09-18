@@ -68,10 +68,13 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
           borderRadius: "20px",
           width: "100%",
           maxWidth: 480,
-          padding: "clamp(20px, 4vw, 28px)",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          padding: "clamp(16px, 4vw, 28px)",
           position: "relative",
           boxShadow: "0 24px 48px -12px rgba(0,0,0,0.35)",
           border: "2px solid #FDE047",
+          boxSizing: "border-box",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -93,6 +96,7 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
             justifyContent: "center",
             cursor: "pointer",
             color: "var(--text-muted)",
+            zIndex: 2,
           }}
         >
           <X size={18} />
@@ -115,10 +119,10 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
           >
             <Phone size={22} color="#2A65E6" />
           </div>
-          <h3 className="display" style={{ fontSize: "1.375rem", color: "#111827", fontWeight: 900 }}>
+          <h3 className="display" style={{ fontSize: "clamp(1.125rem, 3vw, 1.375rem)", color: "#111827", fontWeight: 900, margin: "0 0 4px" }}>
             {language === "ti" ? "ናይ ዓማዊል ደገፍ ርኸቡ" : language === "am" ? "የደንበኞች አገልግሎትን ያነጋግሩ" : "Contact Customer Support"}
           </h3>
-          <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+          <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.4 }}>
             {language === "ti"
               ? "ጉጅለና ብዛዕባ ዕዳጋ ቲኬትን ክፍሊት ሽልማትን ንምሕጋዝ 24/7 ድሉው እዩ።"
               : language === "am"
@@ -128,27 +132,55 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
         </div>
 
         {/* Direct Contact Channels */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 10,
+            marginBottom: 20,
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
           <a
             href={`tel:${contactPhone.replace(/\s+/g, "")}`}
             style={{
               background: "#F8FAFC",
               border: "1px solid var(--gray-line)",
-              borderRadius: "10px",
+              borderRadius: "12px",
               padding: "10px 12px",
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              gap: 10,
               color: "#111827",
+              minWidth: 0,
+              width: "100%",
+              overflow: "hidden",
+              boxSizing: "border-box",
             }}
           >
-            <Phone size={16} color="#2A65E6" />
-            <div>
-              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block" }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "8px",
+                background: "rgba(42, 101, 230, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Phone size={16} color="#2A65E6" />
+            </div>
+            <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block", textTransform: "uppercase", fontWeight: 700 }}>
                 {language === "ti" ? "ናይ ስልኪ መስመር" : language === "am" ? "የስልክ መስመር" : "PHONE HOTLINE"}
               </span>
-              <strong style={{ fontSize: "0.75rem" }}>{contactPhone}</strong>
+              <strong style={{ fontSize: "0.8125rem", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {contactPhone}
+              </strong>
             </div>
           </a>
 
@@ -159,21 +191,40 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
             style={{
               background: "#EFF6FF",
               border: "1px solid #BFDBFE",
-              borderRadius: "10px",
+              borderRadius: "12px",
               padding: "10px 12px",
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              gap: 10,
               color: "#2A65E6",
+              minWidth: 0,
+              width: "100%",
+              overflow: "hidden",
+              boxSizing: "border-box",
             }}
           >
-            <Send size={16} color="#2A65E6" />
-            <div>
-              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block" }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "8px",
+                background: "rgba(42, 101, 230, 0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Send size={16} color="#2A65E6" />
+            </div>
+            <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+              <span className="mono" style={{ fontSize: "0.625rem", color: "var(--text-subtle)", display: "block", textTransform: "uppercase", fontWeight: 700 }}>
                 TELEGRAM
               </span>
-              <strong style={{ fontSize: "0.75rem" }}>{telegramHandle}</strong>
+              <strong style={{ fontSize: "0.8125rem", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {telegramHandle}
+              </strong>
             </div>
           </a>
         </div>

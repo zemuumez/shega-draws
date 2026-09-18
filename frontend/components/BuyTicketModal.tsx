@@ -98,6 +98,27 @@ export function BuyTicketModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+function pickRandomAvailableNumber(pool: number, taken: string[]): string {
+  const safePool = Math.max(1, pool || 1000);
+  const takenSet = new Set(taken.map((n) => Number(n)));
+  // If pool is large, try random sampling first
+  if (safePool > 50) {
+    for (let attempts = 0; attempts < 100; attempts++) {
+      const candidate = Math.floor(Math.random() * safePool) + 1;
+      if (!takenSet.has(candidate)) {
+        return String(candidate);
+      }
+    }
+  }
+  // Fallback: collect all untaken numbers
+  const available: number[] = [];
+  for (let i = 1; i <= safePool; i++) {
+    if (!takenSet.has(i)) available.push(i);
+  }
+  if (available.length === 0) return "1";
+  return String(available[Math.floor(Math.random() * available.length)]);
+}
+
   // Form fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -107,7 +128,7 @@ export function BuyTicketModal({
   const [countrySearch, setCountrySearch] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
-  const [number, setNumber] = useState("7");
+  const [number, setNumber] = useState(() => pickRandomAvailableNumber(initialPoolSize, []));
   const [method, setMethod] = useState("");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string>("");
@@ -166,7 +187,7 @@ export function BuyTicketModal({
       setSubmissionId(crypto.randomUUID());
       setReceiptId("");
       setMethod(paymentMethods(siteSettings, currency)[0]?.id || "");
-      setNumber("7");
+      setNumber(pickRandomAvailableNumber(initialPoolSize, takenNumbers));
 
       setName("");
       setPhone("");
@@ -187,7 +208,20 @@ export function BuyTicketModal({
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Unable to check availability.");
         if (data.price !== initialPrice || data.currency !== initialCurrency || data.poolSize !== initialPoolSize) throw new Error("Ticket settings changed. Close and refresh the page.");
-        if (!cancelled) { setTakenNumbers(data.takenNumbers); setSelectionKey(data.selectionKey); setUnavailable(""); }
+        if (!cancelled) {
+          setTakenNumbers(data.takenNumbers);
+          setSelectionKey(data.selectionKey);
+          setUnavailable("");
+          // Ensure current selected number is valid and available (not taken)
+          setNumber((curr) => {
+            const isTaken = data.takenNumbers.some((t: string) => Number(t) === Number(curr));
+            const isOutOfBounds = Number(curr) < 1 || Number(curr) > (data.poolSize || initialPoolSize);
+            if (!curr || isTaken || isOutOfBounds) {
+              return pickRandomAvailableNumber(data.poolSize || initialPoolSize, data.takenNumbers);
+            }
+            return curr;
+          });
+        }
       } catch (error) { if (!cancelled) setUnavailable(error instanceof Error ? error.message : "Unable to check availability."); }
       finally { if (!cancelled) setChecking(false); }
     }
