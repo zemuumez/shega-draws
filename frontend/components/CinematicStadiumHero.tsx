@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import {
   ShieldCheck,
-  Trophy,
+  Zap,
+  Smartphone,
+  ArrowRight,
   ArrowUpRight,
-  Coins,
-  Ticket,
-  Users,
-  Percent,
-  CheckCircle2,
   Sparkles,
 } from "lucide-react";
 import { FloatingParticlesCanvas } from "./FloatingParticlesCanvas";
@@ -24,7 +20,7 @@ interface CinematicStadiumHeroProps {
 }
 
 export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicStadiumHeroProps) {
-  const { text, t, getLocalized } = useLanguage();
+  const { text, t, language, getLocalized } = useLanguage();
   const initialCurrency = siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB";
   const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">(initialCurrency);
   const [selectedPrice, setSelectedPrice] = useState<number>(initialCurrency === "USD" ? 50 : 100);
@@ -94,6 +90,64 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
     }
   };
 
+  const renderHeadline = () => {
+    if (siteSettings?.tagline && getLocalized(siteSettings, "tagline", "")) {
+      return getLocalized(siteSettings, "tagline", "");
+    }
+    if (language === "am") {
+      return (
+        <>
+          <span>የሚቀጥለው </span>
+          <span
+            style={{
+              background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              display: "block",
+            }}
+          >
+            ትልቅ ድልዎ
+          </span>
+          <span>ካሰቡት በላይ ቅርብ ነው</span>
+        </>
+      );
+    }
+    if (language === "ti") {
+      return (
+        <>
+          <span>ዝቕጽል </span>
+          <span
+            style={{
+              background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              display: "block",
+            }}
+          >
+            ዓቢ ዓወትኩም
+          </span>
+          <span>ካብ ዝሓሰብኩምዎ ንላዕሊ ቀረባ እዩ</span>
+        </>
+      );
+    }
+    return (
+      <>
+        <span>Your Next </span>
+        <span
+          style={{
+            background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            display: "block",
+          }}
+        >
+          Big Win Is Closer
+        </span>
+        <span>Than You Think</span>
+      </>
+    );
+  };
+
   return (
     <section
       style={{
@@ -114,7 +168,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.25) 45%, rgba(15, 23, 42, 0.65) 100%)",
+            "linear-gradient(90deg, rgba(10, 25, 47, 0.75) 0%, rgba(10, 25, 47, 0.45) 45%, rgba(10, 25, 47, 0.1) 75%, rgba(10, 25, 47, 0.5) 100%)",
           zIndex: 0,
           pointerEvents: "none",
         }}
@@ -124,7 +178,7 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(circle at 50% 40%, rgba(234, 179, 8, 0.16) 0%, transparent 65%)",
+            "radial-gradient(circle at 25% 45%, rgba(234, 179, 8, 0.18) 0%, transparent 60%)",
           zIndex: 0,
           pointerEvents: "none",
         }}
@@ -133,189 +187,180 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
       {/* ── 2. Interactive 3D Canvas Floating Particles ── */}
       <FloatingParticlesCanvas />
 
-      {/* ── 3. Main Hero Two-Column Content (Left Hero Text · Right Floating Card) ── */}
+      {/* ── 3. Main Hero Content (Left-Aligned Hero Art & Typography, Clear Right Side for 3D Art) ── */}
       <div
         style={{
           position: "relative",
           zIndex: 10,
-          maxWidth: 1220,
+          maxWidth: 1240,
           width: "100%",
           margin: "0 auto",
-          padding: "clamp(48px, 8vw, 84px) clamp(16px, 3.5vw, 32px) clamp(24px, 4vw, 40px)",
+          padding: "clamp(44px, 7vw, 76px) clamp(16px, 3.5vw, 32px) clamp(24px, 4vw, 40px)",
           boxSizing: "border-box",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
           gap: "clamp(28px, 4.5vw, 56px)",
           alignItems: "center",
         }}
       >
-        {/* Left Side: Headline & Mission */}
-        <div data-page-reveal style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          {/* Trust Pill */}
-          <div style={{ display: "inline-flex" }}>
-            <span
-              style={{
-                background: "rgba(15, 23, 42, 0.75)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1.5px solid #FDE047",
-                padding: "6px 14px",
-                borderRadius: "30px",
-                fontSize: "0.8125rem",
-                fontWeight: 800,
-                color: "#FEF08A",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
-              }}
-            >
-              <ShieldCheck size={15} color="#FACC15" /> {t.hero.trustBadge || "100% Live Video Draws · Audited Broadcast"}
-            </span>
+        {/* Left Side: Eyebrow, Main Headline, Subtitle, Play Now CTA, and Trust Badges */}
+        <div data-page-reveal style={{ display: "flex", flexDirection: "column", gap: "clamp(16px, 2.5vw, 24px)", maxWidth: 580 }}>
+          {/* Eyebrow: PLAY • WIN • LIVE BIGGER */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              letterSpacing: "3.5px",
+              fontSize: "clamp(0.75rem, 1.4vw, 0.875rem)",
+              fontWeight: 900,
+              color: "#FDE047",
+              textTransform: "uppercase",
+              textShadow: "0 2px 10px rgba(0, 0, 0, 0.8)",
+            }}
+          >
+            <span>{language === "ti" ? "ተጻወቱ" : language === "am" ? "ይጫወቱ" : "PLAY"}</span>
+            <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FDE047", opacity: 0.85 }} />
+            <span>{language === "ti" ? "ተዓወቱ" : language === "am" ? "ያሸንፉ" : "WIN"}</span>
+            <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FDE047", opacity: 0.85 }} />
+            <span>{language === "ti" ? "ህይወትኩም ኣዕብዩ" : language === "am" ? "ህይወትዎን ያሳድጉ" : "LIVE BIGGER"}</span>
           </div>
 
           {/* Huge Main Headline */}
           <h1
             className="display"
             style={{
-              fontSize: "clamp(2.4rem, 5.2vw, 4rem)",
+              fontSize: "clamp(2.5rem, 5.5vw, 4.2rem)",
               fontWeight: 900,
-              lineHeight: 1.06,
+              lineHeight: 1.08,
               color: "#FFFFFF",
-              letterSpacing: "-0.8px",
+              letterSpacing: "-0.6px",
               margin: 0,
-              textShadow: "0 2px 20px rgba(0, 0, 0, 0.8)",
+              textShadow: "0 4px 24px rgba(0, 0, 0, 0.9)",
             }}
           >
-            {getLocalized(siteSettings, "tagline", t.hero.title)}
+            {renderHeadline()}
           </h1>
 
           {/* Subtitle */}
           <p
             style={{
-              fontSize: "clamp(1rem, 2vw, 1.15rem)",
+              fontSize: "clamp(0.95rem, 1.8vw, 1.125rem)",
               lineHeight: 1.6,
-              color: "#F8FAFC",
+              color: "#E2E8F0",
               margin: 0,
-              maxWidth: 540,
-              textShadow: "0 1px 8px rgba(0,0,0,0.8)",
+              maxWidth: 500,
+              textShadow: "0 2px 10px rgba(0, 0, 0, 0.8)",
             }}
           >
-            {t.hero.subtitle}
+            {language === "ti"
+              ? "ወግዓዊ ናይ ዲጂታል ሎተሪ ጸወታታት ኣብ ዝኾነ ግዜን ቦታን ተጻወቱ። ውሑስ፣ ቀሊልን ዕድል ዝመልኦን እዩ።"
+              : language === "am"
+              ? "ኦፊሴላዊ የዲጂታል ሎተሪ ጨዋታዎችን በማንኛውም ጊዜ እና ቦታ ይጫወቱ። ደህንነቱ የተጠበቀ፣ ቀላል እና በዕድል የተሞላ ነው።"
+              : (t.hero?.subtitle || "Play official digital lottery games anytime, anywhere. It's safe, simple, and full of opportunity.")}
           </p>
-        </div>
 
-        {/* Right Side: Floating Translucent Glass Feature Card */}
-        <div data-page-reveal style={{ display: "flex", justifyContent: "flex-end" }}>
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 420,
-              background: "rgba(15, 23, 42, 0.58)",
-              backdropFilter: "blur(24px) saturate(190%)",
-              WebkitBackdropFilter: "blur(24px) saturate(190%)",
-              borderRadius: "24px",
-              border: "2px solid rgba(253, 224, 71, 0.75)",
-              padding: "24px 22px",
-              boxShadow:
-                "0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(254, 240, 138, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-              boxSizing: "border-box",
-            }}
-          >
-            {/* Top Gold Badge */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Play Now Signature Gold Pill CTA Button */}
+          <div style={{ paddingTop: 4 }}>
+            <button
+              type="button"
+              onClick={handleActionClick}
+              style={{
+                background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 35%, #F59E0B 80%, #D97706 100%)",
+                border: "none",
+                borderRadius: "9999px",
+                padding: "6px 8px 6px 26px",
+                color: "#111827",
+                fontWeight: 900,
+                fontSize: "clamp(1.05rem, 2vw, 1.18rem)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 16,
+                cursor: "pointer",
+                boxShadow: "0 8px 28px rgba(245, 158, 11, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.03)";
+                e.currentTarget.style.boxShadow = "0 12px 32px rgba(245, 158, 11, 0.6), 0 4px 12px rgba(0, 0, 0, 0.5)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 8px 28px rgba(245, 158, 11, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4)";
+              }}
+            >
+              <span>{language === "ti" ? "ሕጂ ተጻወቱ" : language === "am" ? "አሁን ይጫወቱ" : "Play Now"}</span>
               <div
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "12px",
-                  background: "rgba(254, 240, 138, 0.2)",
-                  border: "1.5px solid #FDE047",
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  background: "#0F172A",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
-                  boxShadow: "0 2px 8px rgba(234, 179, 8, 0.25)",
                 }}
               >
-                <Trophy size={20} color="#FDE047" />
+                <ArrowRight size={20} color="#FFFFFF" strokeWidth={2.5} />
               </div>
-              <div>
-                <span
-                  style={{
-                    fontSize: "0.6875rem",
-                    fontWeight: 900,
-                    color: "#FEF08A",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    display: "block",
-                  }}
-                >
-                  {t.hero?.guaranteedWinnersBadge || "10 GUARANTEED WINNERS"}
+            </button>
+          </div>
+
+          {/* 3 Trust Badges: Secure & Trusted · Fast & Easy · Play Anywhere */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "clamp(18px, 3.5vw, 36px)",
+              flexWrap: "wrap",
+              marginTop: 6,
+              paddingTop: 8,
+            }}
+          >
+            {/* Badge 1: Secure & Trusted */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <ShieldCheck size={28} color="#FFFFFF" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FFFFFF" }}>
+                  {language === "ti" ? "ውሑስ" : language === "am" ? "አስተማማኝ" : "Secure"}
                 </span>
-                <span style={{ fontSize: "0.75rem", color: "#E2E8F0", fontWeight: 700 }}>
-                  {t.hero?.oddsBadge || "High Winning Odds (1 in 100)"}
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#CBD5E1" }}>
+                  {language === "ti" ? "& ዝተኣመነ" : language === "am" ? "& የታመነ" : "& Trusted"}
                 </span>
               </div>
             </div>
 
-            {/* Feature Text */}
-            <h3
-              className="display"
-              style={{
-                fontSize: "1.35rem",
-                fontWeight: 900,
-                color: "#FFFFFF",
-                lineHeight: 1.25,
-                margin: 0,
-                textShadow: "0 2px 8px rgba(0,0,0,0.6)",
-              }}
-            >
-              {t.hero?.cardTitle || "100% Guaranteed Cash Payouts In Every Single Pool"}
-            </h3>
-
-            <p style={{ fontSize: "0.8125rem", color: "#CBD5E1", lineHeight: 1.5, margin: 0 }}>
-              {t.hero?.cardDesc || "No endless rollover delays. Every single draw pays out 10 distinct cash ranks live on video within 30 minutes."}
-            </p>
-
-            {/* Action Button: Signature Casino Red */}
-            <button
-              type="button"
-              onClick={handleActionClick}
-              className="casino-btn-red"
-              style={{
-                padding: "13px 22px",
-                borderRadius: "30px",
-                fontSize: "0.9375rem",
-                fontWeight: 900,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                boxShadow: "0 6px 18px rgba(220, 38, 38, 0.45)",
-                width: "100%",
-                boxSizing: "border-box",
-              }}
-            >
-              <span>{t.hero?.cardCta || "Explore Live Pools"}</span>
-              <div
-                style={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: "50%",
-                  background: "rgba(255, 255, 255, 0.25)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ArrowUpRight size={16} />
+            {/* Badge 2: Fast & Easy */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Zap size={28} color="#FFFFFF" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FFFFFF" }}>
+                  {language === "ti" ? "ቅልጡፍ" : language === "am" ? "ፈጣን" : "Fast"}
+                </span>
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#CBD5E1" }}>
+                  {language === "ti" ? "& ቀሊል" : language === "am" ? "& ቀላል" : "& Easy"}
+                </span>
               </div>
-            </button>
+            </div>
+
+            {/* Badge 3: Play Anywhere */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Smartphone size={28} color="#FFFFFF" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FFFFFF" }}>
+                  {language === "ti" ? "ተጻወቱ" : language === "am" ? "ይጫወቱ" : "Play"}
+                </span>
+                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#CBD5E1" }}>
+                  {language === "ti" ? "ኣብ ዝኾነ ቦታ" : language === "am" ? "በማንኛውም ቦታ" : "Anywhere"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Right Side: Open transparent space so 3D background art (phone, balls, tickets, coins) shines through */}
+        <div style={{ minHeight: "100px", pointerEvents: "none" }} />
       </div>
 
       {/* ── 4. Bottom Overlapping Translucent Glass Quick-Tier Bar ── */}
