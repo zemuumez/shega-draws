@@ -2,17 +2,12 @@ import { defineField, defineType } from "sanity";
 
 export const siteSettingsType = defineType({
   name: "siteSettings",
-  title: "⚙️ Site Configuration & Official Accounts",
+  title: "⚙️ Website Content & Language",
   type: "document",
   fieldsets: [
     {
       name: "localization",
       title: "🌐 Language & Localization Settings",
-      options: { collapsible: true, collapsed: false },
-    },
-    {
-      name: "tierControls",
-      title: "🎛️ Active Lottery Prices & Pool Capacities (Add, Edit, Delete, Toggle)",
       options: { collapsible: true, collapsed: false },
     },
     {
@@ -30,14 +25,8 @@ export const siteSettingsType = defineType({
       title: "📞 24/7 Hotline, Customer Support & Telegram (Header & Footer)",
       options: { collapsible: true, collapsed: false },
     },
-    {
-      name: "paymentAccounts",
-      title: "💳 Official Bank & Telebirr Payment Accounts",
-      options: { collapsible: true, collapsed: false },
-    },
   ],
   fields: [
-    defineField({name: "lastEntryAt", type: "datetime", hidden: true, readOnly: true}),
 
     // ─── Localization & Default Preferences ────────────────────────────
     defineField({
@@ -73,178 +62,6 @@ export const siteSettingsType = defineType({
       initialValue: "ETB",
       validation: (Rule) => Rule.required(),
     }),
-    // ─── Tier Controls (Manage, Add, Edit, Delete, Toggle Prices & Pools) ─
-    defineField({
-      name: "etbPrices",
-      title: "🇪🇹 ETB Ticket Prices (Add, Edit, Delete, Toggle)",
-      type: "array",
-      fieldset: "tierControls",
-      description: "Manage ETB ticket prices. You can add new price amounts, edit values/labels, delete tiers, or turn on/off.",
-      initialValue: [
-        { value: 100, label: "100", isEnabled: true },
-        { value: 200, label: "200", isEnabled: true },
-        { value: 500, label: "500", isEnabled: true },
-        { value: 1000, label: "1,000", isEnabled: true },
-      ],
-      of: [
-        {
-          type: "object",
-          name: "etbPriceOption",
-          title: "ETB Price Option",
-          fields: [
-            {
-              name: "value",
-              title: "Price in ETB (Birr)",
-              type: "number",
-              validation: (Rule) => Rule.required().positive(),
-            },
-            {
-              name: "label",
-              title: "Display Label",
-              type: "string",
-              description: "Optional display text (e.g. '100', '200', '500', '1,000'). Defaults to price if blank.",
-            },
-            {
-              name: "isEnabled",
-              title: "Active & Clickable on Website",
-              type: "boolean",
-              initialValue: true,
-              description: "Turn off to disable/pause on the frontend without deleting.",
-            },
-          ],
-          preview: {
-            select: {
-              value: "value",
-              label: "label",
-              isEnabled: "isEnabled",
-            },
-            prepare({ value, label, isEnabled }) {
-              const status = isEnabled !== false ? "🟢 Active" : "🔴 Paused / Disabled";
-              return {
-                title: `${label || value || 0} ETB`,
-                subtitle: status,
-              };
-            },
-          },
-        },
-      ],
-    }),
-    defineField({
-      name: "usdPrices",
-      title: "🇺🇸 USD Diaspora Ticket Prices (Add, Edit, Delete, Toggle)",
-      type: "array",
-      fieldset: "tierControls",
-      description: "Manage USD diaspora ticket prices ($25, $50, $100, $250, etc.). Add new amounts, edit, delete, or turn on/off.",
-      initialValue: [
-        { value: 25, label: "25", isEnabled: true },
-        { value: 50, label: "50", isEnabled: true },
-        { value: 100, label: "100", isEnabled: true },
-        { value: 250, label: "250", isEnabled: true },
-      ],
-      of: [
-        {
-          type: "object",
-          name: "usdPriceOption",
-          title: "USD Price Option",
-          fields: [
-            {
-              name: "value",
-              title: "Price in USD ($)",
-              type: "number",
-              validation: (Rule) => Rule.required().positive(),
-            },
-            {
-              name: "label",
-              title: "Display Label",
-              type: "string",
-              description: "Optional display text (e.g. '25', '50', '100', '250'). Defaults to price if blank.",
-            },
-            {
-              name: "isEnabled",
-              title: "Active & Clickable on Website",
-              type: "boolean",
-              initialValue: true,
-              description: "Turn off to disable/pause on the frontend without deleting.",
-            },
-          ],
-          preview: {
-            select: {
-              value: "value",
-              label: "label",
-              isEnabled: "isEnabled",
-            },
-            prepare({ value, label, isEnabled }) {
-              const status = isEnabled !== false ? "🟢 Active" : "🔴 Paused / Disabled";
-              return {
-                title: `$${label || value || 0} USD`,
-                subtitle: status,
-              };
-            },
-          },
-        },
-      ],
-    }),
-    defineField({
-      name: "poolSizes",
-      title: "👥 Participant Pool Capacities (Add, Edit, Delete, Toggle)",
-      type: "array",
-      fieldset: "tierControls",
-      description: "Manage lottery participant pool sizes (1K, 2K, 3K, 5K, 10K, etc.). Add new sizes, edit, delete, or turn on/off.",
-      initialValue: [
-        { size: 1000, label: "1K", ticketsCount: "1,000 tickets", isEnabled: true },
-        { size: 2000, label: "2K", ticketsCount: "2,000 tickets", isEnabled: true },
-        { size: 3000, label: "3K", ticketsCount: "3,000 tickets", isEnabled: true },
-        { size: 5000, label: "5K", ticketsCount: "5,000 tickets", isEnabled: true },
-      ],
-      of: [
-        {
-          type: "object",
-          name: "poolSizeOption",
-          title: "Pool Capacity Option",
-          fields: [
-            {
-              name: "size",
-              title: "Total Participant Count (e.g. 1000, 2000, 3000, 5000)",
-              type: "number",
-              validation: (Rule) => Rule.required().integer().min(1).max(100000),
-            },
-            {
-              name: "label",
-              title: "Badge Label (e.g. '1K', '2K', '3K', '5K')",
-              type: "string",
-            },
-            {
-              name: "ticketsCount",
-              title: "Tickets Count Label (e.g. '1,000 tickets')",
-              type: "string",
-            },
-            {
-              name: "isEnabled",
-              title: "Active & Clickable on Website",
-              type: "boolean",
-              initialValue: true,
-              description: "Turn off to disable/pause on the frontend without deleting.",
-            },
-          ],
-          preview: {
-            select: {
-              size: "size",
-              label: "label",
-              ticketsCount: "ticketsCount",
-              isEnabled: "isEnabled",
-            },
-            prepare({ size, label, ticketsCount, isEnabled }) {
-              const status = isEnabled !== false ? "🟢 Active" : "🔴 Paused / Disabled";
-              return {
-                title: `${label || size} Pool (${(size || 0).toLocaleString()} people)`,
-                subtitle: `${status} • ${ticketsCount || `${(size || 0).toLocaleString()} tickets`}`,
-              };
-            },
-          },
-        },
-      ],
-    }),
-
     // ─── Branding ────────────────────────────────────────────────────
     defineField({
       name: "siteName",
@@ -388,108 +205,7 @@ export const siteSettingsType = defineType({
       description: "Direct URL to the official Telegram channel or support bot.",
     }),
 
-    // ─── Payment Accounts (Telebirr, CBE & International IBAN) ──────
-    defineField({
-      name: "telebirrReceiverPhone",
-      title: "📱 Telebirr Recipient Phone Number",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "+251 911 000 000",
-      description: "Official phone number players transfer to when paying via Telebirr.",
-    }),
-    defineField({
-      name: "telebirrMerchantCode",
-      title: "🏪 Telebirr Merchant Code / Shortcode",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "884729",
-      description: "Official shortcode / merchant code displayed to players for Telebirr pay-way.",
-    }),
-    defineField({
-      name: "telebirrAccountName",
-      title: "👤 Telebirr Recipient Account Name",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "Rimna International Digital Lottery PLC",
-      description: "Official name shown to confirm Telebirr transfer recipient.",
-    }),
 
-    defineField({
-      name: "cbeBankName",
-      title: "🏦 Domestic Bank Name",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "Commercial Bank of Ethiopia (CBE)",
-    }),
-    defineField({
-      name: "cbeAccountNumber",
-      title: "💳 CBE Account Number",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "1000 1234 5678",
-      description: "Official CBE bank account number for ticket deposits.",
-    }),
-    defineField({
-      name: "cbeAccountName",
-      title: "👤 CBE Account Holder Name",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "Rimna International Digital Lottery PLC",
-    }),
-
-    defineField({
-      name: "diasporaBankName",
-      title: "🏦 Recipient Bank Name (USD / International)",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "Commercial Bank of Ethiopia (International & Diaspora Banking)",
-    }),
-    defineField({
-      name: "diasporaIban",
-      title: "🌐 IBAN / International Account Number",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "ET64CBET000100012345678",
-      description: "International Bank Account Number (IBAN) for USD remittance.",
-    }),
-    defineField({
-      name: "diasporaAccountName",
-      title: "👤 Recipient / Account Holder Name (USD)",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "Rimna International Digital Lottery PLC",
-    }),
-    defineField({
-      name: "diasporaSwiftBic",
-      title: "⚡ SWIFT / BIC Code (Optional)",
-      type: "string",
-      fieldset: "paymentAccounts",
-      initialValue: "CBETETAA",
-    }),
-    defineField({
-      name: "diasporaWireInstructions",
-      title: "Diaspora USD Wire / Payment Instructions (English)",
-      type: "text",
-      fieldset: "paymentAccounts",
-      rows: 3,
-      initialValue: "Send USD remittance via Western Union, Remitly, or wire transfer using the recipient IBAN and name above.",
-    }),
-    defineField({
-      name: "diasporaWireInstructionsAm",
-      title: "Diaspora USD Wire / Payment Instructions (Amharic - አማርኛ)",
-      type: "text",
-      fieldset: "paymentAccounts",
-      rows: 3,
-      initialValue: "ከላይ በተጠቀሰው የIBAN ቁጥር እና የስም ዝርዝር በዌስተርን ዩኒየን፣ በሬሚትሊ ወይም በቀጥታ የባንክ ዝውውር ይክፈሉ።",
-    }),
-    defineField({
-      name: "diasporaWireInstructionsTi",
-      title: "Diaspora USD Wire / Payment Instructions (Tigrinya - ትግርኛ)",
-      type: "text",
-      fieldset: "paymentAccounts",
-      rows: 3,
-      initialValue: "ኣብ ላዕሊ ብዝተጠቕሰ ናይ IBAN ቁጽርን ሽምን ብዌስተርን ዩንየን፣ ሬሚትሊ ወይ ቀጥታ ናይ ባንክ ዝውውር ክፈሉ።",
-    }),
   ],
   preview: {
     select: {

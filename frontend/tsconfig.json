@@ -25,14 +25,15 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "strictNullChecks": true,
+    "target": "ES2022"
   },
   "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next-verify/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "next-env.d.ts"
   ],
   "exclude": [
     "node_modules"

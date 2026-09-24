@@ -493,7 +493,7 @@ export const translations: Record<Language, Translations> = {
       step1: "1. Pick Your Number",
       step1Desc: "Choose an available number from 1 to your selected pool capacity, or use the quick random generator.",
       step2: "2. Complete Payment",
-      step2Desc: "Pay ticket cost securely through Telebirr or CBE Birr and upload your transaction receipt.",
+      step2Desc: "Sign in with a verified account and pay securely through Chapa. Your ticket appears after payment verification.",
       step3: "3. Live Draw & Direct Payout",
       step3Desc: "Watch founders draw physical numbers live. Cash prizes are transferred instantly to your mobile wallet.",
     },
@@ -523,7 +523,7 @@ export const translations: Record<Language, Translations> = {
     howItWorksPage: {
       badge: "COMPLETE TRANSPARENCY & PLAYER GUIDE",
       title: "How Rimna Digital Lottery Works",
-      subtitle: "Built on 100% genuine public transparency. Learn how to configure your lucky numbers, submit your payment receipt for manual review, watch company founders draw the 10 guaranteed winners live on video, and claim verified cash payouts.",
+      subtitle: "Built on 100% genuine public transparency. Learn how to configure your lucky numbers, sign in and complete a verified payment, watch company founders draw the 10 guaranteed winners live on video, and claim verified cash payouts.",
       chooseTicketCta: "Choose Your Ticket Now",
       viewResultsCta: "View Live & Past Results",
       mathGuaranteeBadge: "100% MATHEMATICAL GUARANTEE",
@@ -544,8 +544,8 @@ export const translations: Record<Language, Translations> = {
         {
           stepNumber: "02",
           badge: "PAYMENT & MANUAL REVIEW",
-          title: "Pay and Upload Your Receipt",
-          description: "Enter your name and phone, pay using the displayed payment instructions, and upload a screenshot with your payment reference. Our team reviews each receipt before confirming the ticket.",
+          title: "Sign In and Pay Securely",
+          description: "Create an account, verify your email, choose a number and continue to Chapa. Your ticket is issued after payment is independently verified.",
           highlights: [
             "Use the payment methods and account details shown for your chosen ticket.",
             "Your ticket stays pending until an employee verifies the payment.",
@@ -592,7 +592,7 @@ export const translations: Record<Language, Translations> = {
       latestAuditBadge: "LATEST COMPLETED DRAW AUDIT",
       winningNumbersTitle: "Top 10 Winning Numbers",
       auditedBadge: "10 Guaranteed Winners Audited",
-      payoutNotice: "All payouts are automatically transferred within 30 minutes of live draw completion to the winner's verified CBE or Telebirr account.",
+      payoutNotice: "Our team verifies winners and coordinates prize payouts. Check the published draw terms for the payment schedule.",
       supportBadge: "NEED ASSISTANCE WITH WINNING CLAIMS?",
       supportTitle: "Live Support 24/7 Hotline",
       supportDesc: "Our customer care team verifies winning tickets and assists with Telebirr and CBE bank payouts around the clock.",
@@ -846,7 +846,7 @@ export const translations: Record<Language, Translations> = {
       step1: "1. ቁጥርዎን ይምረጡ",
       step1Desc: "ከ1 እስከ መረጡት የተሳታፊ ገደብ የሚወዱትን ወይም እድለኛ ቁጥርዎን ይምረጡ።",
       step2: "2. ክፍያ ይፈጽሙ",
-      step2Desc: "በቴሌብር ወይም በሲቢኢ ብር የቲኬት ክፍያዎን ከፍለው የደረሰኝ ስክሪንሾት ያስገቡ።",
+      step2Desc: "በተረጋገጠ መለያ ይግቡና በChapa ይክፈሉ። ክፍያው ሲረጋገጥ ቲኬትዎ ይታያል።",
       step3: "3. የቀጥታ እጣ እና ሽልማት",
       step3Desc: "በእጣው ቀን አሸናፊው በቀጥታ ቪዲዮ ይፋ ይሆናል፤ ሽልማትዎ ወዲያውኑ ይላክልዎታል።",
     },
@@ -901,8 +901,8 @@ export const translations: Record<Language, Translations> = {
           description: "በቴሌብር ወይም በሲቢኢ ብር በሰከንዶች ውስጥ ክፍያዎን ይፈጽሙ። ስልክ ቁጥርዎን ያስገቡ፣ ይክፈሉ፣ እና የተረጋገጠ ዲጂታል ቲኬትዎን ይቀበሉ።",
           highlights: [
             "የሚደገፉ፡ ቴሌብር፣ ሲቢኢ ብር፣ አዋሽ፣ አቢሲኒያ፣ ዳሸን፣ ቪዛ እና ማስተርካርድ።",
-            "ሰራተኞቻችን የክፍያ ደረሰኝዎን ካዩ በኋላ ቲኬትዎን ያረጋግጣሉ።",
-            "ደረሰኙን ከላኩ በኋላ የሚታየውን መለያ ቁጥር ያስቀምጡ።",
+            "ክፍያው በChapa ከተረጋገጠ በኋላ ቲኬትዎ ይሰጣል።",
+            "ቲኬቶችዎን እና የክፍያ ሁኔታን በመለያዎ ይመልከቱ።",
           ],
         },
         {
@@ -1254,8 +1254,8 @@ export const translations: Record<Language, Translations> = {
           description: "ብቴሌብር ወይ ሲቢኢ ብር ብሰከንዶች ውሽጢ ክፍሊትኩም ፈጽሙ። ቁጽሪ ስልክኹም ኣእትዉ፣ ክፈሉ፣ ዝተረጋገጸ ዲጂታል ቲኬትኩም ተቐበሉ።",
           highlights: [
             "ዝድገፉ፡ ቴሌብር፣ ሲቢኢ ብር፣ ኣዋሽ፣ ኣቢሲንያ፣ ዳሽን፣ ቪዛን ማስተርካርድን።",
-            "ሰራሕተኛታትና ደረሰኝ ክፍሊትኩም ድሕሪ ምርኣይ ቲኬትኩም የረጋግጹ።",
-            "ደረሰኝ ምስ ለኣኽኩም ዝርአ መፍለዪ ቁጽሪ ዓቅቡ።",
+            "ክፍሊት ብChapa ምስ ተረጋገጸ ቲኬትኩም ይወሃብ።",
+            "ቲኬታትኩምን ኩነታት ክፍሊትን ኣብ መለያኹም ርኣዩ።",
           ],
         },
         {

@@ -1,0 +1,109 @@
+package main
+
+import (
+	"context"
+	"log/slog"
+	"net"
+	"net/http"
+	"net/url"
+	"os"
+	"os/signal"
+	"rimna/backend/internal/auth"
+	"rimna/backend/internal/domain"
+	"rimna/backend/internal/httpapi"
+	"rimna/backend/internal/payment/chapa"
+	"rimna/backend/internal/service"
+	"rimna/backend/internal/store"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
+)
+
+func env(k, d string) string {
+	if v := os.Getenv(k); v != "" {
+		return v
+	}
+	return d
+}
+func main() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
+	origin := env("WEB_ORIGIN", "http://localhost:3000")
+	issuer := env("AUTH_ISSUER", origin)
+	jwks := env("AUTH_JWKS_URL", issuer+"/api/auth/jwks")
+	mode := env("CHAPA_MODE", "test")
+	key := os.Getenv("CHAPA_SECRET_KEY")
+	if mode != "test" && mode != "live" {
+		slog.Error("invalid CHAPA_MODE")
+		os.Exit(1)
+	}
+	if key != "" && !strings.HasPrefix(key, "CHAPA_"+strings.ToUpper(mode)+"_") {
+		slog.Error("Chapa key does not match configured mode")
+		os.Exit(1)
+	}
+	if env("APP_ENV", "development") == "production" {
+		for _, s := range []string{origin, issuer, jwks} {
+			u, err := url.Parse(s)
+			if err != nil || u.Scheme != "https" || u.Host == "" {
+				slog.Error("production URLs require HTTPS")
+				os.Exit(1)
+			}
+		}
+	}
+	max, _ := strconv.Atoi(env("DB_MAX_CONNECTIONS", "20"))
+	if max < 2 || max > 200 {
+		slog.Error("invalid DB_MAX_CONNECTIONS")
+		os.Exit(1)
+	}
+	st, err := store.Open(ctx, os.Getenv("DATABASE_URL"), int32(max))
+	if err != nil {
+		slog.Error("database unavailable")
+		os.Exit(1)
+	}
+	defer st.DB.Close()
+	if err = st.EnsureMode(ctx, mode); err != nil {
+		slog.Error("database payment environment mismatch or migrations missing")
+		os.Exit(1)
+	}
+	provider := chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, strings.Split(env("CHAPA_CURRENCIES", "ETB"), ","))
+	svc := &service.Service{Store: st, Providers: map[string]domain.PaymentProvider{"chapa": provider}, Mode: mode}
+	role := env("PROCESS_ROLE", "all")
+	if role != "all" && role != "api" && role != "worker" {
+		slog.Error("invalid PROCESS_ROLE")
+		os.Exit(1)
+	}
+	if role == "worker" {
+		svc.RunWorker(ctx)
+		return
+	}
+	if role == "all" {
+		go svc.RunWorker(ctx)
+	}
+	var trusted []*net.IPNet
+	for _, cidr := range strings.Split(os.Getenv("TRUSTED_PROXY_CIDRS"), ",") {
+		if strings.TrimSpace(cidr) == "" {
+			continue
+		}
+		_, network, e := net.ParseCIDR(strings.TrimSpace(cidr))
+		if e != nil {
+			slog.Error("invalid trusted proxy CIDR")
+			os.Exit(1)
+		}
+		trusted = append(trusted, network)
+	}
+	a := &httpapi.API{TrustedProxies: trusted, Store: st, Service: svc, Auth: &auth.Verifier{URL: jwks, Issuer: issuer, Audience: env("AUTH_AUDIENCE", "rimna-api")}, Origin: origin, MediaDir: env("MEDIA_DIR", "./private-media")}
+	srv := &http.Server{Addr: env("LISTEN_ADDR", ":8080"), Handler: a.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 25 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16 << 10}
+	go func() {
+		<-ctx.Done()
+		c, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		srv.Shutdown(c)
+	}()
+	slog.Info("backend ready", "role", role, "paymentsConfigured", key != "")
+	if err = srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		slog.Error("server stopped")
+		os.Exit(1)
+	}
+}

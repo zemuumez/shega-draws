@@ -17,67 +17,59 @@ import type { CMSSiteSettings } from "@/lib/sanity/queries";
 interface CinematicStadiumHeroProps {
   onQuickEnter?: (currency: "ETB" | "USD", price: number, pool: number) => void;
   siteSettings?: CMSSiteSettings | null;
+  draws?: import("@/lib/tickets").TicketDraw[];
 }
 
-export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicStadiumHeroProps) {
+export function CinematicStadiumHero({
+  onQuickEnter,
+  siteSettings,
+  draws = [],
+}: CinematicStadiumHeroProps) {
   const { text, t, language, getLocalized } = useLanguage();
-  const initialCurrency = siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB";
-  const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">(initialCurrency);
-  const [selectedPrice, setSelectedPrice] = useState<number>(initialCurrency === "USD" ? 50 : 100);
+  const initialCurrency =
+    siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB";
+  const [selectedCurrency, setSelectedCurrency] = useState<"ETB" | "USD">(
+    initialCurrency,
+  );
+  const [selectedPrice, setSelectedPrice] = useState<number>(
+    initialCurrency === "USD" ? 50 : 100,
+  );
   const [selectedPool, setSelectedPool] = useState<number>(1000);
 
-  // Sync with published CMS defaultCurrency when settings update
-  React.useEffect(() => {
-    if (siteSettings?.defaultCurrency) {
-      const curr = siteSettings.defaultCurrency === "USD" ? "USD" : "ETB";
-      setSelectedCurrency(curr);
-      const available = curr === "USD"
-        ? siteSettings.usdPrices && siteSettings.usdPrices.length > 0
-          ? siteSettings.usdPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
-          : [25, 50, 100, 250]
-        : siteSettings.etbPrices && siteSettings.etbPrices.length > 0
-        ? siteSettings.etbPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
-        : [100, 200, 500, 1000];
-      setSelectedPrice(available[0] || (curr === "USD" ? 50 : 100));
-    }
-  }, [siteSettings?.defaultCurrency]);
-
+  const openDraws = draws.filter(
+    (d) =>
+      d.status === "open" && d.deadline && Date.parse(d.deadline) > Date.now(),
+  );
+  const priceOptions = Array.from(
+    new Set(
+      openDraws
+        .filter((d) => d.currency === selectedCurrency)
+        .map((d) => d.ticketPrice),
+    ),
+  );
+  const poolOptions = openDraws
+    .filter(
+      (d) => d.currency === selectedCurrency && d.ticketPrice === selectedPrice,
+    )
+    .map((d) => ({
+      size: d.poolCapacity,
+      label: d.poolCapacity.toLocaleString(),
+    }));
   const isUSD = selectedCurrency === "USD";
-
-  const priceOptions = isUSD
-    ? siteSettings?.usdPrices && siteSettings.usdPrices.length > 0
-      ? siteSettings.usdPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
-      : [25, 50, 100, 250]
-    : siteSettings?.etbPrices && siteSettings.etbPrices.length > 0
-    ? siteSettings.etbPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
-    : [100, 200, 500, 1000];
-
-  const poolOptions =
-    siteSettings?.poolSizes && siteSettings.poolSizes.length > 0
-      ? siteSettings.poolSizes
-          .filter((p) => p.isEnabled !== false)
-          .map((p) => ({
-            size: p.size,
-            label: p.label || (p.size >= 1000 ? `${p.size / 1000}K` : `${p.size}`),
-          }))
-      : [
-          { size: 1000, label: "1,000 (1K)" },
-          { size: 2000, label: "2,000 (2K)" },
-          { size: 3000, label: "3,000 (3K)" },
-          { size: 5000, label: "5,000 (5K)" },
-        ];
-
-  const handleCurrencyChange = (curr: "ETB" | "USD") => {
+  React.useEffect(() => {
+    if (siteSettings?.defaultCurrency)
+      setSelectedCurrency(
+        siteSettings.defaultCurrency === "USD" ? "USD" : "ETB",
+      );
+  }, [siteSettings?.defaultCurrency]);
+  React.useEffect(() => {
+    if (!priceOptions.includes(selectedPrice))
+      setSelectedPrice(priceOptions[0] || 0);
+    if (!poolOptions.some((p) => p.size === selectedPool))
+      setSelectedPool(poolOptions[0]?.size || 0);
+  }, [priceOptions, poolOptions, selectedPrice, selectedPool]);
+  const handleCurrencyChange = (curr: "ETB" | "USD") =>
     setSelectedCurrency(curr);
-    const available = curr === "USD"
-      ? siteSettings?.usdPrices && siteSettings.usdPrices.length > 0
-        ? siteSettings.usdPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
-        : [25, 50, 100, 250]
-      : siteSettings?.etbPrices && siteSettings.etbPrices.length > 0
-      ? siteSettings.etbPrices.filter((p) => p.isEnabled !== false).map((p) => p.value)
-      : [100, 200, 500, 1000];
-    setSelectedPrice(available[0] || (curr === "USD" ? 50 : 100));
-  };
 
   const handleActionClick = () => {
     if (onQuickEnter) {
@@ -100,7 +92,8 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           <span>የሚቀጥለው </span>
           <span
             style={{
-              background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
+              background:
+                "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               display: "block",
@@ -118,7 +111,8 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           <span>ዝቕጽል </span>
           <span
             style={{
-              background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
+              background:
+                "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               display: "block",
@@ -135,7 +129,8 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
         <span>Your Next </span>
         <span
           style={{
-            background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
+            background:
+              "linear-gradient(135deg, #FFF08A 0%, #FDE047 40%, #F59E0B 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             display: "block",
@@ -195,16 +190,26 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           maxWidth: 1240,
           width: "100%",
           margin: "0 auto",
-          padding: "clamp(44px, 7vw, 76px) clamp(16px, 3.5vw, 32px) clamp(24px, 4vw, 40px)",
+          padding:
+            "clamp(44px, 7vw, 76px) clamp(16px, 3.5vw, 32px) clamp(24px, 4vw, 40px)",
           boxSizing: "border-box",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
           gap: "clamp(28px, 4.5vw, 56px)",
           alignItems: "center",
         }}
       >
         {/* Left Side: Eyebrow, Main Headline, Subtitle, Play Now CTA, and Trust Badges */}
-        <div data-page-reveal style={{ display: "flex", flexDirection: "column", gap: "clamp(16px, 2.5vw, 24px)", maxWidth: 580 }}>
+        <div
+          data-page-reveal
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(16px, 2.5vw, 24px)",
+            maxWidth: 580,
+          }}
+        >
           {/* Eyebrow: PLAY • WIN • LIVE BIGGER */}
           <div
             style={{
@@ -219,11 +224,37 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
               textShadow: "0 2px 10px rgba(0, 0, 0, 0.8)",
             }}
           >
-            <span>{language === "ti" ? "ተጻወቱ" : language === "am" ? "ይጫወቱ" : "PLAY"}</span>
-            <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FDE047", opacity: 0.85 }} />
-            <span>{language === "ti" ? "ተዓወቱ" : language === "am" ? "ያሸንፉ" : "WIN"}</span>
-            <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FDE047", opacity: 0.85 }} />
-            <span>{language === "ti" ? "ህይወትኩም ኣዕብዩ" : language === "am" ? "ህይወትዎን ያሳድጉ" : "LIVE BIGGER"}</span>
+            <span>
+              {language === "ti" ? "ተጻወቱ" : language === "am" ? "ይጫወቱ" : "PLAY"}
+            </span>
+            <span
+              style={{
+                width: 4,
+                height: 4,
+                borderRadius: "50%",
+                background: "#FDE047",
+                opacity: 0.85,
+              }}
+            />
+            <span>
+              {language === "ti" ? "ተዓወቱ" : language === "am" ? "ያሸንፉ" : "WIN"}
+            </span>
+            <span
+              style={{
+                width: 4,
+                height: 4,
+                borderRadius: "50%",
+                background: "#FDE047",
+                opacity: 0.85,
+              }}
+            />
+            <span>
+              {language === "ti"
+                ? "ህይወትኩም ኣዕብዩ"
+                : language === "am"
+                  ? "ህይወትዎን ያሳድጉ"
+                  : "LIVE BIGGER"}
+            </span>
           </div>
 
           {/* Huge Main Headline */}
@@ -256,8 +287,9 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
             {language === "ti"
               ? "ወግዓዊ ናይ ዲጂታል ሎተሪ ጸወታታት ኣብ ዝኾነ ግዜን ቦታን ተጻወቱ። ውሑስ፣ ቀሊልን ዕድል ዝመልኦን እዩ።"
               : language === "am"
-              ? "ኦፊሴላዊ የዲጂታል ሎተሪ ጨዋታዎችን በማንኛውም ጊዜ እና ቦታ ይጫወቱ። ደህንነቱ የተጠበቀ፣ ቀላል እና በዕድል የተሞላ ነው።"
-              : (t.hero?.subtitle || "Play official digital lottery games anytime, anywhere. It's safe, simple, and full of opportunity.")}
+                ? "ኦፊሴላዊ የዲጂታል ሎተሪ ጨዋታዎችን በማንኛውም ጊዜ እና ቦታ ይጫወቱ። ደህንነቱ የተጠበቀ፣ ቀላል እና በዕድል የተሞላ ነው።"
+                : t.hero?.subtitle ||
+                  "Play official digital lottery games anytime, anywhere. It's safe, simple, and full of opportunity."}
           </p>
 
           {/* Play Now Signature Gold Pill CTA Button */}
@@ -266,7 +298,8 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
               type="button"
               onClick={handleActionClick}
               style={{
-                background: "linear-gradient(135deg, #FFF08A 0%, #FDE047 35%, #F59E0B 80%, #D97706 100%)",
+                background:
+                  "linear-gradient(135deg, #FFF08A 0%, #FDE047 35%, #F59E0B 80%, #D97706 100%)",
                 border: "none",
                 borderRadius: "9999px",
                 padding: "6px 8px 6px 26px",
@@ -277,19 +310,28 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 alignItems: "center",
                 gap: 16,
                 cursor: "pointer",
-                boxShadow: "0 8px 28px rgba(245, 158, 11, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4)",
+                boxShadow:
+                  "0 8px 28px rgba(245, 158, 11, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4)",
                 transition: "transform 0.2s ease, box-shadow 0.2s ease",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.03)";
-                e.currentTarget.style.boxShadow = "0 12px 32px rgba(245, 158, 11, 0.6), 0 4px 12px rgba(0, 0, 0, 0.5)";
+                e.currentTarget.style.boxShadow =
+                  "0 12px 32px rgba(245, 158, 11, 0.6), 0 4px 12px rgba(0, 0, 0, 0.5)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 8px 28px rgba(245, 158, 11, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 28px rgba(245, 158, 11, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4)";
               }}
             >
-              <span>{language === "ti" ? "ሕጂ ተጻወቱ" : language === "am" ? "አሁን ይጫወቱ" : "Play Now"}</span>
+              <span>
+                {language === "ti"
+                  ? "ሕጂ ተጻወቱ"
+                  : language === "am"
+                    ? "አሁን ይጫወቱ"
+                    : "Play Now"}
+              </span>
               <div
                 style={{
                   width: 38,
@@ -320,39 +362,132 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           >
             {/* Badge 1: Secure & Trusted */}
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <ShieldCheck size={28} color="#FFFFFF" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FFFFFF" }}>
-                  {language === "ti" ? "ውሑስ" : language === "am" ? "አስተማማኝ" : "Secure"}
+              <ShieldCheck
+                size={28}
+                color="#FFFFFF"
+                strokeWidth={1.8}
+                style={{ flexShrink: 0 }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  lineHeight: 1.2,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {language === "ti"
+                    ? "ውሑስ"
+                    : language === "am"
+                      ? "አስተማማኝ"
+                      : "Secure"}
                 </span>
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#CBD5E1" }}>
-                  {language === "ti" ? "& ዝተኣመነ" : language === "am" ? "& የታመነ" : "& Trusted"}
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    color: "#CBD5E1",
+                  }}
+                >
+                  {language === "ti"
+                    ? "& ዝተኣመነ"
+                    : language === "am"
+                      ? "& የታመነ"
+                      : "& Trusted"}
                 </span>
               </div>
             </div>
 
             {/* Badge 2: Fast & Easy */}
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Zap size={28} color="#FFFFFF" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FFFFFF" }}>
-                  {language === "ti" ? "ቅልጡፍ" : language === "am" ? "ፈጣን" : "Fast"}
+              <Zap
+                size={28}
+                color="#FFFFFF"
+                strokeWidth={1.8}
+                style={{ flexShrink: 0 }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  lineHeight: 1.2,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {language === "ti"
+                    ? "ቅልጡፍ"
+                    : language === "am"
+                      ? "ፈጣን"
+                      : "Fast"}
                 </span>
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#CBD5E1" }}>
-                  {language === "ti" ? "& ቀሊል" : language === "am" ? "& ቀላል" : "& Easy"}
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    color: "#CBD5E1",
+                  }}
+                >
+                  {language === "ti"
+                    ? "& ቀሊል"
+                    : language === "am"
+                      ? "& ቀላል"
+                      : "& Easy"}
                 </span>
               </div>
             </div>
 
             {/* Badge 3: Play Anywhere */}
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Smartphone size={28} color="#FFFFFF" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FFFFFF" }}>
-                  {language === "ti" ? "ተጻወቱ" : language === "am" ? "ይጫወቱ" : "Play"}
+              <Smartphone
+                size={28}
+                color="#FFFFFF"
+                strokeWidth={1.8}
+                style={{ flexShrink: 0 }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  lineHeight: 1.2,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {language === "ti"
+                    ? "ተጻወቱ"
+                    : language === "am"
+                      ? "ይጫወቱ"
+                      : "Play"}
                 </span>
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#CBD5E1" }}>
-                  {language === "ti" ? "ኣብ ዝኾነ ቦታ" : language === "am" ? "በማንኛውም ቦታ" : "Anywhere"}
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    color: "#CBD5E1",
+                  }}
+                >
+                  {language === "ti"
+                    ? "ኣብ ዝኾነ ቦታ"
+                    : language === "am"
+                      ? "በማንኛውም ቦታ"
+                      : "Anywhere"}
                 </span>
               </div>
             </div>
@@ -364,7 +499,8 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
       </div>
 
       {/* ── 4. Bottom Overlapping Translucent Glass Quick-Tier Bar ── */}
-      <div data-page-reveal
+      <div
+        data-page-reveal
         style={{
           position: "relative",
           zIndex: 20,
@@ -389,7 +525,14 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
           }}
         >
           {/* Header Label */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: 12,
+            }}
+          >
             <Sparkles size={14} color="#FDE047" />
             <span
               style={{
@@ -400,7 +543,10 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 letterSpacing: "0.8px",
                 textShadow: "0 1px 4px rgba(0,0,0,0.5)",
               }}
-            > {text("CHOOSE YOUR LUCKY TIER FAST")} </span>
+            >
+              {" "}
+              {text("CHOOSE YOUR LUCKY TIER FAST")}{" "}
+            </span>
           </div>
 
           {/* 4 Interactive Selector Slots + Action Button */}
@@ -427,7 +573,17 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("CURRENCY")} </span>
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
+                {" "}
+                {text("CURRENCY")}{" "}
+              </span>
               <div style={{ display: "flex", gap: 4, marginTop: 2 }}>
                 <button
                   type="button"
@@ -436,13 +592,19 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                     flex: 1,
                     padding: "4px 8px",
                     borderRadius: "6px",
-                    border: !isUSD ? "1.5px solid #FDE047" : "1px solid rgba(255,255,255,0.15)",
-                    background: !isUSD ? "#FEF08A" : "rgba(255, 255, 255, 0.08)",
+                    border: !isUSD
+                      ? "1.5px solid #FDE047"
+                      : "1px solid rgba(255,255,255,0.15)",
+                    background: !isUSD
+                      ? "#FEF08A"
+                      : "rgba(255, 255, 255, 0.08)",
                     color: !isUSD ? "#854D0E" : "#E2E8F0",
                     fontSize: "0.75rem",
                     fontWeight: 900,
                     cursor: "pointer",
-                    boxShadow: !isUSD ? "0 2px 6px rgba(234, 179, 8, 0.35)" : "none",
+                    boxShadow: !isUSD
+                      ? "0 2px 6px rgba(234, 179, 8, 0.35)"
+                      : "none",
                   }}
                 >
                   🇪🇹 ETB
@@ -454,13 +616,17 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                     flex: 1,
                     padding: "4px 8px",
                     borderRadius: "6px",
-                    border: isUSD ? "1.5px solid #93C5FD" : "1px solid rgba(255,255,255,0.15)",
+                    border: isUSD
+                      ? "1.5px solid #93C5FD"
+                      : "1px solid rgba(255,255,255,0.15)",
                     background: isUSD ? "#EFF6FF" : "rgba(255, 255, 255, 0.08)",
                     color: isUSD ? "#1D4ED8" : "#E2E8F0",
                     fontSize: "0.75rem",
                     fontWeight: 900,
                     cursor: "pointer",
-                    boxShadow: isUSD ? "0 2px 6px rgba(29, 78, 216, 0.35)" : "none",
+                    boxShadow: isUSD
+                      ? "0 2px 6px rgba(29, 78, 216, 0.35)"
+                      : "none",
                   }}
                 >
                   🇺🇸 USD
@@ -483,7 +649,17 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("TICKET PRICE")} </span>
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
+                {" "}
+                {text("TICKET PRICE")}{" "}
+              </span>
               <select
                 value={selectedPrice}
                 onChange={(e) => setSelectedPrice(Number(e.target.value))}
@@ -499,7 +675,11 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 }}
               >
                 {priceOptions.map((p) => (
-                  <option key={p} value={p} style={{ background: "#0F172A", color: "#FFFFFF" }}>
+                  <option
+                    key={p}
+                    value={p}
+                    style={{ background: "#0F172A", color: "#FFFFFF" }}
+                  >
                     {isUSD ? `$${p} USD Entry` : `${p} ETB Fixed Price`}
                   </option>
                 ))}
@@ -521,7 +701,17 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("POOL CAPACITY")} </span>
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
+                {" "}
+                {text("POOL CAPACITY")}{" "}
+              </span>
               <select
                 value={selectedPool}
                 onChange={(e) => setSelectedPool(Number(e.target.value))}
@@ -537,8 +727,13 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 }}
               >
                 {poolOptions.map((p) => (
-                  <option key={p.size} value={p.size} style={{ background: "#0F172A", color: "#FFFFFF" }}>
-                    {p.label} {text("People")} </option>
+                  <option
+                    key={p.size}
+                    value={p.size}
+                    style={{ background: "#0F172A", color: "#FFFFFF" }}
+                  >
+                    {p.label} {text("People")}{" "}
+                  </option>
                 ))}
               </select>
             </div>
@@ -558,8 +753,28 @@ export function CinematicStadiumHero({ onQuickEnter, siteSettings }: CinematicSt
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
               }}
             >
-              <span style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}> {text("WINNING ODDS")} </span>
-              <span style={{ fontSize: "0.875rem", fontWeight: 900, color: "#FDE047" }}> {text("1 in")} {selectedPool / 10} {text("Odds · 10 Winners")} </span>
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
+                {" "}
+                {text("WINNING ODDS")}{" "}
+              </span>
+              <span
+                style={{
+                  fontSize: "0.875rem",
+                  fontWeight: 900,
+                  color: "#FDE047",
+                }}
+              >
+                {" "}
+                {text("1 in")} {selectedPool / 10}{" "}
+                {text("Odds · 10 Winners")}{" "}
+              </span>
             </div>
 
             {/* Action CTA Button: Signature Casino Red */}

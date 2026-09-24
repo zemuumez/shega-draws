@@ -5,7 +5,6 @@ const dataset   = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2024-01-01";
 
 let _client: SanityClient | null = null;
-let _writeClient: SanityClient | null = null;
 
 export function getSanityClient(): SanityClient | null {
   if (!projectId || projectId === "your-project-id-here") {
@@ -26,33 +25,12 @@ export function getSanityClient(): SanityClient | null {
   return _client;
 }
 
-export function getSanityWriteClient(): SanityClient | null {
-  const token = process.env.SANITY_API_TOKEN || process.env.SANITY_API_WRITE_TOKEN;
-  if (!projectId || !token || projectId === "your-project-id-here") return null;
-  if (!_writeClient) {
-    _writeClient = createClient({
-      projectId,
-      dataset,
-      apiVersion,
-      token,
-      useCdn: false,
-      perspective: "raw",
-    });
-  }
-  return _writeClient;
-}
-
 export const sanityClient = {
   fetch: async <T>(query: string, params?: Record<string, unknown>): Promise<T | null> => {
     const client = getSanityClient();
     if (!client) return null;
-    return client.fetch<T>(query, params, {
+    return client.fetch<T>(query, params || {}, {
       cache: "no-store",
     });
-  },
-  create: async <T extends { _type: string; [key: string]: any }>(doc: T): Promise<any> => {
-    const client = getSanityWriteClient();
-    if (!client) return null;
-    return client.create(doc);
   },
 };

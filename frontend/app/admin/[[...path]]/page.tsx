@@ -1,2 +1,2 @@
-import { redirect } from "next/navigation";
-export default function AdminPage() { redirect("/studio"); }
+import {ManagementDashboard} from '@/components/ManagementDashboard';
+export default function AdminPage(){return <ManagementDashboard/>}

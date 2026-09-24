@@ -1,55 +1,5 @@
 import { defineQuery } from "next-sanity";
 
-/** Fetch all active draws from Sanity CMS */
-export const ALL_DRAWS_QUERY = defineQuery(`
-  *[_type == "draw"] | order(deadline desc) {
-    _id,
-    title,
-    titleAm,
-    titleTi,
-    drawId,
-    status,
-    currency,
-    ticketPrice,
-    poolCapacity,
-    deadline,
-    liveVideoUrl
-  }
-`);
-
-/** Fetch active open draw for homepage countdown */
-export const ACTIVE_DRAW_QUERY = defineQuery(`
-  *[_type == "draw" && status == "open"][0] {
-    _id,
-    title,
-    titleAm,
-    titleTi,
-    drawId,
-    currency,
-    ticketPrice,
-    poolCapacity,
-    deadline,
-    liveVideoUrl
-  }
-`);
-
-/** Fetch latest live draw results and winning numbers */
-export const LATEST_RESULTS_QUERY = defineQuery(`
-  *[_type == "drawResult"] | order(drawDate desc) {
-    _id,
-    drawId,
-    drawDate,
-    broadcastVideoUrl,
-    winningNumbers[] {
-      rank,
-      luckyNumber,
-      prizeAmount,
-      winnerName,
-      payoutStatus
-    }
-  }
-`);
-
 /** Global site settings, default language & official payment accounts */
 export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"] | order(_updatedAt desc)[0] {
@@ -73,35 +23,6 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     telegramUrl,
     supportEmail,
     supportEmailSecondary,
-    telebirrReceiverPhone,
-    telebirrMerchantCode,
-    telebirrAccountName,
-    cbeBankName,
-    cbeAccountNumber,
-    cbeAccountName,
-    diasporaBankName,
-    diasporaIban,
-    diasporaAccountName,
-    diasporaSwiftBic,
-    diasporaWireInstructions,
-    diasporaWireInstructionsAm,
-    diasporaWireInstructionsTi,
-    etbPrices[]{
-      value,
-      label,
-      isEnabled
-    },
-    usdPrices[]{
-      value,
-      label,
-      isEnabled
-    },
-    poolSizes[]{
-      size,
-      label,
-      ticketsCount,
-      isEnabled
-    }
   }
 `);
 

@@ -1,64 +1,28 @@
 # Rimna Digital Lottery
 
-Next.js website on Vercel, with Sanity CMS for draws, guest ticket receipts, payment screenshots, content and employee review. No separate Go server, PostgreSQL, Redis, S3 or player accounts are required.
+Rimna now uses a Go backend and PostgreSQL for ticket sales, payments, customer ownership and staff operations. Better Auth runs in the existing Next.js application. Sanity is for website content, branding and English/Amharic/Tigrinya translations.
 
-## Run locally
+**Start with [Backend setup and cutover](docs/BACKEND_SETUP.md).** Chapa secrets are intentionally unset. Checkout cannot accept payments until those credentials and the webhook are configured. Existing production Sanity data has not been modified or imported automatically.
 
-1. Copy `.env.example` to `frontend/.env.local` and enter your Sanity project, dataset and server-only write token.
-2. Run `make frontend-install`, then `make frontend-run`.
-3. Open `http://localhost:3000`. Employees sign into Sanity at `/studio`.
+| Area | Owner |
+| --- | --- |
+| Accounts, email verification, passwords, MFA, sessions | Better Auth, PostgreSQL `auth` schema |
+| Draw prices/capacities, reservations, tickets, payments | Go API, PostgreSQL |
+| Affiliates, messages, results, receipt review, Excel/ZIP exports | `/admin`, Go API |
+| Branding, page content, translations, ads and testimonials | Sanity `/studio` |
+| Original imported payment screenshots | Private backend storage, accessible only to staff |
 
-## Publish ticket sales in CMS
+A draw must be open, before its deadline, and supported by a configured payment provider. A CMS price switch no longer authorizes a purchase. Verified players select a number, receive a temporary reservation and pay through Chapa’s hosted page. Tickets are issued only after independent server-side payment verification.
 
-1. Under **Site Settings**, enable each allowed price and pool capacity. For a 25K participant pool, enter **25000**.
-2. Enter real Telebirr/CBE payment details, or international transfer instructions for USD purchases.
-3. Publish **Site Settings**. An enabled price and enabled pool authorize that combination immediately. For example, enabled USD 25 + enabled 25000 means the USD 25 / 25K ticket is on sale. Draw documents and deadlines are optional broadcast information and do not gate purchases.
-4. Buyers choose an enabled price and pool option, enter their name and phone, select a number from **1 through the pool capacity**, and submit a payment reference plus a PNG/JPEG/WebP screenshot (maximum **3 MB**).
-5. Receipts are saved in Sanity with status **Pending**. The screen confirms receipt submission, not payment verification. Customers should save their submission reference.
+[Architecture and scaling](docs/BACKEND_ARCHITECTURE.md) explains the boundaries, concurrency design, payment lifecycle, future processors, and current limitations. [Backend setup and cutover](docs/BACKEND_SETUP.md) covers local development, deployment, staff access, migration, backups and final credentials.
 
-Missing settings, disabled tiers, unconfigured payment methods, unavailable numbers and CMS failures block purchases. The modal refreshes availability every 15 seconds; the server checks again on submission. A deterministic ID scoped to currency, price and pool capacity, plus an atomic transaction, prevents two submissions for the same number in that pool. Retries of the same request return the original receipt.
+## Tests
 
-All submitted numbers stay reserved, including rejected receipts, until the employee deletes that receipt in Studio. Deleting releases the number, so export records first. Historical Sanity receipts are included in exports and availability when their currency, price and pool capacity match, regardless of their old draw reference. Switching a tier off and back on does not reset its taken numbers. Existing PostgreSQL records are not copied automatically.
+- `make test`: backend unit tests and website content/export tests.
+- `TEST_DATABASE_URL=... make backend-test`: real PostgreSQL reservation and payment tests in temporary schemas.
+- In `backend`: `RUN_LOAD_TEST=1 TEST_DATABASE_URL=... go test -run TestTwentyFiveThousandReservations -v ./internal/store`.
+- In `frontend`: `node scripts/test-auth-e2e.mjs` and `node scripts/test-import-e2e.mjs` use **only** the documented isolated local services. They never contact Chapa or production Sanity.
 
-## Employee review and exports
+The old unauthenticated Sanity purchase/contact endpoints return HTTP 410. Old guest-purchase tests have been replaced by backend transaction, account-isolation and payment tests. Content backup/restore, language and spreadsheet tests are retained.
 
-Open **Studio → Players & Exports** and sign in with a Sanity account that can read the dataset.
-
-- Filter by ticket pool reference (shown in the Draw filter), pool capacity, price, currency or review status.
-- **Excel — filtered / selected** exports a real `.xlsx` workbook.
-- **Excel + screenshots ZIP** contains `players.xlsx` and a `screenshots/` folder. Each player's row names the matching screenshot.
-- Names, phones, ticket numbers and payment references are exported as text to preserve leading zeroes and prevent formula execution.
-- Missing/failed screenshots are identified in the workbook, ZIP README and on screen. They are never silently counted as successful downloads.
-- Review and publish each status change in **Submitted Ticket Receipts**. Pending does not mean payment confirmed.
-
-Exports run in the staff browser through the authenticated Studio client. There is no public players-list/export API. For large volumes, export one draw or smaller selections to keep browser memory usage reasonable.
-
-## Vercel setup
-
-Keep the Vercel project Root Directory as `frontend`. Add the four variables from `.env.example` to the desired environments, then redeploy. The `SANITY_API_TOKEN` needs write permission and stays server-side. Add your Vercel origin to Sanity's CORS settings with credentials for Studio login. Guests need no account.
-
-Remove obsolete backend URLs/JWT/database/Redis/S3 variables from Vercel when no longer used. Any existing Render resources are independent; this code change does not delete them or their stored records.
-
-## Receipt privacy
-
-New receipt IDs use the `private.entry.` path, which Sanity restricts to authenticated readers even in public datasets ([Sanity ID access rules](https://www.sanity.io/docs/content-lake/ids)). The public availability endpoint returns only ticket numbers and draw settings. Previously created root-ID records retain their existing visibility; review or migrate them separately.
-
-Standard Sanity Content Lake asset URLs are publicly accessible to anyone with the URL, including payment screenshots ([Sanity asset behavior](https://www.sanity.io/docs/developer-guides/multi-tenancy-implementation)). Do not treat these screenshots as private file storage. If authenticated access to image bytes is required, use Sanity private Media Library assets and signed URLs before accepting sensitive receipts.
-
-## Checks
-
-`make test` runs guest submission, availability, concurrency and export tests. `cd frontend && npx tsc --noEmit --incremental false` checks TypeScript. `make frontend-build` builds the website.
-
-## CMS backup and restore
-
-Studio → **CMS Complete Backup & Export** offers a full ZIP with content plus media files, or a smaller JSON containing content and media references. Exports include published documents, drafts, translations and private receipt/contact records. Project configuration, permissions, users and revision history are outside this content backup.
-
-Restore accepts the new ZIP/JSON format and earlier Rimna JSON backups. It validates documents, media checksums and required references before writing. ZIP restores upload missing media and remap references; JSON restores require referenced media to remain in the destination dataset. Existing matching document IDs are replaced; unrelated documents are retained. Large restores run in batches and can be retried after an interruption; errors report partial progress rather than claiming success. Browser imports are limited to 500 MB. Content Releases require native Sanity dataset tools.
-
-Pause sales and content edits while exporting/restoring for a consistent snapshot. Download a current ZIP before replacing content. Use the authenticated Studio account with dataset read/write access.
-
-## Website translations
-
-Studio → **Website UI Translations** lists built-in keys by category, with English, Amharic and Tigrinya defaults ready to edit. Publish individual edits and reload the website to apply them. The previous Content & Language Sync tool has been removed; opening a translation does not bulk-import or overwrite other content. Custom existing translation documents remain under All UI Translation Keys. The published default language supersedes older saved visitor choices; manual choices remain saved until that default changes.
-
-Contact forms and community registrations save to **Player Contact Messages** and report storage failures. Community registrations are available for staff follow-up; automated email/SMS delivery is not configured. Results and testimonials show published CMS content rather than invented fallback winners.
+See [verification results and outstanding launch checks](docs/VALIDATION.md), including remaining Sanity tooling advisories.

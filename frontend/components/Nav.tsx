@@ -55,6 +55,7 @@ export function Nav({
   // Right desktop links
   const rightNavItems = [
     { href: "/#choose-ticket", label: "Buy Tickets",    icon: ListChecks },
+    { href: "/account", label: text("My tickets"), icon: User },
     { href: "/about",       label: t.nav.whyRimna || "Why Rimna", icon: Award },
   ];
 

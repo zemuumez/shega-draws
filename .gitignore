@@ -38,3 +38,9 @@ SYSTEM_ARCHITECTURE_GUIDE.md
 
 # Isolated local production verification
 frontend/.next-verify/
+
+# Backend private configuration and verification outputs
+backend/.env
+backend/private-media/
+frontend/.next-*/
+frontend/tsconfig.tsbuildinfo

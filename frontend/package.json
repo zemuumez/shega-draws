@@ -9,8 +9,11 @@
     "lint": "next lint",
     "seed:cms": "node scripts/seed-sanity.mjs",
     "seed:cms:clear": "node scripts/seed-sanity.mjs --clear",
-    "migrate:cms": "node scripts/migrate-to-sanity.mjs",
-    "test": "node --test tests/*.test.cjs"
+    "migrate:cms": "tsx scripts/migrate-to-sanity.mjs",
+    "test": "node --test tests/*.test.cjs",
+    "auth:migrate": "tsx scripts/migrate-auth.ts --apply",
+    "auth:schema": "tsx scripts/migrate-auth.ts",
+    "import:operations": "tsx scripts/import-operations.ts"
   },
   "dependencies": {
     "@sanity/client": "^6.21.3",
@@ -18,10 +21,13 @@
     "@sanity/vision": "^3.99.0",
     "@types/jszip": "^3.4.0",
     "@types/three": "^0.185.4",
+    "better-auth": "1.7.5",
     "jszip": "^3.10.1",
     "lucide-react": "^0.414.0",
-    "next": "14.2.5",
+    "next": "15.5.26",
     "next-sanity": "^9.4.2",
+    "nodemailer": "10.0.10",
+    "pg": "8.23.0",
     "react": "^18",
     "react-dom": "^18",
     "sanity": "^3.99.0",
@@ -30,10 +36,18 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "15.5.26",
+    "tsx": "^4.23.15",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "8.5.28",
+    "adm-zip": "0.6.1",
+    "glob@>=10.2.0 <10.5.0": "^10.5.0"
   }
 }

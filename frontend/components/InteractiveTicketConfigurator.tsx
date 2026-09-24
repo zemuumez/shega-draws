@@ -27,12 +27,17 @@ interface PriceOption {
   isEnabled?: boolean;
 }
 
-interface PoolOption { size: number; label: string; ticketsCount: string; isEnabled?: boolean; }
+interface PoolOption {
+  size: number;
+  label: string;
+  ticketsCount: string;
+  isEnabled?: boolean;
+}
 
 // All 10 Guaranteed Prize distribution percentages (Sums to 100%)
 const ALL_10_PRIZES = [
-  { rank: 1, percent: 0.30, label: "1st Grand Jackpot", tag: "30%" },
-  { rank: 2, percent: 0.20, label: "2nd Luxury Prize", tag: "20%" },
+  { rank: 1, percent: 0.3, label: "1st Grand Jackpot", tag: "30%" },
+  { rank: 2, percent: 0.2, label: "2nd Luxury Prize", tag: "20%" },
   { rank: 3, percent: 0.15, label: "3rd High Cash", tag: "15%" },
   { rank: 4, percent: 0.08, label: "4th Cash Prize", tag: "8%" },
   { rank: 5, percent: 0.06, label: "5th Cash Prize", tag: "6%" },
@@ -50,11 +55,18 @@ interface InteractiveTicketConfiguratorProps {
   siteSettings?: CMSSiteSettings | null;
 }
 
-export function InteractiveTicketConfigurator({ siteSettings, draws }: InteractiveTicketConfiguratorProps) {
+export function InteractiveTicketConfigurator({
+  siteSettings,
+  draws,
+}: InteractiveTicketConfiguratorProps) {
   const { text, language, t, getLocalized } = useLanguage();
-  const initialCurrency = (siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB") as Currency;
+  const initialCurrency = (
+    siteSettings?.defaultCurrency === "USD" ? "USD" : "ETB"
+  ) as Currency;
   const [currency, setCurrency] = useState<Currency>(initialCurrency);
-  const [selectedPrice, setSelectedPrice] = useState<number>(initialCurrency === "USD" ? 50 : 100);
+  const [selectedPrice, setSelectedPrice] = useState<number>(
+    initialCurrency === "USD" ? 50 : 100,
+  );
   const [selectedPool, setSelectedPool] = useState<number>(1000);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState<boolean>(false);
   const [showAllPrizes, setShowAllPrizes] = useState<boolean>(false);
@@ -62,88 +74,116 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
   // Sync with published CMS defaultCurrency
   React.useEffect(() => {
     if (siteSettings?.defaultCurrency) {
-      const targetCurr = (siteSettings.defaultCurrency === "USD" ? "USD" : "ETB") as Currency;
+      const targetCurr = (
+        siteSettings.defaultCurrency === "USD" ? "USD" : "ETB"
+      ) as Currency;
       setCurrency(targetCurr);
     }
   }, [siteSettings?.defaultCurrency]);
 
-  // Derive dynamic ETB Prices from published CMS settings
-  const etbPrices: PriceOption[] = React.useMemo(() => {
-    if (siteSettings?.etbPrices && siteSettings.etbPrices.length > 0) {
-      return siteSettings.etbPrices.map((p) => ({
-        value: p.value,
-        label: p.label || p.value.toLocaleString(),
-        isEnabled: p.isEnabled !== false,
-      }));
-    }
-    return [];
-  }, [siteSettings]);
-
-  // Derive dynamic USD Prices from published CMS settings
-  const usdPrices: PriceOption[] = React.useMemo(() => {
-    if (siteSettings?.usdPrices && siteSettings.usdPrices.length > 0) {
-      return siteSettings.usdPrices.map((p) => ({
-        value: p.value,
-        label: p.label || p.value.toLocaleString(),
-        isEnabled: p.isEnabled !== false,
-      }));
-    }
-    return [];
-  }, [siteSettings]);
-
-  // Derive dynamic Pool Sizes from published CMS settings
-  const poolOptions: PoolOption[] = React.useMemo(() => {
-    if (siteSettings?.poolSizes && siteSettings.poolSizes.length > 0) {
-      return siteSettings.poolSizes.map((p) => ({
-        size: p.size,
-        label: p.label || (p.size >= 1000 ? `${p.size / 1000}K` : `${p.size}`),
-        ticketsCount: p.ticketsCount || `${p.size.toLocaleString()} tickets`,
-        isEnabled: p.isEnabled !== false,
-      }));
-    }
-    return [];
-  }, [siteSettings]);
+  const availableDraws = draws.filter(
+    (d) =>
+      d.status === "open" &&
+      (!d.deadline || Date.parse(d.deadline) > Date.now()),
+  );
+  const etbPrices: PriceOption[] = Array.from(
+    new Set(
+      availableDraws
+        .filter((d) => d.currency === "ETB")
+        .map((d) => d.ticketPrice),
+    ),
+  ).map((value) => ({ value, label: String(value), isEnabled: true }));
+  const usdPrices: PriceOption[] = Array.from(
+    new Set(
+      availableDraws
+        .filter((d) => d.currency === "USD")
+        .map((d) => d.ticketPrice),
+    ),
+  ).map((value) => ({ value, label: String(value), isEnabled: true }));
+  const poolOptions: PoolOption[] = Array.from(
+    new Set(draws.map((d) => d.poolCapacity)),
+  )
+    .sort((a, b) => a - b)
+    .map((size) => ({
+      size,
+      label: size >= 1000 ? `${size / 1000}K` : String(size),
+      ticketsCount: `${size.toLocaleString()} tickets`,
+      isEnabled: availableDraws.some(
+        (d) =>
+          d.currency === currency &&
+          d.ticketPrice === selectedPrice &&
+          d.poolCapacity === size,
+      ),
+    }));
 
   const isUSD = currency === "USD";
-  const selectedDraw = draws.find(d => d.status === "open" && d.currency === currency && d.ticketPrice === selectedPrice && d.poolCapacity === selectedPool && (!d.deadline || Date.parse(d.deadline) > Date.now()));
+  const selectedDraw = draws.find(
+    (d) =>
+      d.status === "open" &&
+      d.currency === currency &&
+      d.ticketPrice === selectedPrice &&
+      d.poolCapacity === selectedPool &&
+      (!d.deadline || Date.parse(d.deadline) > Date.now()),
+  );
 
   const currentPrices = isUSD ? usdPrices : etbPrices;
 
-  const isPriceEnabled = React.useCallback((val: number, curr: Currency) => {
-    const list = curr === "USD" ? usdPrices : etbPrices;
-    const match = list.find((p) => p.value === val);
-    return match ? match.isEnabled !== false : false;
-  }, [usdPrices, etbPrices]);
+  const isPriceEnabled = React.useCallback(
+    (val: number, curr: Currency) => {
+      const list = curr === "USD" ? usdPrices : etbPrices;
+      const match = list.find((p) => p.value === val);
+      return match ? match.isEnabled !== false : false;
+    },
+    [usdPrices, etbPrices],
+  );
 
-  const isPoolEnabled = React.useCallback((size: number) => {
-    const match = poolOptions.find((p) => p.size === size);
-    return match ? match.isEnabled !== false : false;
-  }, [poolOptions]);
+  const isPoolEnabled = React.useCallback(
+    (size: number) => {
+      const match = poolOptions.find((p) => p.size === size);
+      return match ? match.isEnabled !== false : false;
+    },
+    [poolOptions],
+  );
 
   // Automatically switch to first enabled price/pool if current is disabled or deleted
   React.useEffect(() => {
     const availablePrices = isUSD ? usdPrices : etbPrices;
     const priceExists = availablePrices.some((p) => p.value === selectedPrice);
     if (!priceExists || !isPriceEnabled(selectedPrice, currency)) {
-      const firstEnabled = availablePrices.find((p) => isPriceEnabled(p.value, currency)) || availablePrices[0];
+      const firstEnabled =
+        availablePrices.find((p) => isPriceEnabled(p.value, currency)) ||
+        availablePrices[0];
       if (firstEnabled) {
         setSelectedPrice(firstEnabled.value);
       }
     }
     const poolExists = poolOptions.some((p) => p.size === selectedPool);
     if (!poolExists || !isPoolEnabled(selectedPool)) {
-      const firstEnabledPool = poolOptions.find((p) => isPoolEnabled(p.size)) || poolOptions[0];
+      const firstEnabledPool =
+        poolOptions.find((p) => isPoolEnabled(p.size)) || poolOptions[0];
       if (firstEnabledPool) {
         setSelectedPool(firstEnabledPool.size);
       }
     }
-  }, [siteSettings, currency, selectedPrice, selectedPool, isUSD, usdPrices, etbPrices, poolOptions, isPriceEnabled, isPoolEnabled]);
+  }, [
+    siteSettings,
+    currency,
+    selectedPrice,
+    selectedPool,
+    isUSD,
+    usdPrices,
+    etbPrices,
+    poolOptions,
+    isPriceEnabled,
+    isPoolEnabled,
+  ]);
 
   // Handle currency switch
   const handleCurrencyChange = (newCurr: Currency) => {
     setCurrency(newCurr);
     const available = newCurr === "USD" ? usdPrices : etbPrices;
-    const firstEnabled = available.find((p) => isPriceEnabled(p.value, newCurr)) || available[0];
+    const firstEnabled =
+      available.find((p) => isPriceEnabled(p.value, newCurr)) || available[0];
     if (firstEnabled) {
       setSelectedPrice(firstEnabled.value);
     }
@@ -151,8 +191,13 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
 
   // Calculations
   const totalPrizePool = selectedPrice * selectedPool;
-  const currentPoolObj = poolOptions.find((p) => p.size === selectedPool) || poolOptions[0] || { size: 1000, label: "1K", ticketsCount: "1,000 tickets" };
-  const topPrize = Math.round(totalPrizePool * 0.30);
+  const currentPoolObj = poolOptions.find((p) => p.size === selectedPool) ||
+    poolOptions[0] || {
+      size: 1000,
+      label: "1K",
+      ticketsCount: "1,000 tickets",
+    };
+  const topPrize = Math.round(totalPrizePool * 0.3);
   const oddsRatio = Math.round(selectedPool / 10);
 
   // Format currency helper
@@ -171,7 +216,9 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
     amount: formatMoney(Math.round(totalPrizePool * p.percent)),
   }));
 
-  const visiblePrizes = showAllPrizes ? calculatedAll10Prizes : calculatedAll10Prizes.slice(0, 3);
+  const visiblePrizes = showAllPrizes
+    ? calculatedAll10Prizes
+    : calculatedAll10Prizes.slice(0, 3);
 
   return (
     <div
@@ -190,7 +237,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
       }}
     >
       {/* ── 1. Compact Glass Header Bar ────────────────────────────── */}
-      <div data-page-reveal
+      <div
+        data-page-reveal
         style={{
           marginBottom: 14,
           display: "flex",
@@ -204,31 +252,32 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
       >
         <div>
           <h2
-              className="display"
-              style={{
-                fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
-                fontWeight: 900,
-                color: "#FFFFFF",
-                margin: 0,
-                lineHeight: 1.1,
-                textShadow: "0 2px 8px rgba(0,0,0,0.6)",
-              }}
-            >
-              {t.configurator?.title || "Interactive Ticket Configurator"}
-            </h2>
-            <span
-              className="mono"
-              style={{
-                fontSize: "0.625rem",
-                color: "#FEF08A",
-                textTransform: "uppercase",
-                fontWeight: 800,
-                letterSpacing: "0.5px",
-                display: "block",
-              }}
-            >
-              {t.configurator?.subtitle || "Capped Pools · 10 Guaranteed Winners · 100% Video Draw"}
-            </span>
+            className="display"
+            style={{
+              fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
+              fontWeight: 900,
+              color: "#FFFFFF",
+              margin: 0,
+              lineHeight: 1.1,
+              textShadow: "0 2px 8px rgba(0,0,0,0.6)",
+            }}
+          >
+            {t.configurator?.title || "Interactive Ticket Configurator"}
+          </h2>
+          <span
+            className="mono"
+            style={{
+              fontSize: "0.625rem",
+              color: "#FEF08A",
+              textTransform: "uppercase",
+              fontWeight: 800,
+              letterSpacing: "0.5px",
+              display: "block",
+            }}
+          >
+            {t.configurator?.subtitle ||
+              "Capped Pools · 10 Guaranteed Winners · 100% Video Draw"}
+          </span>
         </div>
 
         {/* Header Badges */}
@@ -248,7 +297,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
               boxShadow: "0 2px 6px rgba(234, 179, 8, 0.2)",
             }}
           >
-            <Trophy size={11} color="#FDE047" /> {t.configurator?.tenWinners || "10 Winners"}
+            <Trophy size={11} color="#FDE047" />{" "}
+            {t.configurator?.tenWinners || "10 Winners"}
           </span>
           <span
             style={{
@@ -265,7 +315,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
               boxShadow: "0 2px 6px rgba(16, 185, 129, 0.2)",
             }}
           >
-            <CheckCircle2 size={11} color="#34D399" /> {t.configurator?.liveVideo || "Live Video"}
+            <CheckCircle2 size={11} color="#34D399" />{" "}
+            {t.configurator?.liveVideo || "Live Video"}
           </span>
         </div>
       </div>
@@ -274,13 +325,15 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 310px), 1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(min(100%, 310px), 1fr))",
           gap: "clamp(12px, 2vw, 18px)",
           alignItems: "stretch",
         }}
       >
         {/* ── LEFT COLUMN: Translucent Frosted Glass Controls ───── */}
-        <div data-page-reveal
+        <div
+          data-page-reveal
           style={{
             background: "rgba(0, 0, 0, 0.35)",
             backdropFilter: "blur(16px)",
@@ -297,12 +350,36 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
         >
           {/* A. CURRENCY SELECTOR */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 4,
+              }}
+            >
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
                 {t.configurator?.currencyStep || "1. CURRENCY"}
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 800 }}>
-                {isUSD ? (t.configurator?.currencyDiaspora || "International / Diaspora") : (t.configurator?.currencyNational || "Ethiopia National")}
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  fontWeight: 800,
+                }}
+              >
+                {isUSD
+                  ? t.configurator?.currencyDiaspora ||
+                    "International / Diaspora"
+                  : t.configurator?.currencyNational || "Ethiopia National"}
               </span>
             </div>
             <div
@@ -331,7 +408,10 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                   cursor: "pointer",
                   transition: "all 0.12s ease",
                   textAlign: "center",
-                  boxShadow: currency === "ETB" ? "0 2px 6px rgba(234, 179, 8, 0.35)" : "none",
+                  boxShadow:
+                    currency === "ETB"
+                      ? "0 2px 6px rgba(234, 179, 8, 0.35)"
+                      : "none",
                 }}
               >
                 🇪🇹 ETB (Birr)
@@ -352,7 +432,10 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                   cursor: "pointer",
                   transition: "all 0.12s ease",
                   textAlign: "center",
-                  boxShadow: currency === "USD" ? "0 2px 6px rgba(29, 78, 216, 0.35)" : "none",
+                  boxShadow:
+                    currency === "USD"
+                      ? "0 2px 6px rgba(29, 78, 216, 0.35)"
+                      : "none",
                 }}
               >
                 🇺🇸 USD ($)
@@ -362,19 +445,44 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
 
           {/* B. TICKET PRICE SELECTION */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 4,
+              }}
+            >
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
                 {t.configurator?.ticketPriceStep || "2. TICKET PRICE"}
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "#FDE047", fontWeight: 900 }}>
-                {t.configurator?.selectedPriceLabel || "Selected:"} {formatMoney(selectedPrice)}
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FDE047",
+                  fontWeight: 900,
+                }}
+              >
+                {t.configurator?.selectedPriceLabel || "Selected:"}{" "}
+                {formatMoney(selectedPrice)}
               </span>
             </div>
 
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: currentPrices.length <= 4 ? `repeat(${currentPrices.length}, 1fr)` : "repeat(auto-fit, minmax(68px, 1fr))",
+                gridTemplateColumns:
+                  currentPrices.length <= 4
+                    ? `repeat(${currentPrices.length}, 1fr)`
+                    : "repeat(auto-fit, minmax(68px, 1fr))",
                 gap: 6,
               }}
             >
@@ -394,19 +502,26 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                       border: !enabled
                         ? "1.5px dashed rgba(255, 255, 255, 0.15)"
                         : isSelected
-                        ? "2px solid #F59E0B"
-                        : "1.5px solid rgba(255, 255, 255, 0.15)",
+                          ? "2px solid #F59E0B"
+                          : "1.5px solid rgba(255, 255, 255, 0.15)",
                       background: !enabled
                         ? "rgba(0, 0, 0, 0.25)"
                         : isSelected
-                        ? "#FEF9C3"
-                        : "rgba(0, 0, 0, 0.35)",
-                      color: !enabled ? "#64748B" : isSelected ? "#111827" : "#FFFFFF",
+                          ? "#FEF9C3"
+                          : "rgba(0, 0, 0, 0.35)",
+                      color: !enabled
+                        ? "#64748B"
+                        : isSelected
+                          ? "#111827"
+                          : "#FFFFFF",
                       cursor: !enabled ? "not-allowed" : "pointer",
                       opacity: !enabled ? 0.38 : 1,
                       textAlign: "center",
                       transition: "all 0.12s ease",
-                      boxShadow: isSelected && enabled ? "0 4px 12px rgba(245, 158, 11, 0.35)" : "0 1px 3px rgba(0,0,0,0.2)",
+                      boxShadow:
+                        isSelected && enabled
+                          ? "0 4px 12px rgba(245, 158, 11, 0.35)"
+                          : "0 1px 3px rgba(0,0,0,0.2)",
                     }}
                   >
                     <div
@@ -415,7 +530,11 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                         fontSize: "1.15rem",
                         fontWeight: 900,
                         lineHeight: 1.1,
-                        color: !enabled ? "#64748B" : isSelected ? "#B45309" : "#FFFFFF",
+                        color: !enabled
+                          ? "#64748B"
+                          : isSelected
+                            ? "#B45309"
+                            : "#FFFFFF",
                       }}
                     >
                       {isUSD ? `$${tier.label}` : tier.label}
@@ -424,11 +543,19 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                       style={{
                         fontSize: "0.625rem",
                         fontWeight: 800,
-                        color: !enabled ? "#94A3B8" : isSelected ? "#854D0E" : "#94A3B8",
+                        color: !enabled
+                          ? "#94A3B8"
+                          : isSelected
+                            ? "#854D0E"
+                            : "#94A3B8",
                         textTransform: "uppercase",
                       }}
                     >
-                      {!enabled ? (t.configurator?.paused || "PAUSED") : (isUSD ? "USD" : "ETB")}
+                      {!enabled
+                        ? t.configurator?.paused || "PAUSED"
+                        : isUSD
+                          ? "USD"
+                          : "ETB"}
                     </div>
                   </button>
                 );
@@ -438,11 +565,32 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
 
           {/* C. PARTICIPANT POOL SELECTION */}
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 4,
+              }}
+            >
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
                 {t.configurator?.poolStep || "3. PARTICIPANT POOL"}
               </span>
-              <span style={{ fontSize: "0.6875rem", color: "#94A3B8", fontWeight: 800 }}>
+              <span
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  fontWeight: 800,
+                }}
+              >
                 {currentPoolObj.ticketsCount}
               </span>
             </div>
@@ -450,7 +598,10 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: poolOptions.length <= 4 ? `repeat(${poolOptions.length}, 1fr)` : "repeat(auto-fit, minmax(68px, 1fr))",
+                gridTemplateColumns:
+                  poolOptions.length <= 4
+                    ? `repeat(${poolOptions.length}, 1fr)`
+                    : "repeat(auto-fit, minmax(68px, 1fr))",
                 gap: 6,
               }}
             >
@@ -470,19 +621,26 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                       border: !enabled
                         ? "1.5px dashed rgba(255, 255, 255, 0.15)"
                         : isSelected
-                        ? "2px solid #F59E0B"
-                        : "1.5px solid rgba(255, 255, 255, 0.15)",
+                          ? "2px solid #F59E0B"
+                          : "1.5px solid rgba(255, 255, 255, 0.15)",
                       background: !enabled
                         ? "rgba(0, 0, 0, 0.25)"
                         : isSelected
-                        ? "#FEF9C3"
-                        : "rgba(0, 0, 0, 0.35)",
-                      color: !enabled ? "#64748B" : isSelected ? "#111827" : "#FFFFFF",
+                          ? "#FEF9C3"
+                          : "rgba(0, 0, 0, 0.35)",
+                      color: !enabled
+                        ? "#64748B"
+                        : isSelected
+                          ? "#111827"
+                          : "#FFFFFF",
                       cursor: !enabled ? "not-allowed" : "pointer",
                       opacity: !enabled ? 0.38 : 1,
                       textAlign: "center",
                       transition: "all 0.12s ease",
-                      boxShadow: isSelected && enabled ? "0 4px 12px rgba(245, 158, 11, 0.35)" : "0 1px 3px rgba(0,0,0,0.2)",
+                      boxShadow:
+                        isSelected && enabled
+                          ? "0 4px 12px rgba(245, 158, 11, 0.35)"
+                          : "0 1px 3px rgba(0,0,0,0.2)",
                     }}
                   >
                     <div
@@ -493,20 +651,40 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                         gap: 2,
                         fontSize: "0.875rem",
                         fontWeight: 900,
-                        color: !enabled ? "#64748B" : isSelected ? "#854D0E" : "#FFFFFF",
+                        color: !enabled
+                          ? "#64748B"
+                          : isSelected
+                            ? "#854D0E"
+                            : "#FFFFFF",
                       }}
                     >
-                      <Users size={11} color={!enabled ? "#64748B" : isSelected ? "#854D0E" : "#FDE047"} /> {pool.label}
+                      <Users
+                        size={11}
+                        color={
+                          !enabled
+                            ? "#64748B"
+                            : isSelected
+                              ? "#854D0E"
+                              : "#FDE047"
+                        }
+                      />{" "}
+                      {pool.label}
                     </div>
                     <div
                       style={{
                         fontSize: "0.5625rem",
                         fontWeight: 800,
-                        color: !enabled ? "#94A3B8" : isSelected ? "#854D0E" : "#94A3B8",
+                        color: !enabled
+                          ? "#94A3B8"
+                          : isSelected
+                            ? "#854D0E"
+                            : "#94A3B8",
                         textTransform: "uppercase",
                       }}
                     >
-                      {!enabled ? (t.configurator?.paused || "PAUSED") : (t.configurator?.people || "PEOPLE")}
+                      {!enabled
+                        ? t.configurator?.paused || "PAUSED"
+                        : t.configurator?.people || "PEOPLE"}
                     </div>
                   </button>
                 );
@@ -523,9 +701,32 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
               padding: "8px 10px",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <span className="mono" style={{ fontSize: "0.6875rem", color: "#FEF08A", fontWeight: 900, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
-                <Trophy size={12} color="#FDE047" /> {showAllPrizes ? (t.configurator?.allPayoutsTitle || "All 10 Guaranteed Payouts") : (t.configurator?.topPayoutsTitle || "Top 3 Guaranteed Payouts")}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 6,
+              }}
+            >
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#FEF08A",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <Trophy size={12} color="#FDE047" />{" "}
+                {showAllPrizes
+                  ? t.configurator?.allPayoutsTitle ||
+                    "All 10 Guaranteed Payouts"
+                  : t.configurator?.topPayoutsTitle ||
+                    "Top 3 Guaranteed Payouts"}
               </span>
 
               <button
@@ -545,9 +746,15 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                 }}
               >
                 {showAllPrizes ? (
-                  <>{t.configurator?.hidePrizes || "Show Top 3"} <ChevronUp size={13} /></>
+                  <>
+                    {t.configurator?.hidePrizes || "Show Top 3"}{" "}
+                    <ChevronUp size={13} />
+                  </>
                 ) : (
-                  <>{t.configurator?.showAllPrizes || "Show All 10 Prizes"} <ChevronDown size={13} /></>
+                  <>
+                    {t.configurator?.showAllPrizes || "Show All 10 Prizes"}{" "}
+                    <ChevronDown size={13} />
+                  </>
                 )}
               </button>
             </div>
@@ -556,7 +763,9 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: showAllPrizes ? "repeat(auto-fit, minmax(130px, 1fr))" : "repeat(3, 1fr)",
+                gridTemplateColumns: showAllPrizes
+                  ? "repeat(auto-fit, minmax(130px, 1fr))"
+                  : "repeat(3, 1fr)",
                 gap: 6,
                 maxHeight: showAllPrizes ? 220 : "none",
                 overflowY: showAllPrizes ? "auto" : "visible",
@@ -567,7 +776,14 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                 <div
                   key={pz.rank}
                   style={{
-                    background: pz.rank === 1 ? "rgba(254, 240, 138, 0.25)" : pz.rank === 2 ? "rgba(59, 130, 246, 0.2)" : pz.rank === 3 ? "rgba(245, 158, 11, 0.2)" : "rgba(255, 255, 255, 0.08)",
+                    background:
+                      pz.rank === 1
+                        ? "rgba(254, 240, 138, 0.25)"
+                        : pz.rank === 2
+                          ? "rgba(59, 130, 246, 0.2)"
+                          : pz.rank === 3
+                            ? "rgba(245, 158, 11, 0.2)"
+                            : "rgba(255, 255, 255, 0.08)",
                     border: `1px solid ${pz.rank === 1 ? "#FDE047" : pz.rank === 2 ? "#93C5FD" : pz.rank === 3 ? "#FCD34D" : "rgba(255,255,255,0.15)"}`,
                     borderRadius: "8px",
                     padding: "6px 4px",
@@ -578,7 +794,14 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                     style={{
                       fontSize: "0.5625rem",
                       fontWeight: 900,
-                      color: pz.rank === 1 ? "#FEF08A" : pz.rank === 2 ? "#93C5FD" : pz.rank === 3 ? "#FDE047" : "#CBD5E1",
+                      color:
+                        pz.rank === 1
+                          ? "#FEF08A"
+                          : pz.rank === 2
+                            ? "#93C5FD"
+                            : pz.rank === 3
+                              ? "#FDE047"
+                              : "#CBD5E1",
                       display: "block",
                       marginBottom: 1,
                     }}
@@ -604,7 +827,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
         </div>
 
         {/* ── RIGHT COLUMN: Translucent Floating Summary Card & Stat Grid ── */}
-        <div data-page-reveal
+        <div
+          data-page-reveal
           style={{
             background: "rgba(0, 0, 0, 0.4)",
             backdropFilter: "blur(20px)",
@@ -624,7 +848,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
               position: "relative",
               width: "100%",
               height: 54,
-              background: "linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)",
+              background:
+                "linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -636,7 +861,13 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
           >
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <Sparkles size={14} color="#FDE047" />
-              <span style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FEF08A" }}>
+              <span
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  color: "#FEF08A",
+                }}
+              >
                 {t.configurator?.summaryTitle || "Live Draw Tier Summary"}
               </span>
             </div>
@@ -666,76 +897,235 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
             }}
           >
             {/* Stat 1: Total Prize Pool */}
-            <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
-              <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
+            <div
+              style={{
+                background: "rgba(15, 23, 42, 0.6)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "8px",
+                padding: "6px 8px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "#94A3B8",
+                  fontWeight: 800,
+                  display: "block",
+                }}
+              >
                 {t.configurator?.totalPrizePool || "TOTAL PRIZE POOL"}
               </span>
-              <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "#FDE047" }}>
+              <span
+                className="display"
+                style={{
+                  fontSize: "1.05rem",
+                  fontWeight: 900,
+                  color: "#FDE047",
+                }}
+              >
                 {formatMoney(totalPrizePool)}
               </span>
             </div>
 
             {/* Stat 2: 1st Jackpot Prize */}
-            <div style={{ background: "rgba(254, 240, 138, 0.15)", border: "1px solid #FDE047", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(234, 179, 8, 0.2)" }}>
-              <span style={{ fontSize: "0.625rem", color: "#FEF08A", fontWeight: 800, display: "block" }}>
+            <div
+              style={{
+                background: "rgba(254, 240, 138, 0.15)",
+                border: "1px solid #FDE047",
+                borderRadius: "8px",
+                padding: "6px 8px",
+                boxShadow: "0 1px 3px rgba(234, 179, 8, 0.2)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "#FEF08A",
+                  fontWeight: 800,
+                  display: "block",
+                }}
+              >
                 {t.configurator?.firstJackpot || "1ST GRAND JACKPOT"}
               </span>
-              <span className="display" style={{ fontSize: "1.05rem", fontWeight: 900, color: "#F87171" }}>
+              <span
+                className="display"
+                style={{
+                  fontSize: "1.05rem",
+                  fontWeight: 900,
+                  color: "#F87171",
+                }}
+              >
                 {formatMoney(topPrize)}
               </span>
             </div>
 
             {/* Stat 3: Participants */}
-            <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
-              <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
+            <div
+              style={{
+                background: "rgba(15, 23, 42, 0.6)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "8px",
+                padding: "6px 8px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "#94A3B8",
+                  fontWeight: 800,
+                  display: "block",
+                }}
+              >
                 {t.configurator?.poolCapacity || "POOL CAPACITY"}
               </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
-                {selectedPool.toLocaleString()} {t.configurator?.people || "People"}
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  color: "#FFFFFF",
+                }}
+              >
+                {selectedPool.toLocaleString()}{" "}
+                {t.configurator?.people || "People"}
               </span>
               <PoolAvailability
                 key={`${currency}-${selectedPrice}-${selectedPool}`}
-                currency={currency} price={selectedPrice} capacity={selectedPool}
-                enabled={isPriceEnabled(selectedPrice, currency) && isPoolEnabled(selectedPool)}
+                currency={currency}
+                price={selectedPrice}
+                capacity={selectedPool}
+                enabled={
+                  isPriceEnabled(selectedPrice, currency) &&
+                  isPoolEnabled(selectedPool)
+                }
                 checkoutOpen={isBuyModalOpen}
               />
             </div>
 
             {/* Stat 4: Winning Odds */}
-            <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid #10B981", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(16, 185, 129, 0.2)" }}>
-              <span style={{ fontSize: "0.625rem", color: "#6EE7B7", fontWeight: 800, display: "block" }}>
+            <div
+              style={{
+                background: "rgba(16, 185, 129, 0.15)",
+                border: "1px solid #10B981",
+                borderRadius: "8px",
+                padding: "6px 8px",
+                boxShadow: "0 1px 3px rgba(16, 185, 129, 0.2)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "#6EE7B7",
+                  fontWeight: 800,
+                  display: "block",
+                }}
+              >
                 {t.configurator?.winningOdds || "WINNING ODDS"}
               </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#34D399" }}> {text("1 in")} {oddsRatio} ({text("High Odds")})
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  color: "#34D399",
+                }}
+              >
+                {" "}
+                {text("1 in")} {oddsRatio} ({text("High Odds")})
               </span>
             </div>
 
             {/* Stat 5: Guaranteed Winners */}
-            <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
-              <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
+            <div
+              style={{
+                background: "rgba(15, 23, 42, 0.6)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "8px",
+                padding: "6px 8px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "#94A3B8",
+                  fontWeight: 800,
+                  display: "block",
+                }}
+              >
                 {t.configurator?.cashWinners || "CASH WINNERS"}
               </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  color: "#FFFFFF",
+                }}
+              >
                 {t.configurator?.guaranteedCount || "10 Guaranteed"}
               </span>
             </div>
 
             {/* Stat 6: Draw Date */}
-            <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "8px", padding: "6px 8px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }}>
-              <span style={{ fontSize: "0.625rem", color: "#94A3B8", fontWeight: 800, display: "block" }}>
+            <div
+              style={{
+                background: "rgba(15, 23, 42, 0.6)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                borderRadius: "8px",
+                padding: "6px 8px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "#94A3B8",
+                  fontWeight: 800,
+                  display: "block",
+                }}
+              >
                 {t.configurator?.drawBroadcast || "DRAW BROADCAST"}
               </span>
-              <span className="mono" style={{ fontSize: "0.8125rem", fontWeight: 900, color: "#FFFFFF" }}>
-                {selectedDraw?.deadline ? new Date(selectedDraw.deadline).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Addis_Ababa"}) : text("To be announced")}
+              <span
+                className="mono"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 900,
+                  color: "#FFFFFF",
+                }}
+              >
+                {selectedDraw?.deadline
+                  ? new Date(selectedDraw.deadline).toLocaleDateString(
+                      "en-GB",
+                      {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        timeZone: "Africa/Addis_Ababa",
+                      },
+                    )
+                  : text("To be announced")}
               </span>
             </div>
           </div>
 
           {/* Action CTA */}
-          <div style={{ padding: "10px 14px 12px", borderTop: "1px solid rgba(255, 255, 255, 0.12)", background: "rgba(15, 23, 42, 0.7)" }}>
+          <div
+            style={{
+              padding: "10px 14px 12px",
+              borderTop: "1px solid rgba(255, 255, 255, 0.12)",
+              background: "rgba(15, 23, 42, 0.7)",
+            }}
+          >
             <button
               type="button"
-              disabled={!isPriceEnabled(selectedPrice, currency) || !isPoolEnabled(selectedPool)}
+              disabled={
+                !isPriceEnabled(selectedPrice, currency) ||
+                !isPoolEnabled(selectedPool)
+              }
               onClick={() => setIsBuyModalOpen(true)}
               aria-haspopup="dialog"
               className="casino-btn-red"
@@ -753,10 +1143,19 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                 boxShadow: "0 4px 14px rgba(220, 38, 38, 0.45)",
               }}
             >
-              <Ticket size={16} /> {t.configurator?.buyTicketBtn || "Buy Ticket"} — {formatMoney(selectedPrice)}
+              <Ticket size={16} />{" "}
+              {t.configurator?.buyTicketBtn || "Buy Ticket"} —{" "}
+              {formatMoney(selectedPrice)}
             </button>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: 8,
+              }}
+            >
               <Link
                 href="/how-it-works"
                 style={{
@@ -769,7 +1168,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                   fontWeight: 700,
                 }}
               >
-                <HelpCircle size={12} color="#93C5FD" /> {t.configurator?.howItWorksLink || "How It Works"}
+                <HelpCircle size={12} color="#93C5FD" />{" "}
+                {t.configurator?.howItWorksLink || "How It Works"}
               </Link>
 
               <Link
@@ -784,7 +1184,8 @@ export function InteractiveTicketConfigurator({ siteSettings, draws }: Interacti
                   fontWeight: 700,
                 }}
               >
-                <Award size={12} color="#FDE047" /> {t.configurator?.pastResultsLink || "Past Results"}
+                <Award size={12} color="#FDE047" />{" "}
+                {t.configurator?.pastResultsLink || "Past Results"}
               </Link>
             </div>
           </div>

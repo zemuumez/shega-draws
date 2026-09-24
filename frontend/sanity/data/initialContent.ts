@@ -335,10 +335,8 @@ const SAMPLE_PLAYER_ENTRIES = [
   },
 ];
 
-export const ALL_INITIAL_DOCUMENTS = [
-  ...CORE_INITIAL_DOCUMENTS,
-  ...GENERATED_UI_TRANSLATIONS,
-  ...SAMPLE_PLAYER_ENTRIES,
-];
-
-
+// Sanity seeds only website content. Operational records belong to PostgreSQL.
+const contentTypes=new Set(['siteSettings','uiTranslation','advertisement','testimonial','sectionContent']);
+export const ALL_INITIAL_DOCUMENTS = [...CORE_INITIAL_DOCUMENTS,...GENERATED_UI_TRANSLATIONS]
+ .filter(doc=>contentTypes.has(doc._type))
+ .map(doc=>doc._type!=='siteSettings'?doc:Object.fromEntries(Object.entries(doc).filter(([key])=>!['etbPrices','usdPrices','poolSizes','lastEntryAt'].includes(key)&&!key.startsWith('telebirr')&&!key.startsWith('cbe')&&!key.startsWith('diaspora'))));

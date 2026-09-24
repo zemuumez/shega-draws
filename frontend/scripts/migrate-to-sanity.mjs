@@ -2,7 +2,7 @@ import { createClient } from "@sanity/client";
 import { readFileSync, existsSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { ALL_INITIAL_DOCUMENTS } from "../sanity/data/initialContent.js";
+import { ALL_INITIAL_DOCUMENTS } from "../sanity/data/initialContent.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

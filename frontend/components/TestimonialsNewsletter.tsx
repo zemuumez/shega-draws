@@ -1,4 +1,5 @@
 "use client";
+import {apiBase} from "@/lib/backend";
 
 import React, { useState } from "react";
 import { Star, Send, CheckCircle2, ChevronLeft, ChevronRight, MessageSquare, BellRing } from "lucide-react";
@@ -37,7 +38,7 @@ export function TestimonialsNewsletter({ cmsTestimonials }: TestimonialsNewslett
     if (saving || !email.trim()) return;
     setSaving(true); setSubscribeError("");
     try {
-      const response = await fetch("/api/subscribe", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({contact:email})});
+      const response = await fetch(`${apiBase}/v1/subscribe`, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({contact:email})});
       if (!response.ok) throw new Error("save failed");
       setSubscribed(true);
     } catch {setSubscribeError("Subscription could not be saved. Please try again.");}

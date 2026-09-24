@@ -26,11 +26,3 @@ export interface DrawState {
   }>;
   custom_pools?: PoolOption[];
 }
-
-
-export async function submitEntry(formData: FormData): Promise<{id: string; status: "pending"}> {
-  const res = await fetch("/api/entries/submit", { method: "POST", body: formData });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Could not submit your ticket. Please try again.");
-  return data;
-}

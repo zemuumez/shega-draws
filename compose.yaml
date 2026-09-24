@@ -1,0 +1,21 @@
+name: rimna-development
+# Local development only. Production uses private managed Postgres and real mail delivery.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: rimna
+      POSTGRES_PASSWORD: local-development-only
+      POSTGRES_DB: rimna
+    ports: ["127.0.0.1:55437:5432"]
+    volumes: ["rimna_pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rimna -d rimna"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports: ["127.0.0.1:1027:1025", "127.0.0.1:8027:8025"]
+volumes:
+  rimna_pg:

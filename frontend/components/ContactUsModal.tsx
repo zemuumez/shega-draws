@@ -1,4 +1,5 @@
 "use client";
+import {apiBase} from "@/lib/backend";
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -37,7 +38,7 @@ export function ContactUsModal({ isOpen, onClose, siteSettings }: ContactUsModal
     if (sending || !phone.trim() || !message.trim()) return;
     setSending(true); setError("");
     try {
-      const response = await fetch("/api/contact", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,phone,message})});
+      const response = await fetch(`${apiBase}/v1/contact`, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({name,phone,message})});
       if (!response.ok) throw new Error("save failed");
       setSubmitted(true);
     } catch {setError("Your message could not be saved. Please try again.");}

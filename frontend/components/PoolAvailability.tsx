@@ -1,10 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { publicAPI, type BackendDraw } from "@/lib/backend";
 import type { Currency } from "@/lib/api";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
-export function PoolAvailability({ currency, price, capacity, enabled, checkoutOpen }: {
+export function PoolAvailability({
+  currency,
+  price,
+  capacity,
+  enabled,
+  checkoutOpen,
+}: {
   currency: Currency;
   price: number;
   capacity: number;
@@ -16,6 +23,8 @@ export function PoolAvailability({ currency, price, capacity, enabled, checkoutO
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    setReserved(null);
+    setFailed(false);
     if (!enabled) return;
     let disposed = false;
     let pending = false;
@@ -26,22 +35,38 @@ export function PoolAvailability({ currency, price, capacity, enabled, checkoutO
       controller = new AbortController();
       const timeout = window.setTimeout(() => controller.abort(), 10000);
       try {
-        const params = new URLSearchParams({ currency, price: String(price), pool: String(capacity) });
-        const response = await fetch(`/api/entries/availability?${params}`, { cache: "no-store", signal: controller.signal });
-        if (!response.ok) throw new Error("Availability unavailable");
-        const data = await response.json();
-        if (data.poolSize !== capacity || !Array.isArray(data.takenNumbers)) throw new Error("Invalid availability");
-        const count = new Set(data.takenNumbers.map(Number).filter((number: number) => Number.isInteger(number) && number >= 1 && number <= capacity)).size;
-        if (!disposed) { setReserved(count); setFailed(false); }
+        const draws = await publicAPI<BackendDraw[]>("/draws", {
+          signal: controller.signal,
+        });
+        const draw = draws.find(
+          (d) =>
+            d.currency === currency &&
+            d.priceMinor === Math.round(price * 100) &&
+            d.capacity === capacity &&
+            d.status === "open",
+        );
+        if (!draw) throw new Error("No open draw");
+        const data = await publicAPI<{ reserved: number }>(
+          `/draws/${encodeURIComponent(draw.id)}/availability`,
+          { signal: controller.signal },
+        );
+        const count = data.reserved;
+        if (!disposed) {
+          setReserved(count);
+          setFailed(false);
+        }
       } catch {
-        if (!disposed) { setReserved(null); setFailed(true); }
+        if (!disposed) {
+          setReserved(null);
+          setFailed(true);
+        }
       } finally {
         window.clearTimeout(timeout);
         pending = false;
       }
     };
     void refresh();
-    const interval = window.setInterval(refresh, 15000);
+    const interval = window.setInterval(refresh, 30000 + Math.random() * 5000);
     document.addEventListener("visibilitychange", refresh);
     return () => {
       disposed = true;
@@ -53,18 +78,44 @@ export function PoolAvailability({ currency, price, capacity, enabled, checkoutO
 
   return (
     <div data-pool-availability style={{ marginTop: 6 }}>
-      <div role="status" style={{ fontSize: "0.75rem", fontWeight: 800, color: enabled && reserved !== null ? "#6EE7B7" : "#CBD5E1" }}>
-        {!enabled ? t.configurator.paused || "Paused" : reserved !== null
-          ? `${(capacity - reserved).toLocaleString()} ${t.configurator.spotsRemaining}`
-          : failed ? t.configurator.availabilityUnavailable : t.configurator.checkingAvailability}
+      <div
+        role="status"
+        style={{
+          fontSize: "0.75rem",
+          fontWeight: 800,
+          color: enabled && reserved !== null ? "#6EE7B7" : "#CBD5E1",
+        }}
+      >
+        {!enabled
+          ? t.configurator.paused || "Paused"
+          : reserved !== null
+            ? `${(capacity - reserved).toLocaleString()} ${t.configurator.spotsRemaining}`
+            : failed
+              ? t.configurator.availabilityUnavailable
+              : t.configurator.checkingAvailability}
       </div>
-      {enabled && reserved !== null && <>
-        <progress aria-label={t.configurator.spotsReserved} value={reserved} max={capacity}
-          style={{ display: "block", width: "100%", height: 6, margin: "6px 0", accentColor: "#34D399" }} />
-        <span style={{ display: "block", fontSize: "0.625rem", color: "#94A3B8" }}>
-          {reserved.toLocaleString()} / {capacity.toLocaleString()} {t.configurator.spotsReserved}
-        </span>
-      </>}
+      {enabled && reserved !== null && (
+        <>
+          <progress
+            aria-label={t.configurator.spotsReserved}
+            value={reserved}
+            max={capacity}
+            style={{
+              display: "block",
+              width: "100%",
+              height: 6,
+              margin: "6px 0",
+              accentColor: "#34D399",
+            }}
+          />
+          <span
+            style={{ display: "block", fontSize: "0.625rem", color: "#94A3B8" }}
+          >
+            {reserved.toLocaleString()} / {capacity.toLocaleString()}{" "}
+            {t.configurator.spotsReserved}
+          </span>
+        </>
+      )}
     </div>
   );
 }

@@ -1,0 +1,7 @@
+.env
+.env.*
+private-media
+keys
+bin
+tmp
+*.log

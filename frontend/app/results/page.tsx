@@ -1,6 +1,7 @@
+import {publicAPI} from "@/lib/backend";
 import type { Metadata } from "next";
 import { sanityClient } from "@/lib/sanity/client";
-import { LATEST_RESULTS_QUERY, SITE_SETTINGS_QUERY, type CMSDrawResult, type CMSSiteSettings } from "@/lib/sanity/queries";
+import { SITE_SETTINGS_QUERY, type CMSDrawResult, type CMSSiteSettings } from "@/lib/sanity/queries";
 import { ResultsView } from "@/components/ResultsView";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const revalidate = 0;
 
 export default async function ResultsPage() {
   const [cmsResultsRes, siteSettingsRes] = await Promise.allSettled([
-    sanityClient.fetch<CMSDrawResult[]>(LATEST_RESULTS_QUERY).catch(() => null),
+    publicAPI<CMSDrawResult[]>("/results").catch(() => null),
     sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
   ]);
 

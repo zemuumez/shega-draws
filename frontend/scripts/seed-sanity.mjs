@@ -57,7 +57,11 @@ const client = createClient({
 async function main() {
   const seedFile = resolve(__dirname, "seed-sanity.json");
   const rawData = readFileSync(seedFile, "utf-8");
-  const documents = JSON.parse(rawData);
+  const contentTypes=new Set(['siteSettings','uiTranslation','advertisement','testimonial','sectionContent']);
+  const documents = JSON.parse(rawData).filter(doc=>contentTypes.has(doc._type)).map(doc=>{
+    if(doc._type!=='siteSettings')return doc;
+    return Object.fromEntries(Object.entries(doc).filter(([key])=>!['etbPrices','usdPrices','poolSizes','lastEntryAt'].includes(key)&&!key.startsWith('telebirr')&&!key.startsWith('cbe')&&!key.startsWith('diaspora')));
+  });
 
   if (isClearMode) {
     console.log(`\n🧹 Clearing ${documents.length} temporary seed documents from Sanity CMS...`);

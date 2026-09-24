@@ -878,7 +878,7 @@ h1, h2, h3, h4, h5, h6 {
 
   .mobile-bottom-nav {
     display: grid !important;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     position: fixed;
     bottom: 0;
     left: 0;
@@ -1019,3 +1019,24 @@ h1, h2, h3, h4, h5, h6 {
 [data-testid*="field-"] label {
   color: #F1F5F9 !important;
 }
+
+/* Account, checkout and operations share accessible, responsive form primitives. */
+.management-page { max-width:1100px; margin:3rem auto; padding:1.5rem; color:#e2e8f0; background:#101a2c; border:1px solid #475569; border-radius:18px; }
+.account-panel { max-width:800px; margin:auto; }
+.account-panel form,.purchase-dialog { display:flex; flex-direction:column; gap:14px; }
+.management-page input,.management-page select,.management-page textarea,.purchase-dialog input,.purchase-dialog select { display:block; width:100%; box-sizing:border-box; padding:12px; margin:6px 0; background:#0b1220; color:#f8fafc; border:1px solid #64748b; border-radius:8px; }
+.management-page button,.purchase-dialog button { padding:10px 14px; margin:4px; border:1px solid #64748b; border-radius:8px; background:#1e293b; color:white; cursor:pointer; }
+.management-page button:disabled,.purchase-dialog button:disabled { opacity:.4; cursor:not-allowed; }
+.management-page a,.purchase-dialog a { color:#fde047; }
+.account-ticket { padding:16px; margin:12px 0; border:1px solid #475569; border-radius:10px; overflow-wrap:anywhere; }
+.purchase-overlay { position:fixed; inset:0; z-index:10000; background:#000b; display:flex; align-items:center; justify-content:center; padding:16px; }
+.purchase-dialog { position:relative; background:#101a2c; color:#f8fafc; width:min(620px,100%); max-height:90dvh; overflow:auto; padding:24px; border:1px solid #eab308; border-radius:20px; }
+.purchase-dialog .modal-close { align-self:flex-end; }
+.ticket-number-grid { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:4px; }
+.ticket-number-grid button { padding:7px 0; margin:0; font-size:.8rem; }
+.ticket-number-grid button[aria-pressed=true] { background:#eab308; color:#0f172a; }
+.ticket-paging { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+.purchase-dialog .primary-action { background:#dc2626; font-weight:700; }
+@media(max-width:480px){.ticket-number-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.purchase-dialog{padding:16px}.management-page{margin:1rem;padding:1rem}}
+
+.management-page input[type="checkbox"],.purchase-dialog input[type="checkbox"] { display:inline-block; width:auto; margin-right:8px; }

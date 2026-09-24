@@ -1,7 +1,7 @@
+import {publicAPI,compatibleDraw,type BackendDraw} from "@/lib/backend";
 import type { Metadata } from "next";
 import { sanityClient } from "@/lib/sanity/client";
 import {
-  ALL_DRAWS_QUERY,
   SITE_SETTINGS_QUERY,
   TESTIMONIALS_QUERY,
   ADVERTISEMENTS_QUERY,
@@ -26,7 +26,7 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   const [draws, siteSettings, testimonials, ads] = await Promise.all([
-    sanityClient.fetch<import("@/lib/tickets").TicketDraw[]>(ALL_DRAWS_QUERY).catch(() => null),
+    publicAPI<BackendDraw[]>("/draws").then(ds=>ds.map(compatibleDraw)).catch(() => []),
     sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
     sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => null),
     sanityClient.fetch<CMSAdvertisement[]>(ADVERTISEMENTS_QUERY).catch(() => null),
@@ -60,7 +60,7 @@ export default async function HomePage() {
 
         {/* 1. Screenful Cinematic Hero */}
         <div style={{ position: "relative", zIndex: 2 }}>
-          <CinematicStadiumHero siteSettings={siteSettings} />
+          <CinematicStadiumHero siteSettings={siteSettings} draws={draws} />
         </div>
 
         {/* 2. Promotional Advertisements & Teasers (Containing Payment Gateways at the Top) */}
