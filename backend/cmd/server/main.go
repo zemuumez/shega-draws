@@ -93,7 +93,20 @@ func main() {
 		}
 		trusted = append(trusted, network)
 	}
-	a := &httpapi.API{TrustedProxies: trusted, Store: st, Service: svc, Auth: &auth.Verifier{URL: jwks, Issuer: issuer, Audience: env("AUTH_AUDIENCE", "rimna-api")}, Origin: origin, MediaDir: env("MEDIA_DIR", "./private-media")}
+	metricsToken := os.Getenv("METRICS_TOKEN")
+	if file := os.Getenv("METRICS_TOKEN_FILE"); file != "" {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			slog.Error("metrics secret file unavailable")
+			os.Exit(1)
+		}
+		metricsToken = strings.TrimSpace(string(data))
+	}
+	if metricsToken != "" && len(metricsToken) < 32 {
+		slog.Error("metrics token must contain at least 32 characters")
+		os.Exit(1)
+	}
+	a := &httpapi.API{MetricsToken: metricsToken, TrustedProxies: trusted, Store: st, Service: svc, Auth: &auth.Verifier{URL: jwks, Issuer: issuer, Audience: env("AUTH_AUDIENCE", "rimna-api")}, Origin: origin, MediaDir: env("MEDIA_DIR", "./private-media")}
 	srv := &http.Server{Addr: env("LISTEN_ADDR", ":8080"), Handler: a.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 25 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16 << 10}
 	go func() {
 		<-ctx.Done()

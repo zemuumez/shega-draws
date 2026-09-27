@@ -38,6 +38,8 @@ type API struct {
 	Auth             Identity
 	Origin, MediaDir string
 	TrustedProxies   []*net.IPNet
+	MetricsToken     string
+	metrics          metrics
 	mu               sync.Mutex
 	flights          singleflight.Group
 	cache            map[string]cacheEntry
@@ -46,8 +48,10 @@ type API struct {
 
 func (a *API) Handler() http.Handler {
 	a.cache = map[string]cacheEntry{}
+	a.metrics.samples = map[string]*sample{}
 	a.gate = make(chan struct{}, 256)
 	m := http.NewServeMux()
+	m.HandleFunc("GET /metrics", a.serveMetrics)
 	m.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { reply(w, 200, map[string]bool{"ok": true}) })
 	m.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := context.WithTimeout(r.Context(), time.Second)
@@ -83,10 +87,10 @@ func (a *API) Handler() http.Handler {
 	m.HandleFunc("GET /v1/admin/{kind}", a.authenticated(a.admin))
 	m.HandleFunc("PUT /v1/admin/{kind}/{id}", a.authenticated(a.admin))
 	m.HandleFunc("GET /v1/admin/media/{id}", a.authenticated(a.media))
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if recover() != nil {
-				slog.Error("request panic", "path", r.URL.Path)
+				slog.Error("request panic", "request_id", w.Header().Get("X-Request-ID"))
 				reply(w, 500, map[string]string{"error": "Request failed"})
 			}
 		}()
@@ -118,8 +122,11 @@ func (a *API) Handler() http.Handler {
 		r.Body = http.MaxBytesReader(w, r.Body, 64<<10)
 		ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 		defer cancel()
-		m.ServeHTTP(w, r.WithContext(ctx))
+		inner := r.WithContext(ctx)
+		defer func() { r.Pattern = inner.Pattern }()
+		m.ServeHTTP(w, inner)
 	})
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { a.observe(w, r, handler) })
 }
 func reply(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -136,6 +143,10 @@ func fail(w http.ResponseWriter, err error) {
 	case errors.Is(err, domain.ErrNotFound):
 		status = 404
 		message = err.Error()
+	case errors.Is(err, domain.ErrPaused):
+		status = 503
+		message = err.Error()
+		w.Header().Set("Retry-After", "30")
 	case errors.Is(err, domain.ErrClosed), errors.Is(err, domain.ErrConflict):
 		status = 409
 		message = err.Error()
@@ -346,7 +357,9 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 	kind := r.PathValue("kind")
 	if r.Method == "GET" {
 		var out any
-		if kind == "orders" {
+		if kind == "operations" {
+			out, err = a.Store.Operations(r.Context())
+		} else if kind == "orders" {
 			out, err = a.Store.Orders(r.Context(), "", offset(r), true)
 		} else if kind == "draws" {
 			out, err = a.Store.Draws(r.Context())
@@ -364,7 +377,27 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 		reply(w, 403, map[string]string{"error": "Administrator access required"})
 		return
 	}
-	if kind == "payments" {
+	if kind == "operations" {
+		switch r.PathValue("id") {
+		case "sales":
+			var input struct {
+				Paused bool   `json:"paused"`
+				Reason string `json:"reason"`
+			}
+			err = decode(r, &input)
+			if err == nil {
+				err = a.Store.SetSalesPaused(r.Context(), u.ID, input.Paused, input.Reason)
+			}
+		case "backup":
+			var input struct{}
+			err = decode(r, &input)
+			if err == nil {
+				err = a.Store.RequestBackup(r.Context(), u.ID, service.ID())
+			}
+		default:
+			err = domain.ErrNotFound
+		}
+	} else if kind == "payments" {
 		var input struct {
 			Reference string `json:"reference"`
 		}

@@ -133,6 +133,13 @@ func (s *Store) Reserve(ctx context.Context, o domain.Order) (domain.Order, bool
 	if !errors.Is(e, domain.ErrNotFound) {
 		return o, false, e
 	}
+	var paused, recovery bool
+	if err = tx.QueryRow(ctx, `SELECT sales_paused,recovery_locked FROM operations_control WHERE id=true FOR SHARE`).Scan(&paused, &recovery); err != nil {
+		return o, false, err
+	}
+	if paused || recovery {
+		return o, false, domain.ErrPaused
+	}
 	var active int
 	if err = tx.QueryRow(ctx, `SELECT count(*) FROM orders WHERE user_id=$1 AND status IN ('initializing','pending') AND expires_at>now()`, o.UserID).Scan(&active); err != nil {
 		return o, false, err
@@ -209,6 +216,13 @@ func (s *Store) ApplyPayment(ctx context.Context, id string, v domain.Verificati
 		return err
 	}
 	defer tx.Rollback(ctx)
+	var recovering bool
+	if err = tx.QueryRow(ctx, `SELECT recovery_locked FROM operations_control WHERE id=true FOR SHARE`).Scan(&recovering); err != nil {
+		return err
+	}
+	if recovering {
+		return domain.ErrUnavailable
+	}
 	var drawStatus string
 	// Same lock order as reservation: draw first, then order. Publishing locks the
 	// draw exclusively, so payment completion cannot race final results.

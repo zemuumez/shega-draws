@@ -44,3 +44,7 @@ backend/.env
 backend/private-media/
 frontend/.next-*/
 frontend/tsconfig.tsbuildinfo
+
+# Operational secrets and Python runtime files
+backend/ops/**/secrets/
+backend/ops/__pycache__/

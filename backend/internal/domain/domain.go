@@ -9,6 +9,7 @@ import (
 
 var (
 	ErrConflict    = errors.New("ticket is reserved or the request conflicts with an earlier purchase")
+	ErrPaused      = errors.New("New ticket sales are temporarily paused. Existing payments are still being checked.")
 	ErrClosed      = errors.New("this draw is not open for ticket sales")
 	ErrNotFound    = errors.New("record not found")
 	ErrUnavailable = errors.New("payment service is not configured or temporarily unavailable")

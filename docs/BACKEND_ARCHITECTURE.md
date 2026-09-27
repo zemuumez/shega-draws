@@ -79,3 +79,9 @@ A future mobile app can reuse Go’s account-scoped API and hosted checkout. Add
 - [Better Auth Next.js integration](https://better-auth.com/docs/integrations/next)
 - [Better Auth JWT plugin](https://better-auth.com/docs/plugins/jwt)
 - [Better Auth rate limiting](https://better-auth.com/docs/concepts/rate-limit)
+
+## Operations extension — September 2026
+
+Migration `003_operations.sql` adds a shared sales/recovery control, serialized backup-job requests and worker heartbeats. New reservations take a shared lock on the control row; an administrator pause takes an exclusive update lock. This defines a pause boundary across API hosts while allowing committed holds to finish. Recovery locks additionally block payment application and worker processing.
+
+The protected `/metrics` endpoint exports bounded-route request counters/histograms and operational health data. Structured request logs omit personal payloads and credentials. A separately credentialed Python/Restic runner handles database/media backup requests outside the API process. Restore targets must be isolated and empty; restored sessions are revoked and the recovery lock is committed with the restore. Production setup, limits and evidence are documented in [the operations runbook](OPERATIONS_RUNBOOK.md) and [verification report](OPERATIONS_VALIDATION.md).

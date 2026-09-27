@@ -140,3 +140,9 @@ Configure alerts for payment verification errors, oldest unresolved order, refun
 Run the target-server load test and a security review before a high-volume launch. The local tests are evidence of transaction correctness, not a production throughput guarantee.
 
 Review [the validation report](VALIDATION.md), including unresolved Sanity tooling advisories, before treating this as a production-ready release. Review and publish updated content describing account sign-in and Chapa checkout; existing CMS translation overrides can still contain the old screenshot-payment instructions.
+
+## 8. Operational controls added September 2026
+
+Apply migration `003_operations.sql` before deploying the updated API/worker. The admin dashboard now includes a global sales pause and encrypted-backup requests. Configure the separate trusted backup runner before describing the backup button as operational. Configure protected metrics and monitoring, then test alert delivery and isolated restoration.
+
+See [Operations runbook](OPERATIONS_RUNBOOK.md), [Operations verification](OPERATIONS_VALIDATION.md), and the client-facing [Capacity and operations comparison](CAPACITY_AND_OPERATIONS_REPORT.md). Customer waiting-room integration and target-server throughput remain unverified deployment work.

@@ -1,0 +1,33 @@
+groups:
+  - name: rimna
+    rules:
+      - alert: RimnaAPIUnavailable
+        expr: up{job="rimna-api"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations: {summary: 'API metrics unavailable; check public readiness separately'}
+      - alert: RimnaWorkerMissing
+        expr: time() - rimna_worker_last_seen_seconds > 120
+        for: 2m
+        labels: {severity: critical}
+        annotations: {summary: 'No recent payment-worker heartbeat'}
+      - alert: RimnaBackupOverdue
+        expr: time() - rimna_backup_last_success_seconds > 7200
+        for: 5m
+        labels: {severity: critical}
+        annotations: {summary: 'No successful operational backup in two hours'}
+      - alert: RimnaPaymentRefundReview
+        expr: rimna_refund_required > 0
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: 'Payments require operator refund review'}
+      - alert: RimnaServerErrors
+        expr: sum(rate(rimna_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(rimna_http_requests_total[5m])), 0.001) > 0.01
+        for: 5m
+        labels: {severity: critical}
+        annotations: {summary: 'API 5xx ratio exceeds 1%; includes admission refusals'}
+      - alert: RimnaDatabasePoolPressure
+        expr: rimna_db_connections_acquired / rimna_db_connections_max > 0.85
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: 'Database connection pool has sustained pressure'}

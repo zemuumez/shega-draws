@@ -1,0 +1,177 @@
+{
+  "uid": "rimna-operations",
+  "title": "Rimna operations",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Requests / second",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(rimna_http_requests_total[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "API p95 response time",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(rimna_http_request_duration_seconds_bucket[5m])))"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Pending payments",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rimna_pending_payments"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Refund review",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rimna_refund_required"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Seconds since worker heartbeat",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - rimna_worker_last_seen_seconds"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Hours since successful backup",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(time() - rimna_backup_last_success_seconds)/3600"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Sales paused",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rimna_sales_paused"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Database connections in use",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "rimna-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rimna_db_connections_acquired"
+        }
+      ]
+    }
+  ]
+}

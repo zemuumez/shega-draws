@@ -7,6 +7,7 @@ import { type BackendDraw, type Order } from "@/lib/backend";
 import { playersWorkbook, type PlayerReceipt } from "@/lib/exports/players";
 import Link from "next/link";
 import JSZip from "jszip";
+import {OperationsPanel} from "./OperationsPanel";
 const sections = [
   "draws",
   "orders",
@@ -204,6 +205,7 @@ export function ManagementDashboard() {
   return (
     <div className="management-page">
       <h1>Rimna Management</h1>
+      <OperationsPanel/>
       <p>
         Manage sales and verified payments here.{" "}
         <Link href="/studio">Edit website content in Sanity</Link>.

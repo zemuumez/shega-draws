@@ -25,6 +25,7 @@ type Repository interface {
 	Work(context.Context) (domain.Order, error)
 	FinishWork(context.Context, string, bool) error
 	Expire(context.Context) error
+	WorkerEnabled(context.Context, string) (bool, error)
 }
 type Service struct {
 	Store     Repository
@@ -100,6 +101,7 @@ func (s *Service) Reconcile(ctx context.Context, o domain.Order) error {
 	return s.Store.ApplyPayment(ctx, o.ID, v, s.Mode)
 }
 func (s *Service) RunWorker(ctx context.Context) {
+	workerID := ID()
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	expiry := time.NewTicker(time.Minute)
@@ -109,10 +111,16 @@ func (s *Service) RunWorker(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-expiry.C:
+			if enabled, err := s.Store.WorkerEnabled(ctx, workerID); err != nil || !enabled {
+				continue
+			}
 			if err := s.Store.Expire(ctx); err != nil {
 				slog.Error("reservation expiry failed")
 			}
 		case <-ticker.C:
+			if enabled, err := s.Store.WorkerEnabled(ctx, workerID); err != nil || !enabled {
+				continue
+			}
 			// Bounded work per worker; SKIP LOCKED leases allow horizontal worker scaling.
 			var batch sync.WaitGroup
 			for i := 0; i < 8; i++ {

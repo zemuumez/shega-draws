@@ -1,0 +1,22 @@
+[Unit]
+Description=Rimna scheduled and administrator-requested encrypted backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=rimna-backup
+Group=rimna-backup
+EnvironmentFile=/etc/rimna/operator.env
+ExecStart=/usr/bin/python3 /srv/rimna/backend/ops/operations.py schedule
+TimeoutStartSec=90min
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/srv/rimna/private-media
+ReadWritePaths=/var/lib/rimna-backup
+Environment=HOME=/var/lib/rimna-backup
+# Temporary archive storage must fit database dump + media + tar archive.
+Environment=TMPDIR=/var/lib/rimna-backup

@@ -1,0 +1,39 @@
+# Run alongside the backend; set API_METRICS_TARGET via prometheus.yaml for another host.
+# No public dashboard or Docker socket. Access by SSH tunnel/VPN.
+name: rimna-monitoring
+services:
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command: [--config.file=/etc/prometheus/prometheus.yml, --storage.tsdb.retention.time=7d, --storage.tsdb.retention.size=2GB]
+    ports: ['127.0.0.1:9090:9090']
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.yaml:/etc/prometheus/alerts.yml:ro
+      - ./secrets/metrics_token:/run/secrets/metrics_token:ro
+      - prometheus_data:/prometheus
+    networks: [default, backend]
+    restart: unless-stopped
+    mem_limit: 768m
+  grafana:
+    image: grafana/grafana:12.1.0
+    ports: ['127.0.0.1:3001:3000']
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+    volumes:
+      - ./secrets/grafana_password:/run/secrets/grafana_password:ro
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/rimna.yaml:ro
+      - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/rimna.yaml:ro
+      - ./dashboard.json:/var/lib/grafana/dashboards/rimna.json:ro
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    mem_limit: 512m
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  backend:
+    external: true
+    name: ${RIMNA_NETWORK:-rimna-backend_default}
