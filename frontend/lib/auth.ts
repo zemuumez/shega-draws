@@ -2,6 +2,7 @@ import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { jwt, twoFactor } from "better-auth/plugins";
 import { Pool } from "pg";
 import nodemailer from "nodemailer";
+import { smtpOptions } from "./auth-mail";
 
 let instance: ReturnType<typeof betterAuth> | undefined;
 let pool: Pool | undefined;
@@ -22,21 +23,7 @@ export function authOptions(): BetterAuthOptions {
   });
   async function send(to: string | undefined, subject: string, url: string) {
     if (!to) throw new Error("Email is required.");
-    if (!process.env.SMTP_HOST || !process.env.SMTP_FROM)
-      throw new Error("Verification email delivery is not configured.");
-    const transport = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_PORT === "465",
-      ...(process.env.SMTP_USER
-        ? {
-            auth: {
-              user: process.env.SMTP_USER,
-              pass: process.env.SMTP_PASSWORD,
-            },
-          }
-        : {}),
-    });
+    const transport = nodemailer.createTransport(smtpOptions());
     await transport.sendMail({
       from: process.env.SMTP_FROM,
       to,
@@ -89,6 +76,9 @@ export function authOptions(): BetterAuthOptions {
         "/sign-in/email": { window: 60, max: 5 },
         "/sign-up/email": { window: 60, max: 3 },
         "/request-password-reset": { window: 60, max: 3 },
+        "/send-verification-email": { window: 60, max: 3 },
+        "/reset-password": { window: 60, max: 5 },
+        "/two-factor/*": { window: 60, max: 5 },
       },
     },
     plugins: [

@@ -33,7 +33,7 @@ This file is the canonical progress tracker. Read it with the linked specificati
 
 Security review accompanies every workstream. Start payment onboarding and infrastructure access early; do not postpone these external dependencies until UI completion.
 
-**Current focus:** admin templates/rounds and the wallet ledger/test-deposit increment are locally verified. Next: connect quantity ticket purchases and lucky-number allocation to the authoritative wallet debit in one transaction, then complete the player journeys. Live wallet deposits remain blocked in code. Provider sandbox acceptance, database privileges, settlement reconciliation, wallet recovery rehearsal, full staff permissions and unresolved draw/refund policies remain open. See [wallet delivery and evidence](WALLET_DEPOSITS_IMPLEMENTATION.md).
+**Current focus (reordered at the user's request):** complete Better Auth signup/sign-in/recovery/MFA acceptance, actual Chapa and eligible international-provider sandbox deposits, and admin/player tracking of externally paid prizes before proceeding to wallet-funded ticket purchases. Required inputs and acceptance gates are in [authentication/payment sandbox setup](AUTH_PAYMENT_SANDBOX_ACCEPTANCE.md). SMTP delivery, test credentials, callback hosting, MFA policy and settlement approval policy need confirmation. Stripe is requested for sandbox adapter work, but its published lottery prohibition means production eligibility must not be assumed. Existing wallet/local test evidence remains valid; live funding stays blocked. Quantity purchases and atomic lucky-number issuance follow this milestone.
 
 ## 0. Confirmed scope — decisions, not delivery claims
 
@@ -338,3 +338,7 @@ For each task marked complete, record: **task ID; implementation/revision or dec
 - [Capacity and operations comparison](CAPACITY_AND_OPERATIONS_REPORT.md)
 - [Client proposal](CLIENT_BACKEND_PROPOSAL.md)
 - [Earlier baseline timeline — needs re-estimation for expanded scope](PROJECT_TIMELINE.md)
+
+### Priority update — 28 September 2026
+
+The user requests authentication, real provider sandbox verification, and external prize-payment status before the next purchase increment. [Setup and acceptance checklist](AUTH_PAYMENT_SANDBOX_ACCEPTANCE.md) records credential placement, missing non-secret configuration and acceptance scenarios. No new delivery checkboxes are marked complete by this intake/review. Player MFA policy and settlement approvers are pending user answers.

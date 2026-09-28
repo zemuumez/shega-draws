@@ -53,6 +53,7 @@ export function WalletPanel({ userId }: { userId: string }) {
   }, [storageKey]);
   useEffect(() => {
     const c = new AbortController();
+    setData(null);
     setHistory(null);
     setDeposits(null);
     setError("");
@@ -63,7 +64,7 @@ export function WalletPanel({ userId }: { userId: string }) {
       refreshing = true;
       try {
         const [w, h, d] = await Promise.all([
-          accountAPI<WalletData>("/wallet", { signal: c.signal }),
+          accountAPI<WalletData>(`/wallet?currency=${currency}`, { signal: c.signal }),
           accountAPI<WalletPage<WalletEntry>>(
             `/wallet/history?currency=${currency}&offset=${offset}`,
             { signal: c.signal },
@@ -256,7 +257,7 @@ export function WalletPanel({ userId }: { userId: string }) {
             {money(data!.depositPolicy.maxMinor, currency)}
           </small>
           <button disabled={busy}>
-            {text(busy ? "Please wait…" : "Continue to Chapa")}
+            {text(busy ? "Please wait…" : "Continue to payment")}
           </button>
         </form>
       ) : (

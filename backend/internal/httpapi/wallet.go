@@ -21,7 +21,15 @@ func (a *API) wallet(w http.ResponseWriter, r *http.Request, u domain.User) {
 		fail(w, err)
 		return
 	}
-	policy := a.Service.Deposits
+	currency := r.URL.Query().Get("currency")
+	if currency == "" {
+		currency = "ETB"
+	}
+	if currency != "ETB" && currency != "USD" {
+		fail(w, domain.ErrInvalid)
+		return
+	}
+	policy := a.Service.DepositPolicyFor(currency)
 	methods := []string{}
 	if policy.Enabled && !paused {
 		for name, p := range a.Service.Providers {

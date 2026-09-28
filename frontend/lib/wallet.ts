@@ -60,7 +60,9 @@ export function checkoutLink(d: Deposit): string | undefined {
       !u.username &&
       !u.password &&
       !u.port &&
-      ["checkout.chapa.co", "checkout.chapa.global"].includes(u.hostname)
+      (d.provider === "chapa"
+        ? ["checkout.chapa.co", "checkout.chapa.global"].includes(u.hostname)
+        : d.provider === "stripe" && u.hostname === "checkout.stripe.com")
     )
       return u.href;
   } catch {

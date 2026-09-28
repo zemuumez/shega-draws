@@ -28,14 +28,29 @@ type DepositPolicy struct {
 	MaxMinor int64  `json:"maxMinor"`
 }
 
+// DepositPolicyFor never falls back across currencies.
+func (s *Service) DepositPolicyFor(currency string) DepositPolicy {
+	if s.DepositPolicies != nil {
+		if p, ok := s.DepositPolicies[currency]; ok {
+			return p
+		}
+		return DepositPolicy{Currency: currency}
+	}
+	if s.Deposits.Currency == currency {
+		return s.Deposits
+	}
+	return DepositPolicy{Currency: currency}
+}
+
 func (s *Service) StartDeposit(ctx context.Context, u domain.User, key string, p domain.DepositRequest) (domain.Deposit, error) {
 	if !u.Verified || !keyPattern.MatchString(key) || !phone.MatchString(p.Phone) || p.AmountMinor < 1 || p.AmountMinor > 100000000 {
 		return domain.Deposit{}, domain.ErrInvalid
 	}
-	if s.Wallet == nil || !s.Deposits.Enabled || p.Currency != s.Deposits.Currency {
+	policy := s.DepositPolicyFor(p.Currency)
+	if s.Wallet == nil || !policy.Enabled {
 		return domain.Deposit{}, domain.ErrUnavailable
 	}
-	if p.AmountMinor < s.Deposits.MinMinor || p.AmountMinor > s.Deposits.MaxMinor {
+	if p.AmountMinor < policy.MinMinor || p.AmountMinor > policy.MaxMinor {
 		return domain.Deposit{}, domain.ErrInvalid
 	}
 	provider, ok := s.Providers[p.Provider]

@@ -32,7 +32,8 @@ type Service struct {
 	Providers             map[string]domain.PaymentProvider
 	Mode                  string
 	Wallet                WalletRepository
-	Deposits              DepositPolicy
+	Deposits              DepositPolicy // Legacy single-currency configuration, retained for existing callers.
+	DepositPolicies       map[string]DepositPolicy
 	VerificationPerMinute int
 }
 
