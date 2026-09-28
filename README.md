@@ -1,5 +1,7 @@
 # Rimna Digital Lottery
 
+**Development tracker:** use the [Master Development and Release Checklist](docs/DEVELOPMENT_CHECKLIST.md) for the revised wallet, player portal and admin scope. It records agreed rules, dependencies, security/scalability work and evidence required before marking tasks complete. The implementation description below covers the existing direct-payment foundation; the revised wallet design is not yet delivered.
+
 Rimna now uses a Go backend and PostgreSQL for ticket sales, payments, customer ownership and staff operations. Better Auth runs in the existing Next.js application. Sanity is for website content, branding and English/Amharic/Tigrinya translations.
 
 **Start with [Backend setup and cutover](docs/BACKEND_SETUP.md).** Chapa secrets are intentionally unset. Checkout cannot accept payments until those credentials and the webhook are configured. Existing production Sanity data has not been modified or imported automatically.

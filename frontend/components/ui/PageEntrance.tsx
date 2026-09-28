@@ -10,7 +10,7 @@ export function PageEntrance({children}: {children: ReactNode}) {
   useEffect(() => {
     const root = ref.current;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!root || pathname.startsWith('/studio') || reduced.matches || !('IntersectionObserver' in window)) return;
+    if (!root || (pathname.startsWith('/studio') || pathname === '/admin' || pathname.startsWith('/admin/')) || reduced.matches || !('IntersectionObserver' in window)) return;
     const animations: Animation[] = [];
     const queued = new Set<HTMLElement>();
     const observed = new Set<Element>();

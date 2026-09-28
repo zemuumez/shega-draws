@@ -43,7 +43,7 @@ export function Nav({
   const siteName = getLocalized(siteSettings, "siteName", "Rimna International Digital Lottery");
   const logoImage = siteSettings?.logoImageUrl || "/images/rimna-brand-logo.png";
 
-  if (pathname?.startsWith("/studio")) return null;
+  if ((pathname?.startsWith("/studio") || pathname === "/admin" || pathname?.startsWith("/admin/"))) return null;
 
   // Left desktop links
   const leftNavItems = [

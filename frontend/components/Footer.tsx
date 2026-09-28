@@ -16,7 +16,7 @@ export function Footer({ siteSettings }: FooterProps) {
   const pathname = usePathname();
   const { language, t, getLocalized } = useLanguage();
 
-  if (pathname?.startsWith("/studio")) {
+  if ((pathname?.startsWith("/studio") || pathname === "/admin" || pathname?.startsWith("/admin/"))) {
     return null;
   }
 

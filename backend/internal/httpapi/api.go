@@ -355,14 +355,30 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 		return
 	}
 	kind := r.PathValue("kind")
+	if !adminAllowed(role, r.Method, kind) {
+		reply(w, 403, map[string]string{"error": "You do not have permission for this operation"})
+		return
+	}
 	if r.Method == "GET" {
+		if kind == "users" || kind == "overview" {
+			if err = a.Store.Rate(r.Context(), "admin-read:"+u.ID, 60); err != nil {
+				fail(w, err)
+				return
+			}
+		}
 		var out any
-		if kind == "operations" {
+		if kind == "session" {
+			out = map[string]string{"role": role, "userId": u.ID}
+		} else if kind == "overview" {
+			out, err = a.Store.AdminOverview(r.Context())
+		} else if kind == "users" {
+			out, err = a.Store.AdminUsers(r.Context(), r.URL.Query().Get("q"), offset(r))
+		} else if kind == "operations" {
 			out, err = a.Store.Operations(r.Context())
 		} else if kind == "orders" {
 			out, err = a.Store.Orders(r.Context(), "", offset(r), true)
 		} else if kind == "draws" {
-			out, err = a.Store.Draws(r.Context())
+			out, err = a.Store.AdminDraws(r.Context(), offset(r))
 		} else {
 			out, err = a.Store.JSONList(r.Context(), kind, offset(r))
 		}

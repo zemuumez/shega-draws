@@ -1,5 +1,7 @@
 # Backend architecture
 
+**Design update — 28 September 2026:** This document describes the existing direct-payment foundation. The proposed customer wallets, bulk ticket purchases and expanded staff portal are specified in [Admin Portal and Scalable Architecture](ADMIN_PORTAL_ARCHITECTURE.md) and [Player Portal and Ticketing Specification](PLAYER_PORTAL_AND_TICKETING_SPEC.md). Those additions are target designs, not implemented guarantees. The selected pilot is a Yegara 8 CPU / 16 GB VPS; adding PostgreSQL to that pilot and securing access from the authentication runtime remains deployment work.
+
 ## Recommended approach
 
 Use a **modular Go monolith**, a separate payment worker process built from the same code, and managed PostgreSQL. Keep Next.js on Vercel, including Better Auth’s TypeScript routes. This is simpler to operate than microservices and keeps ticket ownership and money changes in one database transaction. Separate services can follow measured bottlenecks; 25,000 registered buyers alone is not a reason for microservices.
