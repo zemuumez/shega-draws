@@ -1,6 +1,6 @@
 # Backend architecture
 
-**Design update — 28 September 2026:** This document describes the existing direct-payment foundation. The proposed customer wallets, bulk ticket purchases and expanded staff portal are specified in [Admin Portal and Scalable Architecture](ADMIN_PORTAL_ARCHITECTURE.md) and [Player Portal and Ticketing Specification](PLAYER_PORTAL_AND_TICKETING_SPEC.md). Those additions are target designs, not implemented guarantees. The selected pilot is a Yegara 8 CPU / 16 GB VPS; adding PostgreSQL to that pilot and securing access from the authentication runtime remains deployment work.
+**Design update — 28 September 2026:** This document describes the existing direct-payment foundation. The proposed customer wallets, bulk ticket purchases and expanded staff portal are specified in [Admin Portal and Scalable Architecture](ADMIN_PORTAL_ARCHITECTURE.md) and [Player Portal and Ticketing Specification](PLAYER_PORTAL_AND_TICKETING_SPEC.md). The separate-currency ledger and test-only verified deposit foundation are now implemented locally; see [wallet implementation and limitations](WALLET_DEPOSITS_IMPLEMENTATION.md). Quantity wallet purchases and the remaining designs are not implemented guarantees. The selected pilot is a Yegara 8 CPU / 16 GB VPS; adding PostgreSQL to that pilot and securing access from the authentication runtime remains deployment work.
 
 ## Recommended approach
 

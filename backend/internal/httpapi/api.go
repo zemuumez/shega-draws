@@ -78,6 +78,11 @@ func (a *API) Handler() http.Handler {
 		}
 		reply(w, 200, out)
 	})
+	m.HandleFunc("GET /v1/wallet", a.authenticated(a.wallet))
+	m.HandleFunc("GET /v1/wallet/history", a.authenticated(a.walletHistory))
+	m.HandleFunc("GET /v1/deposits", a.authenticated(a.deposits))
+	m.HandleFunc("GET /v1/deposits/{id}", a.authenticated(a.deposit))
+	m.HandleFunc("POST /v1/deposits", a.authenticated(a.startDeposit))
 	m.HandleFunc("POST /v1/orders", a.authenticated(a.purchase))
 	m.HandleFunc("GET /v1/orders", a.authenticated(a.orders))
 	m.HandleFunc("GET /v1/orders/{id}", a.authenticated(a.order))
@@ -360,7 +365,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 		return
 	}
 	if r.Method == "GET" {
-		if kind == "users" || kind == "overview" || kind == "rounds" || kind == "templates" {
+		if kind == "users" || kind == "overview" || kind == "rounds" || kind == "templates" || kind == "wallets" || kind == "deposits" {
 			if err = a.Store.Rate(r.Context(), "admin-read:"+u.ID, 60); err != nil {
 				fail(w, err)
 				return
@@ -377,6 +382,14 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 			out, err = a.Store.Operations(r.Context())
 		} else if kind == "orders" {
 			out, err = a.Store.Orders(r.Context(), "", offset(r), true)
+		} else if kind == "wallets" {
+			if err = a.Store.Rate(r.Context(), "wallet-report:"+u.ID, 10); err != nil {
+				fail(w, err)
+				return
+			}
+			out, err = a.Store.WalletReport(r.Context())
+		} else if kind == "deposits" {
+			out, err = a.adminDepositPage(r.Context(), offset(r))
 		} else if kind == "templates" {
 			out, err = a.Store.Templates(r.Context(), offset(r))
 		} else if kind == "rounds" {
@@ -399,6 +412,15 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 	}
 	if kind == "operations" {
 		switch r.PathValue("id") {
+		case "deposits":
+			var input struct {
+				Paused bool   `json:"paused"`
+				Reason string `json:"reason"`
+			}
+			err = decode(r, &input)
+			if err == nil {
+				err = a.Store.SetDepositsPaused(r.Context(), u.ID, input.Paused, input.Reason)
+			}
 		case "sales":
 			var input struct {
 				Paused bool   `json:"paused"`
@@ -416,6 +438,14 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 			}
 		default:
 			err = domain.ErrNotFound
+		}
+	} else if kind == "deposits" {
+		var input struct {
+			Reference string `json:"reference"`
+		}
+		err = decode(r, &input)
+		if err == nil {
+			err = a.Store.DepositReference(r.Context(), u.ID, r.PathValue("id"), input.Reference)
 		}
 	} else if kind == "payments" {
 		var input struct {

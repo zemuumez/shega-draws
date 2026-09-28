@@ -30,6 +30,13 @@ export const adminSections = [
     description: "Review ticket payments and reconcile provider transactions.",
   },
   {
+    id: "wallets",
+    title: "Wallets & deposits",
+    description:
+      "Review verified funding, wallet accounting and deposit availability.",
+    adminOnly: true,
+  },
+  {
     id: "messages",
     title: "Support & messages",
     description: "Review customer messages and subscriptions.",

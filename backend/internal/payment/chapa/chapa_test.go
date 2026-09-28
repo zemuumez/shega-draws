@@ -62,7 +62,7 @@ func TestHostedCheckoutAndVerification(t *testing.T) {
 	defer server.Close()
 	a := New("test-key", "secret", "test", []string{"ETB"})
 	a.BaseURL = server.URL
-	o := domain.Order{ID: "order1", AmountMinor: 2501, Currency: "ETB", Name: "Example Player"}
+	o := domain.CheckoutRequest{ID: "order1", AmountMinor: 2501, Currency: "ETB", Name: "Example Player"}
 	checkout, err := a.Start(context.Background(), o)
 	if err != nil || checkout.URL == "" || count != 1 {
 		t.Fatal(checkout, err)
@@ -79,7 +79,7 @@ func TestCheckoutRejectsUntrustedRedirect(t *testing.T) {
 	defer s.Close()
 	a := New("test", "secret", "test", []string{"ETB"})
 	a.BaseURL = s.URL
-	if _, err := a.Start(context.Background(), domain.Order{Currency: "ETB"}); err == nil {
+	if _, err := a.Start(context.Background(), domain.CheckoutRequest{Currency: "ETB"}); err == nil {
 		t.Fatal("accepted attacker URL")
 	}
 }

@@ -8,6 +8,7 @@ import (
 )
 
 type Operations struct {
+	DepositsPaused  bool        `json:"depositsPaused"`
 	SalesPaused     bool        `json:"salesPaused"`
 	RecoveryLocked  bool        `json:"recoveryLocked"`
 	Reason          string      `json:"reason"`
@@ -28,7 +29,7 @@ type BackupJob struct {
 
 func (s *Store) Operations(ctx context.Context) (Operations, error) {
 	var o Operations
-	err := s.DB.QueryRow(ctx, `SELECT sales_paused,recovery_locked,reason,updated_at FROM operations_control WHERE id=true`).Scan(&o.SalesPaused, &o.RecoveryLocked, &o.Reason, &o.UpdatedAt)
+	err := s.DB.QueryRow(ctx, `SELECT deposits_paused,sales_paused,recovery_locked,reason,updated_at FROM operations_control WHERE id=true`).Scan(&o.DepositsPaused, &o.SalesPaused, &o.RecoveryLocked, &o.Reason, &o.UpdatedAt)
 	if err != nil {
 		return o, err
 	}

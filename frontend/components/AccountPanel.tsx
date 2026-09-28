@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { accountAPI, clearAccountToken } from "@/lib/account-api";
+import { WalletPanel } from "./WalletPanel";
 import type { Order } from "@/lib/backend";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 export function AccountPanel({ compact = false }: { compact?: boolean }) {
@@ -22,6 +23,11 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
   const [offset, setOffset] = useState(0);
   const [totp, setTotp] = useState("");
   const [backups, setBackups] = useState<string[]>([]);
+  useEffect(() => {
+    clearAccountToken();
+    setOrders([]);
+    setOffset(0);
+  }, [session?.user.id]);
   useEffect(() => {
     if (!session?.user.emailVerified || compact) return;
     let active = true;
@@ -126,6 +132,9 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
             <>
               <Link href="/#choose-ticket">{text("Buy tickets")}</Link> ·{" "}
               <Link href="/admin">{text("Staff dashboard")}</Link>
+              {session.user.emailVerified && (
+                <WalletPanel key={session.user.id} userId={session.user.id} />
+              )}
               <h3>{text("My tickets and payments")}</h3>
               {orders.length === 0 ? (
                 <p>{text("No tickets on this page yet.")}</p>

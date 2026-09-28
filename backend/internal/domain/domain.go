@@ -72,7 +72,7 @@ type Verification struct {
 type PaymentProvider interface {
 	Name() string
 	Supports(currency string) bool
-	Start(context.Context, Order) (Checkout, error)
+	Start(context.Context, CheckoutRequest) (Checkout, error)
 	Verify(context.Context, string) (Verification, error)
 	AuthenticateWebhook([]byte, string) bool
 	WebhookReference([]byte) (Webhook, error)

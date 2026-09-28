@@ -198,6 +198,11 @@ def restore(snapshot, media_destination):
             SET LOCAL search_path=public;
             UPDATE operations_control SET recovery_locked=true,sales_paused=true,
               reason='Restored database: reconcile provider payments before reopening',updated_at=now(),updated_by='recovery-operator';
+            DO $$ BEGIN
+              IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='operations_control' AND column_name='deposits_paused') THEN
+                UPDATE operations_control SET deposits_paused=true;
+              END IF;
+            END $$;
             UPDATE backup_jobs SET status='failed',finished_at=now(),message='Job interrupted by restore' WHERE status IN ('queued','running');
             DELETE FROM worker_heartbeats;
             DO $$ BEGIN IF to_regclass('auth.session') IS NOT NULL THEN DELETE FROM auth.session; END IF; END $$;

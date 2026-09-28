@@ -17,7 +17,7 @@ This file is the canonical progress tracker. Read it with the linked specificati
 - All non-`LATER` tasks are part of release acceptance unless an explicit, documented scope decision removes them. Business-policy decisions may be resolved through an approved staged release, such as disabling USD funding initially.
 - At the end of each work session, update **Current focus**, the evidence register and any changed decisions. No sensitive credentials, personal records or private payment evidence belong in this file.
 
-**Overall state:** specification captured; admin foundation and template/round workflow delivered and locally verified; revised wallet delivery, full admin workflows and production acceptance remain incomplete. No overall completion percentage is asserted.
+**Overall state:** specification captured; admin foundation and template/round workflow delivered and locally verified; wallet ledger/test-deposit foundation locally verified; wallet ticket purchases, full admin workflows and production acceptance remain incomplete. No overall completion percentage is asserted.
 
 ## Current focus and execution order
 
@@ -33,7 +33,7 @@ This file is the canonical progress tracker. Read it with the linked specificati
 
 Security review accompanies every workstream. Start payment onboarding and infrastructure access early; do not postpone these external dependencies until UI completion.
 
-**Current focus:** the admin foundation and templates/rounds increment are locally verified (`AUTH-11`, `ADM-11`–`ADM-14`, `LOT-01/02`). Next: implement the separate currency ledger and verified deposit contracts (`FIN-01`–`FIN-04`, `PAY`), then quantity purchases/player journeys. Full staff permissions, independent draw approval and cancellation policy remain open. Admin financial screens must not simulate unsupported wallet balances. See [round implementation and validation](LOTTERY_ROUNDS_IMPLEMENTATION.md).
+**Current focus:** admin templates/rounds and the wallet ledger/test-deposit increment are locally verified. Next: connect quantity ticket purchases and lucky-number allocation to the authoritative wallet debit in one transaction, then complete the player journeys. Live wallet deposits remain blocked in code. Provider sandbox acceptance, database privileges, settlement reconciliation, wallet recovery rehearsal, full staff permissions and unresolved draw/refund policies remain open. See [wallet delivery and evidence](WALLET_DEPOSITS_IMPLEMENTATION.md).
 
 ## 0. Confirmed scope — decisions, not delivery claims
 
@@ -112,16 +112,18 @@ These block their dependent features or launch; they do not stop unrelated devel
 
 Depends on applicable DEC policies and ARC-02/03. No real-money deposits until ledger invariants pass.
 
-- [ ] **FIN-01** Create distinct user/currency accounts and integer-minor-unit money types, with bounds and overflow/precision validation.
-- [ ] **FIN-02** Implement balanced, append-only ledger transactions per currency; explicit unique operation references; corrections through reversals. Runtime roles cannot casually edit posted entries.
-- [ ] **FIN-03** Define available, pending and any restricted amounts and their permitted transitions. Unverified deposits and externally paid prize awards are not spendable balance.
-- [ ] **FIN-04** Lock/check the authoritative balance during spend and atomically post debits; prevent negative spendable balances and simultaneous overspending across sessions/servers.
-- [ ] **FIN-05** Reconcile displayed balance to ledger entries and customer liabilities to provider/settlement records; deposits are not ticket sales or platform revenue.
+- [x] **FIN-01** Create distinct user/currency accounts and integer-minor-unit money types, with bounds and overflow/precision validation.
+- [ ] **FIN-02** Implement balanced, append-only ledger transactions per currency; explicit unique operation references; corrections through reversals. Runtime roles cannot casually edit posted entries. **IN PROGRESS:** immutable/balanced journal constraints and reversals pass local SQL tests; deployment privilege separation remains unverified.
+- [x] **FIN-03** Define available, pending and any restricted amounts and their permitted transitions. Unverified deposits and externally paid prize awards are not spendable balance.
+- [ ] **FIN-04** Lock/check the authoritative balance during spend and atomically post debits; prevent negative spendable balances and simultaneous overspending across sessions/servers. **IN PROGRESS:** internal concurrent debit primitive passes; atomic wallet-funded ticket issuance is next.
+- [ ] **FIN-05** Reconcile displayed balance to ledger entries and customer liabilities to provider/settlement records; deposits are not ticket sales or platform revenue. **IN PROGRESS:** administrator internal balance comparison delivered; external provider/bank settlement reconciliation remains open.
 - [ ] **FIN-06** Implement approved refunds/reversals/adjustments with approval, reasons and traceability; define disputed deposits already spent without rewriting historical purchases.
-- [ ] **FIN-07** Test concurrent credit/debit, duplicate credit, refund replay, rollback, integer limits, cross-currency attempts and ledger imbalance rejection.
-- [ ] **FIN-08** Expose currency-specific balances/history with authorization and pagination; currency toggling never transfers or exchanges money.
+- [x] **FIN-07** Test concurrent credit/debit, duplicate credit, refund replay, rollback, integer limits, cross-currency attempts and ledger imbalance rejection.
+- [x] **FIN-08** Expose currency-specific balances/history with authorization and pagination; currency toggling never transfers or exchanges money. Evidence for FIN-01/03/07/08: [wallet local integration and browser checks](WALLET_DEPOSITS_IMPLEMENTATION.md).
 
 ## 5. Deposits and payment-provider integration
+
+Test implementation evidence for PAY-01–08 is recorded in [wallet delivery](WALLET_DEPOSITS_IMPLEMENTATION.md). Keep these broader acceptance items open: live approval, fees/policy decisions, actual provider sandbox behavior, mature exception handling and production acceptance are incomplete.
 
 - [ ] **PAY-01** Adapt the provider interface for deposits and provider attempts while preserving reference, amount, currency, environment and account checks. Keep international/bank adapters replaceable.
 - [ ] **PAY-02** Create server-priced deposit intents with unique idempotency keys, permitted limits/precision, displayed fees and clear pending status.
@@ -194,6 +196,7 @@ Depends on applicable DEC policies and ARC-02/03. No real-money deposits until l
 - [x] **ADM-12** Deliver database-backed overview and read-only, paginated user directory with search and distinct email/MFA labels; do not invent wallet or identity-verification data. Evidence: admin validation.
 - [x] **ADM-13** Carry existing management actions into the new shell, page draw listings and protect immutable fields in the editor; preserve read-only reviewer UI and server write restrictions. Evidence: admin validation. Existing publication/export limitations remain open.
 - [x] **ADM-14** Deliver reusable template and round screens, explicit financial rule entry, draft editing, version checks, rule locking, open/pause/resume/permanent-close controls, admin sold/remaining/prize-fund estimates and readable before/after audit records. Evidence: [round implementation and local verification](LOTTERY_ROUNDS_IMPLEMENTATION.md). Cancellation/refunds, public portal rollout and independent draw approval remain separate.
+- [x] **ADM-15** Deliver administrator-only wallet accounting and deposit review, audited independent deposit pause, verification scheduling with immutable provider references, and paginated player currency balances/history. Evidence: [wallet increment](WALLET_DEPOSITS_IMPLEMENTATION.md), real API/database checks and fixture browser tests. Test mode only; no arbitrary credit/refund approval, advanced identity review or production acceptance.
 
 ## 10. Sanity content and language preservation
 
@@ -311,6 +314,7 @@ Use one row per completed task or coherent tested group. Link a detailed test re
 | 2026-09-28 | Checklist creation | Documentation only | This file; local link/ID/format checks | No application tests or production checks run for this documentation task |
 | 2026-09-28 | BASE-01, AUTH-11, ADM-11–13 | Complete for first increment / local | [Admin validation](ADMIN_PORTAL_VALIDATION.md); modified/new source and tests in current working tree | Production, full MFA end-to-end, wallet, advanced permissions, translations and approval flows remain open |
 | 2026-09-28 | LOT-01/02, ADM-14 | Complete for templates/rounds increment / local | [Round contracts, migration and verification](LOTTERY_ROUNDS_IMPLEMENTATION.md); source and executable tests in current changes | LOT-03/04 and ADM-02 remain broader release tasks: public portal, cancellation policy, full inventory/wallet rollout and target-server acceptance are incomplete |
+| 2026-09-28 | FIN-01/03/07/08, ADM-15; FIN-02/04/05 and PAY partial | Complete for local test-deposit increment / broader release open | [Wallet ledger, contracts and validation](WALLET_DEPOSITS_IMPLEMENTATION.md); Go/PostgreSQL race tests and fixture browser checks | Live deposits blocked; wallet ticket purchase, privilege separation, provider sandbox, business exceptions, external reconciliation and wallet restore/load acceptance remain open |
 
 ### Historical evidence — useful foundations, not current release sign-off
 

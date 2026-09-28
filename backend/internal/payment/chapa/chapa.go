@@ -67,7 +67,7 @@ func (a *Adapter) request(ctx context.Context, method, path string, body any, ou
 	}
 	return nil
 }
-func (a *Adapter) Start(ctx context.Context, o domain.Order) (domain.Checkout, error) {
+func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.Checkout, error) {
 	if !a.Supports(o.Currency) {
 		return domain.Checkout{}, domain.ErrUnavailable
 	}
@@ -77,7 +77,7 @@ func (a *Adapter) Start(ctx context.Context, o domain.Order) (domain.Checkout, e
 		first = names[0]
 		last = strings.Join(names[1:], " ")
 	}
-	body := map[string]any{"amount": json.Number(fmt.Sprintf("%d.%02d", o.AmountMinor/100, o.AmountMinor%100)), "currency": o.Currency, "merchant_reference": o.ID, "customer": map[string]string{"first_name": first, "last_name": last, "email": o.Email, "phone_number": o.Phone}, "meta": map[string]string{"order_id": o.ID}}
+	body := map[string]any{"amount": json.Number(fmt.Sprintf("%d.%02d", o.AmountMinor/100, o.AmountMinor%100)), "currency": o.Currency, "merchant_reference": o.ID, "customer": map[string]string{"first_name": first, "last_name": last, "email": o.Email, "phone_number": o.Phone}, "meta": map[string]string{"payment_id": o.ID}}
 	var result struct {
 		Status string `json:"status"`
 		Data   struct {

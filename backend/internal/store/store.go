@@ -294,7 +294,11 @@ func (s *Store) Webhook(ctx context.Context, provider, digest, ref, providerRef 
 		return err
 	}
 	if tag.RowsAffected() > 0 {
-		_, err = tx.Exec(ctx, `UPDATE orders SET next_check_at=now(),provider_reference=CASE WHEN provider_reference='' THEN $3 ELSE provider_reference END WHERE id=$1 AND provider=$2 AND (provider_reference='' OR provider_reference=$3)`, ref, provider, providerRef)
+		if strings.HasPrefix(ref, "dep_") {
+			_, err = tx.Exec(ctx, `UPDATE deposits SET next_check_at=now(),provider_reference=CASE WHEN provider_reference='' THEN $3 ELSE provider_reference END WHERE id=$1 AND provider=$2 AND (provider_reference='' OR provider_reference=$3)`, ref, provider, providerRef)
+		} else {
+			_, err = tx.Exec(ctx, `UPDATE orders SET next_check_at=now(),provider_reference=CASE WHEN provider_reference='' THEN $3 ELSE provider_reference END WHERE id=$1 AND provider=$2 AND (provider_reference='' OR provider_reference=$3)`, ref, provider, providerRef)
+		}
 		if err != nil {
 			return err
 		}

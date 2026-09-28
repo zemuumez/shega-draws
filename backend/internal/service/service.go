@@ -28,9 +28,12 @@ type Repository interface {
 	WorkerEnabled(context.Context, string) (bool, error)
 }
 type Service struct {
-	Store     Repository
-	Providers map[string]domain.PaymentProvider
-	Mode      string
+	Store                 Repository
+	Providers             map[string]domain.PaymentProvider
+	Mode                  string
+	Wallet                WalletRepository
+	Deposits              DepositPolicy
+	VerificationPerMinute int
 }
 
 func ID() string {
@@ -71,7 +74,7 @@ func (s *Service) Purchase(ctx context.Context, u domain.User, key string, p dom
 	if err != nil || !created {
 		return o, err
 	}
-	checkout, err := provider.Start(ctx, o)
+	checkout, err := provider.Start(ctx, domain.CheckoutRequest{ID: o.ID, AmountMinor: o.AmountMinor, Currency: o.Currency, Phone: o.Phone, Email: o.Email, Name: o.Name})
 	if err != nil { // Keep the hold and reconcile: the provider may have received it.
 		slog.Warn("checkout outcome uncertain", "order", o.ID)
 		return o, nil
@@ -93,6 +96,9 @@ func (s *Service) Reconcile(ctx context.Context, o domain.Order) error {
 		// Hosted initialization may return only a URL. The signed webhook supplies
 		// the Chapa reference; merchant references are NOT accepted by /verify.
 		return domain.ErrUnavailable
+	}
+	if err := s.verificationQuota(ctx, o.Provider); err != nil {
+		return err
 	}
 	v, err := provider.Verify(ctx, ref)
 	if err != nil {
@@ -116,6 +122,11 @@ func (s *Service) RunWorker(ctx context.Context) {
 			}
 			if err := s.Store.Expire(ctx); err != nil {
 				slog.Error("reservation expiry failed")
+			}
+			if s.Wallet != nil {
+				if err := s.Wallet.DepositMaintenance(ctx); err != nil {
+					slog.Error("deposit maintenance failed")
+				}
 			}
 		case <-ticker.C:
 			if enabled, err := s.Store.WorkerEnabled(ctx, workerID); err != nil || !enabled {
@@ -145,6 +156,7 @@ func (s *Service) RunWorker(ctx context.Context) {
 				}(o)
 			}
 			batch.Wait()
+			s.runDepositBatch(ctx)
 		}
 	}
 }

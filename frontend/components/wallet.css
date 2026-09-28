@@ -1,0 +1,108 @@
+.wallet-panel {
+  margin: 28px 0;
+  padding: 24px;
+  border: 1px solid #64748b;
+  border-radius: 16px;
+  max-width: 100%;
+  min-width: 0;
+}
+.wallet-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.wallet-panel h3,
+.wallet-panel h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 12px 0;
+}
+.wallet-panel p {
+  margin: 12px 0;
+}
+.wallet-panel button {
+  border: 1px solid #64748b;
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin: 4px;
+}
+.wallet-panel button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.wallet-panel button[aria-pressed="true"] {
+  background: #ffe04a;
+  color: #111827;
+}
+.wallet-balances {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.wallet-balances article {
+  padding: 16px;
+  background: rgba(100, 116, 139, 0.12);
+  border-radius: 12px;
+}
+.wallet-balances strong {
+  display: block;
+  font-size: 1.5rem;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+.wallet-notice {
+  padding: 12px;
+  border-left: 3px solid #d9ac24;
+  background: rgba(217, 172, 36, 0.08);
+}
+.wallet-form {
+  display: grid;
+  gap: 12px;
+  max-width: 440px;
+}
+.wallet-form label {
+  display: grid;
+  gap: 6px;
+}
+.wallet-form input {
+  background: transparent;
+  color: inherit;
+  border: 1px solid #64748b;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 0;
+}
+.wallet-record {
+  padding: 14px 0;
+  border-bottom: 1px solid #64748b55;
+  overflow-wrap: anywhere;
+}
+.wallet-record small {
+  display: block;
+  margin-top: 6px;
+}
+.wallet-record a {
+  text-decoration: underline;
+  display: inline-block;
+  padding: 10px 0;
+}
+.wallet-pagination {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.wallet-panel [role="alert"] {
+  color: #f87171;
+}
+@media (max-width: 540px) {
+  .wallet-panel {
+    padding: 14px;
+  }
+  .wallet-balances {
+    grid-template-columns: 1fr;
+  }
+}

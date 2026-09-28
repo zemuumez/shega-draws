@@ -5,30 +5,43 @@ import { apiBase } from "./backend";
 // on every request. Sharing acquisition avoids a new auth request per ZIP image.
 let cached: { token: string; until: number } | undefined;
 let acquiring: Promise<string> | undefined;
+let generation = 0;
 export function clearAccountToken() {
+  generation++;
   cached = undefined;
   acquiring = undefined;
 }
 async function token() {
   if (cached && cached.until > Date.now()) return cached.token;
   if (acquiring) return acquiring;
-  acquiring = (async () => {
+  const current = generation;
+  const pending = (async () => {
     const { data, error } = await authClient.token();
     if (error || !data?.token)
       throw new Error("Please sign in with a verified account.");
+    if (current !== generation)
+      throw new Error("Your session changed. Please try again.");
     cached = { token: data.token, until: Date.now() + 90000 };
     return data.token;
   })();
+  acquiring = pending;
   try {
-    return await acquiring;
+    return await pending;
   } finally {
-    acquiring = undefined;
+    if (acquiring === pending) acquiring = undefined;
   }
 }
 export async function accountFetch(path: string, init: RequestInit = {}) {
+  let requestGeneration = generation;
+  function assertSession() {
+    if (requestGeneration !== generation)
+      throw new Error("Your session changed. Please try again.");
+  }
   async function send() {
+    assertSession();
     const headers = new Headers(init.headers);
     headers.set("Authorization", `Bearer ${await token()}`);
+    assertSession();
     return fetch(`${apiBase}/v1${path}`, {
       ...init,
       headers,
@@ -36,9 +49,13 @@ export async function accountFetch(path: string, init: RequestInit = {}) {
     });
   }
   const response = await send();
+  assertSession();
   if (response.status !== 401) return response;
   clearAccountToken();
-  return send();
+  requestGeneration = generation;
+  const retried = await send();
+  assertSession();
+  return retried;
 }
 export async function accountAPI<T>(
   path: string,

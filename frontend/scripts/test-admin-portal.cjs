@@ -220,7 +220,7 @@ const rounds = [
       .getByRole("heading", { name: "Overview", exact: true })
       .waitFor();
     await page.getByText("Recorded collections", { exact: true }).waitFor();
-    assert.equal(await page.locator(".admin-sidebar nav a").count(), 11);
+    assert.equal(await page.locator(".admin-sidebar nav a").count(), 12);
     await page.screenshot({
       path: `${output}/desktop-overview.png`,
       fullPage: true,

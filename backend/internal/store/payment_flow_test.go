@@ -16,7 +16,7 @@ type testProvider struct {
 
 func (p *testProvider) Name() string           { return "chapa" }
 func (p *testProvider) Supports(c string) bool { return c == "ETB" }
-func (p *testProvider) Start(_ context.Context, o domain.Order) (domain.Checkout, error) {
+func (p *testProvider) Start(_ context.Context, o domain.CheckoutRequest) (domain.Checkout, error) {
 	p.starts.Add(1)
 	if o.AmountMinor != 2500 {
 		return domain.Checkout{}, errors.New("untrusted price")

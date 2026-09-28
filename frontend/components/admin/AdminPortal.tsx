@@ -40,6 +40,9 @@ const AdminRecordsPanel = dynamic(
   () => import("./AdminRecordsPanel").then((m) => m.AdminRecordsPanel),
   { loading: () => <p role="status">Loading workspace…</p> },
 );
+const AdminWallets = dynamic(() =>
+  import("./AdminWallets").then((m) => m.AdminWallets),
+);
 const OperationsPanel = dynamic(() =>
   import("../OperationsPanel").then((m) => m.OperationsPanel),
 );
@@ -49,6 +52,7 @@ const icons = {
   results: Trophy,
   users: Users,
   orders: CreditCard,
+  wallets: CreditCard,
   messages: Headphones,
   audit: History,
   legacy: FileArchive,
@@ -253,6 +257,7 @@ export function AdminPortal() {
             <>
               {section.id === "overview" && <AdminOverview />}
               {section.id === "users" && <AdminUsers />}
+              {section.id === "wallets" && <AdminWallets />}
               {section.id === "draws" && (
                 <AdminLotteries canWrite={role === "admin"} />
               )}
@@ -282,9 +287,9 @@ export function AdminPortal() {
                 <section className="admin-card">
                   {section.id === "orders" && (
                     <p className="admin-notice">
-                      This view shows existing ticket payments. Customer deposit
-                      balances and identity-review workflows are not available
-                      yet.
+                      This view shows direct ticket payments. Wallets & deposits
+                      has the separate test funding records. Identity-review
+                      workflows are still pending.
                     </p>
                   )}
                   {section.id === "results" && (

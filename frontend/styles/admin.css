@@ -787,3 +787,11 @@ body:has(.admin-portal) .scroll-progress-container {
     grid-column: 1 / -1;
   }
 }
+/* Keep the keyboard skip link hidden even inside animated/scrolling layouts. */
+.admin-skip:not(:focus) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

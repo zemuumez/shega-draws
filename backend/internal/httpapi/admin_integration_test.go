@@ -2,12 +2,17 @@ package httpapi
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http/httptest"
 	"os"
 	"rimna/backend/internal/domain"
+	"rimna/backend/internal/payment/chapa"
+	"rimna/backend/internal/service"
 	"rimna/backend/internal/store"
 	"rimna/backend/migrations"
 	"strings"
@@ -63,7 +68,11 @@ func TestAdminEndpointRolesAndRevocation(t *testing.T) {
 	if _, err = db.Exec(ctx, `INSERT INTO staff(user_id,role) VALUES($1,'reviewer')`, id); err != nil {
 		t.Fatal(err)
 	}
-	a := API{Store: &store.Store{DB: db}, Auth: staffTestIdentity{domain.User{ID: id, SessionID: id, Verified: true}}, Origin: "https://example.test"}
+	provider := chapa.New("test-fixture-key", "test-fixture-webhook", "test", []string{"ETB"})
+	svc := &service.Service{Mode: "test", Providers: map[string]domain.PaymentProvider{"chapa": provider}}
+	a := API{Service: svc, Store: &store.Store{DB: db}, Auth: staffTestIdentity{domain.User{ID: id, SessionID: id, Verified: true}}, Origin: "https://example.test"}
+	svc.Wallet = a.Store
+	svc.Store = a.Store
 	h := a.Handler()
 	request := func(path string, expected int) string {
 		t.Helper()
@@ -92,6 +101,10 @@ func TestAdminEndpointRolesAndRevocation(t *testing.T) {
 			t.Fatalf("PUT %s: got %d want %d: %s", path, w.Code, expected, w.Body.String())
 		}
 	}
+	request("wallets", 403)
+	request("deposits", 403)
+	write("deposits/missing", map[string]any{"reference": "ref"}, 403)
+	write("operations/deposits", map[string]any{"paused": false, "reason": "Fixture enable"}, 403)
 	request("templates", 200)
 	request("rounds", 200)
 	write("templates/weekly", map[string]any{}, 403)
@@ -105,6 +118,69 @@ func TestAdminEndpointRolesAndRevocation(t *testing.T) {
 	if _, err = db.Exec(ctx, `UPDATE staff SET role='admin' WHERE user_id=$1`, id); err != nil {
 		t.Fatal(err)
 	}
+	request("wallets", 200)
+	request("deposits", 200)
+	write("operations/deposits", map[string]any{"paused": false, "reason": "Fixture enable"}, 200)
+	// Exercise real authenticated wallet handlers, owner filtering and signed callbacks.
+	d, _, e := a.Store.CreateDeposit(ctx, domain.Deposit{ID: "dep_http_test", UserID: id, Currency: "ETB", AmountMinor: 2500, Provider: "chapa", Mode: "test", Key: "http-fixture-key", Fingerprint: "fixture", Phone: "+251911123456", Email: "fixture@example.test", Name: "Fixture"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	_, _, e = a.Store.CreateDeposit(ctx, domain.Deposit{ID: "dep_private_other", UserID: "other", Currency: "USD", AmountMinor: 9000, Provider: "chapa", Mode: "test", Key: "other-key", Fingerprint: "other", Phone: "+251911123456", Email: "private@example.test", Name: "Private"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	playerRequest := func(path string, expected int) string {
+		t.Helper()
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("GET", "/v1/"+path, nil)
+		r.Header.Set("Authorization", "Bearer fixture")
+		h.ServeHTTP(w, r)
+		if w.Code != expected {
+			t.Fatalf("%s: %d %s", path, w.Code, w.Body.String())
+		}
+		return w.Body.String()
+	}
+	playerRequest("wallet", 200)
+	playerRequest("wallet/history?currency=USD", 200)
+	playerRequest("wallet/history?currency=EUR", 400)
+	playerRequest("deposits/dep_private_other", 404)
+	if b := playerRequest("deposits", 200); strings.Contains(b, "dep_private_other") || strings.Contains(b, "fixture@example.test") {
+		t.Fatal("private deposit data leaked", b)
+	}
+	if b := playerRequest("deposits/"+d.ID, 200); !strings.Contains(b, d.ID) {
+		t.Fatal(b)
+	}
+	webhook := []byte(`{"webhook_type":"payment","mode":"test","merchant_reference":"dep_http_test","chapa_reference":"http-chapa-reference"}`)
+	mac := hmac.New(sha256.New, []byte("test-fixture-webhook"))
+	mac.Write(webhook)
+	sig := hex.EncodeToString(mac.Sum(nil))
+	for _, signature := range []string{"forged", sig, sig} {
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("POST", "/v1/webhooks/chapa", strings.NewReader(string(webhook)))
+		r.Header.Set("X-Chapa-Signature", signature)
+		h.ServeHTTP(w, r)
+		expected := 200
+		if signature == "forged" {
+			expected = 401
+		}
+		if w.Code != expected {
+			t.Fatalf("webhook: %d %s", w.Code, w.Body.String())
+		}
+	}
+	if b, e := a.Store.WalletBalances(ctx, id); e != nil || b[0].AvailableMinor != 0 {
+		t.Fatal("webhook credited without verification", b, e)
+	}
+	d, e = a.Store.Deposit(ctx, d.ID)
+	if e != nil || d.ProviderReference != "http-chapa-reference" {
+		t.Fatal(d, e)
+	}
+	write("deposits/"+d.ID, map[string]any{"reference": d.ProviderReference}, 200)
+	write("deposits/"+d.ID, map[string]any{"reference": "replacement"}, 409)
+	if b := playerRequest("wallet/history?currency=ETB", 200); strings.Contains(b, "2500") {
+		t.Fatal("scheduled verification must not credit", b)
+	}
+	write("operations/deposits", map[string]any{"paused": true, "reason": "Fixture pause"}, 200)
 	body := request("users?q="+id, 200)
 	if !strings.Contains(body, id+"@example.test") || strings.Contains(body, "test-fixture") {
 		t.Fatal("unexpected user directory response")
