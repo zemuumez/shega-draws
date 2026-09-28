@@ -42,7 +42,7 @@ func dbError(err error) error {
 		return domain.ErrNotFound
 	}
 	var p *pgconn.PgError
-	if errors.As(err, &p) && p.Code == "23505" {
+	if errors.As(err, &p) && (p.Code == "23505" || p.Code == "23514") {
 		return domain.ErrConflict
 	}
 	return err
@@ -152,7 +152,13 @@ func (s *Store) Reserve(ctx context.Context, o domain.Order) (domain.Order, bool
 	if err != nil {
 		return o, false, dbError(err)
 	}
-	if d.Status != "open" || !d.Deadline.After(time.Now()) {
+	// Use the authoritative database clock after acquiring the round lock;
+	// different API hosts must not disagree about the sales cutoff.
+	var admissionTime time.Time
+	if err = tx.QueryRow(ctx, `SELECT clock_timestamp()`).Scan(&admissionTime); err != nil {
+		return o, false, err
+	}
+	if d.Status != "open" || !d.Deadline.After(admissionTime) {
 		return o, false, domain.ErrClosed
 	}
 	if o.Number < 1 || o.Number > d.Capacity {
@@ -177,7 +183,7 @@ func (s *Store) Reserve(ctx context.Context, o domain.Order) (domain.Order, bool
 	o.AmountMinor = d.PriceMinor
 	o.Currency = d.Currency
 	o.Status = "initializing"
-	o.ExpiresAt = time.Now().Add(15 * time.Minute)
+	o.ExpiresAt = admissionTime.Add(15 * time.Minute)
 	if d.Deadline.Before(o.ExpiresAt) {
 		o.ExpiresAt = d.Deadline
 	}
@@ -234,6 +240,10 @@ func (s *Store) ApplyPayment(ctx context.Context, id string, v domain.Verificati
 	if err != nil {
 		return err
 	}
+	var verificationTime time.Time
+	if err = tx.QueryRow(ctx, `SELECT clock_timestamp()`).Scan(&verificationTime); err != nil {
+		return err
+	}
 	if v.MerchantReference != o.ID || v.Reference == "" || v.Currency != o.Currency || v.AmountMinor != o.AmountMinor || v.Mode != mode || (o.ProviderReference != "" && o.ProviderReference != v.Reference) {
 		return domain.ErrInvalid
 	}
@@ -246,7 +256,7 @@ func (s *Store) ApplyPayment(ctx context.Context, id string, v domain.Verificati
 			return nil
 		}
 		status := "paid"
-		if (o.Status != "pending" && o.Status != "initializing") || !o.ExpiresAt.After(time.Now()) || drawStatus == "completed" {
+		if (o.Status != "pending" && o.Status != "initializing") || !o.ExpiresAt.After(verificationTime) || drawStatus == "completed" {
 			status = "refund_required"
 		}
 		_, err = tx.Exec(ctx, `UPDATE orders SET status=$2,provider_reference=$3,paid_at=now() WHERE id=$1`, id, status, v.Reference)
@@ -309,6 +319,20 @@ func (s *Store) FinishWork(ctx context.Context, id string, success bool) error {
 	return err
 }
 func (s *Store) Expire(ctx context.Context) error {
+	// Admission already checks the deadline synchronously. This bounded worker
+	// batch records closure and releases the legacy open-selection index.
+	if _, err := s.DB.Exec(ctx, `WITH batch AS (
+      SELECT * FROM draws WHERE sales_started_at IS NOT NULL AND sales_closed_at IS NULL
+      AND deadline<=now() AND status<>'completed' ORDER BY deadline LIMIT 100 FOR UPDATE SKIP LOCKED
+    ), changed AS (
+      UPDATE draws d SET status='closed',sales_closed_at=d.deadline,version=d.version+1
+      FROM batch b WHERE d.id=b.id RETURNING d.*
+    ) INSERT INTO audit_log(actor,action,resource,details)
+      SELECT 'system:deadline','round.close_deadline',c.id,
+      jsonb_build_object('before',to_jsonb(b),'after',to_jsonb(c)) FROM changed c JOIN batch b ON c.id=b.id`); err != nil {
+		return err
+	}
+
 	if _, err := s.DB.Exec(ctx, `DELETE FROM rate_limits WHERE reset_at<now()-interval '1 day'`); err != nil {
 		return err
 	}
@@ -346,7 +370,7 @@ func (s *Store) SaveDraw(ctx context.Context, actor string, d domain.Draw) error
 	}
 	defer tx.Rollback(ctx)
 	// A selection is immutable; create a new draw for a different price or capacity.
-	tag, err := tx.Exec(ctx, `INSERT INTO draws(id,title,currency,price_minor,capacity,status,deadline,live_video_url) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(id) DO UPDATE SET title=EXCLUDED.title,status=EXCLUDED.status,deadline=EXCLUDED.deadline,live_video_url=EXCLUDED.live_video_url WHERE draws.currency=EXCLUDED.currency AND draws.price_minor=EXCLUDED.price_minor AND draws.capacity=EXCLUDED.capacity AND (draws.status<>'completed' OR EXCLUDED.status='completed')`, d.ID, d.Title, d.Currency, d.PriceMinor, d.Capacity, d.Status, d.Deadline, d.LiveVideoURL)
+	tag, err := tx.Exec(ctx, `INSERT INTO draws(id,title,currency,price_minor,capacity,status,deadline,live_video_url) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(id) DO UPDATE SET title=EXCLUDED.title,status=EXCLUDED.status,deadline=EXCLUDED.deadline,live_video_url=EXCLUDED.live_video_url WHERE draws.template_id IS NULL AND (draws.sales_closed_at IS NULL OR EXCLUDED.status<>'open') AND (draws.sales_started_at IS NULL OR draws.deadline=EXCLUDED.deadline) AND draws.currency=EXCLUDED.currency AND draws.price_minor=EXCLUDED.price_minor AND draws.capacity=EXCLUDED.capacity AND (draws.status<>'completed' OR EXCLUDED.status='completed')`, d.ID, d.Title, d.Currency, d.PriceMinor, d.Capacity, d.Status, d.Deadline, d.LiveVideoURL)
 	if err != nil {
 		return dbError(err)
 	}
@@ -468,10 +492,11 @@ func (s *Store) AdminWrite(ctx context.Context, actor, kind, id string, data []b
 			}
 		}
 		var status string
-		if err = tx.QueryRow(ctx, `SELECT status FROM draws WHERE id=$1 FOR UPDATE`, id).Scan(&status); err != nil {
+		var needsClosure bool
+		if err = tx.QueryRow(ctx, `SELECT status,template_id IS NOT NULL AND sales_closed_at IS NULL FROM draws WHERE id=$1 FOR UPDATE`, id).Scan(&status, &needsClosure); err != nil {
 			return dbError(err)
 		}
-		if status == "open" {
+		if status == "open" || needsClosure {
 			return domain.ErrClosed
 		}
 		var pending bool
@@ -490,7 +515,7 @@ func (s *Store) AdminWrite(ctx context.Context, actor, kind, id string, data []b
 			ranks[w.Rank] = true
 			nums[w.Number] = true
 			var exists bool
-			if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM orders WHERE draw_id=$1 AND number::text=$2 AND status='paid')`, id, w.Number).Scan(&exists); err != nil {
+			if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM orders WHERE draw_id=$1 AND number::text=$2 AND status='paid' AND NOT refund_recorded)`, id, w.Number).Scan(&exists); err != nil {
 				return err
 			}
 			if !exists {

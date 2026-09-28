@@ -17,7 +17,7 @@ This file is the canonical progress tracker. Read it with the linked specificati
 - All non-`LATER` tasks are part of release acceptance unless an explicit, documented scope decision removes them. Business-policy decisions may be resolved through an approved staged release, such as disabling USD funding initially.
 - At the end of each work session, update **Current focus**, the evidence register and any changed decisions. No sensitive credentials, personal records or private payment evidence belong in this file.
 
-**Overall state:** specification captured; first admin portal foundation delivered and locally verified; revised wallet delivery, full admin workflows and production acceptance remain incomplete. No overall completion percentage is asserted.
+**Overall state:** specification captured; admin foundation and template/round workflow delivered and locally verified; revised wallet delivery, full admin workflows and production acceptance remain incomplete. No overall completion percentage is asserted.
 
 ## Current focus and execution order
 
@@ -33,7 +33,7 @@ This file is the canonical progress tracker. Read it with the linked specificati
 
 Security review accompanies every workstream. Start payment onboarding and infrastructure access early; do not postpone these external dependencies until UI completion.
 
-**Current focus:** client prioritized admin development on 28 September 2026. `ADM-11`–`ADM-13` and `AUTH-11` capture the completed first increment; broader `ADM-01`–`ADM-10` remain incomplete. Next: review the admin increment, then round/template contracts and fine-grained staff workflows (`ARC-02/03`, `ADM-02`, `AUTH-06/08`). Financial administration depends on the ledger work (`FIN-01`–`FIN-04`); it must not simulate unsupported balances.
+**Current focus:** the admin foundation and templates/rounds increment are locally verified (`AUTH-11`, `ADM-11`–`ADM-14`, `LOT-01/02`). Next: implement the separate currency ledger and verified deposit contracts (`FIN-01`–`FIN-04`, `PAY`), then quantity purchases/player journeys. Full staff permissions, independent draw approval and cancellation policy remain open. Admin financial screens must not simulate unsupported wallet balances. See [round implementation and validation](LOTTERY_ROUNDS_IMPLEMENTATION.md).
 
 ## 0. Confirmed scope — decisions, not delivery claims
 
@@ -137,8 +137,8 @@ Depends on applicable DEC policies and ARC-02/03. No real-money deposits until l
 
 ## 6. Lotteries, tickets and atomic purchases
 
-- [ ] **LOT-01** Implement reusable templates and independently identified rounds with immutable snapshots of financial rules when sales start.
-- [ ] **LOT-02** Validate currency, price, capacity/lucky-number range, timestamps/timezone, deductions, ranked shares and allowed status transitions on the server.
+- [x] **LOT-01** Implement reusable templates and independently identified rounds with immutable snapshots of financial rules when sales start. Evidence: [round implementation](LOTTERY_ROUNDS_IMPLEMENTATION.md), local database and browser checks.
+- [x] **LOT-02** Validate currency, price, capacity/lucky-number range, timestamps/timezone, deductions, ranked shares and allowed status transitions on the server. Evidence: round implementation; actual business terms and settlement policies remain undecided.
 - [ ] **LOT-03** Implement global/per-round sales pause, sold-out behavior and fixed cutoff enforced transactionally. Pausing does not silently change published dates/rules.
 - [ ] **LOT-04** Publish accurate sold/remaining counts and separate current versus maximum net pools; private customer information never enters public availability responses.
 - [ ] **BUY-01** Support quantity purchases with one unique tracking ID per ticket and a per-round unique lucky number; allow a number to recur in a different round.
@@ -193,6 +193,7 @@ Depends on applicable DEC policies and ARC-02/03. No real-money deposits until l
 - [x] **ADM-11** Deliver responsive admin shell, dedicated section routes, verified staff-access gate, role-filtered navigation and access-error states. Evidence: [admin validation](ADMIN_PORTAL_VALIDATION.md); fixture browser checks and separate API tests.
 - [x] **ADM-12** Deliver database-backed overview and read-only, paginated user directory with search and distinct email/MFA labels; do not invent wallet or identity-verification data. Evidence: admin validation.
 - [x] **ADM-13** Carry existing management actions into the new shell, page draw listings and protect immutable fields in the editor; preserve read-only reviewer UI and server write restrictions. Evidence: admin validation. Existing publication/export limitations remain open.
+- [x] **ADM-14** Deliver reusable template and round screens, explicit financial rule entry, draft editing, version checks, rule locking, open/pause/resume/permanent-close controls, admin sold/remaining/prize-fund estimates and readable before/after audit records. Evidence: [round implementation and local verification](LOTTERY_ROUNDS_IMPLEMENTATION.md). Cancellation/refunds, public portal rollout and independent draw approval remain separate.
 
 ## 10. Sanity content and language preservation
 
@@ -309,6 +310,7 @@ Use one row per completed task or coherent tested group. Link a detailed test re
 | 2026-09-28 | SCOPE-01–10 | Decisions recorded | Player/admin specifications and client confirmations | Implementation and production acceptance remain open |
 | 2026-09-28 | Checklist creation | Documentation only | This file; local link/ID/format checks | No application tests or production checks run for this documentation task |
 | 2026-09-28 | BASE-01, AUTH-11, ADM-11–13 | Complete for first increment / local | [Admin validation](ADMIN_PORTAL_VALIDATION.md); modified/new source and tests in current working tree | Production, full MFA end-to-end, wallet, advanced permissions, translations and approval flows remain open |
+| 2026-09-28 | LOT-01/02, ADM-14 | Complete for templates/rounds increment / local | [Round contracts, migration and verification](LOTTERY_ROUNDS_IMPLEMENTATION.md); source and executable tests in current changes | LOT-03/04 and ADM-02 remain broader release tasks: public portal, cancellation policy, full inventory/wallet rollout and target-server acceptance are incomplete |
 
 ### Historical evidence — useful foundations, not current release sign-off
 

@@ -615,3 +615,175 @@ body:has(.admin-portal) .scroll-progress-container {
     padding: 16px;
   }
 }
+
+.admin-lotteries {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.admin-lotteries .admin-card {
+  margin: 0;
+  min-width: 0;
+}
+.admin-template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 16px;
+}
+.admin-template {
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  padding: 22px;
+  background: #fbfaff;
+}
+.admin-template svg {
+  color: var(--admin-accent);
+}
+.admin-round-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.admin-lotteries td {
+  vertical-align: top;
+}
+.admin-lotteries td:last-child {
+  min-width: 180px;
+}
+.admin-round-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.admin-round-editor fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.admin-round-editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+.admin-round-editor input,
+.admin-round-editor select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d9deed;
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: white;
+  color: var(--admin-ink);
+  font: inherit;
+}
+.admin-round-editor small {
+  font-weight: 400;
+  color: var(--admin-muted);
+}
+.admin-round-editor .admin-round-check {
+  flex-direction: row;
+  align-items: center;
+}
+.admin-round-check input {
+  width: auto;
+}
+.admin-deduction {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+.admin-portal .admin-form-section {
+  margin-top: 26px;
+}
+.admin-prize-fields,
+.admin-prize-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.admin-prize-summary span {
+  border: 1px solid var(--admin-line);
+  padding: 12px;
+  border-radius: 8px;
+}
+.admin-round-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+.admin-portal .admin-round-confirm {
+  border: 2px solid #bea9f0;
+}
+@media (max-width: 760px) {
+  .admin-round-fields {
+    grid-template-columns: 1fr;
+  }
+  .admin-prize-fields,
+  .admin-prize-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-deduction {
+    grid-template-columns: 1fr 1fr;
+  }
+  .admin-deduction button {
+    grid-column: 1 / -1;
+  }
+  .admin-round-pagination {
+    justify-content: flex-start;
+  }
+}
+.admin-audit-changes {
+  margin-top: 12px;
+}
+.admin-audit-changes summary {
+  color: var(--admin-accent);
+  cursor: pointer;
+  font-weight: 600;
+}
+.admin-audit-changes td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .admin-round-table,
+  .admin-round-table tbody {
+    display: block;
+  }
+  .admin-round-table thead {
+    display: none;
+  }
+  .admin-round-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+  .admin-portal .admin-round-table td {
+    display: block;
+    border: 0;
+    padding: 8px 4px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+  .admin-round-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--admin-muted);
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+  .admin-round-table td:first-child,
+  .admin-round-table td:last-child {
+    grid-column: 1 / -1;
+  }
+}

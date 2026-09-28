@@ -1,27 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { accountAPI, accountFetch } from "@/lib/account-api";
-import { type BackendDraw, type Order } from "@/lib/backend";
+import { type Order } from "@/lib/backend";
 import { playersWorkbook, type PlayerReceipt } from "@/lib/exports/players";
 import JSZip from "jszip";
+import { AdminAuditChanges } from "./AdminAuditChanges";
 export type RecordSection =
-  | "draws"
-  | "orders"
-  | "legacy"
-  | "results"
-  | "advertisers"
-  | "messages"
-  | "audit";
-const blankDraw = (): BackendDraw => ({
-  id: crypto.randomUUID(),
-  title: "",
-  currency: "ETB",
-  priceMinor: 10000,
-  capacity: 25000,
-  status: "closed",
-  deadline: new Date(Date.now() + 86400000).toISOString(),
-  liveVideoUrl: "",
-});
+  "orders" | "legacy" | "results" | "advertisers" | "messages" | "audit";
 function download(bytes: Uint8Array, name: string, type: string) {
   const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type }));
   const a = document.createElement("a");
@@ -44,7 +29,6 @@ export function AdminRecordsPanel({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [refresh, setRefresh] = useState(0);
-  const [draw, setDraw] = useState<BackendDraw | null>(null);
   const [aff, setAff] = useState({
     code: "",
     name: "",
@@ -104,7 +88,6 @@ export function AdminRecordsPanel({
         body: JSON.stringify(value),
       });
       setRefresh((v) => v + 1);
-      setDraw(null);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -198,182 +181,6 @@ export function AdminRecordsPanel({
       {busy && <p role="status">Loading records…</p>}
       {!busy && !error && rows.length === 0 && (
         <div className="admin-empty">No records on this page yet.</div>
-      )}
-      {section === "draws" && (
-        <>
-          <button
-            className="admin-primary"
-            disabled={!canWrite}
-            onClick={() => setDraw(blankDraw())}
-          >
-            + New round
-          </button>
-          {draw && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void save("draws", draw.id, draw);
-              }}
-            >
-              <fieldset disabled={!canWrite || busy}>
-                <label>
-                  Draw title
-                  <input
-                    required
-                    maxLength={160}
-                    value={draw.title}
-                    onChange={(e) =>
-                      setDraw({ ...draw, title: e.target.value })
-                    }
-                  />
-                </label>
-                <label>
-                  Currency
-                  <select
-                    disabled={rows.some((r) => r.id === draw.id)}
-                    value={draw.currency}
-                    onChange={(e) =>
-                      setDraw({
-                        ...draw,
-                        currency: e.target.value as "ETB" | "USD",
-                      })
-                    }
-                  >
-                    <option>ETB</option>
-                    <option>USD</option>
-                  </select>
-                </label>
-                <label>
-                  Ticket price
-                  <input
-                    required
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    disabled={rows.some((r) => r.id === draw.id)}
-                    value={draw.priceMinor / 100}
-                    onChange={(e) =>
-                      setDraw({
-                        ...draw,
-                        priceMinor: Math.round(Number(e.target.value) * 100),
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Pool capacity
-                  <input
-                    required
-                    type="number"
-                    min={1}
-                    max={100000}
-                    disabled={rows.some((r) => r.id === draw.id)}
-                    value={draw.capacity}
-                    onChange={(e) =>
-                      setDraw({ ...draw, capacity: Number(e.target.value) })
-                    }
-                  />
-                </label>
-                <label>
-                  Sales deadline (your local time)
-                  <input
-                    required
-                    type="datetime-local"
-                    value={new Date(
-                      Date.parse(draw.deadline) -
-                        new Date(draw.deadline).getTimezoneOffset() * 60000,
-                    )
-                      .toISOString()
-                      .slice(0, 16)}
-                    onChange={(e) => {
-                      if (e.target.value)
-                        setDraw({
-                          ...draw,
-                          deadline: new Date(e.target.value).toISOString(),
-                        });
-                    }}
-                  />
-                </label>
-                <label>
-                  Sales status
-                  <select
-                    value={draw.status}
-                    onChange={(e) =>
-                      setDraw({
-                        ...draw,
-                        status: e.target.value as BackendDraw["status"],
-                      })
-                    }
-                  >
-                    <option value="closed">Closed</option>
-                    <option value="open">Open</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                </label>
-                <label>
-                  Broadcast URL
-                  <input
-                    type="url"
-                    value={draw.liveVideoUrl}
-                    onChange={(e) =>
-                      setDraw({ ...draw, liveVideoUrl: e.target.value })
-                    }
-                  />
-                </label>
-                <p>
-                  Price, currency and capacity are fixed after creation. Create
-                  a new draw for the next round.
-                </p>
-                <button disabled={busy}>Save draw</button>
-                <button type="button" onClick={() => setDraw(null)}>
-                  Cancel
-                </button>
-              </fieldset>
-            </form>
-          )}
-          <div className="admin-table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Lottery round</th>
-                  <th>Ticket price</th>
-                  <th>Capacity</th>
-                  <th>Sales status</th>
-                  <th>Deadline</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((d) => (
-                  <tr key={d.id}>
-                    <th scope="row">
-                      {d.title}
-                      <small style={{ display: "block" }}>{d.id}</small>
-                    </th>
-                    <td>
-                      {d.currency} {(d.priceMinor / 100).toLocaleString()}
-                    </td>
-                    <td>{d.capacity.toLocaleString()}</td>
-                    <td>
-                      <span className="admin-badge">
-                        {d.status === "open" &&
-                        Date.parse(d.deadline) <= Date.now()
-                          ? "Deadline passed"
-                          : d.status}
-                      </span>
-                    </td>
-                    <td>{new Date(d.deadline).toLocaleString()}</td>
-                    <td>
-                      <button disabled={!canWrite} onClick={() => setDraw(d)}>
-                        Edit round
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
       )}
       {section === "orders" && (
         <form
@@ -691,6 +498,7 @@ export function AdminRecordsPanel({
           <article key={r.id} className="account-ticket">
             {r.action} · {r.actor} · {r.resource} ·{" "}
             {new Date(r.created_at).toLocaleString()}
+            <AdminAuditChanges details={r.details} />
           </article>
         ))}
       {

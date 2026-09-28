@@ -360,7 +360,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 		return
 	}
 	if r.Method == "GET" {
-		if kind == "users" || kind == "overview" {
+		if kind == "users" || kind == "overview" || kind == "rounds" || kind == "templates" {
 			if err = a.Store.Rate(r.Context(), "admin-read:"+u.ID, 60); err != nil {
 				fail(w, err)
 				return
@@ -377,6 +377,10 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 			out, err = a.Store.Operations(r.Context())
 		} else if kind == "orders" {
 			out, err = a.Store.Orders(r.Context(), "", offset(r), true)
+		} else if kind == "templates" {
+			out, err = a.Store.Templates(r.Context(), offset(r))
+		} else if kind == "rounds" {
+			out, err = a.Store.Rounds(r.Context(), offset(r))
 		} else if kind == "draws" {
 			out, err = a.Store.AdminDraws(r.Context(), offset(r))
 		} else {
@@ -436,16 +440,19 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 				}
 			}
 		}
-	} else if kind == "draws" {
-		var d domain.Draw
-		if err = decode(r, &d); err == nil {
-			if d.ID != r.PathValue("id") {
-				err = domain.ErrInvalid
-			} else if d.LiveVideoURL != "" && !safeLink(d.LiveVideoURL) {
+	} else if kind == "templates" {
+		var input domain.LotteryTemplate
+		if err = decode(r, &input); err == nil {
+			if input.ID != r.PathValue("id") {
 				err = domain.ErrInvalid
 			} else {
-				err = a.Store.SaveDraw(r.Context(), u.ID, d)
+				err = a.Store.SaveTemplate(r.Context(), u.ID, input)
 			}
+		}
+	} else if kind == "rounds" {
+		var input domain.RoundCommand
+		if err = decode(r, &input); err == nil {
+			err = a.Store.SaveRound(r.Context(), u.ID, r.PathValue("id"), input)
 		}
 	} else {
 		var data json.RawMessage

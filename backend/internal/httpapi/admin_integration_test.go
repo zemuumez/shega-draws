@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http/httptest"
@@ -75,6 +76,26 @@ func TestAdminEndpointRolesAndRevocation(t *testing.T) {
 		}
 		return w.Body.String()
 	}
+
+	write := func(path string, input any, expected int) {
+		t.Helper()
+		raw, e := json.Marshal(input)
+		if e != nil {
+			t.Fatal(e)
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest("PUT", "/v1/admin/"+path, strings.NewReader(string(raw)))
+		r.Header.Set("Authorization", "Bearer test-fixture")
+		r.Header.Set("Content-Type", "application/json")
+		h.ServeHTTP(w, r)
+		if w.Code != expected {
+			t.Fatalf("PUT %s: got %d want %d: %s", path, w.Code, expected, w.Body.String())
+		}
+	}
+	request("templates", 200)
+	request("rounds", 200)
+	write("templates/weekly", map[string]any{}, 403)
+	write("rounds/weekly", map[string]any{}, 403)
 	request("session", 200)
 	request("orders", 200)
 	request("users", 403)
@@ -88,6 +109,19 @@ func TestAdminEndpointRolesAndRevocation(t *testing.T) {
 	if !strings.Contains(body, id+"@example.test") || strings.Contains(body, "test-fixture") {
 		t.Fatal("unexpected user directory response")
 	}
+
+	template := domain.LotteryTemplate{ID: "weekly", Active: true, LotterySettings: domain.LotterySettings{Title: "Weekly", Currency: "ETB", PriceMinor: 50000, Capacity: 100, Rules: domain.LotteryRules{Deductions: []domain.Deduction{}, PrizeBPS: []int64{1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000}}}}
+	write("templates/weekly", template, 200)
+	write("templates/weekly", template, 409)
+	write("templates/wrong-id", template, 400)
+	round := domain.RoundCommand{Action: "save", TemplateID: "weekly", TemplateVersion: 1, LotterySettings: template.LotterySettings, Deadline: time.Now().Add(time.Hour)}
+	write("rounds/round1", round, 200)
+	write("rounds/round1", map[string]any{"action": "open", "version": 1}, 200)
+	write("rounds/round1", map[string]any{"action": "pause", "version": 1}, 409)
+	round.Version = 2
+	write("rounds/round1", round, 409)
+	write("draws/round1", map[string]any{}, 403)
+	write("rounds/round1", map[string]any{"action": "pause", "version": 2, "unexpected": true}, 400)
 	request("overview", 200)
 	request("users?q="+strings.Repeat("x", 101), 400)
 	request("unknown", 403)

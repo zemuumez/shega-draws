@@ -1,5 +1,7 @@
 # Admin portal foundation — 28 September 2026
 
+This report records the first increment. The later [templates/rounds implementation](LOTTERY_ROUNDS_IMPLEMENTATION.md) replaces its draw editor and adds frozen rules, lifecycle controls and estimates.
+
 ## Delivered in this development slice
 
 - Responsive Rimna administration shell based on the supplied references, with dedicated section URLs, mobile navigation, sign-out, keyboard focus styles and a navigation skip link.

@@ -71,7 +71,6 @@ export function visibleSections(role: StaffRole) {
 }
 export function recordSection(id: AdminSection): id is RecordSection {
   return [
-    "draws",
     "results",
     "orders",
     "messages",

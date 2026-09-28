@@ -1,5 +1,7 @@
 # Rimna — Admin Portal and Scalable Architecture
 
+Implementation update (28 September 2026): the [templates and rounds increment](LOTTERY_ROUNDS_IMPLEMENTATION.md) is now locally verified. Wallets, independent draw approval and production acceptance remain planned.
+
 Prepared: 28 September 2026  
 Status: target design grounded in a limited source review. This is not a security certification, implementation completion report or production capacity measurement.
 

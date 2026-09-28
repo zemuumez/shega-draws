@@ -32,6 +32,10 @@ import {
 import { AccountPanel } from "../AccountPanel";
 import { AdminOverview } from "./AdminOverview";
 import { AdminUsers } from "./AdminUsers";
+const AdminLotteries = dynamic(
+  () => import("./AdminLotteries").then((m) => m.AdminLotteries),
+  { loading: () => <p role="status">Loading lotteries…</p> },
+);
 const AdminRecordsPanel = dynamic(
   () => import("./AdminRecordsPanel").then((m) => m.AdminRecordsPanel),
   { loading: () => <p role="status">Loading workspace…</p> },
@@ -249,6 +253,9 @@ export function AdminPortal() {
             <>
               {section.id === "overview" && <AdminOverview />}
               {section.id === "users" && <AdminUsers />}
+              {section.id === "draws" && (
+                <AdminLotteries canWrite={role === "admin"} />
+              )}
               {section.id === "operations" && (
                 <section className="admin-card">
                   <OperationsPanel />

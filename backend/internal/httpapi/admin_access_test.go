@@ -7,7 +7,7 @@ import (
 
 func TestAdminNewEndpointsRequireAuthentication(t *testing.T) {
 	a := API{Origin: "https://example.test"}
-	for _, path := range []string{"session", "users", "overview"} {
+	for _, path := range []string{"session", "users", "overview", "templates", "rounds"} {
 		w := httptest.NewRecorder()
 		a.Handler().ServeHTTP(w, httptest.NewRequest("GET", "/v1/admin/"+path, nil))
 		if w.Code != 401 {
@@ -21,7 +21,11 @@ func TestAdminPermissionBoundary(t *testing.T) {
 		role, method, kind string
 		allowed            bool
 	}{
-		{"reviewer", "GET", "session", true}, {"reviewer", "GET", "orders", true},
+		{"reviewer", "GET", "session", true},
+		{"reviewer", "GET", "templates", true}, {"reviewer", "GET", "rounds", true},
+		{"reviewer", "PUT", "templates", false}, {"reviewer", "PUT", "rounds", false},
+		{"admin", "PUT", "templates", true}, {"admin", "PUT", "rounds", true},
+		{"admin", "PUT", "draws", false}, {"reviewer", "GET", "orders", true},
 		{"reviewer", "GET", "users", false}, {"reviewer", "GET", "operations", false},
 		{"reviewer", "GET", "audit", false}, {"reviewer", "PUT", "draws", false},
 		{"admin", "GET", "users", true}, {"admin", "GET", "overview", true},
