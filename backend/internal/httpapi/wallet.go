@@ -39,7 +39,7 @@ func (a *API) wallet(w http.ResponseWriter, r *http.Request, u domain.User) {
 		}
 	}
 	policy.Enabled = policy.Enabled && !paused && len(methods) > 0
-	reply(w, 200, map[string]any{"balances": balances, "depositPolicy": policy, "methods": methods, "mode": a.Service.Mode, "walletPurchasesEnabled": false})
+	reply(w, 200, map[string]any{"balances": balances, "depositPolicy": policy, "methods": methods, "mode": a.Service.Mode, "walletPurchasesEnabled": true})
 }
 func (a *API) walletHistory(w http.ResponseWriter, r *http.Request, u domain.User) {
 	if err := a.Store.Rate(r.Context(), "wallet-read:"+u.ID, 120); err != nil {

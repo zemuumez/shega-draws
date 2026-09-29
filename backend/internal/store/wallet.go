@@ -2,6 +2,13 @@ package store
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"time"
+
 	"github.com/jackc/pgx/v5"
 	"rimna/backend/internal/domain"
 )
@@ -122,3 +129,119 @@ func (s *Store) WalletReport(ctx context.Context) ([]WalletReport, error) {
 	}
 	return out, rows.Err()
 }
+
+func (s *Store) PurchaseWithWallet(ctx context.Context, u domain.User, key string, p domain.Purchase, d domain.Draw) (domain.Order, error) {
+	tx, err := s.DB.Begin(ctx)
+	if err != nil {
+		return domain.Order{}, err
+	}
+	defer tx.Rollback(ctx)
+
+	// Serialize user's wallet operations & orders
+	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended($1,0))`, u.ID); err != nil {
+		return domain.Order{}, err
+	}
+
+	encoded, _ := json.Marshal(p)
+	sum := sha256.Sum256(encoded)
+	fingerprint := hex.EncodeToString(sum[:])
+
+	// Check idempotency
+	existing, e := scanOrder(tx.QueryRow(ctx, `SELECT `+orderColumns+` FROM orders WHERE user_id=$1 AND idempotency_key=$2`, u.ID, key))
+	if e == nil {
+		if existing.Fingerprint != fingerprint {
+			return domain.Order{}, domain.ErrConflict
+		}
+		return existing, nil
+	}
+	if !errors.Is(e, domain.ErrNotFound) {
+		return domain.Order{}, e
+	}
+
+	var paused, recovery bool
+	if err = tx.QueryRow(ctx, `SELECT sales_paused,recovery_locked FROM operations_control WHERE id=true FOR SHARE`).Scan(&paused, &recovery); err != nil {
+		return domain.Order{}, err
+	}
+	if paused || recovery {
+		return domain.Order{}, domain.ErrPaused
+	}
+
+	// Verify draw is open and not past deadline
+	var admissionTime time.Time
+	if err = tx.QueryRow(ctx, `SELECT clock_timestamp()`).Scan(&admissionTime); err != nil {
+		return domain.Order{}, err
+	}
+	var currentStatus string
+	var currentDeadline time.Time
+	var currentPrice int64
+	var currentCapacity int
+	err = tx.QueryRow(ctx, `SELECT status, deadline, price_minor, capacity FROM draws WHERE id=$1 FOR SHARE`, p.DrawID).Scan(&currentStatus, &currentDeadline, &currentPrice, &currentCapacity)
+	if err != nil {
+		return domain.Order{}, dbError(err)
+	}
+	if currentStatus != "open" || !currentDeadline.After(admissionTime) {
+		return domain.Order{}, domain.ErrClosed
+	}
+	if p.Number < 1 || p.Number > currentCapacity {
+		return domain.Order{}, domain.ErrInvalid
+	}
+
+	// Release any expired hold on this number
+	_, err = tx.Exec(ctx, `UPDATE orders SET status='expired' WHERE draw_id=$1 AND number=$2 AND status IN ('initializing','pending') AND expires_at<=now()`, p.DrawID, p.Number)
+	if err != nil {
+		return domain.Order{}, err
+	}
+
+	// Verify number is not already taken
+	var taken bool
+	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM orders WHERE draw_id=$1 AND number=$2 AND (status IN ('paid','legacy_pending') OR (status IN ('initializing','pending') AND expires_at>now())))`, p.DrawID, p.Number).Scan(&taken)
+	if err != nil {
+		return domain.Order{}, err
+	}
+	if taken {
+		return domain.Order{}, domain.ErrConflict
+	}
+
+	var b [16]byte
+	if _, err = rand.Read(b[:]); err != nil {
+		return domain.Order{}, err
+	}
+	orderID := hex.EncodeToString(b[:])
+
+	// Deduct from wallet balance atomically
+	if _, err = postWallet(ctx, tx, u.ID, d.Currency, "purchase", orderID, -currentPrice, nil); err != nil {
+		return domain.Order{}, err
+	}
+
+	// Insert order as paid
+	o := domain.Order{
+		ID:          orderID,
+		UserID:      u.ID,
+		DrawID:      p.DrawID,
+		Number:      p.Number,
+		AmountMinor: currentPrice,
+		Currency:    d.Currency,
+		Provider:    "wallet",
+		Status:      "paid",
+		Key:         key,
+		Fingerprint: fingerprint,
+		Phone:       p.Phone,
+		Email:       u.Email,
+		Name:        u.Name,
+		PromoCode:   p.PromoCode,
+		ExpiresAt:   admissionTime,
+		CreatedAt:   admissionTime,
+	}
+
+	_, err = tx.Exec(ctx, `INSERT INTO orders(id,user_id,draw_id,number,amount_minor,currency,provider,status,idempotency_key,fingerprint,phone,email,name,promo_code,expires_at,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
+		o.ID, o.UserID, o.DrawID, o.Number, o.AmountMinor, o.Currency, o.Provider, o.Status, o.Key, o.Fingerprint, o.Phone, o.Email, o.Name, o.PromoCode, o.ExpiresAt, o.CreatedAt)
+	if err != nil {
+		return domain.Order{}, dbError(err)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return domain.Order{}, err
+	}
+	return o, nil
+}
+

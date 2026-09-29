@@ -12,7 +12,7 @@ import {
 import { CinematicStadiumHero } from "@/components/CinematicStadiumHero";
 import { PaymentLogosFarm } from "@/components/PaymentLogosFarm";
 import { AdvertisementCarousel } from "@/components/AdvertisementCarousel";
-import { InteractiveTicketConfigurator } from "@/components/InteractiveTicketConfigurator";
+import { AvailableLotteries } from "@/components/AvailableLotteries";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
 
 export const metadata: Metadata = {
@@ -25,16 +25,18 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [draws, siteSettings, testimonials, ads] = await Promise.all([
-    publicAPI<BackendDraw[]>("/draws").then(ds=>ds.map(compatibleDraw)).catch(() => []),
+  const [rawDraws, siteSettings, testimonials, ads] = await Promise.all([
+    publicAPI<BackendDraw[]>("/draws").catch(() => []),
     sanityClient.fetch<CMSSiteSettings>(SITE_SETTINGS_QUERY).catch(() => null),
     sanityClient.fetch<CMSTestimonial[]>(TESTIMONIALS_QUERY).catch(() => null),
     sanityClient.fetch<CMSAdvertisement[]>(ADVERTISEMENTS_QUERY).catch(() => null),
   ]);
 
+  const compatibleDraws = (rawDraws || []).map(compatibleDraw);
+
   return (
     <div style={{ width: "100%", overflowX: "hidden" }}>
-      {/* ── UNIFIED FIXED STILL PARALLAX BACKGROUND SECTION (Hero through Ticket Configurator) ── */}
+      {/* ── UNIFIED FIXED STILL PARALLAX BACKGROUND SECTION (Hero through Available Lotteries) ── */}
       <div
         style={{
           position: "relative",
@@ -60,7 +62,7 @@ export default async function HomePage() {
 
         {/* 1. Screenful Cinematic Hero */}
         <div style={{ position: "relative", zIndex: 2 }}>
-          <CinematicStadiumHero siteSettings={siteSettings} draws={draws} />
+          <CinematicStadiumHero siteSettings={siteSettings} draws={compatibleDraws} />
         </div>
 
         {/* 2. Promotional Advertisements & Teasers (Containing Payment Gateways at the Top) */}
@@ -86,7 +88,7 @@ export default async function HomePage() {
           <div data-page-reveal><AdvertisementCarousel cmsAds={ads} /></div>
         </section>
 
-        {/* 3. Centerpiece Interactive Ticket Configurator (Floating Translucent Glass Card Over The Still Background!) */}
+        {/* 3. Centerpiece Available Digital Lotteries (Cards for each open round created by admin) */}
         <section
           id="choose-ticket"
           style={{
@@ -98,7 +100,7 @@ export default async function HomePage() {
           }}
         >
           <div className="page-inner-container">
-            <InteractiveTicketConfigurator siteSettings={siteSettings} draws={draws || []} />
+            <AvailableLotteries initialDraws={rawDraws || []} />
           </div>
         </section>
       </div>

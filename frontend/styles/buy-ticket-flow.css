@@ -1,0 +1,498 @@
+/* ── SHEGA DRAWS / RIMNA LOTTERY: 3-STEP TICKET FLOW MODAL ── */
+.flow-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 15, 25, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.flow-modal-container {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  background: #0E1626;
+  border: 1.5px solid #FDE047;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(253, 224, 71, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: flowModalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes flowModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header Area */
+.flow-modal-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid rgba(253, 224, 71, 0.15);
+  position: relative;
+}
+
+.flow-header-tag {
+  font-size: 0.725rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #FDE047;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-header-title {
+  font-family: var(--font-heading, "Cinzel", Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.flow-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8125rem;
+  color: #94A3B8;
+  margin-bottom: 18px;
+}
+
+.flow-header-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.flow-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.flow-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #EF4444;
+  color: #F87171;
+}
+
+/* Step Progress Indicator */
+.flow-progress-bar-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.flow-progress-segment {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.3s;
+}
+
+.flow-progress-segment.active {
+  background: #FDE047;
+  box-shadow: 0 0 8px rgba(253, 224, 71, 0.5);
+}
+
+.flow-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.flow-progress-step-text {
+  color: #FDE047;
+}
+
+.flow-progress-guarantee {
+  color: #94A3B8;
+}
+
+/* Modal Body / Scrollable Content */
+.flow-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.flow-step-intro {
+  color: #94A3B8;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Form inputs */
+.flow-form-group {
+  margin-bottom: 18px;
+}
+
+.flow-form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #FDE047;
+  margin-bottom: 8px;
+}
+
+.flow-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.flow-input:focus {
+  border-color: #FDE047;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.15);
+}
+
+.flow-phone-row {
+  display: flex;
+  gap: 8px;
+}
+
+.flow-phone-select {
+  padding: 12px 14px;
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 0.875rem;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+.flow-phone-select:focus {
+  border-color: #FDE047;
+}
+
+/* Step 2 Lucky Number Styling */
+.flow-selected-number-card {
+  background: #080D1A;
+  border: 1.5px solid rgba(253, 224, 71, 0.3);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.flow-selected-number-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.flow-selected-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  background: rgba(253, 224, 71, 0.1);
+  border: 2px solid #FDE047;
+  border-radius: 12px;
+  color: #FDE047;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.flow-pick-random-btn {
+  width: 100%;
+  padding: 12px;
+  background: #FDE047;
+  border: none;
+  border-radius: 10px;
+  color: #0F172A;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(253, 224, 71, 0.25);
+}
+
+.flow-pick-random-btn:hover {
+  background: #FEF08A;
+  transform: translateY(-1px);
+}
+
+/* Number Search & Page controls */
+.flow-search-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.flow-search-input-wrap {
+  flex: 1;
+  position: relative;
+}
+
+.flow-search-input-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748B;
+}
+
+.flow-search-input-wrap input {
+  padding-left: 36px;
+}
+
+.flow-page-nav-btn {
+  padding: 10px 14px;
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.flow-page-nav-btn:hover:not(:disabled) {
+  border-color: #FDE047;
+  color: #FDE047;
+}
+
+.flow-page-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Number Grid */
+.flow-grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.725rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.flow-grid-legend {
+  display: flex;
+  gap: 12px;
+}
+
+.flow-grid-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.flow-numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  max-height: 230px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.flow-num-btn {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #162032;
+  border: 1px solid #23314B;
+  color: #E2E8F0;
+  padding: 0;
+}
+
+.flow-num-btn:hover:not(:disabled) {
+  background: #1E293B;
+  border-color: #FDE047;
+  color: #FDE047;
+}
+
+.flow-num-btn.selected {
+  background: #FDE047;
+  border-color: #FDE047;
+  color: #0F172A;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(253, 224, 71, 0.4);
+}
+
+.flow-num-btn.taken {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #EF4444;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Modal Footer / Navigation */
+.flow-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(253, 224, 71, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(14, 22, 38, 0.95);
+}
+
+.flow-back-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  color: #CBD5E1;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-back-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+}
+
+.flow-continue-btn {
+  padding: 11px 28px;
+  background: linear-gradient(135deg, #DC2626 0%, #EA580C 100%);
+  border: none;
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-continue-btn:hover:not(:disabled) {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.flow-continue-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Step 3 Checkout Card */
+.flow-summary-box {
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.flow-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.875rem;
+}
+
+.flow-summary-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.flow-summary-label {
+  color: #94A3B8;
+}
+
+.flow-summary-val {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.flow-wallet-check-box {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1.5px solid rgba(253, 224, 71, 0.4);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Success Card */
+.flow-success-box {
+  text-align: center;
+  padding: 28px 16px;
+}
+
+.flow-success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid #10B981;
+  color: #34D399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}

@@ -26,6 +26,7 @@ type Repository interface {
 	FinishWork(context.Context, string, bool) error
 	Expire(context.Context) error
 	WorkerEnabled(context.Context, string) (bool, error)
+	PurchaseWithWallet(context.Context, domain.User, string, domain.Purchase, domain.Draw) (domain.Order, error)
 }
 type Service struct {
 	Store                 Repository
@@ -57,6 +58,15 @@ func (s *Service) Purchase(ctx context.Context, u domain.User, key string, p dom
 	if p.PromoCode != "" && !promoPattern.MatchString(p.PromoCode) {
 		return domain.Order{}, domain.ErrInvalid
 	}
+
+	if p.Provider == "wallet" {
+		d, err := s.Store.Draw(ctx, p.DrawID)
+		if err != nil {
+			return domain.Order{}, err
+		}
+		return s.Store.PurchaseWithWallet(ctx, u, key, p, d)
+	}
+
 	provider, ok := s.Providers[p.Provider]
 	if !ok {
 		return domain.Order{}, domain.ErrUnavailable

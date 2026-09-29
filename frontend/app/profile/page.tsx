@@ -20,6 +20,7 @@ import {
   LogOut,
   Mail,
   Ticket,
+  History,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { clearAccountToken } from "@/lib/account-api";
@@ -42,7 +43,7 @@ export default function ProfilePage() {
   const { data: session, isPending: sessionLoading } = authClient.useSession();
 
   // Active section tab
-  const [activeTab, setActiveTab] = useState<"wallet" | "profile" | "security">("wallet");
+  const [activeTab, setActiveTab] = useState<"wallet" | "history" | "profile" | "security">("wallet");
 
   // Profile edit state
   const [name, setName] = useState("");
@@ -80,11 +81,11 @@ export default function ProfilePage() {
     }
   }, [session?.user?.name]);
 
-  // Handle URL hash navigation (e.g. /profile#wallet or /profile#security)
+  // Handle URL hash navigation (e.g. /profile#wallet, /profile#history, /profile#profile, /profile#security)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.replace("#", "");
-      if (hash === "wallet" || hash === "profile" || hash === "security") {
+      if (hash === "wallet" || hash === "history" || hash === "profile" || hash === "security") {
         setActiveTab(hash as any);
       }
     }
@@ -125,6 +126,7 @@ export default function ProfilePage() {
       }
       setNameSuccess("Profile name updated successfully.");
       setTimeout(() => setNameSuccess(""), 4000);
+      router.refresh();
     } catch (err: any) {
       setNameError(err.message || "Failed to update profile name.");
     } finally {
@@ -138,6 +140,10 @@ export default function ProfilePage() {
     setPasswordStatus("");
     setPasswordError("");
 
+    if (!currentPassword) {
+      setPasswordError("Please enter your current account password.");
+      return;
+    }
     if (newPassword.length < 12) {
       setPasswordError("New password must be at least 12 characters long.");
       return;
@@ -152,14 +158,14 @@ export default function ProfilePage() {
       const res = await authClient.changePassword({
         currentPassword,
         newPassword,
-        revokeOtherSessions: true,
+        revokeOtherSessions: false,
       });
 
       if (res?.error) {
         throw new Error(res.error.message || "Failed to change password.");
       }
 
-      setPasswordStatus("Password changed successfully. All other sessions have been revoked.");
+      setPasswordStatus("Password changed successfully.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -423,6 +429,18 @@ export default function ProfilePage() {
 
         <button
           type="button"
+          className={`profile-nav-pill-btn ${activeTab === "history" ? "active" : ""}`}
+          onClick={() => {
+            setActiveTab("history");
+            window.location.hash = "history";
+          }}
+        >
+          <History size={16} />
+          <span>{text("Deposit & Balance History")}</span>
+        </button>
+
+        <button
+          type="button"
           className={`profile-nav-pill-btn ${activeTab === "profile" ? "active" : ""}`}
           onClick={() => {
             setActiveTab("profile");
@@ -448,11 +466,19 @@ export default function ProfilePage() {
 
       {/* ── 3. Tab Contents ─── */}
 
-      {/* TAB 1: WALLET */}
+      {/* TAB 1: WALLET & BALANCES */}
       {activeTab === "wallet" && (
         <div>
           {isVerified ? (
-            <WalletPanel key={session.user.id} userId={session.user.id} />
+            <WalletPanel
+              key={session.user.id + "-wallet"}
+              userId={session.user.id}
+              view="balances"
+              onGoToHistory={() => {
+                setActiveTab("history");
+                window.location.hash = "history";
+              }}
+            />
           ) : (
             <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
               <Lock size={36} color="#FBBF24" style={{ margin: "0 auto 12px" }} />
@@ -476,6 +502,29 @@ export default function ProfilePage() {
               >
                 {text("Resend verification email")}
               </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 2: DEPOSIT & BALANCE HISTORY */}
+      {activeTab === "history" && (
+        <div>
+          {isVerified ? (
+            <WalletPanel
+              key={session.user.id + "-history"}
+              userId={session.user.id}
+              view="history"
+            />
+          ) : (
+            <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
+              <Lock size={36} color="#FBBF24" style={{ margin: "0 auto 12px" }} />
+              <h3 style={{ color: "#F9FAFB", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                {text("History Locked — Email Verification Required")}
+              </h3>
+              <p style={{ color: "#9CA3AF", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                {text("Please click the verification link sent to your email to view your financial transactions and deposit history.")}
+              </p>
             </div>
           )}
         </div>
