@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
+import "../styles/auth-profile.css";
 import { PageEntrance } from "@/components/ui/PageEntrance";
 import { PageLoader } from "@/components/PageLoader";
 import { Nav } from "@/components/Nav";

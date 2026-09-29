@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -20,6 +20,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
+import { authClient } from "@/lib/auth-client";
 import { ContactUsModal } from "./ContactUsModal";
 
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
@@ -33,7 +34,23 @@ export function Nav({
 }) {
   const pathname = usePathname();
   const { text, t, getLocalized } = useLanguage();
+  const { data: session } = authClient.useSession();
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
@@ -53,10 +70,14 @@ export function Nav({
   ];
 
   // Right desktop links
+  const myTicketsHref = session
+    ? "/my-tickets"
+    : `/login?redirect=${encodeURIComponent("/my-tickets")}`;
+
   const rightNavItems = [
     { href: "/#choose-ticket", label: "Buy Tickets",    icon: ListChecks },
-    { href: "/account", label: text("My tickets"), icon: User },
-    { href: "/about",       label: t.nav.whyRimna || "Why Rimna", icon: Award },
+    { href: myTicketsHref,     label: text("My tickets"), icon: Ticket },
+    { href: "/about",          label: t.nav.whyRimna || "Why Rimna", icon: Award },
   ];
 
   // All navigation links for mobile dock
@@ -109,9 +130,112 @@ export function Nav({
           </a>
         </div>
 
-        {/* Language Selector */}
+        {/* Language Selector & Auth Entry */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, position: "relative" }}>
           <LanguageSwitcher />
+
+          {!session ? (
+            <Link
+              href={`/login?redirect=${encodeURIComponent(pathname || "/")}`}
+              className="top-ribbon-login-btn"
+              title={text("Sign in or create account")}
+            >
+              <LogIn size={13} />
+              <span>{t.nav.signIn || text("Log In")}</span>
+            </Link>
+          ) : (
+            <div style={{ position: "relative" }} ref={profileDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                className="top-ribbon-profile-btn"
+                aria-expanded={isProfileOpen}
+                aria-haspopup="menu"
+              >
+                <div className="top-ribbon-avatar-circle">
+                  {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
+                </div>
+                <span style={{ maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {session.user.name?.split(" ")[0] || text("Profile")}
+                </span>
+                <ChevronDown
+                  size={12}
+                  style={{
+                    transition: "transform 0.2s ease",
+                    transform: isProfileOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                />
+              </button>
+
+              {isProfileOpen && (
+                <div className="top-ribbon-dropdown-menu" role="menu">
+                  <div className="dropdown-user-header">
+                    <div className="top-ribbon-avatar-circle" style={{ width: 34, height: 34, fontSize: "1rem" }}>
+                      {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
+                    </div>
+                    <div>
+                      <div className="user-name">{session.user.name}</div>
+                      <div className="user-email">{session.user.email}</div>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/profile"
+                    className="dropdown-item-link"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <User size={15} color="#FDE047" />
+                    <span>{text("Profile & Settings")}</span>
+                  </Link>
+
+                  <Link
+                    href="/profile#wallet"
+                    className="dropdown-item-link"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <Award size={15} color="#FDE047" />
+                    <span>{text("My Wallet & Balance")}</span>
+                  </Link>
+
+                  <Link
+                    href="/my-tickets"
+                    className="dropdown-item-link"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <Ticket size={15} color="#FDE047" />
+                    <span>{text("My Tickets")}</span>
+                  </Link>
+
+                  <Link
+                    href="/admin"
+                    className="dropdown-item-link"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <ShieldCheck size={15} color="#60A5FA" />
+                    <span>{text("Staff Portal")}</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    className="dropdown-item-link signout-item"
+                    role="menuitem"
+                    onClick={async () => {
+                      setIsProfileOpen(false);
+                      await authClient.signOut();
+                      window.location.href = "/";
+                    }}
+                  >
+                    <LogOut size={15} />
+                    <span>{t.nav.signOut || text("Sign Out")}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

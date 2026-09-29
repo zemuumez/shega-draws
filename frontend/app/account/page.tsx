@@ -1,8 +1,5 @@
-import { AccountPanel } from "@/components/AccountPanel";
+import { redirect } from "next/navigation";
+
 export default function AccountPage() {
-  return (
-    <div className="management-page">
-      <AccountPanel />
-    </div>
-  );
+  redirect("/profile");
 }

@@ -1,0 +1,642 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Rimna International Digital Lottery — Auth, Profile & Tickets Design System
+   Gold & Deep Navy Luxury Casino Aesthetic
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Top Header Ribbon Auth Elements ────────────────────────────────────── */
+.top-ribbon-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(253, 224, 71, 0.12);
+  border: 1px solid rgba(253, 224, 71, 0.6);
+  border-radius: 20px;
+  color: #FDE047;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(253, 224, 71, 0.1);
+  white-space: nowrap;
+}
+
+.top-ribbon-login-btn:hover {
+  background: #FDE047;
+  color: #111827;
+  border-color: #FDE047;
+  box-shadow: 0 0 14px rgba(253, 224, 71, 0.35);
+  transform: translateY(-1px);
+}
+
+.top-ribbon-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px 3px 5px;
+  background: rgba(31, 41, 55, 0.85);
+  border: 1px solid rgba(253, 224, 71, 0.4);
+  border-radius: 20px;
+  color: #FDE047;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.top-ribbon-profile-btn:hover,
+.top-ribbon-profile-btn[aria-expanded="true"] {
+  background: rgba(55, 65, 81, 0.95);
+  border-color: #FDE047;
+  box-shadow: 0 0 12px rgba(253, 224, 71, 0.25);
+}
+
+.top-ribbon-avatar-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FDE047 0%, #D97706 100%);
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Profile Dropdown Popover ───────────────────────────────────────────── */
+.top-ribbon-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: rgba(17, 24, 39, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(253, 224, 71, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(234, 179, 8, 0.15);
+  padding: 8px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  animation: dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-user-header {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-user-header .user-name {
+  font-weight: 800;
+  color: #F9FAFB;
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+.dropdown-user-header .user-email {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+  margin-top: 2px;
+}
+
+.dropdown-item-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: #E5E7EB;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.dropdown-item-link:hover {
+  background: rgba(253, 224, 71, 0.12);
+  color: #FDE047;
+  transform: translateX(2px);
+}
+
+.dropdown-item-link.signout-item {
+  color: #F87171;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
+.dropdown-item-link.signout-item:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #FCA5A5;
+}
+
+/* ── Modern Auth & Login Page ───────────────────────────────────────────── */
+.auth-page-container {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  background: radial-gradient(circle at 50% 20%, #1A2234 0%, #0B111E 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-page-container::before {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 350px;
+  background: radial-gradient(ellipse, rgba(234, 179, 8, 0.12) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+.auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(17, 24, 39, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(253, 224, 71, 0.35);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(234, 179, 8, 0.12);
+  color: #F9FAFB;
+  box-sizing: border-box;
+  animation: authCardEntrance 0.3s ease-out;
+}
+
+@keyframes authCardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-header h1 {
+  font-family: var(--font-headline, 'Fraunces', serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #FDE047;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.auth-header p {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #0B111E;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
+  gap: 4px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #9CA3AF;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.auth-tab-btn.active {
+  background: #1F2937;
+  color: #FDE047;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.auth-form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-form-group label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #D1D5DB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.auth-form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  background: #0B111E;
+  border: 1.5px solid #374151;
+  border-radius: 10px;
+  color: #F9FAFB;
+  font-size: 0.9375rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.auth-form-group input:focus {
+  outline: none;
+  border-color: #FDE047;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.2);
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, #FDE047 0%, #D97706 100%);
+  color: #111827;
+  font-weight: 900;
+  font-size: 0.9375rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(234, 179, 8, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(234, 179, 8, 0.45);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-alert-message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.auth-alert-message.error {
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: #FCA5A5;
+}
+
+.auth-alert-message.success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6EE7B7;
+}
+
+/* ── Profile Hub Page ───────────────────────────────────────────────────── */
+.profile-page-wrapper {
+  max-width: 1100px;
+  margin: 32px auto 60px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.profile-hero-card {
+  background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+  border: 1.5px solid rgba(253, 224, 71, 0.35);
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(234, 179, 8, 0.1);
+}
+
+.profile-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.profile-avatar-large {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FDE047 0%, #D97706 100%);
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.85rem;
+  box-shadow: 0 4px 15px rgba(234, 179, 8, 0.35);
+  border: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-info-heading h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #F9FAFB;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.profile-info-heading .profile-email {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+  margin: 0 0 8px 0;
+}
+
+.profile-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.status-badge-pill.verified {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10B981;
+  color: #34D399;
+}
+
+.status-badge-pill.unverified {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #F59E0B;
+  color: #FBBF24;
+}
+
+.status-badge-pill.twofa-active {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid #3B82F6;
+  color: #93C5FD;
+}
+
+.profile-nav-pills {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.profile-nav-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  background: #111827;
+  color: #9CA3AF;
+  border: 1px solid #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.profile-nav-pill-btn:hover {
+  color: #FDE047;
+  border-color: rgba(253, 224, 71, 0.4);
+}
+
+.profile-nav-pill-btn.active {
+  background: #1F2937;
+  color: #FDE047;
+  border-color: #FDE047;
+  box-shadow: 0 0 14px rgba(253, 224, 71, 0.2);
+}
+
+.profile-card-section {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.profile-card-section h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #FDE047;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── My Tickets Dashboard ───────────────────────────────────────────────── */
+.tickets-page-container {
+  max-width: 1100px;
+  margin: 32px auto 60px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.tickets-hero-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(253, 224, 71, 0.2);
+}
+
+.tickets-hero-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #FDE047;
+  margin: 0;
+}
+
+.ticket-item-card {
+  background: #111827;
+  border: 1px solid #374151;
+  border-left: 4px solid #FDE047;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.2s ease;
+}
+
+.ticket-item-card:hover {
+  border-color: rgba(253, 224, 71, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.ticket-number-badge {
+  background: #0B111E;
+  border: 1.5px solid rgba(253, 224, 71, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.ticket-number-badge .label {
+  font-size: 0.65rem;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.ticket-number-badge .number {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #FDE047;
+}
+
+.ticket-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ticket-meta-info .draw-title {
+  font-weight: 800;
+  color: #F9FAFB;
+  font-size: 1rem;
+}
+
+.ticket-meta-info .meta-subtext {
+  font-size: 0.8125rem;
+  color: #9CA3AF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ticket-action-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ticket-price-display {
+  font-weight: 900;
+  color: #FDE047;
+  font-size: 1.1rem;
+}
+
+.tickets-empty-card {
+  text-align: center;
+  padding: 48px 24px;
+  background: #111827;
+  border: 1.5px dashed rgba(253, 224, 71, 0.3);
+  border-radius: 20px;
+  margin: 20px 0;
+}
+
+.tickets-empty-card h3 {
+  font-size: 1.3rem;
+  color: #F9FAFB;
+  margin: 16px 0 8px;
+}
+
+.tickets-empty-card p {
+  color: #9CA3AF;
+  font-size: 0.9rem;
+  max-width: 440px;
+  margin: 0 auto 24px;
+}
+
+@media (max-width: 640px) {
+  .ticket-item-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .ticket-action-col {
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .profile-hero-card {
+    padding: 20px 16px;
+  }
+}
