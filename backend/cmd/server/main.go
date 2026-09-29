@@ -10,8 +10,10 @@ import (
 	"os/signal"
 	"rimna/backend/internal/auth"
 	"rimna/backend/internal/domain"
+	dotenv "rimna/backend/internal/env"
 	"rimna/backend/internal/httpapi"
 	"rimna/backend/internal/payment/chapa"
+	"rimna/backend/internal/payment/stripe"
 	"rimna/backend/internal/service"
 	"rimna/backend/internal/store"
 	"strconv"
@@ -27,6 +29,7 @@ func env(k, d string) string {
 	return d
 }
 func main() {
+	dotenv.Load()
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
@@ -59,7 +62,7 @@ func main() {
 	}
 	st, err := store.Open(ctx, os.Getenv("DATABASE_URL"), int32(max))
 	if err != nil {
-		slog.Error("database unavailable")
+		slog.Error("database unavailable", "error", err)
 		os.Exit(1)
 	}
 	defer st.DB.Close()
@@ -67,8 +70,14 @@ func main() {
 		slog.Error("database payment environment mismatch or migrations missing")
 		os.Exit(1)
 	}
-	provider := chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, strings.Split(env("CHAPA_CURRENCIES", "ETB"), ","))
-	svc := &service.Service{Store: st, Providers: map[string]domain.PaymentProvider{"chapa": provider}, Mode: mode}
+	providers := map[string]domain.PaymentProvider{"chapa": chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, strings.Split(env("CHAPA_CURRENCIES", "ETB"), ","))}
+	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
+	stripeSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
+	if stripeKey != "" && stripeSecret != "" {
+		stripeProvider := stripe.New(stripeKey, stripeSecret, origin+"/account")
+		providers["stripe"] = stripeProvider
+	}
+	svc := &service.Service{Store: st, Providers: providers, Mode: mode}
 	enabled := env("DEPOSITS_ENABLED", "false") == "true"
 	min, errMin := strconv.ParseInt(env("DEPOSIT_MIN_MINOR", "0"), 10, 64)
 	maxDeposit, errMax := strconv.ParseInt(env("DEPOSIT_MAX_MINOR", "0"), 10, 64)
@@ -83,6 +92,10 @@ func main() {
 	}
 	svc.Wallet = st
 	svc.Deposits = service.DepositPolicy{Enabled: enabled, Currency: "ETB", MinMinor: min, MaxMinor: maxDeposit}
+	svc.DepositPolicies = map[string]service.DepositPolicy{
+		"ETB": {Enabled: enabled, Currency: "ETB", MinMinor: min, MaxMinor: maxDeposit},
+		"USD": {Enabled: enabled && stripeKey != "", Currency: "USD", MinMinor: min, MaxMinor: maxDeposit},
+	}
 	svc.VerificationPerMinute = quota
 	role := env("PROCESS_ROLE", "all")
 	if role != "all" && role != "api" && role != "worker" {

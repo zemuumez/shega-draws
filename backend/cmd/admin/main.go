@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	dotenv "rimna/backend/internal/env"
 	"rimna/backend/internal/store"
 )
 
 func main() {
+	dotenv.Load()
 	email := flag.String("email", "", "Verified staff account email")
 	role := flag.String("role", "reviewer", "admin or reviewer")
 	revoke := flag.Bool("revoke", false, "Revoke staff access")

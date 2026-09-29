@@ -1,11 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import QRCode from "qrcode";
 import { authClient } from "@/lib/auth-client";
 import { accountAPI, clearAccountToken } from "@/lib/account-api";
 import { WalletPanel } from "./WalletPanel";
 import type { Order } from "@/lib/backend";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+function getTotpSecret(uri: string): string {
+  try {
+    const url = new URL(uri);
+    return url.searchParams.get("secret") || uri;
+  } catch {
+    const match = uri.match(/[?&]secret=([A-Z0-9]+)/i);
+    return match ? match[1] : uri;
+  }
+}
 export function AccountPanel({ compact = false }: { compact?: boolean }) {
   const { text } = useLanguage();
   const { data: session, isPending } = authClient.useSession();
@@ -23,6 +34,9 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
   const [offset, setOffset] = useState(0);
   const [totp, setTotp] = useState("");
   const [backups, setBackups] = useState<string[]>([]);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [copiedSecret, setCopiedSecret] = useState(false);
+  const [copiedBackups, setCopiedBackups] = useState(false);
   useEffect(() => {
     clearAccountToken();
     setOrders([]);
@@ -192,45 +206,115 @@ export function AccountPanel({ compact = false }: { compact?: boolean }) {
                     if (r.error)
                       setMessage(r.error.message || "Could not enable");
                     else if (r.data.method === "totp") {
-                      setTotp(r.data.totpURI);
+                      const uri = r.data.totpURI;
+                      setTotp(uri);
                       setBackups(r.data.backupCodes);
+                      QRCode.toDataURL(uri, {
+                        width: 200,
+                        margin: 2,
+                        color: { dark: "#0F172A", light: "#FFFFFF" },
+                      })
+                        .then(setQrCodeDataUrl)
+                        .catch(() => {});
                     }
                   }}
                 >
                   {text("Set up authenticator")}
                 </button>
                 {totp && (
-                  <>
-                    <p>
-                      {text(
-                        "Add this setup URI to your authenticator. Save the recovery codes privately.",
-                      )}
+                  <div style={{ marginTop: "16px", padding: "16px", background: "rgba(15, 23, 42, 0.6)", borderRadius: "12px", border: "1.5px solid rgba(253, 224, 71, 0.3)" }}>
+                    <h4 style={{ color: "#FDE047", marginBottom: "8px", fontSize: "0.95rem" }}>
+                      {text("1. Scan QR Code with Authenticator App")}
+                    </h4>
+                    <p style={{ fontSize: "0.8125rem", color: "#D1D5DB", marginBottom: "12px" }}>
+                      {text("Open Google Authenticator, Authy, or Microsoft Authenticator and scan this code:")}
                     </p>
-                    <code style={{ overflowWrap: "anywhere" }}>{totp}</code>
-                    <pre>{backups.join("\n")}</pre>
-                    <input
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      placeholder="6-digit code"
-                    />
+                    {qrCodeDataUrl ? (
+                      <div style={{ display: "inline-block", padding: "8px", background: "#FFFFFF", borderRadius: "8px", marginBottom: "16px" }}>
+                        <img src={qrCodeDataUrl} alt="2FA QR Code" width={180} height={180} style={{ display: "block" }} />
+                      </div>
+                    ) : (
+                      <p style={{ fontSize: "0.8125rem", color: "#9CA3AF" }}>{text("Generating QR code…")}</p>
+                    )}
+
+                    <h4 style={{ color: "#FDE047", marginBottom: "6px", fontSize: "0.95rem" }}>
+                      {text("Or Enter Secret Key Manually:")}
+                    </h4>
+                    <p style={{ fontSize: "0.8125rem", color: "#9CA3AF", marginBottom: "8px" }}>
+                      {text("In your authenticator, choose 'Enter a setup key' and use this exact key (do NOT use the full URL):")}
+                    </p>
+                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+                      <code style={{ background: "#0F172A", padding: "8px 12px", borderRadius: "6px", color: "#FDE047", fontSize: "0.9rem", letterSpacing: "1px", userSelect: "all", border: "1px solid rgba(253, 224, 71, 0.2)" }}>
+                        {getTotpSecret(totp)}
+                      </code>
+                      <button
+                        type="button"
+                        style={{ padding: "6px 12px", fontSize: "0.8125rem" }}
+                        onClick={() => {
+                          navigator.clipboard.writeText(getTotpSecret(totp));
+                          setCopiedSecret(true);
+                          setTimeout(() => setCopiedSecret(false), 2500);
+                        }}
+                      >
+                        {copiedSecret ? text("Copied!") : text("Copy Secret Key")}
+                      </button>
+                    </div>
+
+                    <h4 style={{ color: "#FDE047", marginBottom: "6px", fontSize: "0.95rem" }}>
+                      {text("2. Save Your Recovery Backup Codes")}
+                    </h4>
+                    <p style={{ fontSize: "0.8125rem", color: "#9CA3AF", marginBottom: "8px" }}>
+                      {text("Save these single-use codes privately. They can recover your account if you lose your phone:")}
+                    </p>
+                    <div style={{ background: "#0B0F17", padding: "10px", borderRadius: "6px", marginBottom: "8px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <pre style={{ margin: 0, color: "#93C5FD", fontFamily: "monospace", fontSize: "0.8125rem", lineHeight: "1.6" }}>
+                        {backups.join("   ·   ")}
+                      </pre>
+                    </div>
                     <button
-                      onClick={async () => {
-                        const r = await authClient.twoFactor.verifyTotp({
-                          code,
-                        });
-                        setMessage(
-                          r.error?.message ||
-                            "Two-factor authentication enabled.",
-                        );
-                        if (!r.error) {
-                          setTotp("");
-                          setBackups([]);
-                        }
+                      type="button"
+                      style={{ padding: "4px 10px", fontSize: "0.75rem", marginBottom: "16px" }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(backups.join("\n"));
+                        setCopiedBackups(true);
+                        setTimeout(() => setCopiedBackups(false), 2500);
                       }}
                     >
-                      {text("Verify code")}
+                      {copiedBackups ? text("Copied all codes!") : text("Copy Backup Codes")}
                     </button>
-                  </>
+
+                    <h4 style={{ color: "#FDE047", marginBottom: "6px", fontSize: "0.95rem" }}>
+                      {text("3. Enter 6-digit Code to Complete Setup")}
+                    </h4>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <input
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        placeholder="123456"
+                        maxLength={6}
+                        style={{ width: "120px", textAlign: "center", fontSize: "1.1rem", letterSpacing: "3px" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const r = await authClient.twoFactor.verifyTotp({
+                            code,
+                          });
+                          setMessage(
+                            r.error?.message ||
+                              "Two-factor authentication enabled successfully.",
+                          );
+                          if (!r.error) {
+                            setTotp("");
+                            setQrCodeDataUrl("");
+                            setBackups([]);
+                          }
+                        }}
+                      >
+                        {text("Verify code")}
+                      </button>
+                    </div>
+                  </div>
                 )}
               </details>
             </>
