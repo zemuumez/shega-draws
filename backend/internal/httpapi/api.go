@@ -103,11 +103,15 @@ func (a *API) Handler() http.Handler {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("X-Request-ID", service.ID())
 		if o := r.Header.Get("Origin"); o != "" {
-			if o != a.Origin {
+			allowed := o == a.Origin
+			if !allowed && (strings.HasPrefix(o, "http://localhost:") || strings.HasPrefix(o, "http://127.0.0.1:")) {
+				allowed = true
+			}
+			if !allowed {
 				reply(w, 403, map[string]string{"error": "Origin not allowed"})
 				return
 			}
-			w.Header().Set("Access-Control-Allow-Origin", a.Origin)
+			w.Header().Set("Access-Control-Allow-Origin", o)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Idempotency-Key")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")

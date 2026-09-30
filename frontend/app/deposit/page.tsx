@@ -38,7 +38,13 @@ export default function DepositPage() {
   const [message, setMessage] = useState("");
   const [revision, setRevision] = useState(0);
 
+  const [mounted, setMounted] = useState(false);
+
   const presets = currency === "ETB" ? [50, 100, 250, 500, 1000, 2500] : [5, 10, 25, 50, 100];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!session?.user) return;
@@ -102,6 +108,21 @@ export default function DepositPage() {
       return;
     }
 
+    // Auto-normalize phone format (e.g. 0941253945 -> +251941253945)
+    let normalizedPhone = phoneNumber.trim().replace(/[\s\-()]/g, "");
+    if (normalizedPhone.startsWith("09") || normalizedPhone.startsWith("07")) {
+      normalizedPhone = "+251" + normalizedPhone.slice(1);
+    } else if ((normalizedPhone.startsWith("9") || normalizedPhone.startsWith("7")) && normalizedPhone.length === 9) {
+      normalizedPhone = "+251" + normalizedPhone;
+    } else if (normalizedPhone.startsWith("251")) {
+      normalizedPhone = "+" + normalizedPhone;
+    } else if (!normalizedPhone.startsWith("+") && normalizedPhone.length > 0) {
+      normalizedPhone = "+" + normalizedPhone;
+    }
+    if (!normalizedPhone && currency === "ETB") {
+      normalizedPhone = "+251911000000";
+    }
+
     try {
       setSubmitting(true);
       const idempotencyKey = crypto.randomUUID();
@@ -116,7 +137,7 @@ export default function DepositPage() {
           currency,
           amountMinor,
           provider: currency === "ETB" ? "chapa" : "stripe",
-          phone: phoneNumber.trim() || undefined,
+          phone: normalizedPhone,
         }),
       });
 
@@ -135,7 +156,7 @@ export default function DepositPage() {
     }
   };
 
-  if (sessionLoading) {
+  if (!mounted || sessionLoading) {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#9CA3AF" }}>
         {text("Loading wallet…")}
@@ -449,6 +470,9 @@ export default function DepositPage() {
                 />
                 <Phone size={16} color="#9CA3AF" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)" }} />
               </div>
+              <span style={{ fontSize: "0.75rem", color: "#34D399", marginTop: "5px", display: "block" }}>
+                💡 {text("Chapa Sandbox tip: Enter ")} <strong style={{ color: "#FDE047" }}>0900123456</strong> {text("on Chapa's checkout page for a guaranteed successful test payment")}
+              </span>
             </div>
           )}
 

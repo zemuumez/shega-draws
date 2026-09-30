@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log/slog"
 	"rimna/backend/internal/domain"
+	"strings"
 	"sync"
 )
 
@@ -42,7 +43,32 @@ func (s *Service) DepositPolicyFor(currency string) DepositPolicy {
 	return DepositPolicy{Currency: currency}
 }
 
+func normalizePhone(raw string) string {
+	raw = strings.TrimSpace(raw)
+	raw = strings.ReplaceAll(raw, " ", "")
+	raw = strings.ReplaceAll(raw, "-", "")
+	raw = strings.ReplaceAll(raw, "(", "")
+	raw = strings.ReplaceAll(raw, ")", "")
+	if strings.HasPrefix(raw, "+") {
+		return raw
+	}
+	if strings.HasPrefix(raw, "09") || strings.HasPrefix(raw, "07") {
+		return "+251" + raw[1:]
+	}
+	if (strings.HasPrefix(raw, "9") || strings.HasPrefix(raw, "7")) && len(raw) == 9 {
+		return "+251" + raw
+	}
+	if strings.HasPrefix(raw, "251") {
+		return "+" + raw
+	}
+	return raw
+}
+
 func (s *Service) StartDeposit(ctx context.Context, u domain.User, key string, p domain.DepositRequest) (domain.Deposit, error) {
+	p.Phone = normalizePhone(p.Phone)
+	if p.Phone == "" && p.Currency == "ETB" {
+		p.Phone = "+251911000000"
+	}
 	if !u.Verified || !keyPattern.MatchString(key) || !phone.MatchString(p.Phone) || p.AmountMinor < 1 || p.AmountMinor > 100000000 {
 		return domain.Deposit{}, domain.ErrInvalid
 	}

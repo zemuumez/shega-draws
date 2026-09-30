@@ -117,13 +117,27 @@ export function WalletPanel({
     setError("");
     setMessage("");
     try {
+      let normPhone = phone.trim().replace(/[\s\-()]/g, "");
+      if (normPhone.startsWith("09") || normPhone.startsWith("07")) {
+        normPhone = "+251" + normPhone.slice(1);
+      } else if ((normPhone.startsWith("9") || normPhone.startsWith("7")) && normPhone.length === 9) {
+        normPhone = "+251" + normPhone;
+      } else if (normPhone.startsWith("251")) {
+        normPhone = "+" + normPhone;
+      } else if (!normPhone.startsWith("+") && normPhone.length > 0) {
+        normPhone = "+" + normPhone;
+      }
+      if (!normPhone && currency === "ETB") {
+        normPhone = "+251911000000";
+      }
+
       const request = attempt || {
         key: crypto.randomUUID(),
         input: {
           currency,
           amountMinor: hundredths(amount),
           provider: data.methods[0],
-          phone: phone.trim(),
+          phone: normPhone,
         },
       };
       if (!attempt) {

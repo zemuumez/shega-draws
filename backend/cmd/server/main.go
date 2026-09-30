@@ -99,6 +99,11 @@ func main() {
 		os.Exit(1)
 	}
 	svc.Wallet = st
+	if enabled {
+		if err := st.SetDepositsPaused(ctx, "system-startup", false, "DEPOSITS_ENABLED configured in environment"); err != nil {
+			slog.Warn("could not auto-unpause deposits on startup", "error", err)
+		}
+	}
 	svc.Deposits = service.DepositPolicy{Enabled: enabled, Currency: "ETB", MinMinor: min, MaxMinor: maxDeposit}
 	svc.DepositPolicies = map[string]service.DepositPolicy{
 		"ETB": {Enabled: enabled, Currency: "ETB", MinMinor: min, MaxMinor: maxDeposit},

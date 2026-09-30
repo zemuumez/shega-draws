@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -82,19 +83,24 @@ func (a *Adapter) request(ctx context.Context, method, path string, body any, ou
 	req.Header.Set("Content-Type", "application/json")
 	res, err := a.Client.Do(req)
 	if err != nil {
+		slog.Error("Chapa request network failure", "error", err)
 		return domain.ErrUnavailable
 	}
 	defer res.Body.Close()
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		body, _ := io.ReadAll(res.Body)
+		slog.Error("Chapa request returned non-2xx status", "status", res.StatusCode, "body", string(body))
 		return domain.ErrUnavailable
 	}
 	if err = json.NewDecoder(io.LimitReader(res.Body, 1<<20)).Decode(output); err != nil {
+		slog.Error("Chapa response decode failed", "error", err)
 		return domain.ErrUnavailable
 	}
 	return nil
 }
 func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.Checkout, error) {
 	if !a.Supports(o.Currency) {
+		slog.Warn("Chapa adapter does not support currency or is not configured", "currency", o.Currency, "hasKey", a.Key != "", "hasSecret", a.WebhookSecret != "")
 		return domain.Checkout{}, domain.ErrUnavailable
 	}
 
@@ -126,7 +132,7 @@ func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.C
 		"first_name":         first,
 		"last_name":          last,
 		"phone_number":       o.Phone,
-		"return_url":         a.Origin + "/profile#wallet",
+		"return_url":         a.Origin + "/deposit",
 		"customization": map[string]string{
 			"title":       "Shega Draws",
 			"description": "Wallet Deposit",
@@ -149,12 +155,10 @@ func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.C
 	}
 	u, err := url.Parse(result.Data.URL)
 	if err != nil || u.Scheme != "https" || u.User != nil || u.Port() != "" || (u.Hostname() != "checkout.chapa.co" && u.Hostname() != "checkout.chapa.global") || result.Status != "success" {
+		slog.Error("Chapa checkout response invalid", "status", result.Status, "url", result.Data.URL, "message", result.Message)
 		return domain.Checkout{}, domain.ErrUnavailable
 	}
-	ref := result.Data.Reference
-	if ref == "" {
-		ref = o.ID
-	}
+	ref := o.ID
 	return domain.Checkout{URL: u.String(), Reference: ref}, nil
 }
 
@@ -231,8 +235,18 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 		return domain.Verification{}, err
 	}
 	d := result.Data
-	if d.Mode == "" {
-		d.Mode = a.Mode
+	mode := strings.ToLower(strings.TrimSpace(d.Mode))
+	if mode == "" {
+		mode = a.Mode
+	}
+	status := strings.ToLower(strings.TrimSpace(d.Status))
+	switch {
+	case strings.Contains(status, "success"):
+		status = "success"
+	case strings.Contains(status, "fail") || strings.Contains(status, "cancel"):
+		status = "failed"
+	case strings.Contains(status, "pend"):
+		status = "pending"
 	}
 	merchant := d.Merchant
 	if merchant == "" {
@@ -241,7 +255,7 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 	if merchant == "" {
 		merchant = ref
 	}
-	return domain.Verification{Reference: ref, MerchantReference: merchant, Status: d.Status, AmountMinor: amount, Currency: d.Currency, Mode: d.Mode}, nil
+	return domain.Verification{Reference: ref, MerchantReference: merchant, Status: status, AmountMinor: amount, Currency: strings.ToUpper(d.Currency), Mode: mode}, nil
 }
 func (a *Adapter) AuthenticateWebhook(body []byte, sig string) bool {
 	if a.WebhookSecret == "" {
