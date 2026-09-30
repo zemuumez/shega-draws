@@ -102,7 +102,22 @@ export function Nav({
   const siteName = getLocalized(siteSettings, "siteName", "Rimna International Digital Lottery");
   const logoImage = siteSettings?.logoImageUrl || "/images/rimna-brand-logo.png";
 
-  if ((pathname?.startsWith("/studio") || pathname === "/admin" || pathname?.startsWith("/admin/"))) return null;
+  const isDashboardMode =
+    pathname === "/profile" ||
+    pathname?.startsWith("/profile/") ||
+    pathname === "/dashboard" ||
+    pathname?.startsWith("/dashboard/") ||
+    pathname === "/my-tickets" ||
+    pathname?.startsWith("/my-tickets/");
+
+  if (
+    pathname?.startsWith("/studio") ||
+    pathname === "/admin" ||
+    pathname?.startsWith("/admin/") ||
+    isDashboardMode
+  ) {
+    return null;
+  }
 
   // Left desktop links: Home (Home page is home not draws), How It Works, Results
   const leftNavItems = [

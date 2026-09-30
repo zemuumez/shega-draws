@@ -21,6 +21,7 @@ import {
   Mail,
   Ticket,
   History,
+  Home,
   LayoutDashboard,
   CreditCard,
   Plus,
@@ -423,13 +424,76 @@ function UserPortalContent() {
     return !d || d.status === "open" || d.status === "closed";
   });
 
+  const tabNames: Record<PortalTab, string> = {
+    dashboard: text("Dashboard"),
+    tickets: text("Purchased Tickets"),
+    wallet: text("My Wallet & Balances"),
+    deposit: text("Deposit Funds"),
+    history: text("Deposit & History"),
+    profile: text("Profile Information"),
+    security: text("Security & 2FA"),
+  };
+
   return (
     <div className="user-portal-container">
       {/* ── 1. Modern User Portal Sidebar ──────────────────────────────────── */}
       <aside className="portal-sidebar" aria-label="Portal Navigation">
+        {/* Brand Logo & Back to Site Header */}
+        <div className="portal-sidebar-brand">
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 10,
+                background: "linear-gradient(135deg, #FDE047 0%, #D97706 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 900,
+                color: "#111827",
+                fontSize: "1.1rem",
+                boxShadow: "0 0 14px rgba(253, 224, 71, 0.4)",
+                flexShrink: 0,
+              }}
+            >
+              R
+            </div>
+            <div>
+              <div style={{ fontWeight: 900, color: "#FDE047", fontSize: "0.95rem", letterSpacing: "0.05em", lineHeight: 1.1 }}>
+                SHEGA DRAWS
+              </div>
+              <div style={{ fontSize: "0.625rem", color: "#94A3B8", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                PLAYER PORTAL
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/"
+            title={text("Back to website")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              padding: "5px 9px",
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: 8,
+              color: "#94A3B8",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            <Home size={13} />
+            <span>{text("Home")}</span>
+          </Link>
+        </div>
+
         {/* User Card in Sidebar */}
         <div className="portal-sidebar-user">
-          <div className="profile-avatar-large" style={{ width: 48, height: 48, fontSize: "1.25rem" }}>
+          <div className="profile-avatar-large" style={{ width: 44, height: 44, fontSize: "1.15rem" }}>
             {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
@@ -640,8 +704,61 @@ function UserPortalContent() {
       </aside>
 
       {/* ── 2. Portal Main Content Area ────────────────────────────────────── */}
-      <main className="portal-main-content">
-        {/* Unverified Email Warning Bar if applicable */}
+      <main className="portal-main-content" style={{ display: "flex", flexDirection: "column", padding: 0 }}>
+        {/* Sleek Portal Topbar Header */}
+        <header className="portal-topbar">
+          <div className="portal-topbar-breadcrumb">
+            <span style={{ color: "#64748B" }}>Portal</span>
+            <ChevronRight size={14} style={{ opacity: 0.5 }} />
+            <strong>{tabNames[activeTab]}</strong>
+          </div>
+
+          <div className="portal-topbar-actions">
+            <Link
+              href="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 8,
+                color: "#94A3B8",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              <Home size={14} />
+              <span>{text("Public Home")}</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => switchTab("wallet")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                background: "rgba(16, 185, 129, 0.15)",
+                border: "1px solid rgba(16, 185, 129, 0.3)",
+                borderRadius: 8,
+                color: "#34D399",
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              <Wallet size={14} />
+              <span>{totalBalanceDisplay}</span>
+            </button>
+          </div>
+        </header>
+
+        <div style={{ flex: 1, padding: "clamp(20px, 3vw, 36px) clamp(16px, 3vw, 48px)", overflowY: "auto" }}>
+          {/* Unverified Email Warning Bar if applicable */}
         {!isVerified && (
           <div
             style={{
@@ -1645,6 +1762,7 @@ function UserPortalContent() {
             </div>
           </div>
         )}
+        </div>
       </main>
     </div>
   );

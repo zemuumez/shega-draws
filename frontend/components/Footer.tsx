@@ -16,7 +16,20 @@ export function Footer({ siteSettings }: FooterProps) {
   const pathname = usePathname();
   const { language, t, getLocalized } = useLanguage();
 
-  if ((pathname?.startsWith("/studio") || pathname === "/admin" || pathname?.startsWith("/admin/"))) {
+  const isDashboardMode =
+    pathname === "/profile" ||
+    pathname?.startsWith("/profile/") ||
+    pathname === "/dashboard" ||
+    pathname?.startsWith("/dashboard/") ||
+    pathname === "/my-tickets" ||
+    pathname?.startsWith("/my-tickets/");
+
+  if (
+    pathname?.startsWith("/studio") ||
+    pathname === "/admin" ||
+    pathname?.startsWith("/admin/") ||
+    isDashboardMode
+  ) {
     return null;
   }
 
