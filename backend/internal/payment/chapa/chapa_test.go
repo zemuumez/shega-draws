@@ -45,16 +45,16 @@ func TestHostedCheckoutAndVerification(t *testing.T) {
 			t.Error("missing auth")
 		}
 		switch r.URL.Path {
-		case "/payments/hosted":
+		case "/payments/hosted", "/transaction/initialize":
 			count++
 			var body map[string]any
 			json.NewDecoder(r.Body).Decode(&body)
-			if body["merchant_reference"] != "order1" || body["amount"] != 25.01 {
+			if (body["merchant_reference"] != "order1" && body["tx_ref"] != "order1") || (body["amount"] != 25.01 && body["amount"] != "25.01") {
 				t.Errorf("wrong checkout: %v", body)
 			}
-			w.Write([]byte(`{"status":"success","data":{"checkout_url":"https://checkout.chapa.global/payment/example"}}`))
-		case "/payments/ref1/verify":
-			w.Write([]byte(`{"status":"success","data":{"status":"success","amount":"25.01","currency":"ETB","merchant_reference":"order1","chapa_reference":"ref1"}}`))
+			w.Write([]byte(`{"status":"success","data":{"checkout_url":"https://checkout.chapa.co/checkout/payment/example","chapa_reference":"ref1"}}`))
+		case "/payments/ref1/verify", "/transaction/verify/ref1":
+			w.Write([]byte(`{"status":"success","data":{"status":"success","amount":"25.01","currency":"ETB","merchant_reference":"order1","tx_ref":"order1","chapa_reference":"ref1"}}`))
 		default:
 			t.Error(r.URL.Path)
 		}

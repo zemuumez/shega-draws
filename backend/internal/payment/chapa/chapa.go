@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"rimna/backend/internal/domain"
 	"strconv"
 	"strings"
@@ -30,11 +31,15 @@ func New(key, secret, mode string, currencies []string, origin ...string) *Adapt
 	if len(origin) > 0 && origin[0] != "" {
 		orig = strings.TrimRight(origin[0], "/")
 	}
+	baseURL := "https://api.chapa.co/v1"
+	if u := os.Getenv("CHAPA_BASE_URL"); u != "" {
+		baseURL = strings.TrimRight(u, "/")
+	}
 	a := &Adapter{
 		Key:           key,
 		WebhookSecret: secret,
 		Mode:          mode,
-		BaseURL:       "https://api.chapa.global/v2",
+		BaseURL:       baseURL,
 		Origin:        orig,
 		Currencies:    map[string]bool{},
 		Client: &http.Client{
@@ -101,41 +106,56 @@ func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.C
 		return domain.Checkout{URL: checkoutURL, Reference: ref}, nil
 	}
 
-	// Real Chapa API v2 Hosted Checkout
+	// Real Chapa API Hosted Checkout
 	names := strings.Fields(o.Name)
 	first, last := "Player", ""
 	if len(names) > 0 {
 		first = names[0]
 		last = strings.Join(names[1:], " ")
 	}
+	email := o.Email
+	if email == "" || !strings.Contains(email, "@") {
+		email = "customer@example.com"
+	}
 	body := map[string]any{
-		"amount":             json.Number(fmt.Sprintf("%d.%02d", o.AmountMinor/100, o.AmountMinor%100)),
+		"amount":             fmt.Sprintf("%d.%02d", o.AmountMinor/100, o.AmountMinor%100),
 		"currency":           o.Currency,
+		"tx_ref":             o.ID,
 		"merchant_reference": o.ID,
-		"customer": map[string]string{
-			"first_name":   first,
-			"last_name":    last,
-			"email":        o.Email,
-			"phone_number": o.Phone,
+		"email":              email,
+		"first_name":         first,
+		"last_name":          last,
+		"phone_number":       o.Phone,
+		"return_url":         a.Origin + "/profile#wallet",
+		"customization": map[string]string{
+			"title":       "Shega Draws",
+			"description": "Wallet Deposit",
 		},
-		"meta":       map[string]string{"payment_id": o.ID},
-		"return_url": a.Origin + "/profile#wallet",
 	}
 	var result struct {
-		Status string `json:"status"`
-		Data   struct {
+		Status  string `json:"status"`
+		Message string `json:"message"`
+		Data    struct {
 			URL       string `json:"checkout_url"`
 			Reference string `json:"chapa_reference"`
 		} `json:"data"`
 	}
-	if err := a.request(ctx, "POST", "/payments/hosted", body, &result); err != nil {
+	endpoint := "/transaction/initialize"
+	if strings.Contains(a.BaseURL, "/v2") {
+		endpoint = "/payments/hosted"
+	}
+	if err := a.request(ctx, "POST", endpoint, body, &result); err != nil {
 		return domain.Checkout{}, err
 	}
 	u, err := url.Parse(result.Data.URL)
 	if err != nil || u.Scheme != "https" || u.User != nil || u.Port() != "" || (u.Hostname() != "checkout.chapa.co" && u.Hostname() != "checkout.chapa.global") || result.Status != "success" {
 		return domain.Checkout{}, domain.ErrUnavailable
 	}
-	return domain.Checkout{URL: u.String(), Reference: result.Data.Reference}, nil
+	ref := result.Data.Reference
+	if ref == "" {
+		ref = o.ID
+	}
+	return domain.Checkout{URL: u.String(), Reference: ref}, nil
 }
 
 // DecimalMinor rejects rounding, exponent notation, negatives and excess precision.
@@ -183,17 +203,24 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 	}
 
 	var result struct {
-		Status string `json:"status"`
-		Data   struct {
+		Status  string `json:"status"`
+		Message string `json:"message"`
+		Data    struct {
 			Status    string          `json:"status"`
 			Amount    json.RawMessage `json:"amount"`
 			Currency  string          `json:"currency"`
-			Reference string          `json:"chapa_reference"`
+			Reference string          `json:"reference"`
+			ChapaRef  string          `json:"chapa_reference"`
+			TxRef     string          `json:"tx_ref"`
 			Merchant  string          `json:"merchant_reference"`
 			Mode      string          `json:"mode"`
 		} `json:"data"`
 	}
-	if err := a.request(ctx, "GET", "/payments/"+url.PathEscape(ref)+"/verify", nil, &result); err != nil {
+	endpoint := "/transaction/verify/" + url.PathEscape(ref)
+	if strings.Contains(a.BaseURL, "/v2") {
+		endpoint = "/payments/" + url.PathEscape(ref) + "/verify"
+	}
+	if err := a.request(ctx, "GET", endpoint, nil, &result); err != nil {
 		return domain.Verification{}, err
 	}
 	if result.Status != "success" {
@@ -204,12 +231,17 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 		return domain.Verification{}, err
 	}
 	d := result.Data
-	// v2 verification does not document a mode field. The authenticated API key
-	// selects the environment; reject any conflicting mode when one is returned.
 	if d.Mode == "" {
 		d.Mode = a.Mode
 	}
-	return domain.Verification{Reference: d.Reference, MerchantReference: d.Merchant, Status: d.Status, AmountMinor: amount, Currency: d.Currency, Mode: d.Mode}, nil
+	merchant := d.Merchant
+	if merchant == "" {
+		merchant = d.TxRef
+	}
+	if merchant == "" {
+		merchant = ref
+	}
+	return domain.Verification{Reference: ref, MerchantReference: merchant, Status: d.Status, AmountMinor: amount, Currency: d.Currency, Mode: d.Mode}, nil
 }
 func (a *Adapter) AuthenticateWebhook(body []byte, sig string) bool {
 	if a.WebhookSecret == "" {

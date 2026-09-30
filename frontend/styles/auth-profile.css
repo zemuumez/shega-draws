@@ -30,6 +30,31 @@
   transform: translateY(-1px);
 }
 
+.top-ribbon-deposit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border: 1px solid #34D399;
+  border-radius: 20px;
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+  white-space: nowrap;
+}
+
+.top-ribbon-deposit-btn:hover {
+  background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+  color: #FFFFFF;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.55);
+  transform: translateY(-1px);
+}
+
 .top-ribbon-profile-btn {
   display: inline-flex;
   align-items: center;
@@ -145,6 +170,21 @@
 .dropdown-item-link:hover {
   background: rgba(253, 224, 71, 0.12);
   color: #FDE047;
+  transform: translateX(2px);
+}
+
+.dropdown-item-link.deposit-item {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #A7F3D0;
+  margin-bottom: 6px;
+  border-radius: 10px;
+}
+
+.dropdown-item-link.deposit-item:hover {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #34D399;
+  color: #FFFFFF;
   transform: translateX(2px);
 }
 
