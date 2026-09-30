@@ -23,8 +23,11 @@ import {
   LayoutDashboard,
   KeyRound,
   History,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
+import { useBalanceVisibility } from "@/lib/balance-visibility";
 import { authClient } from "@/lib/auth-client";
 import { accountAPI } from "@/lib/account-api";
 import type { WalletData } from "@/lib/wallet";
@@ -41,6 +44,7 @@ export function Nav({
 }) {
   const pathname = usePathname();
   const { text, t, getLocalized } = useLanguage();
+  const { showBalance, toggleBalance, formatBalance } = useBalanceVisibility();
   const { data: session } = authClient.useSession();
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -206,11 +210,9 @@ export function Nav({
             </Link>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              {/* Show live Balance instead of static deposit button */}
-              <Link
-                href="/profile?tab=wallet"
-                className="top-ribbon-balance-btn"
-                title={text("Available Balance — Click to manage wallet or deposit")}
+              {/* Show live Balance with eye visibility toggle button */}
+              <div
+                className="top-ribbon-balance-pill"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -218,36 +220,59 @@ export function Nav({
                   background: "rgba(16, 185, 129, 0.15)",
                   border: "1px solid rgba(16, 185, 129, 0.4)",
                   borderRadius: "9999px",
-                  padding: "4px 10px",
+                  padding: "3px 8px 3px 10px",
                   color: "#34D399",
                   fontWeight: 800,
                   fontSize: "0.75rem",
-                  textDecoration: "none",
                   transition: "all 0.2s ease",
                 }}
               >
-                <Wallet size={13} color="#34D399" />
-                <span>
-                  {walletBalance !== null ? `${(walletBalance / 100).toFixed(2)} ETB` : text("Balance…")}
-                </span>
-                <span
+                <Link
+                  href="/profile?tab=wallet"
+                  title={text("Available Balance — Click to manage wallet or view ledger")}
                   style={{
-                    backgroundColor: "#10B981",
-                    color: "#064E3B",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    color: "#34D399",
+                    textDecoration: "none",
+                  }}
+                >
+                  <Wallet size={13} color="#34D399" />
+                  <span>
+                    {walletBalance !== null
+                      ? formatBalance(`${(walletBalance / 100).toFixed(2)} ETB`, "ETB")
+                      : text("Balance…")}
+                  </span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleBalance();
+                  }}
+                  title={showBalance ? text("Hide balance") : text("Show balance")}
+                  aria-label={showBalance ? text("Hide balance") : text("Show balance")}
+                  style={{
+                    backgroundColor: "rgba(16, 185, 129, 0.25)",
+                    color: "#A7F3D0",
+                    border: "none",
                     borderRadius: "9999px",
-                    width: "16px",
-                    height: "16px",
+                    width: "20px",
+                    height: "20px",
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "0.75rem",
-                    fontWeight: 900,
-                    marginLeft: "2px",
+                    cursor: "pointer",
+                    padding: 0,
+                    transition: "all 0.15s ease",
                   }}
                 >
-                  +
-                </span>
-              </Link>
+                  {showBalance ? <Eye size={12} /> : <EyeOff size={12} />}
+                </button>
+              </div>
 
               <div style={{ position: "relative" }} ref={profileDropdownRef}>
                 <button
@@ -314,20 +339,19 @@ export function Nav({
                       <span>{text("My Wallet & Balances")}</span>
                       {walletBalance !== null && (
                         <span style={{ marginLeft: "auto", fontSize: "0.6875rem", color: "#34D399", fontWeight: 800 }}>
-                          {(walletBalance / 100).toFixed(2)} ETB
+                          {formatBalance(`${(walletBalance / 100).toFixed(2)} ETB`, "ETB")}
                         </span>
                       )}
                     </Link>
 
                     <Link
-                      href="/deposit"
+                      href="/profile?tab=deposit"
                       className="dropdown-item-link deposit-item"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
                       <Plus size={15} strokeWidth={3} color="#34D399" />
                       <span style={{ fontWeight: 800, color: "#34D399" }}>{text("Deposit Funds")}</span>
-                      <span style={{ marginLeft: "auto", fontSize: "0.6875rem", backgroundColor: "rgba(16, 185, 129, 0.2)", color: "#A7F3D0", padding: "1px 6px", borderRadius: "9999px", fontWeight: 700 }}>Chapa</span>
                     </Link>
 
                     <Link

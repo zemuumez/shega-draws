@@ -6,6 +6,7 @@ import { PageLoader } from "@/components/PageLoader";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import { BalanceVisibilityProvider } from "@/lib/balance-visibility";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { sanityClient } from "@/lib/sanity/client";
 import { SITE_SETTINGS_QUERY, UI_TRANSLATIONS_QUERY, type CMSSiteSettings, type CMSUITranslation } from "@/lib/sanity/queries";
@@ -49,13 +50,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           defaultLanguage={siteSettings?.defaultLanguage || "en"}
           cmsTranslations={uiTranslations || []}
         >
-          <PageLoader initial />
-          <ScrollProgressBar />
-          <Nav siteSettings={siteSettings} />
-          <main id="main-content" className="page-content">
-            <PageEntrance>{children}</PageEntrance>
-          </main>
-          <Footer siteSettings={siteSettings} />
+          <BalanceVisibilityProvider>
+            <PageLoader initial />
+            <ScrollProgressBar />
+            <Nav siteSettings={siteSettings} />
+            <main id="main-content" className="page-content">
+              <PageEntrance>{children}</PageEntrance>
+            </main>
+            <Footer siteSettings={siteSettings} />
+          </BalanceVisibilityProvider>
         </LanguageProvider>
       </body>
     </html>

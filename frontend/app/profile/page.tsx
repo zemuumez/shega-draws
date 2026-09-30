@@ -46,6 +46,7 @@ import { WalletPanel } from "@/components/WalletPanel";
 import { type WalletData, type Deposit, type WalletPage } from "@/lib/wallet";
 import { money } from "@/lib/admin";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useBalanceVisibility } from "@/lib/balance-visibility";
 
 function getTotpSecret(uri: string): string {
   try {
@@ -82,7 +83,7 @@ function UserPortalContent() {
   const [draws, setDraws] = useState<BackendDraw[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [showBalance, setShowBalance] = useState(true);
+  const { showBalance, toggleBalance, formatBalance } = useBalanceVisibility();
 
   // Profile edit state
   const [name, setName] = useState("");
@@ -510,19 +511,6 @@ function UserPortalContent() {
           >
             <CreditCard size={18} />
             <span>{text("Deposit Funds")}</span>
-            <span
-              style={{
-                marginLeft: "auto",
-                fontSize: "0.625rem",
-                fontWeight: 800,
-                background: activeTab === "deposit" ? "#1B7A53" : "rgba(255, 255, 255, 0.2)",
-                color: "#FFFFFF",
-                padding: "1px 7px",
-                borderRadius: 9999,
-              }}
-            >
-              Chapa
-            </span>
           </button>
 
           <button
@@ -678,14 +666,14 @@ function UserPortalContent() {
                 title={text("My Wallet & Balances")}
               >
                 <Wallet size={15} color="#1B7A53" />
-                <span>{showBalance ? totalBalanceDisplay : "** ETB"}</span>
+                <span>{formatBalance(totalBalanceDisplay, "ETB")}</span>
               </button>
 
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setShowBalance(!showBalance);
+                  toggleBalance();
                 }}
                 style={{
                   background: "transparent",
@@ -912,7 +900,7 @@ function UserPortalContent() {
                     <TrendingUp size={18} />
                   </div>
                 </div>
-                <div className="portal-metric-val">{totalBalanceDisplay}</div>
+                <div className="portal-metric-val">{formatBalance(totalBalanceDisplay, "ETB")}</div>
                 <div className="portal-metric-sub positive">
                   <span>↑</span>
                   <span>{text("Available ETB in Player Wallet")}</span>
@@ -942,9 +930,9 @@ function UserPortalContent() {
                     <Coins size={18} />
                   </div>
                 </div>
-                <div className="portal-metric-val">{totalDepositDisplay}</div>
+                <div className="portal-metric-val">{formatBalance(totalDepositDisplay, "ETB")}</div>
                 <div className="portal-metric-sub neutral">
-                  <span>{deposits.length} {text("Completed via Chapa")}</span>
+                  <span>{deposits.length} {text("Completed Deposits")}</span>
                 </div>
               </div>
 
@@ -956,7 +944,7 @@ function UserPortalContent() {
                     <Trophy size={18} />
                   </div>
                 </div>
-                <div className="portal-metric-val">0.00 ETB</div>
+                <div className="portal-metric-val">{formatBalance("0.00 ETB", "ETB")}</div>
                 <div className="portal-metric-sub neutral">
                   <span>{text("0 Winning Draws Settled")}</span>
                 </div>
@@ -1259,7 +1247,7 @@ function UserPortalContent() {
                 {text("Deposit Funds")}
               </h1>
               <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
-                {text("Instantly deposit funds into your player wallet via Chapa (Telebirr, CBE Birr, Awash, Cards).")}
+                {text("Instantly deposit funds into your player wallet via Telebirr, CBE Birr, Awash, and Bank Cards.")}
               </p>
             </div>
 

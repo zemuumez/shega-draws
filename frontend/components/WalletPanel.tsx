@@ -11,6 +11,7 @@ import {
   type WalletPage,
 } from "@/lib/wallet";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useBalanceVisibility } from "@/lib/balance-visibility";
 import {
   Wallet,
   CreditCard,
@@ -45,6 +46,7 @@ export function WalletPanel({
   onGoToHistory?: () => void;
 }) {
   const { text } = useLanguage();
+  const { formatBalance } = useBalanceVisibility();
   const [currency, setCurrency] = useState("ETB");
   const [data, setData] = useState<WalletData | null>(null);
   const [history, setHistory] = useState<WalletPage<WalletEntry> | null>(null);
@@ -282,7 +284,7 @@ export function WalletPanel({
                       <small>{text("Available balance")} ({currency})</small>
                       <span className="wallet-currency-tag">{text("Ready to Play")}</span>
                     </div>
-                    <strong>{money(balance.availableMinor, currency)}</strong>
+                    <strong>{formatBalance(money(balance.availableMinor, currency), currency)}</strong>
                   </article>
                   <article>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -291,7 +293,7 @@ export function WalletPanel({
                         {text("Pending Review")}
                       </span>
                     </div>
-                    <strong>{money(balance.pendingMinor, currency)}</strong>
+                    <strong>{formatBalance(money(balance.pendingMinor, currency), currency)}</strong>
                   </article>
                 </div>
               )}
@@ -321,10 +323,10 @@ export function WalletPanel({
                       <span className="wallet-currency-tag">{text("Primary")}</span>
                     </div>
                     <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#1B7A53", fontFamily: "var(--font-mono, monospace)" }}>
-                      {money(etbBalance?.availableMinor || 0, "ETB")}
+                      {formatBalance(money(etbBalance?.availableMinor || 0, "ETB"), "ETB")}
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                      {text("Pending:")} {money(etbBalance?.pendingMinor || 0, "ETB")}
+                      {text("Pending:")} {formatBalance(money(etbBalance?.pendingMinor || 0, "ETB"), "ETB")}
                     </div>
                   </div>
 
@@ -339,10 +341,10 @@ export function WalletPanel({
                       </span>
                     </div>
                     <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#1E293B", fontFamily: "var(--font-mono, monospace)" }}>
-                      {money(usdBalance?.availableMinor || 0, "USD")}
+                      {formatBalance(money(usdBalance?.availableMinor || 0, "USD"), "USD")}
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                      {text("Pending:")} {money(usdBalance?.pendingMinor || 0, "USD")}
+                      {text("Pending:")} {formatBalance(money(usdBalance?.pendingMinor || 0, "USD"), "USD")}
                     </div>
                   </div>
                 </div>
@@ -357,7 +359,7 @@ export function WalletPanel({
                     className="wallet-link-btn"
                   >
                     <CreditCard size={15} />
-                    <span>{text("Deposit Funds via Chapa")}</span>
+                    <span>{text("Deposit Funds")}</span>
                     <ArrowRight size={14} />
                   </button>
                 )}
@@ -421,8 +423,7 @@ export function WalletPanel({
                           className="wallet-record-amount"
                           style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}
                         >
-                          {h.amountMinor > 0 ? "+" : ""}
-                          {money(h.amountMinor, h.currency)}
+                          {formatBalance((h.amountMinor > 0 ? "+" : "") + money(h.amountMinor, h.currency), h.currency)}
                         </div>
                         <div className="wallet-record-meta">
                           <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
@@ -437,7 +438,7 @@ export function WalletPanel({
                         <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
                           {text("Balance after")}:{" "}
                           <strong style={{ color: "#1E293B" }}>
-                            {money(h.balanceAfterMinor, h.currency)}
+                            {formatBalance(money(h.balanceAfterMinor, h.currency), h.currency)}
                           </strong>
                         </span>
                       </div>
@@ -466,15 +467,15 @@ export function WalletPanel({
       )}
 
       {/* ════════════════════════════════════════════════════════════════════════
-          VIEW 2: DEDICATED DEPOSIT FUNDS CHAPA CHECKOUT FLOW
+          VIEW 2: DEDICATED DEPOSIT FUNDS CHECKOUT FLOW
          ════════════════════════════════════════════════════════════════════════ */}
       {(view === "deposit" || view === "all") && (
         <div style={{ marginTop: view === "all" ? 40 : 0 }}>
           <div className="wallet-heading">
             <div>
-              <h3>{text("Deposit Funds via Chapa")}</h3>
+              <h3>{text("Deposit Funds")}</h3>
               <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: "0.8125rem" }}>
-                {text("Fast & secure player account funding via Telebirr, CBE Birr, Awash Birr, and Bank Cards.")}
+                {text("Fast & secure player account funding via Telebirr, CBE Birr, Awash, and Bank Cards.")}
               </p>
             </div>
             <div role="group" aria-label={text("Wallet currency")}>
@@ -497,7 +498,7 @@ export function WalletPanel({
           <div className="wallet-current-bal-badge">
             <div>
               <small>{text("Current Wallet Balance")} ({currency})</small>
-              <strong>{money(balance?.availableMinor || 0, currency)}</strong>
+              <strong>{formatBalance(money(balance?.availableMinor || 0, currency), currency)}</strong>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.75rem", color: "#059669", fontWeight: 700 }}>
               <ShieldCheck size={16} />
@@ -511,11 +512,10 @@ export function WalletPanel({
               {text("Supported Payment Channels")}:
             </span>
             <div className="wallet-provider-badges">
-              <span className="provider-badge chapa">Chapa Pay</span>
               <span className="provider-badge telebirr">Telebirr</span>
               <span className="provider-badge cbe">CBE Birr</span>
               <span className="provider-badge awash">Awash Birr</span>
-              <span className="provider-badge cards">Visa / Mastercard</span>
+              <span className="provider-badge cards">Bank Cards</span>
             </div>
           </div>
 
@@ -531,7 +531,7 @@ export function WalletPanel({
                 {text(
                   "A previous deposit request needs a response. Retrying uses the same payment request.",
                 )}{" "}
-                {money(attempt.input.amountMinor, attempt.input.currency)}
+                {formatBalance(money(attempt.input.amountMinor, attempt.input.currency), attempt.input.currency)}
               </p>
               <button disabled={busy} className="wallet-submit-btn">
                 {text(busy ? "Please wait…" : "Retry same deposit")}
@@ -596,7 +596,7 @@ export function WalletPanel({
 
               <button disabled={busy} className="wallet-submit-btn">
                 <Zap size={16} />
-                <span>{text(busy ? "Processing Checkout…" : "Continue to Payment via Chapa")}</span>
+                <span>{text(busy ? "Processing Checkout…" : "Continue to Payment")}</span>
                 <ArrowRight size={15} />
               </button>
             </form>
@@ -657,7 +657,7 @@ export function WalletPanel({
           <div className="wallet-heading" style={{ marginBottom: "16px" }}>
             <h3>
               {historyTab === "deposits"
-                ? text("Chapa Deposit Records")
+                ? text("Deposit Records")
                 : text("Balance Ledger History")}
             </h3>
             <div role="group" aria-label={text("Wallet currency")}>
@@ -689,7 +689,7 @@ export function WalletPanel({
                     <article className="wallet-record" key={d.id}>
                       <div>
                         <div className="wallet-record-amount">
-                          {money(d.amountMinor, d.currency)}
+                          {formatBalance(money(d.amountMinor, d.currency), d.currency)}
                         </div>
                         <div className="wallet-record-meta">
                           <span>{new Date(d.createdAt).toLocaleString()}</span>
@@ -756,8 +756,7 @@ export function WalletPanel({
                           className="wallet-record-amount"
                           style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}
                         >
-                          {h.amountMinor > 0 ? "+" : ""}
-                          {money(h.amountMinor, h.currency)}
+                          {formatBalance((h.amountMinor > 0 ? "+" : "") + money(h.amountMinor, h.currency), h.currency)}
                         </div>
                         <div className="wallet-record-meta">
                           <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
@@ -772,7 +771,7 @@ export function WalletPanel({
                         <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
                           {text("Balance after")}:{" "}
                           <strong style={{ color: "#1E293B" }}>
-                            {money(h.balanceAfterMinor, h.currency)}
+                            {formatBalance(money(h.balanceAfterMinor, h.currency), h.currency)}
                           </strong>
                         </span>
                       </div>
