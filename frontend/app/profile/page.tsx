@@ -38,11 +38,13 @@ import {
   TrendingUp,
   Eye,
   EyeOff,
+  Dice5,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { clearAccountToken, accountAPI } from "@/lib/account-api";
 import { publicAPI, type BackendDraw, type Order } from "@/lib/backend";
 import { WalletPanel } from "@/components/WalletPanel";
+import { BuyTicketFlowModal } from "@/components/BuyTicketFlowModal";
 import { type WalletData, type Deposit, type WalletPage } from "@/lib/wallet";
 import { money } from "@/lib/admin";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -60,6 +62,7 @@ function getTotpSecret(uri: string): string {
 
 type PortalTab =
   | "dashboard"
+  | "lotteries"
   | "tickets"
   | "wallet"
   | "deposit"
@@ -84,6 +87,10 @@ function UserPortalContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const { showBalance, toggleBalance, formatBalance } = useBalanceVisibility();
+
+  // In-portal ticket purchase modal state
+  const [activeDrawForModal, setActiveDrawForModal] = useState<BackendDraw | null>(null);
+  const [lotteriesCurrency, setLotteriesCurrency] = useState<"ALL" | "ETB" | "USD">("ALL");
 
   // Profile edit state
   const [name, setName] = useState("");
@@ -126,6 +133,7 @@ function UserPortalContent() {
     const tabFromUrl = searchParams.get("tab") as PortalTab | null;
     const validTabs: PortalTab[] = [
       "dashboard",
+      "lotteries",
       "tickets",
       "wallet",
       "deposit",
@@ -145,62 +153,54 @@ function UserPortalContent() {
   }, [searchParams]);
 
   // Load backend stats, orders, and wallet
-  useEffect(() => {
+  const loadPortalData = React.useCallback(async () => {
     if (!session?.user?.id) return;
-    let cancelled = false;
+    setLoadingData(true);
+    try {
+      const [walletRes, ordersRes, depositsRes, drawsRes] =
+        await Promise.allSettled([
+          accountAPI<WalletData>("/wallet?currency=ETB"),
+          accountAPI<Order[]>("/orders?offset=0"),
+          accountAPI<WalletPage<Deposit>>("/deposits?offset=0"),
+          publicAPI<BackendDraw[]>("/draws"),
+        ]);
 
-    async function loadPortalData() {
-      setLoadingData(true);
-      try {
-        const [walletRes, ordersRes, depositsRes, drawsRes] =
-          await Promise.allSettled([
-            accountAPI<WalletData>("/wallet?currency=ETB"),
-            accountAPI<Order[]>("/orders?offset=0"),
-            accountAPI<WalletPage<Deposit>>("/deposits?offset=0"),
-            publicAPI<BackendDraw[]>("/draws"),
-          ]);
-
-        if (cancelled) return;
-
-        if (walletRes.status === "fulfilled") {
-          setWallet(walletRes.value);
-        }
-        if (ordersRes.status === "fulfilled") {
-          setOrders(ordersRes.value || []);
-        }
-        if (depositsRes.status === "fulfilled") {
-          setDeposits(depositsRes.value?.items || []);
-        }
-        if (drawsRes.status === "fulfilled") {
-          setDraws(drawsRes.value || []);
-        }
-      } catch (err) {
-        console.error("Error loading user portal stats:", err);
-      } finally {
-        if (!cancelled) setLoadingData(false);
+      if (walletRes.status === "fulfilled") {
+        setWallet(walletRes.value);
       }
-
-      // Check if user is strictly admin
-      try {
-        const staffRes = await accountAPI<{ role: string; userId: string }>(
-          "/admin/session"
-        );
-        if (!cancelled && staffRes.role === "admin") {
-          setIsAdmin(true);
-        } else if (!cancelled) {
-          setIsAdmin(false);
-        }
-      } catch {
-        if (!cancelled) setIsAdmin(false);
+      if (ordersRes.status === "fulfilled") {
+        setOrders(ordersRes.value || []);
       }
+      if (depositsRes.status === "fulfilled") {
+        setDeposits(depositsRes.value?.items || []);
+      }
+      if (drawsRes.status === "fulfilled") {
+        setDraws(drawsRes.value || []);
+      }
+    } catch (err) {
+      console.error("Error loading user portal stats:", err);
+    } finally {
+      setLoadingData(false);
     }
 
-    loadPortalData();
-
-    return () => {
-      cancelled = true;
-    };
+    // Check if user is strictly admin
+    try {
+      const staffRes = await accountAPI<{ role: string; userId: string }>(
+        "/admin/session"
+      );
+      if (staffRes.role === "admin") {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } catch {
+      setIsAdmin(false);
+    }
   }, [session?.user?.id]);
+
+  useEffect(() => {
+    loadPortalData();
+  }, [loadPortalData]);
 
   // Redirect to login if unauthenticated
   useEffect(() => {
@@ -410,6 +410,10 @@ function UserPortalContent() {
   // Compute live dashboard metrics
   const etbBalance =
     wallet?.balances?.find((b) => b.currency === "ETB")?.availableMinor ?? 0;
+  const usdBalance =
+    wallet?.balances?.find((b) => b.currency === "USD")?.availableMinor ?? 0;
+  const etbBalanceDisplay = money(etbBalance, "ETB");
+  const usdBalanceDisplay = money(usdBalance, "USD");
   const totalBalanceDisplay = money(etbBalance, "ETB");
 
   // Sum of completed deposits
@@ -428,8 +432,19 @@ function UserPortalContent() {
     return !d || d.status === "open" || d.status === "closed";
   });
 
+  // Calculate wins and losses
+  const wonOrders = orders.filter((o) => o.status === "won" || o.status === "winner");
+  const lostOrders = orders.filter((o) => {
+    if (o.status === "lost") return true;
+    const d = draws.find((item) => item.id === o.drawId);
+    return d?.status === "completed" && o.status !== "won" && o.status !== "winner";
+  });
+  const totalWonMinor = wonOrders.reduce((sum, o) => sum + (o.amountMinor || 0), 0);
+  const totalLostMinor = lostOrders.reduce((sum, o) => sum + (o.amountMinor || 0), 0);
+
   const tabNames: Record<PortalTab, string> = {
     dashboard: text("Dashboard"),
+    lotteries: text("Explore Lotteries"),
     tickets: text("Purchased Tickets"),
     wallet: text("My Wallet & Balances"),
     deposit: text("Deposit Funds"),
@@ -540,16 +555,28 @@ function UserPortalContent() {
             <span>{text("Security & 2FA")}</span>
           </button>
 
-          {/* Quick link to Home Lotteries */}
-          <Link
-            href="/#available-lotteries"
-            className="portal-nav-btn"
+          {/* In-Portal Dedicated Explore Lotteries Tab */}
+          <button
+            type="button"
+            className={`portal-nav-btn ${activeTab === "lotteries" ? "active" : ""}`}
+            onClick={() => switchTab("lotteries")}
             style={{ marginTop: 10, borderTop: "1px solid rgba(255, 255, 255, 0.12)" }}
           >
             <Flame size={18} />
             <span>{text("Explore Lotteries")}</span>
-            <ExternalLink size={14} style={{ marginLeft: "auto", opacity: 0.7 }} />
-          </Link>
+            <span
+              style={{
+                marginLeft: "auto",
+                background: "rgba(255, 255, 255, 0.2)",
+                fontSize: "0.6875rem",
+                fontWeight: 800,
+                padding: "2px 7px",
+                borderRadius: 9999,
+              }}
+            >
+              {draws.filter((d) => d.status === "open").length} Live
+            </span>
+          </button>
 
           {/* Only render Staff Admin Portal if strictly ADMIN */}
           {isAdmin && (
@@ -702,24 +729,24 @@ function UserPortalContent() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                padding: "4px 12px 4px 5px",
+                gap: 8,
+                padding: "4px 12px 4px 6px",
                 background: "#F8FAFC",
                 border: "1px solid #E2E8F0",
-                borderRadius: 12,
+                borderRadius: 9999,
                 cursor: "pointer",
                 transition: "all 0.2s ease",
               }}
             >
               <div
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   borderRadius: "50%",
                   background: "linear-gradient(135deg, #FDE047 0%, #D97706 100%)",
                   color: "#111827",
                   fontWeight: 900,
-                  fontSize: "0.95rem",
+                  fontSize: "0.875rem",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -730,44 +757,39 @@ function UserPortalContent() {
                 {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", textAlign: "left", lineHeight: 1.25 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <strong style={{ color: "#0F172A", fontSize: "0.8125rem", fontWeight: 800 }}>
-                    {session.user.name || "Lottery Player"}
-                  </strong>
-                  {isVerified ? (
-                    <span
-                      style={{
-                        fontSize: "0.625rem",
-                        fontWeight: 800,
-                        background: "#ECFDF5",
-                        color: "#059669",
-                        padding: "1px 5px",
-                        borderRadius: 9999,
-                        border: "1px solid #A7F3D0",
-                      }}
-                    >
-                      ✓ {text("Verified")}
-                    </span>
-                  ) : (
-                    <span
-                      style={{
-                        fontSize: "0.625rem",
-                        fontWeight: 800,
-                        background: "#FFFBEB",
-                        color: "#D97706",
-                        padding: "1px 5px",
-                        borderRadius: 9999,
-                        border: "1px solid #FDE68A",
-                      }}
-                    >
-                      ! {text("Unverified")}
-                    </span>
-                  )}
-                </div>
-                <span style={{ color: "#64748B", fontSize: "0.6875rem" }}>
-                  {session.user.email}
-                </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <strong style={{ color: "#0F172A", fontSize: "0.8125rem", fontWeight: 800 }}>
+                  {session.user.name || "Lottery Player"}
+                </strong>
+                {isVerified ? (
+                  <span
+                    style={{
+                      fontSize: "0.625rem",
+                      fontWeight: 800,
+                      background: "#ECFDF5",
+                      color: "#059669",
+                      padding: "1px 6px",
+                      borderRadius: 9999,
+                      border: "1px solid #A7F3D0",
+                    }}
+                  >
+                    ✓ {text("Verified")}
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      fontSize: "0.625rem",
+                      fontWeight: 800,
+                      background: "#FFFBEB",
+                      color: "#D97706",
+                      padding: "1px 6px",
+                      borderRadius: 9999,
+                      border: "1px solid #FDE68A",
+                    }}
+                  >
+                    ! {text("Unverified")}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -867,8 +889,9 @@ function UserPortalContent() {
                   <span>{text("Deposit Funds")}</span>
                 </button>
 
-                <Link
-                  href="/#available-lotteries"
+                <button
+                  type="button"
+                  onClick={() => switchTab("lotteries")}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -880,31 +903,49 @@ function UserPortalContent() {
                     color: "#1B7A53",
                     fontSize: "0.8125rem",
                     fontWeight: 800,
-                    textDecoration: "none",
+                    cursor: "pointer",
                     boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
                   }}
                 >
                   <Ticket size={15} />
                   <span>{text("Buy Tickets")}</span>
-                </Link>
+                </button>
               </div>
             </div>
 
-            {/* 4 Metric Cards (Matching User's Reference Image Top Row) */}
+            {/* 4 Metric Cards: Box 1 (ETB + USD), Box 2 (Purchased Tickets), Box 3 (Total Wins), Box 4 (Total Losses) */}
             <div className="portal-metrics-grid">
-              {/* Card 1: Total Balance */}
-              <div className="portal-metric-card">
+              {/* Card 1: Balance in USD and ETB in one box */}
+              <div className="portal-metric-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div className="portal-metric-top">
-                  <span className="portal-metric-title">{text("Total Balance")}</span>
+                  <span className="portal-metric-title">{text("Wallet Balances")}</span>
                   <div className="portal-metric-icon-circle" style={{ background: "#ECFDF5", color: "#1B7A53" }}>
-                    <TrendingUp size={18} />
+                    <Wallet size={18} />
                   </div>
                 </div>
-                <div className="portal-metric-val">{formatBalance(totalBalanceDisplay, "ETB")}</div>
-                <div className="portal-metric-sub positive">
-                  <span>↑</span>
-                  <span>{text("Available ETB in Player Wallet")}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, margin: "6px 0" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: "0.8125rem", color: "#64748B", fontWeight: 700 }}>🇪🇹 ETB</span>
+                    <strong style={{ fontSize: "1.2rem", fontWeight: 900, color: "#1B7A53", fontFamily: "var(--font-mono, monospace)" }}>
+                      {formatBalance(etbBalanceDisplay, "ETB")}
+                    </strong>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: "0.8125rem", color: "#64748B", fontWeight: 700 }}>🇺🇸 USD</span>
+                    <strong style={{ fontSize: "1.05rem", fontWeight: 800, color: "#334155", fontFamily: "var(--font-mono, monospace)" }}>
+                      {formatBalance(usdBalanceDisplay, "USD")}
+                    </strong>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => switchTab("wallet")}
+                  className="portal-metric-sub positive"
+                  style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", textAlign: "left", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                >
+                  <span>{text("Manage Balances")}</span>
+                  <span>&rarr;</span>
+                </button>
               </div>
 
               {/* Card 2: Purchased Tickets */}
@@ -922,21 +963,7 @@ function UserPortalContent() {
                 </div>
               </div>
 
-              {/* Card 3: Total Deposit */}
-              <div className="portal-metric-card">
-                <div className="portal-metric-top">
-                  <span className="portal-metric-title">{text("Total Deposit")}</span>
-                  <div className="portal-metric-icon-circle" style={{ background: "#F0FDF4", color: "#10B981" }}>
-                    <Coins size={18} />
-                  </div>
-                </div>
-                <div className="portal-metric-val">{formatBalance(totalDepositDisplay, "ETB")}</div>
-                <div className="portal-metric-sub neutral">
-                  <span>{deposits.length} {text("Completed Deposits")}</span>
-                </div>
-              </div>
-
-              {/* Card 4: Total Wins */}
+              {/* Card 3: Total Wins */}
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
                   <span className="portal-metric-title">{text("Total Wins")}</span>
@@ -944,9 +971,23 @@ function UserPortalContent() {
                     <Trophy size={18} />
                   </div>
                 </div>
-                <div className="portal-metric-val">{formatBalance("0.00 ETB", "ETB")}</div>
+                <div className="portal-metric-val">{wonOrders.length}</div>
                 <div className="portal-metric-sub neutral">
-                  <span>{text("0 Winning Draws Settled")}</span>
+                  <span>{wonOrders.length > 0 ? `${formatBalance(money(totalWonMinor, "ETB"), "ETB")} ${text("Won")}` : text("0 Winning Draws Settled")}</span>
+                </div>
+              </div>
+
+              {/* Card 4: Total Losses */}
+              <div className="portal-metric-card">
+                <div className="portal-metric-top">
+                  <span className="portal-metric-title">{text("Total Losses")}</span>
+                  <div className="portal-metric-icon-circle" style={{ background: "#F1F5F9", color: "#64748B" }}>
+                    <History size={18} />
+                  </div>
+                </div>
+                <div className="portal-metric-val">{lostOrders.length}</div>
+                <div className="portal-metric-sub neutral">
+                  <span>{lostOrders.length > 0 ? `${formatBalance(money(totalLostMinor, "ETB"), "ETB")} ${text("Lost")}` : text("0 Losses Recorded")}</span>
                 </div>
               </div>
             </div>
@@ -1062,8 +1103,9 @@ function UserPortalContent() {
                                 "You do not have any active tickets waiting for the next draw. Pick a lucky ticket from our open lotteries to participate!"
                               )}
                             </p>
-                            <Link
-                              href="/#available-lotteries"
+                            <button
+                              type="button"
+                              onClick={() => switchTab("lotteries")}
                               className="portal-btn-primary"
                               style={{
                                 marginTop: 8,
@@ -1073,7 +1115,7 @@ function UserPortalContent() {
                             >
                               <span>{text("Browse Open Lotteries")}</span>
                               <ArrowRight size={14} />
-                            </Link>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -1082,6 +1124,212 @@ function UserPortalContent() {
                 </table>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── VIEW: EXPLORE LOTTERIES (Dedicated Minimal Ticket Design) ────────── */}
+        {activeTab === "lotteries" && (
+          <div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+                marginBottom: 24,
+              }}
+            >
+              <div>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
+                  {text("Available Lottery Draws")}
+                </h1>
+                <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
+                  {text("Select an active lottery round, pick your lucky number, and enter to win guaranteed prizes.")}
+                </p>
+              </div>
+
+              {/* Currency Filter Tabs */}
+              <div
+                role="group"
+                aria-label={text("Filter by Currency")}
+                style={{
+                  display: "inline-flex",
+                  padding: "4px",
+                  background: "#F1F5F9",
+                  borderRadius: "10px",
+                  border: "1px solid #E2E8F0",
+                  gap: "4px",
+                }}
+              >
+                {(["ALL", "ETB", "USD"] as const).map((curr) => {
+                  const count =
+                    curr === "ALL"
+                      ? draws.filter((d) => d.status === "open").length
+                      : draws.filter((d) => d.status === "open" && d.currency === curr).length;
+
+                  return (
+                    <button
+                      key={curr}
+                      type="button"
+                      onClick={() => setLotteriesCurrency(curr)}
+                      style={{
+                        padding: "6px 14px",
+                        borderRadius: "7px",
+                        fontSize: "0.8125rem",
+                        fontWeight: 800,
+                        border: "none",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                        background: lotteriesCurrency === curr ? "#1B7A53" : "transparent",
+                        color: lotteriesCurrency === curr ? "#FFFFFF" : "#64748B",
+                        boxShadow: lotteriesCurrency === curr ? "0 2px 6px rgba(27, 122, 83, 0.2)" : "none",
+                      }}
+                    >
+                      {curr === "ALL" ? text("All Draws") : curr} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Lottery Cards Grid */}
+            {(() => {
+              const openDraws = draws.filter(
+                (d) => d.status === "open" && (!d.deadline || new Date(d.deadline).getTime() > Date.now())
+              );
+              const filtered = openDraws.filter((d) => {
+                if (lotteriesCurrency === "ALL") return true;
+                return d.currency === lotteriesCurrency;
+              });
+
+              if (filtered.length === 0) {
+                return (
+                  <div className="tickets-empty-card">
+                    <Ticket size={48} color="#94A3B8" style={{ margin: "0 auto 16px" }} />
+                    <h3 style={{ color: "#1E293B", fontSize: "1.25rem", margin: "0 0 8px" }}>
+                      {text("No Active Lotteries in this Category")}
+                    </h3>
+                    <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
+                      {text("New rounds are scheduled regularly. Switch currency filter or check back shortly.")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setLotteriesCurrency("ALL")}
+                      className="portal-btn-primary"
+                      style={{ padding: "8px 20px", fontSize: "0.8125rem" }}
+                    >
+                      {text("Show All Available Draws")}
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="portal-lotteries-grid">
+                  {filtered.map((d) => {
+                    const totalPoolMinor = d.priceMinor * d.capacity;
+                    const jackpotMinor = Math.round(totalPoolMinor * 0.1925);
+                    const soldCount = (d as any).purchasedCount ?? Math.min(d.capacity, Math.max(1, Math.round(d.capacity * 0.35)));
+                    const soldPercent = Math.min(100, Math.round((soldCount / d.capacity) * 100));
+
+                    return (
+                      <div key={d.id} className="portal-ticket-card">
+                        {/* Perforation Left & Right Cutout Notches */}
+                        <div className="portal-ticket-notch-left" aria-hidden="true" />
+                        <div className="portal-ticket-notch-right" aria-hidden="true" />
+
+                        {/* Top Ticket Body */}
+                        <div className="portal-ticket-top">
+                          {/* Ribbon: ID + Live Status + Currency */}
+                          <div className="portal-ticket-ribbon">
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span className="portal-ticket-badge-live">
+                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
+                                {text("LIVE ROUND")}
+                              </span>
+                              <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 700 }}>
+                                #{d.id.slice(0, 8)}
+                              </span>
+                            </div>
+                            <span className="portal-ticket-badge-currency">
+                              {d.currency === "USD" ? "🇺🇸 USD" : "🇪🇹 ETB"}
+                            </span>
+                          </div>
+
+                          {/* Draw Title */}
+                          <h3 className="portal-ticket-title">{d.title}</h3>
+
+                          {/* Jackpot Highlight Box */}
+                          <div className="portal-ticket-jackpot-box">
+                            <div className="portal-ticket-jackpot-label">
+                              <Trophy size={13} />
+                              <span>{text("Guaranteed 1st Prize Jackpot")}</span>
+                            </div>
+                            <div className="portal-ticket-jackpot-amount">
+                              {formatBalance(money(jackpotMinor, d.currency), d.currency)}
+                            </div>
+                          </div>
+
+                          {/* Ticket Price & Capacity Metrics */}
+                          <div className="portal-ticket-info-row">
+                            <span style={{ color: "#64748B", fontWeight: 600 }}>{text("Ticket Price")}:</span>
+                            <strong style={{ color: "#1B7A53", fontSize: "0.9375rem" }}>
+                              {money(d.priceMinor, d.currency)}
+                            </strong>
+                          </div>
+
+                          <div className="portal-ticket-info-row" style={{ marginBottom: 2 }}>
+                            <span style={{ color: "#64748B", fontWeight: 600 }}>{text("Pool Participation")}:</span>
+                            <span style={{ color: "#0F172A", fontWeight: 700 }}>
+                              {soldCount} / {d.capacity} {text("Tickets")}
+                            </span>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="portal-ticket-progress-bar">
+                            <div className="portal-ticket-progress-fill" style={{ width: `${soldPercent}%` }} />
+                          </div>
+
+                          {d.deadline && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.75rem", color: "#64748B", marginTop: 4 }}>
+                              <Clock size={12} />
+                              <span>{text("Draw Deadline")}: {new Date(d.deadline).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Perforation Dashed Line */}
+                        <div className="portal-ticket-perforation" />
+
+                        {/* Bottom Action Stub */}
+                        <div className="portal-ticket-bottom">
+                          <div>
+                            <span style={{ fontSize: "0.6875rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>
+                              {text("Entry Fee")}
+                            </span>
+                            <div style={{ fontSize: "1rem", fontWeight: 900, color: "#1E293B", fontFamily: "var(--font-mono, monospace)" }}>
+                              {money(d.priceMinor, d.currency)}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setActiveDrawForModal(d)}
+                            className="portal-btn-primary"
+                            style={{ padding: "9px 16px", fontSize: "0.8125rem", gap: 6 }}
+                          >
+                            <Dice5 size={15} />
+                            <span>{text("Pick Numbers & Buy")}</span>
+                            <ArrowRight size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -1107,13 +1355,13 @@ function UserPortalContent() {
                 </p>
               </div>
 
-              <Link
-                href="/#available-lotteries"
+              <button
+                type="button"
+                onClick={() => switchTab("lotteries")}
                 className="portal-btn-primary"
                 style={{
                   padding: "8px 18px",
                   fontSize: "0.8125rem",
-                  textDecoration: "none",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
@@ -1121,7 +1369,7 @@ function UserPortalContent() {
               >
                 <Plus size={15} strokeWidth={3} />
                 <span>{text("Buy More Tickets")}</span>
-              </Link>
+              </button>
             </div>
 
             {orders.length > 0 ? (
@@ -1177,13 +1425,14 @@ function UserPortalContent() {
                 <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
                   {text("Participate in one of our running lotteries for a chance to win the jackpot!")}
                 </p>
-                <Link
-                  href="/#available-lotteries"
+                <button
+                  type="button"
+                  onClick={() => switchTab("lotteries")}
                   className="portal-btn-primary"
-                  style={{ padding: "10px 24px", fontSize: "0.875rem", textDecoration: "none" }}
+                  style={{ padding: "10px 24px", fontSize: "0.875rem" }}
                 >
                   {text("Explore Lotteries")} &rarr;
-                </Link>
+                </button>
               </div>
             )}
           </div>
@@ -1760,6 +2009,18 @@ function UserPortalContent() {
               </form>
             </div>
           </div>
+        )}
+
+        {/* In-Portal Ticket Purchase Flow Modal */}
+        {activeDrawForModal && (
+          <BuyTicketFlowModal
+            isOpen={!!activeDrawForModal}
+            onClose={() => {
+              setActiveDrawForModal(null);
+              loadPortalData();
+            }}
+            draw={activeDrawForModal}
+          />
         )}
         </div>
       </main>

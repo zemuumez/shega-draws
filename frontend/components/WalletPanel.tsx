@@ -62,7 +62,6 @@ export function WalletPanel({
   const [attempt, setAttempt] = useState<Attempt | null>(null);
 
   // Sub-tab states
-  const [walletTab, setWalletTab] = useState<"breakdown" | "ledger">("breakdown");
   const [historyTab, setHistoryTab] = useState<"deposits" | "ledger">("deposits");
 
   const sending = useRef(false);
@@ -211,8 +210,6 @@ export function WalletPanel({
   const enabled =
     !!data?.depositPolicy.enabled && currency === data.depositPolicy.currency;
 
-  const quickPresets = currency === "ETB" ? [50, 100, 250, 500, 1000, 2000] : [5, 10, 25, 50, 100];
-
   return (
     <section className="wallet-panel" aria-label={text("Wallet and payments")}>
       {/* ════════════════════════════════════════════════════════════════════════
@@ -220,33 +217,7 @@ export function WalletPanel({
          ════════════════════════════════════════════════════════════════════════ */}
       {(view === "balances" || view === "all") && (
         <div style={{ marginBottom: view === "all" ? 40 : 0 }}>
-          {/* Sub-Tabs: Balances & Breakdown vs Recent Ledger */}
-          <div className="wallet-tab-bar" role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={walletTab === "breakdown"}
-              className={`wallet-tab-btn ${walletTab === "breakdown" ? "active" : ""}`}
-              onClick={() => setWalletTab("breakdown")}
-            >
-              <Wallet size={15} />
-              <span>{text("Balances & Currency Breakdown")}</span>
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={walletTab === "ledger"}
-              className={`wallet-tab-btn ${walletTab === "ledger" ? "active" : ""}`}
-              onClick={() => setWalletTab("ledger")}
-            >
-              <FileText size={15} />
-              <span>{text("Recent Ledger")}</span>
-            </button>
-          </div>
-
-          {/* TAB 1: Balances Overview & Multi-Currency Breakdown */}
-          {walletTab === "breakdown" && (
-            <div>
+          <div>
               <div className="wallet-heading">
                 <div>
                   <h3>{text("My Wallet & Balances")}</h3>
@@ -269,12 +240,6 @@ export function WalletPanel({
                   ))}
                 </div>
               </div>
-
-              {data?.mode === "test" && (
-                <p className="wallet-notice">
-                  {text("Test environment — balances and payments are for testing only.")}
-                </p>
-              )}
 
               {/* 2 Primary Balance Metric Cards */}
               {balance && (
@@ -364,105 +329,27 @@ export function WalletPanel({
                   </button>
                 )}
 
+              {onGoToHistory && (
                 <button
                   type="button"
-                  onClick={() => setWalletTab("ledger")}
+                  onClick={onGoToHistory}
                   className="wallet-secondary-btn"
                 >
                   <FileText size={14} />
-                  <span>{text("View Balance Ledger")}</span>
+                  <span>{text("View Balance Ledger & History")}</span>
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setRevision((v) => v + 1)}
-                  className="wallet-secondary-btn"
-                >
-                  <RotateCw size={14} />
-                  <span>{text("Refresh Balances")}</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: Recent Ledger Preview */}
-          {walletTab === "ledger" && (
-            <div>
-              <div className="wallet-heading">
-                <div>
-                  <h3>{text("Recent Balance Ledger")}</h3>
-                  <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: "0.8125rem" }}>
-                    {text("Detailed ledger audit trail of ticket debits, deposit credits, and winning settlements.")}
-                  </p>
-                </div>
-                <div role="group" aria-label={text("Wallet currency")}>
-                  {["ETB", "USD"].map((c) => (
-                    <button
-                      key={c}
-                      aria-pressed={currency === c}
-                      onClick={() => {
-                        setCurrency(c);
-                        setOffset(0);
-                      }}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {!history ? (
-                <p role="status">{text("Loading balance history…")}</p>
-              ) : (
-                <>
-                  {!history.items.length && <p>{text("No balance entries recorded for this currency.")}</p>}
-                  {history.items.map((h) => (
-                    <article className="wallet-record" key={h.id}>
-                      <div>
-                        <div
-                          className="wallet-record-amount"
-                          style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}
-                        >
-                          {formatBalance((h.amountMinor > 0 ? "+" : "") + money(h.amountMinor, h.currency), h.currency)}
-                        </div>
-                        <div className="wallet-record-meta">
-                          <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
-                          <span>•</span>
-                          <span>{new Date(h.createdAt).toLocaleString()}</span>
-                          <span>•</span>
-                          <span className="wallet-record-ref">Ref: {h.reference}</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
-                          {text("Balance after")}:{" "}
-                          <strong style={{ color: "#1E293B" }}>
-                            {formatBalance(money(h.balanceAfterMinor, h.currency), h.currency)}
-                          </strong>
-                        </span>
-                      </div>
-                    </article>
-                  ))}
-
-                  <div className="wallet-pagination">
-                    <button
-                      disabled={!offset}
-                      onClick={() => setOffset((v) => Math.max(0, v - 50))}
-                    >
-                      {text("Previous entries")}
-                    </button>
-                    <button
-                      disabled={!history.hasMore}
-                      onClick={() => setOffset((v) => v + 50)}
-                    >
-                      {text("Next entries")}
-                    </button>
-                  </div>
-                </>
               )}
+
+              <button
+                type="button"
+                onClick={() => setRevision((v) => v + 1)}
+                className="wallet-secondary-btn"
+              >
+                <RotateCw size={14} />
+                <span>{text("Refresh Balances")}</span>
+              </button>
             </div>
-          )}
+          </div>
         </div>
       )}
 
@@ -475,7 +362,7 @@ export function WalletPanel({
             <div>
               <h3>{text("Deposit Funds")}</h3>
               <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: "0.8125rem" }}>
-                {text("Fast & secure player account funding via Telebirr, CBE Birr, Awash, and Bank Cards.")}
+                {text("Top up your lottery wallet instantly. Funds are credited immediately for ticket purchases.")}
               </p>
             </div>
             <div role="group" aria-label={text("Wallet currency")}>
@@ -494,118 +381,267 @@ export function WalletPanel({
             </div>
           </div>
 
-          {/* Current Available Balance Mini Card */}
-          <div className="wallet-current-bal-badge">
-            <div>
-              <small>{text("Current Wallet Balance")} ({currency})</small>
-              <strong>{formatBalance(money(balance?.availableMinor || 0, currency), currency)}</strong>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.75rem", color: "#059669", fontWeight: 700 }}>
-              <ShieldCheck size={16} />
-              <span>{text("Instant Automatic Credit")}</span>
-            </div>
-          </div>
-
-          {/* Payment Provider Badges */}
-          <div style={{ marginBottom: 8 }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-              {text("Supported Payment Channels")}:
-            </span>
-            <div className="wallet-provider-badges">
-              <span className="provider-badge telebirr">Telebirr</span>
-              <span className="provider-badge cbe">CBE Birr</span>
-              <span className="provider-badge awash">Awash Birr</span>
-              <span className="provider-badge cards">Bank Cards</span>
-            </div>
-          </div>
-
-          {data?.mode === "test" && (
-            <p className="wallet-notice">
-              {text("Test environment — use phone 0900123456 to simulate successful test deposits.")}
-            </p>
-          )}
-
-          {attempt ? (
-            <form onSubmit={deposit}>
-              <p>
-                {text(
-                  "A previous deposit request needs a response. Retrying uses the same payment request.",
-                )}{" "}
-                {formatBalance(money(attempt.input.amountMinor, attempt.input.currency), attempt.input.currency)}
-              </p>
-              <button disabled={busy} className="wallet-submit-btn">
-                {text(busy ? "Please wait…" : "Retry same deposit")}
-              </button>
-            </form>
-          ) : enabled && !balance?.restricted ? (
-            <form onSubmit={deposit} className="wallet-form">
-              {/* Quick Select Amount Presets */}
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: "16px",
+              padding: "24px",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+              maxWidth: "540px",
+              margin: "16px 0",
+            }}
+          >
+            {/* Header / Available Balance Strip */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingBottom: "16px",
+                marginBottom: "20px",
+                borderBottom: "1px solid #F1F5F9",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
               <div>
-                <label style={{ marginBottom: 6 }}>
-                  {text("Select Quick Amount")} ({currency})
-                </label>
-                <div className="wallet-quick-amounts">
-                  {quickPresets.map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      className={`quick-amount-btn ${amount === String(preset) ? "active" : ""}`}
-                      onClick={() => setAmount(String(preset))}
-                    >
-                      {preset} {currency}
-                    </button>
-                  ))}
+                <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  {text("Current Available Balance")}
+                </span>
+                <div style={{ fontSize: "1.35rem", fontWeight: 900, color: "#1B7A53", fontFamily: "var(--font-mono, monospace)", marginTop: "2px" }}>
+                  {formatBalance(money(balance?.availableMinor || 0, currency), currency)}
                 </div>
               </div>
 
-              <label>
-                {text("Custom Deposit Amount")} ({currency})
-                <input
-                  aria-label="Deposit amount"
-                  inputMode="decimal"
-                  required
-                  placeholder={currency === "ETB" ? "250.00" : "25.00"}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  maxLength={12}
-                />
-              </label>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "4px 10px",
+                  background: "#ECFDF5",
+                  border: "1px solid #A7F3D0",
+                  borderRadius: 9999,
+                  color: "#059669",
+                  fontSize: "0.75rem",
+                  fontWeight: 800,
+                }}
+              >
+                <ShieldCheck size={15} />
+                <span>{text("Instant Automatic Credit")}</span>
+              </div>
+            </div>
 
-              <label>
-                {text("Phone Number")}
-                <input
-                  aria-label="Deposit phone number"
-                  type="tel"
-                  autoComplete="tel"
-                  required
-                  pattern="\+[1-9][0-9]{7,14}"
-                  placeholder="+251…"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  maxLength={16}
-                />
-                <small style={{ color: "#64748B", fontSize: "0.75rem" }}>
-                  {text("Required for Telebirr / CBE Birr instant payment prompt notification.")}
-                </small>
-              </label>
+            {attempt ? (
+              <form onSubmit={deposit} style={{ display: "grid", gap: "16px" }}>
+                <div
+                  style={{
+                    padding: "14px",
+                    background: "#FFFBEB",
+                    border: "1px solid #FDE68A",
+                    borderRadius: "10px",
+                    fontSize: "0.8125rem",
+                    color: "#92400E",
+                  }}
+                >
+                  <p style={{ margin: 0 }}>
+                    {text("A previous deposit request needs a response. Retrying uses the same payment request:")}{" "}
+                    <strong>{formatBalance(money(attempt.input.amountMinor, attempt.input.currency), attempt.input.currency)}</strong>
+                  </p>
+                </div>
+                <button
+                  disabled={busy}
+                  className="portal-btn-primary"
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: "0.875rem" }}
+                >
+                  {text(busy ? "Please wait…" : "Retry same deposit")}
+                </button>
+              </form>
+            ) : enabled && !balance?.restricted ? (
+              <form onSubmit={deposit} style={{ display: "grid", gap: "18px" }}>
+                {/* Clean Amount Input */}
+                <div>
+                  <label
+                    htmlFor="deposit-amount-input"
+                    style={{ display: "block", fontSize: "0.8125rem", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}
+                  >
+                    {text("Amount to Deposit")} ({currency})
+                  </label>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      border: "1.5px solid #CBD5E1",
+                      borderRadius: "10px",
+                      background: "#FFFFFF",
+                      overflow: "hidden",
+                      transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                    }}
+                  >
+                    <span
+                      style={{
+                        padding: "12px 14px",
+                        background: "#F8FAFC",
+                        borderRight: "1px solid #E2E8F0",
+                        fontSize: "0.875rem",
+                        fontWeight: 800,
+                        color: "#475569",
+                        userSelect: "none",
+                      }}
+                    >
+                      {currency}
+                    </span>
+                    <input
+                      id="deposit-amount-input"
+                      aria-label="Deposit amount"
+                      inputMode="decimal"
+                      required
+                      placeholder={currency === "ETB" ? "250.00" : "25.00"}
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      maxLength={12}
+                      style={{
+                        flex: 1,
+                        border: "none",
+                        outline: "none",
+                        padding: "12px 14px",
+                        fontSize: "1rem",
+                        fontWeight: 700,
+                        color: "#0F172A",
+                        background: "transparent",
+                      }}
+                    />
+                  </div>
+                  {data?.depositPolicy && (
+                    <small style={{ display: "block", marginTop: "5px", color: "#64748B", fontSize: "0.75rem", fontWeight: 600 }}>
+                      {text("Permitted range:")} {money(data.depositPolicy.minMinor, currency)} – {money(data.depositPolicy.maxMinor, currency)}
+                    </small>
+                  )}
+                </div>
 
-              <small>
-                {text("Permitted deposit range:")} {money(data!.depositPolicy.minMinor, currency)} –{" "}
-                {money(data!.depositPolicy.maxMinor, currency)}
-              </small>
+                {/* Clean Phone Input */}
+                <div>
+                  <label
+                    htmlFor="deposit-phone-input"
+                    style={{ display: "block", fontSize: "0.8125rem", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}
+                  >
+                    {text("Mobile Phone Number")}
+                  </label>
+                  <input
+                    id="deposit-phone-input"
+                    aria-label="Deposit phone number"
+                    type="tel"
+                    autoComplete="tel"
+                    required
+                    pattern="\+[1-9][0-9]{7,14}"
+                    placeholder={currency === "USD" ? "+1…" : "+251…"}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    maxLength={16}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      border: "1.5px solid #CBD5E1",
+                      borderRadius: "10px",
+                      padding: "12px 14px",
+                      fontSize: "0.9375rem",
+                      fontWeight: 600,
+                      color: "#0F172A",
+                      background: "#FFFFFF",
+                      outline: "none",
+                    }}
+                  />
+                  <small style={{ display: "block", marginTop: "5px", color: "#64748B", fontSize: "0.75rem", fontWeight: 600 }}>
+                    {text("Used to send the instant payment prompt on your phone.")}
+                  </small>
+                </div>
 
-              <button disabled={busy} className="wallet-submit-btn">
-                <Zap size={16} />
-                <span>{text(busy ? "Processing Checkout…" : "Continue to Payment")}</span>
-                <ArrowRight size={15} />
-              </button>
-            </form>
-          ) : (
-            <p>{text("New deposits are currently unavailable for this currency.")}</p>
-          )}
+                {error && (
+                  <div
+                    role="alert"
+                    style={{
+                      padding: "10px 14px",
+                      background: "#FEF2F2",
+                      border: "1px solid #FECACA",
+                      borderRadius: "8px",
+                      color: "#DC2626",
+                      fontSize: "0.8125rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {text(error)}
+                  </div>
+                )}
+                {message && (
+                  <div
+                    role="status"
+                    style={{
+                      padding: "10px 14px",
+                      background: "#F0FDF4",
+                      border: "1px solid #BBF7D0",
+                      borderRadius: "8px",
+                      color: "#16A34A",
+                      fontSize: "0.8125rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {text(message)}
+                  </div>
+                )}
 
-          {error && <p role="alert">{text(error)}</p>}
-          {message && <p role="status">{text(message)}</p>}
+                {/* Primary CTA Submit Button */}
+                <button
+                  disabled={busy}
+                  className="portal-btn-primary"
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    padding: "14px 20px",
+                    fontSize: "0.9375rem",
+                    fontWeight: 800,
+                    boxShadow: "0 4px 14px rgba(27, 122, 83, 0.25)",
+                    cursor: busy ? "not-allowed" : "pointer",
+                    opacity: busy ? 0.7 : 1,
+                  }}
+                >
+                  <CreditCard size={18} />
+                  <span>
+                    {busy
+                      ? text("Processing Checkout…")
+                      : amount
+                        ? `${text("Deposit")} ${amount} ${currency}`
+                        : text("Continue to Payment")}
+                  </span>
+                  <ArrowRight size={16} />
+                </button>
+
+                {/* Subdued Supported Gateways Footer */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    paddingTop: "12px",
+                    borderTop: "1px solid #F1F5F9",
+                    fontSize: "0.75rem",
+                    color: "#64748B",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <span style={{ fontWeight: 600 }}>{text("Supported Payment Channels:")}</span>
+                  <span style={{ fontWeight: 800, color: "#334155" }}>
+                    Telebirr • CBE Birr • Awash Birr • Bank Cards
+                  </span>
+                </div>
+              </form>
+            ) : (
+              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "16px 0 0" }}>
+                {text("New deposits are currently unavailable for this currency.")}
+              </p>
+            )}
+          </div>
 
           <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
             {onGoToHistory && (
