@@ -730,7 +730,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 
 /* ── Deep Emerald Sidebar (matching reference image) ───────────────────────── */
 .portal-sidebar {
-  width: 275px;
+  width: 290px;
   flex-shrink: 0;
   background: #1B7A53;
   border-right: 1px solid rgba(0, 0, 0, 0.05);
@@ -802,8 +802,8 @@ body:has(.user-portal-container) .scroll-progress-container {
 .portal-nav-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 18px;
+  gap: 10px;
+  padding: 11px 16px;
   border-radius: 9999px;
   border: 1.5px solid transparent;
   background: transparent;
@@ -816,6 +816,30 @@ body:has(.user-portal-container) .scroll-progress-container {
   width: 100%;
   text-decoration: none;
   flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.portal-nav-btn span:first-of-type {
+  white-space: nowrap;
+}
+
+.portal-nav-badge {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.portal-nav-btn.active .portal-nav-badge {
+  background: #1B7A53;
+  color: #FFFFFF;
 }
 
 .portal-nav-btn:hover {
@@ -1842,6 +1866,17 @@ body:has(.user-portal-container) .scroll-progress-container {
   color: #0F172A !important;
 }
 
+.user-portal-container.dark-theme .portal-nav-badge {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .portal-nav-btn.active .portal-nav-badge {
+  background: #0F172A !important;
+  color: #FDE047 !important;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3) !important;
+}
+
 .user-portal-container.dark-theme .portal-sidebar-support-card {
   background: #0E1628;
   border: 1px solid #1E293B;
@@ -1910,7 +1945,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 }
 
 .user-portal-container.dark-theme p {
-  color: #94A3B8;
+  color: #CBD5E1 !important;
 }
 
 /* Metric Cards in Dark Mode */
@@ -1926,7 +1961,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 }
 
 .user-portal-container.dark-theme .portal-metric-title {
-  color: #94A3B8;
+  color: #CBD5E1 !important;
 }
 
 .user-portal-container.dark-theme .portal-metric-val {
@@ -2073,7 +2108,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 }
 
 .user-portal-container.dark-theme .ticket-number-badge .label {
-  color: #94A3B8;
+  color: #CBD5E1 !important;
 }
 
 .user-portal-container.dark-theme .ticket-number-badge .number {
@@ -2084,8 +2119,10 @@ body:has(.user-portal-container) .scroll-progress-container {
   color: #FFFFFF;
 }
 
-.user-portal-container.dark-theme .ticket-meta-info .meta-subtext {
-  color: #94A3B8;
+.user-portal-container.dark-theme .ticket-meta-info .meta-subtext,
+.user-portal-container.dark-theme .ticket-meta-info .meta-subtext span,
+.user-portal-container.dark-theme .ticket-meta-info .meta-subtext code {
+  color: #CBD5E1 !important;
 }
 
 .user-portal-container.dark-theme .ticket-price-display {
@@ -2285,6 +2322,113 @@ body:has(.user-portal-container) .scroll-progress-container {
   border-color: #FDE047;
   color: #FDE047;
 }
+
+/* ── Deposit Card in Dark Mode ────────────────────────────────────────────── */
+.user-portal-container.dark-theme .wallet-deposit-card {
+  background: #0E1628 !important;
+  border: 1.5px solid #1E293B !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+.user-portal-container.dark-theme .wallet-deposit-header {
+  border-bottom-color: #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-deposit-balance-label {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-deposit-balance-val {
+  color: #FDE047 !important;
+  text-shadow: 0 0 12px rgba(253, 224, 71, 0.25);
+}
+
+.user-portal-container.dark-theme .wallet-deposit-badge {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: #10B981 !important;
+  color: #34D399 !important;
+}
+
+.user-portal-container.dark-theme .wallet-form-label {
+  color: #FDE047 !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.user-portal-container.dark-theme .wallet-input-group {
+  background: #080D1A !important;
+  border: 1.5px solid #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-currency-prefix {
+  background: #162032 !important;
+  border-right: 1px solid #1E293B !important;
+  color: #FDE047 !important;
+}
+
+.user-portal-container.dark-theme .wallet-input-field {
+  color: #FFFFFF !important;
+  background: transparent !important;
+}
+
+.user-portal-container.dark-theme .wallet-phone-input {
+  background: #080D1A !important;
+  border: 1.5px solid #1E293B !important;
+  color: #FFFFFF !important;
+}
+
+.user-portal-container.dark-theme .wallet-input-group:focus-within,
+.user-portal-container.dark-theme .wallet-phone-input:focus {
+  border-color: #FDE047 !important;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.15) !important;
+}
+
+.user-portal-container.dark-theme .wallet-form-hint {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-deposit-footer {
+  border-top-color: #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-deposit-footer-label {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-deposit-footer-channels {
+  color: #FFFFFF !important;
+}
+
+/* Explore Lotteries & Wallet Subtexts in Dark Mode */
+.user-portal-container.dark-theme .portal-ticket-info-row span:first-child,
+.user-portal-container.dark-theme .portal-ticket-bottom small,
+.user-portal-container.dark-theme .portal-ticket-bottom span {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-balances article span {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-currency-box span {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-breakdown-card {
+  background: #080D1A !important;
+  border: 1.5px solid #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-breakdown-header h4 {
+  color: #FFFFFF !important;
+}
+
+.user-portal-container.dark-theme .wallet-breakdown-header span {
+  color: #CBD5E1 !important;
+}
+
 
 
 

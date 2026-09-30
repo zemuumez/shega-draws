@@ -382,53 +382,19 @@ export function WalletPanel({
             </div>
           </div>
 
-          <div
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "16px",
-              padding: "24px",
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
-              maxWidth: "540px",
-              margin: "16px 0",
-            }}
-          >
+          <div className="wallet-deposit-card">
             {/* Header / Available Balance Strip */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingBottom: "16px",
-                marginBottom: "20px",
-                borderBottom: "1px solid #F1F5F9",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
+            <div className="wallet-deposit-header">
               <div>
-                <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <span className="wallet-deposit-balance-label">
                   {text("Current Available Balance")}
                 </span>
-                <div style={{ fontSize: "1.35rem", fontWeight: 900, color: "#1B7A53", fontFamily: "var(--font-mono, monospace)", marginTop: "2px" }}>
+                <div className="wallet-deposit-balance-val">
                   {formatBalance(money(balance?.availableMinor || 0, currency), currency)}
                 </div>
               </div>
 
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "4px 10px",
-                  background: "#ECFDF5",
-                  border: "1px solid #A7F3D0",
-                  borderRadius: 9999,
-                  color: "#059669",
-                  fontSize: "0.75rem",
-                  fontWeight: 800,
-                }}
-              >
+              <div className="wallet-deposit-badge">
                 <ShieldCheck size={15} />
                 <span>{text("Instant Automatic Credit")}</span>
               </div>
@@ -463,34 +429,11 @@ export function WalletPanel({
               <form onSubmit={deposit} style={{ display: "grid", gap: "18px" }}>
                 {/* Clean Amount Input */}
                 <div>
-                  <label
-                    htmlFor="deposit-amount-input"
-                    style={{ display: "block", fontSize: "0.8125rem", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}
-                  >
+                  <label htmlFor="deposit-amount-input" className="wallet-form-label">
                     {text("Amount to Deposit")} ({currency})
                   </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      border: "1.5px solid #CBD5E1",
-                      borderRadius: "10px",
-                      background: "#FFFFFF",
-                      overflow: "hidden",
-                      transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-                    }}
-                  >
-                    <span
-                      style={{
-                        padding: "12px 14px",
-                        background: "#F8FAFC",
-                        borderRight: "1px solid #E2E8F0",
-                        fontSize: "0.875rem",
-                        fontWeight: 800,
-                        color: "#475569",
-                        userSelect: "none",
-                      }}
-                    >
+                  <div className="wallet-input-group">
+                    <span className="wallet-currency-prefix">
                       {currency}
                     </span>
                     <input
@@ -502,31 +445,44 @@ export function WalletPanel({
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       maxLength={12}
-                      style={{
-                        flex: 1,
-                        border: "none",
-                        outline: "none",
-                        padding: "12px 14px",
-                        fontSize: "1rem",
-                        fontWeight: 700,
-                        color: "#0F172A",
-                        background: "transparent",
-                      }}
+                      className="wallet-input-field"
                     />
                   </div>
                   {data?.depositPolicy && (
-                    <small style={{ display: "block", marginTop: "5px", color: "#64748B", fontSize: "0.75rem", fontWeight: 600 }}>
+                    <small className="wallet-form-hint">
                       {text("Permitted range:")} {money(data.depositPolicy.minMinor, currency)} – {money(data.depositPolicy.maxMinor, currency)}
                     </small>
                   )}
                 </div>
 
+                {/* Quick Select Preset Amounts */}
+                <div>
+                  <label className="wallet-form-label">
+                    {text("Preset Amounts")}
+                  </label>
+                  <div className="wallet-quick-amounts">
+                    {(currency === "ETB"
+                      ? [100, 250, 500, 1000, 2500, 5000]
+                      : [10, 25, 50, 100, 250, 500]
+                    ).map((presetVal) => {
+                      const isSelected = amount === String(presetVal);
+                      return (
+                        <button
+                          key={presetVal}
+                          type="button"
+                          className={`quick-amount-btn ${isSelected ? "active" : ""}`}
+                          onClick={() => setAmount(String(presetVal))}
+                        >
+                          {currency === "ETB" ? `ETB ${presetVal}` : `$${presetVal}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Clean Phone Input */}
                 <div>
-                  <label
-                    htmlFor="deposit-phone-input"
-                    style={{ display: "block", fontSize: "0.8125rem", fontWeight: 800, color: "#1E293B", marginBottom: "6px" }}
-                  >
+                  <label htmlFor="deposit-phone-input" className="wallet-form-label">
                     {text("Mobile Phone Number")}
                   </label>
                   <input
@@ -540,20 +496,9 @@ export function WalletPanel({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     maxLength={16}
-                    style={{
-                      width: "100%",
-                      boxSizing: "border-box",
-                      border: "1.5px solid #CBD5E1",
-                      borderRadius: "10px",
-                      padding: "12px 14px",
-                      fontSize: "0.9375rem",
-                      fontWeight: 600,
-                      color: "#0F172A",
-                      background: "#FFFFFF",
-                      outline: "none",
-                    }}
+                    className="wallet-phone-input"
                   />
-                  <small style={{ display: "block", marginTop: "5px", color: "#64748B", fontSize: "0.75rem", fontWeight: 600 }}>
+                  <small className="wallet-form-hint">
                     {text("Used to send the instant payment prompt on your phone.")}
                   </small>
                 </div>
@@ -601,7 +546,6 @@ export function WalletPanel({
                     padding: "14px 20px",
                     fontSize: "0.9375rem",
                     fontWeight: 800,
-                    boxShadow: "0 4px 14px rgba(27, 122, 83, 0.25)",
                     cursor: busy ? "not-allowed" : "pointer",
                     opacity: busy ? 0.7 : 1,
                   }}
@@ -618,21 +562,9 @@ export function WalletPanel({
                 </button>
 
                 {/* Subdued Supported Gateways Footer */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    paddingTop: "12px",
-                    borderTop: "1px solid #F1F5F9",
-                    fontSize: "0.75rem",
-                    color: "#64748B",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>{text("Supported Payment Channels:")}</span>
-                  <span style={{ fontWeight: 800, color: "#334155" }}>
+                <div className="wallet-deposit-footer">
+                  <span className="wallet-deposit-footer-label">{text("Supported Payment Channels:")}</span>
+                  <span className="wallet-deposit-footer-channels">
                     Telebirr • CBE Birr • Awash Birr • Bank Cards
                   </span>
                 </div>

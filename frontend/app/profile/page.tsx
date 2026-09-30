@@ -523,17 +523,7 @@ function UserPortalContent() {
             <Ticket size={18} />
             <span>{text("Purchased Tickets")}</span>
             {orders.length > 0 && (
-              <span
-                style={{
-                  marginLeft: "auto",
-                  fontSize: "0.6875rem",
-                  fontWeight: 800,
-                  background: activeTab === "tickets" ? "#1B7A53" : "rgba(255, 255, 255, 0.2)",
-                  color: "#FFFFFF",
-                  padding: "1px 8px",
-                  borderRadius: 9999,
-                }}
-              >
+              <span className="portal-nav-badge">
                 {orders.length}
               </span>
             )}
@@ -593,17 +583,8 @@ function UserPortalContent() {
           >
             <Flame size={18} />
             <span>{text("Explore Lotteries")}</span>
-            <span
-              style={{
-                marginLeft: "auto",
-                background: "rgba(255, 255, 255, 0.2)",
-                fontSize: "0.6875rem",
-                fontWeight: 800,
-                padding: "2px 7px",
-                borderRadius: 9999,
-              }}
-            >
-              {draws.filter((d) => d.status === "open").length} Live
+            <span className="portal-nav-badge">
+              {draws.filter((d) => d.status === "open").length}
             </span>
           </button>
 

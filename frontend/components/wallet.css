@@ -601,3 +601,138 @@
   border-radius: 6px;
 }
 
+/* ── Dedicated Fast Deposit Card ─────────────────────────────────────────── */
+.wallet-deposit-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  max-width: 540px;
+  margin: 16px 0;
+}
+
+.wallet-deposit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #F1F5F9;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.wallet-deposit-balance-label {
+  font-size: 0.75rem;
+  color: #64748B;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.wallet-deposit-balance-val {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #1B7A53;
+  font-family: var(--font-mono, monospace);
+  margin-top: 2px;
+}
+
+.wallet-deposit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  border-radius: 9999px;
+  color: #059669;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.wallet-form-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #1E293B;
+  margin-bottom: 6px;
+}
+
+.wallet-input-group {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  background: #FFFFFF;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wallet-currency-prefix {
+  padding: 12px 14px;
+  background: #F8FAFC;
+  border-right: 1px solid #E2E8F0;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #475569;
+  user-select: none;
+}
+
+.wallet-input-field {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0F172A;
+  background: transparent;
+}
+
+.wallet-phone-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0F172A;
+  background: #FFFFFF;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wallet-form-hint {
+  display: block;
+  margin-top: 5px;
+  color: #64748B;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.wallet-deposit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid #F1F5F9;
+  font-size: 0.75rem;
+  color: #64748B;
+  flex-wrap: wrap;
+}
+
+.wallet-deposit-footer-label {
+  font-weight: 600;
+}
+
+.wallet-deposit-footer-channels {
+  font-weight: 800;
+  color: #334155;
+}
+
+
