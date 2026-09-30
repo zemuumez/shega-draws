@@ -11,7 +11,18 @@ import {
   type WalletPage,
 } from "@/lib/wallet";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import {
+  Wallet,
+  CreditCard,
+  FileText,
+  RotateCw,
+  Coins,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 import "./wallet.css";
+
 type Attempt = {
   key: string;
   input: {
@@ -25,29 +36,37 @@ type Attempt = {
 export function WalletPanel({
   userId,
   view = "all",
+  onGoToDeposit,
   onGoToHistory,
 }: {
   userId: string;
-  view?: "balances" | "history" | "all";
+  view?: "balances" | "deposit" | "history" | "all";
+  onGoToDeposit?: () => void;
   onGoToHistory?: () => void;
 }) {
   const { text } = useLanguage();
-  const [currency, setCurrency] = useState("ETB"),
-    [data, setData] = useState<WalletData | null>(null);
-  const [history, setHistory] = useState<WalletPage<WalletEntry> | null>(null),
-    [deposits, setDeposits] = useState<WalletPage<Deposit> | null>(null);
-  const [offset, setOffset] = useState(0),
-    [depositOffset, setDepositOffset] = useState(0),
-    [revision, setRevision] = useState(0);
-  const [amount, setAmount] = useState(""),
-    [phone, setPhone] = useState(""),
-    [busy, setBusy] = useState(false);
-  const [error, setError] = useState(""),
-    [message, setMessage] = useState(""),
-    [attempt, setAttempt] = useState<Attempt | null>(null);
-  const sending = useRef(false),
-    alive = useRef(true),
-    storageKey = `rimna-deposit-attempt:${userId}`;
+  const [currency, setCurrency] = useState("ETB");
+  const [data, setData] = useState<WalletData | null>(null);
+  const [history, setHistory] = useState<WalletPage<WalletEntry> | null>(null);
+  const [deposits, setDeposits] = useState<WalletPage<Deposit> | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [depositOffset, setDepositOffset] = useState(0);
+  const [revision, setRevision] = useState(0);
+  const [amount, setAmount] = useState("");
+  const [phone, setPhone] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [attempt, setAttempt] = useState<Attempt | null>(null);
+
+  // Sub-tab states
+  const [walletTab, setWalletTab] = useState<"breakdown" | "ledger">("breakdown");
+  const [historyTab, setHistoryTab] = useState<"deposits" | "ledger">("deposits");
+
+  const sending = useRef(false);
+  const alive = useRef(true);
+  const storageKey = `rimna-deposit-attempt:${userId}`;
+
   useEffect(() => {
     alive.current = true;
     try {
@@ -60,14 +79,16 @@ export function WalletPanel({
       alive.current = false;
     };
   }, [storageKey]);
+
   useEffect(() => {
     const c = new AbortController();
     setData(null);
     setHistory(null);
     setDeposits(null);
     setError("");
-    let pending = false,
-      refreshing = false;
+    let pending = false;
+    let refreshing = false;
+
     async function refresh() {
       if (refreshing) return;
       refreshing = true;
@@ -97,6 +118,7 @@ export function WalletPanel({
         refreshing = false;
       }
     }
+
     void refresh();
     const timer = setInterval(
       () => {
@@ -109,6 +131,7 @@ export function WalletPanel({
       clearInterval(timer);
     };
   }, [currency, offset, depositOffset, revision]);
+
   async function deposit(e: React.FormEvent) {
     e.preventDefault();
     if (sending.current || !data) return;
@@ -146,7 +169,6 @@ export function WalletPanel({
           request.input.amountMinor > data.depositPolicy.maxMinor
         )
           throw new Error("Amount is outside the permitted deposit limits.");
-        // Persist before sending: reloading after a network failure must reuse the same request.
         sessionStorage.setItem(storageKey, JSON.stringify(request));
         setAttempt(request);
       }
@@ -180,20 +202,281 @@ export function WalletPanel({
       if (alive.current) setBusy(false);
     }
   }
+
   const balance = data?.balances.find((b) => b.currency === currency);
+  const etbBalance = data?.balances.find((b) => b.currency === "ETB");
+  const usdBalance = data?.balances.find((b) => b.currency === "USD");
   const enabled =
     !!data?.depositPolicy.enabled && currency === data.depositPolicy.currency;
 
-  const showBalances = view === "balances" || view === "all";
-  const showHistory = view === "history" || view === "all";
+  const quickPresets = currency === "ETB" ? [50, 100, 250, 500, 1000, 2000] : [5, 10, 25, 50, 100];
 
   return (
-    <section className="wallet-panel" aria-label={view === "history" ? text("Deposit & Balance History") : text("My wallet")}>
-      {/* ── BALANCES & DEPOSIT SECTION ── */}
-      {showBalances && (
-        <>
+    <section className="wallet-panel" aria-label={text("Wallet and payments")}>
+      {/* ════════════════════════════════════════════════════════════════════════
+          VIEW 1: MY WALLET & BALANCES (Tabs: Breakdown & Recent Ledger)
+         ════════════════════════════════════════════════════════════════════════ */}
+      {(view === "balances" || view === "all") && (
+        <div style={{ marginBottom: view === "all" ? 40 : 0 }}>
+          {/* Sub-Tabs: Balances & Breakdown vs Recent Ledger */}
+          <div className="wallet-tab-bar" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={walletTab === "breakdown"}
+              className={`wallet-tab-btn ${walletTab === "breakdown" ? "active" : ""}`}
+              onClick={() => setWalletTab("breakdown")}
+            >
+              <Wallet size={15} />
+              <span>{text("Balances & Currency Breakdown")}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={walletTab === "ledger"}
+              className={`wallet-tab-btn ${walletTab === "ledger" ? "active" : ""}`}
+              onClick={() => setWalletTab("ledger")}
+            >
+              <FileText size={15} />
+              <span>{text("Recent Ledger")}</span>
+            </button>
+          </div>
+
+          {/* TAB 1: Balances Overview & Multi-Currency Breakdown */}
+          {walletTab === "breakdown" && (
+            <div>
+              <div className="wallet-heading">
+                <div>
+                  <h3>{text("My Wallet & Balances")}</h3>
+                  <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: "0.8125rem" }}>
+                    {text("ETB and USD are separate player balances. Switching currency does not convert money.")}
+                  </p>
+                </div>
+                <div role="group" aria-label={text("Wallet currency")}>
+                  {["ETB", "USD"].map((c) => (
+                    <button
+                      key={c}
+                      aria-pressed={currency === c}
+                      onClick={() => {
+                        setCurrency(c);
+                        setOffset(0);
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {data?.mode === "test" && (
+                <p className="wallet-notice">
+                  {text("Test environment — balances and payments are for testing only.")}
+                </p>
+              )}
+
+              {/* 2 Primary Balance Metric Cards */}
+              {balance && (
+                <div className="wallet-balances">
+                  <article>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <small>{text("Available balance")} ({currency})</small>
+                      <span className="wallet-currency-tag">{text("Ready to Play")}</span>
+                    </div>
+                    <strong>{money(balance.availableMinor, currency)}</strong>
+                  </article>
+                  <article>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <small>{text("Awaiting verification")}</small>
+                      <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#D97706" }}>
+                        {text("Pending Review")}
+                      </span>
+                    </div>
+                    <strong>{money(balance.pendingMinor, currency)}</strong>
+                  </article>
+                </div>
+              )}
+
+              {balance?.restricted && (
+                <p role="alert">
+                  {text("This wallet is restricted. Contact support to resolve its payment review.")}
+                </p>
+              )}
+
+              {/* Multi-Currency Asset Overview Box */}
+              <div className="wallet-breakdown-card">
+                <div className="wallet-breakdown-header">
+                  <h4>{text("Multi-Currency Asset Overview")}</h4>
+                  <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 600 }}>
+                    {text("2 Supported Currencies")}
+                  </span>
+                </div>
+
+                <div className="wallet-breakdown-grid">
+                  {/* ETB Card */}
+                  <div className="wallet-currency-box">
+                    <div className="wallet-currency-box-top">
+                      <strong style={{ color: "#1E293B", fontSize: "0.9375rem" }}>
+                        🇪🇹 Ethiopian Birr (ETB)
+                      </strong>
+                      <span className="wallet-currency-tag">{text("Primary")}</span>
+                    </div>
+                    <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#1B7A53", fontFamily: "var(--font-mono, monospace)" }}>
+                      {money(etbBalance?.availableMinor || 0, "ETB")}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                      {text("Pending:")} {money(etbBalance?.pendingMinor || 0, "ETB")}
+                    </div>
+                  </div>
+
+                  {/* USD Card */}
+                  <div className="wallet-currency-box">
+                    <div className="wallet-currency-box-top">
+                      <strong style={{ color: "#1E293B", fontSize: "0.9375rem" }}>
+                        🇺🇸 US Dollar (USD)
+                      </strong>
+                      <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748B", background: "#F1F5F9", padding: "2px 8px", borderRadius: 6 }}>
+                        {text("Global")}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#1E293B", fontFamily: "var(--font-mono, monospace)" }}>
+                      {money(usdBalance?.availableMinor || 0, "USD")}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                      {text("Pending:")} {money(usdBalance?.pendingMinor || 0, "USD")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: "flex", gap: "10px", marginTop: "24px", flexWrap: "wrap", alignItems: "center" }}>
+                {onGoToDeposit && (
+                  <button
+                    type="button"
+                    onClick={onGoToDeposit}
+                    className="wallet-link-btn"
+                  >
+                    <CreditCard size={15} />
+                    <span>{text("Deposit Funds via Chapa")}</span>
+                    <ArrowRight size={14} />
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setWalletTab("ledger")}
+                  className="wallet-secondary-btn"
+                >
+                  <FileText size={14} />
+                  <span>{text("View Balance Ledger")}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRevision((v) => v + 1)}
+                  className="wallet-secondary-btn"
+                >
+                  <RotateCw size={14} />
+                  <span>{text("Refresh Balances")}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: Recent Ledger Preview */}
+          {walletTab === "ledger" && (
+            <div>
+              <div className="wallet-heading">
+                <div>
+                  <h3>{text("Recent Balance Ledger")}</h3>
+                  <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: "0.8125rem" }}>
+                    {text("Detailed ledger audit trail of ticket debits, deposit credits, and winning settlements.")}
+                  </p>
+                </div>
+                <div role="group" aria-label={text("Wallet currency")}>
+                  {["ETB", "USD"].map((c) => (
+                    <button
+                      key={c}
+                      aria-pressed={currency === c}
+                      onClick={() => {
+                        setCurrency(c);
+                        setOffset(0);
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {!history ? (
+                <p role="status">{text("Loading balance history…")}</p>
+              ) : (
+                <>
+                  {!history.items.length && <p>{text("No balance entries recorded for this currency.")}</p>}
+                  {history.items.map((h) => (
+                    <article className="wallet-record" key={h.id}>
+                      <div>
+                        <div
+                          className="wallet-record-amount"
+                          style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}
+                        >
+                          {h.amountMinor > 0 ? "+" : ""}
+                          {money(h.amountMinor, h.currency)}
+                        </div>
+                        <div className="wallet-record-meta">
+                          <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
+                          <span>•</span>
+                          <span>{new Date(h.createdAt).toLocaleString()}</span>
+                          <span>•</span>
+                          <span className="wallet-record-ref">Ref: {h.reference}</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                          {text("Balance after")}:{" "}
+                          <strong style={{ color: "#1E293B" }}>
+                            {money(h.balanceAfterMinor, h.currency)}
+                          </strong>
+                        </span>
+                      </div>
+                    </article>
+                  ))}
+
+                  <div className="wallet-pagination">
+                    <button
+                      disabled={!offset}
+                      onClick={() => setOffset((v) => Math.max(0, v - 50))}
+                    >
+                      {text("Previous entries")}
+                    </button>
+                    <button
+                      disabled={!history.hasMore}
+                      onClick={() => setOffset((v) => v + 50)}
+                    >
+                      {text("Next entries")}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════════
+          VIEW 2: DEDICATED DEPOSIT FUNDS CHAPA CHECKOUT FLOW
+         ════════════════════════════════════════════════════════════════════════ */}
+      {(view === "deposit" || view === "all") && (
+        <div style={{ marginTop: view === "all" ? 40 : 0 }}>
           <div className="wallet-heading">
-            <h3>{text("My Wallet & Balances")}</h3>
+            <div>
+              <h3>{text("Deposit Funds via Chapa")}</h3>
+              <p style={{ margin: "4px 0 0", color: "#64748B", fontSize: "0.8125rem" }}>
+                {text("Fast & secure player account funding via Telebirr, CBE Birr, Awash Birr, and Bank Cards.")}
+              </p>
+            </div>
             <div role="group" aria-label={text("Wallet currency")}>
               {["ETB", "USD"].map((c) => (
                 <button
@@ -209,37 +492,39 @@ export function WalletPanel({
               ))}
             </div>
           </div>
+
+          {/* Current Available Balance Mini Card */}
+          <div className="wallet-current-bal-badge">
+            <div>
+              <small>{text("Current Wallet Balance")} ({currency})</small>
+              <strong>{money(balance?.availableMinor || 0, currency)}</strong>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.75rem", color: "#059669", fontWeight: 700 }}>
+              <ShieldCheck size={16} />
+              <span>{text("Instant Automatic Credit")}</span>
+            </div>
+          </div>
+
+          {/* Payment Provider Badges */}
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+              {text("Supported Payment Channels")}:
+            </span>
+            <div className="wallet-provider-badges">
+              <span className="provider-badge chapa">Chapa Pay</span>
+              <span className="provider-badge telebirr">Telebirr</span>
+              <span className="provider-badge cbe">CBE Birr</span>
+              <span className="provider-badge awash">Awash Birr</span>
+              <span className="provider-badge cards">Visa / Mastercard</span>
+            </div>
+          </div>
+
           {data?.mode === "test" && (
             <p className="wallet-notice">
-              {text(
-                "Test environment — balances and payments are for testing only.",
-              )}
+              {text("Test environment — use phone 0900123456 to simulate successful test deposits.")}
             </p>
           )}
-          <p>
-            {text(
-              "ETB and USD are separate balances. Switching currency does not convert money.",
-            )}
-          </p>
-          {balance && (
-            <div className="wallet-balances">
-              <article>
-                <small>{text("Available balance")}</small>
-                <strong>{money(balance.availableMinor, currency)}</strong>
-              </article>
-              <article>
-                <small>{text("Awaiting verification")}</small>
-                <strong>{money(balance.pendingMinor, currency)}</strong>
-              </article>
-            </div>
-          )}
-          {balance?.restricted && (
-            <p role="alert">
-              {text(
-                "This wallet is restricted. Contact support to resolve its payment review.",
-              )}
-            </p>
-          )}
+
           {attempt ? (
             <form onSubmit={deposit}>
               <p>
@@ -254,19 +539,40 @@ export function WalletPanel({
             </form>
           ) : enabled && !balance?.restricted ? (
             <form onSubmit={deposit} className="wallet-form">
+              {/* Quick Select Amount Presets */}
+              <div>
+                <label style={{ marginBottom: 6 }}>
+                  {text("Select Quick Amount")} ({currency})
+                </label>
+                <div className="wallet-quick-amounts">
+                  {quickPresets.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      className={`quick-amount-btn ${amount === String(preset) ? "active" : ""}`}
+                      onClick={() => setAmount(String(preset))}
+                    >
+                      {preset} {currency}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <label>
-                {text("Deposit amount")} ({currency})
+                {text("Custom Deposit Amount")} ({currency})
                 <input
                   aria-label="Deposit amount"
                   inputMode="decimal"
                   required
+                  placeholder={currency === "ETB" ? "250.00" : "25.00"}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   maxLength={12}
                 />
               </label>
+
               <label>
-                {text("Phone number")}
+                {text("Phone Number")}
                 <input
                   aria-label="Deposit phone number"
                   type="tel"
@@ -278,45 +584,82 @@ export function WalletPanel({
                   onChange={(e) => setPhone(e.target.value)}
                   maxLength={16}
                 />
+                <small style={{ color: "#64748B", fontSize: "0.75rem" }}>
+                  {text("Required for Telebirr / CBE Birr instant payment prompt notification.")}
+                </small>
               </label>
+
               <small>
-                {money(data!.depositPolicy.minMinor, currency)} –{" "}
+                {text("Permitted deposit range:")} {money(data!.depositPolicy.minMinor, currency)} –{" "}
                 {money(data!.depositPolicy.maxMinor, currency)}
               </small>
+
               <button disabled={busy} className="wallet-submit-btn">
-                {text(busy ? "Please wait…" : "Continue to payment")}
+                <Zap size={16} />
+                <span>{text(busy ? "Processing Checkout…" : "Continue to Payment via Chapa")}</span>
+                <ArrowRight size={15} />
               </button>
             </form>
           ) : (
-            <p>
-              {text("New deposits are currently unavailable for this currency.")}
-            </p>
+            <p>{text("New deposits are currently unavailable for this currency.")}</p>
           )}
+
           {error && <p role="alert">{text(error)}</p>}
           {message && <p role="status">{text(message)}</p>}
-          <div style={{ display: "flex", gap: "10px", marginTop: "16px", flexWrap: "wrap" }}>
-            <button onClick={() => setRevision((v) => v + 1)} className="wallet-secondary-btn">
-              {text("Refresh wallet")}
-            </button>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
             {onGoToHistory && (
               <button
                 type="button"
                 onClick={onGoToHistory}
-                className="wallet-link-btn"
+                className="wallet-secondary-btn"
               >
-                <span>{text("View Deposit & Balance History")}</span>
+                <span>{text("View Deposit History")}</span>
                 <span>→</span>
               </button>
             )}
+            <button onClick={() => setRevision((v) => v + 1)} className="wallet-secondary-btn">
+              {text("Refresh Status")}
+            </button>
           </div>
-        </>
+        </div>
       )}
 
-      {/* ── DEPOSIT & BALANCE HISTORY SECTION ── */}
-      {showHistory && (
-        <div style={{ marginTop: showBalances ? "32px" : "0" }}>
+      {/* ════════════════════════════════════════════════════════════════════════
+          VIEW 3: DEPOSIT & BALANCE HISTORY
+         ════════════════════════════════════════════════════════════════════════ */}
+      {view === "history" && (
+        <div>
+          {/* Sub-Tabs: Deposits vs Balance Ledger */}
+          <div className="wallet-tab-bar" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={historyTab === "deposits"}
+              className={`wallet-tab-btn ${historyTab === "deposits" ? "active" : ""}`}
+              onClick={() => setHistoryTab("deposits")}
+            >
+              <Coins size={15} />
+              <span>{text("Deposit History")}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={historyTab === "ledger"}
+              className={`wallet-tab-btn ${historyTab === "ledger" ? "active" : ""}`}
+              onClick={() => setHistoryTab("ledger")}
+            >
+              <FileText size={15} />
+              <span>{text("Balance Ledger")}</span>
+            </button>
+          </div>
+
           <div className="wallet-heading" style={{ marginBottom: "16px" }}>
-            <h3>{text("Deposit & Balance History")}</h3>
+            <h3>
+              {historyTab === "deposits"
+                ? text("Chapa Deposit Records")
+                : text("Balance Ledger History")}
+            </h3>
             <div role="group" aria-label={text("Wallet currency")}>
               {["ETB", "USD"].map((c) => (
                 <button
@@ -334,113 +677,125 @@ export function WalletPanel({
             </div>
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: 10 }}>
-            <p style={{ margin: 0, color: "#64748B", fontSize: "0.875rem" }}>
-              {text("Verified financial ledger records for your deposits and transactions.")}
-            </p>
-            <button onClick={() => setRevision((v) => v + 1)} className="wallet-secondary-btn" style={{ padding: "6px 14px", fontSize: "0.75rem" }}>
-              {text("Refresh Ledger")}
-            </button>
-          </div>
+          {/* TAB 1: Deposit History */}
+          {historyTab === "deposits" && (
+            <div>
+              {!deposits ? (
+                <p role="status">{text("Loading deposits…")}</p>
+              ) : (
+                <>
+                  {!deposits.items.length && <p>{text("No deposits recorded yet.")}</p>}
+                  {deposits.items.map((d) => (
+                    <article className="wallet-record" key={d.id}>
+                      <div>
+                        <div className="wallet-record-amount">
+                          {money(d.amountMinor, d.currency)}
+                        </div>
+                        <div className="wallet-record-meta">
+                          <span>{new Date(d.createdAt).toLocaleString()}</span>
+                          <span>•</span>
+                          <span className="wallet-record-ref">ID: {d.id.slice(0, 16)}...</span>
+                          {d.reviewReason && (
+                            <span style={{ color: "#DC2626", fontWeight: 600 }}>
+                              • {text(d.reviewReason)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-          <h4>{text("Deposit history")}</h4>
-          {!deposits ? (
-            <p role="status">{text("Loading deposits…")}</p>
-          ) : (
-            <>
-              {!deposits.items.length && <p>{text("No deposits recorded yet.")}</p>}
-              {deposits.items.map((d) => (
-                <article className="wallet-record" key={d.id}>
-                  <div>
-                    <div className="wallet-record-amount">
-                      {money(d.amountMinor, d.currency)}
-                    </div>
-                    <div className="wallet-record-meta">
-                      <span>{new Date(d.createdAt).toLocaleString()}</span>
-                      <span>•</span>
-                      <span className="wallet-record-ref">ID: {d.id.slice(0, 14)}...</span>
-                      {d.reviewReason && (
-                        <span style={{ color: "#DC2626", fontWeight: 600 }}>• {text(d.reviewReason)}</span>
-                      )}
-                    </div>
-                  </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                        <span className={`wallet-record-pill ${d.status}`}>
+                          {d.status === "confirmed" || d.status === "succeeded"
+                            ? "✓ "
+                            : d.status === "failed"
+                            ? "✕ "
+                            : "⧗ "}
+                          {text(d.status).toUpperCase()}
+                        </span>
+                        {checkoutLink(d) && (
+                          <a href={checkoutLink(d)} className="wallet-pay-btn">
+                            <span>{text("Continue payment")}</span>
+                            <span>→</span>
+                          </a>
+                        )}
+                      </div>
+                    </article>
+                  ))}
 
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                    <span className={`wallet-record-pill ${d.status}`}>
-                      {d.status === "confirmed" || d.status === "succeeded" ? "✓ " : d.status === "failed" ? "✕ " : "⧗ "}
-                      {text(d.status).toUpperCase()}
-                    </span>
-                    {checkoutLink(d) && (
-                      <a href={checkoutLink(d)} className="wallet-pay-btn">
-                        <span>{text("Continue payment")}</span>
-                        <span>→</span>
-                      </a>
-                    )}
+                  <div className="wallet-pagination">
+                    <button
+                      disabled={!depositOffset}
+                      onClick={() => setDepositOffset((v) => Math.max(0, v - 50))}
+                    >
+                      {text("Previous deposits")}
+                    </button>
+                    <button
+                      disabled={!deposits.hasMore}
+                      onClick={() => setDepositOffset((v) => v + 50)}
+                    >
+                      {text("Next deposits")}
+                    </button>
                   </div>
-                </article>
-              ))}
-              <div className="wallet-pagination">
-                <button
-                  disabled={!depositOffset}
-                  onClick={() => setDepositOffset((v) => Math.max(0, v - 50))}
-                >
-                  {text("Previous deposits")}
-                </button>
-                <button
-                  disabled={!deposits.hasMore}
-                  onClick={() => setDepositOffset((v) => v + 50)}
-                >
-                  {text("Next deposits")}
-                </button>
-              </div>
-            </>
+                </>
+              )}
+            </div>
           )}
 
-          <h4 style={{ marginTop: "28px" }}>
-            {text("Balance history")} · {currency}
-          </h4>
-          {!history ? (
-            <p role="status">{text("Loading balance history…")}</p>
-          ) : (
-            <>
-              {!history.items.length && <p>{text("No balance entries yet.")}</p>}
-              {history.items.map((h) => (
-                <article className="wallet-record" key={h.id}>
-                  <div>
-                    <div className="wallet-record-amount" style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}>
-                      {h.amountMinor > 0 ? "+" : ""}{money(h.amountMinor, h.currency)}
-                    </div>
-                    <div className="wallet-record-meta">
-                      <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
-                      <span>•</span>
-                      <span>{new Date(h.createdAt).toLocaleString()}</span>
-                      <span>•</span>
-                      <span className="wallet-record-ref">Ref: {h.reference}</span>
-                    </div>
-                  </div>
+          {/* TAB 2: Balance Ledger */}
+          {historyTab === "ledger" && (
+            <div>
+              {!history ? (
+                <p role="status">{text("Loading balance history…")}</p>
+              ) : (
+                <>
+                  {!history.items.length && <p>{text("No balance entries yet.")}</p>}
+                  {history.items.map((h) => (
+                    <article className="wallet-record" key={h.id}>
+                      <div>
+                        <div
+                          className="wallet-record-amount"
+                          style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}
+                        >
+                          {h.amountMinor > 0 ? "+" : ""}
+                          {money(h.amountMinor, h.currency)}
+                        </div>
+                        <div className="wallet-record-meta">
+                          <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
+                          <span>•</span>
+                          <span>{new Date(h.createdAt).toLocaleString()}</span>
+                          <span>•</span>
+                          <span className="wallet-record-ref">Ref: {h.reference}</span>
+                        </div>
+                      </div>
 
-                  <div>
-                    <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
-                      {text("Balance after")}: <strong style={{ color: "#1E293B" }}>{money(h.balanceAfterMinor, h.currency)}</strong>
-                    </span>
+                      <div>
+                        <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                          {text("Balance after")}:{" "}
+                          <strong style={{ color: "#1E293B" }}>
+                            {money(h.balanceAfterMinor, h.currency)}
+                          </strong>
+                        </span>
+                      </div>
+                    </article>
+                  ))}
+
+                  <div className="wallet-pagination">
+                    <button
+                      disabled={!offset}
+                      onClick={() => setOffset((v) => Math.max(0, v - 50))}
+                    >
+                      {text("Previous entries")}
+                    </button>
+                    <button
+                      disabled={!history.hasMore}
+                      onClick={() => setOffset((v) => v + 50)}
+                    >
+                      {text("Next entries")}
+                    </button>
                   </div>
-                </article>
-              ))}
-              <div className="wallet-pagination">
-                <button
-                  disabled={!offset}
-                  onClick={() => setOffset((v) => Math.max(0, v - 50))}
-                >
-                  {text("Previous entries")}
-                </button>
-                <button
-                  disabled={!history.hasMore}
-                  onClick={() => setOffset((v) => v + 50)}
-                >
-                  {text("Next entries")}
-                </button>
-              </div>
-            </>
+                </>
+              )}
+            </div>
           )}
         </div>
       )}

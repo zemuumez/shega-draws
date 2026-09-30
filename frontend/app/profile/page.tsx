@@ -1218,6 +1218,7 @@ function UserPortalContent() {
                 key={session.user.id + "-wallet"}
                 userId={session.user.id}
                 view="balances"
+                onGoToDeposit={() => switchTab("deposit")}
                 onGoToHistory={() => switchTab("history")}
               />
             ) : (
@@ -1266,7 +1267,7 @@ function UserPortalContent() {
               <WalletPanel
                 key={session.user.id + "-deposit"}
                 userId={session.user.id}
-                view="balances"
+                view="deposit"
                 onGoToHistory={() => switchTab("history")}
               />
             ) : (
