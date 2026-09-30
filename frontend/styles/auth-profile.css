@@ -1667,5 +1667,625 @@ body:has(.user-portal-container) .scroll-progress-container {
   gap: 12px;
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   USER PORTAL: THEME TOGGLE BUTTON & TOPBAR COMPONENT STYLES
+   ════════════════════════════════════════════════════════════════════════ */
+.portal-topbar-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  color: #334155;
+}
+
+.portal-topbar-home-btn:hover {
+  background: #E2E8F0;
+  border-color: #CBD5E1;
+}
+
+.portal-topbar-balance-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  padding: 3px 8px 3px 12px;
+  gap: 8px;
+  background: rgba(27, 122, 83, 0.08);
+  border: 1.5px solid rgba(27, 122, 83, 0.25);
+  transition: all 0.2s ease;
+}
+
+.portal-topbar-balance-pill button {
+  color: #1B7A53;
+}
+
+.portal-topbar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 9999px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.portal-topbar-profile-btn strong {
+  color: #0F172A;
+}
+
+.portal-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  text-decoration: none;
+  user-select: none;
+}
+
+.user-portal-container.dark-theme .portal-theme-toggle-btn {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  color: #FDE047;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.user-portal-container.dark-theme .portal-theme-toggle-btn:hover {
+  background: #162032;
+  border-color: #FDE047;
+  box-shadow: 0 0 14px rgba(253, 224, 71, 0.25);
+  transform: translateY(-1px);
+}
+
+.user-portal-container.dark-theme .portal-theme-toggle-btn .theme-toggle-sun {
+  color: #FDE047;
+  filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.6));
+}
+
+.user-portal-container.light-theme .portal-theme-toggle-btn {
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  color: #334155;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.user-portal-container.light-theme .portal-theme-toggle-btn:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #0F172A;
+  transform: translateY(-1px);
+}
+
+.user-portal-container.light-theme .portal-theme-toggle-btn .theme-toggle-moon {
+  color: #6366F1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   USER PORTAL: DARK MODE THEME (DEFAULT)
+   Based on luxury casino midnight navy & vibrant gold/orange aesthetic
+   ════════════════════════════════════════════════════════════════════════ */
+.user-portal-container.dark-theme {
+  background: #080D1A;
+  color: #F8FAFC;
+}
+
+.user-portal-container.dark-theme .portal-main-content {
+  background: #080D1A;
+}
+
+.user-portal-container.dark-theme .portal-body-scroll {
+  scrollbar-color: #334155 transparent;
+}
+
+.user-portal-container.dark-theme .portal-body-scroll::-webkit-scrollbar-thumb {
+  background: #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: #FDE047;
+}
+
+/* Sidebar in Dark Mode */
+.user-portal-container.dark-theme .portal-sidebar {
+  background: #0B1120;
+  border-right: 1.5px solid #1E293B;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+}
+
+.user-portal-container.dark-theme .portal-sidebar-brand {
+  border-bottom: 1px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-sidebar-footer {
+  background: #0B1120;
+  border-top: 1px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-nav-btn {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .portal-nav-btn svg {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .portal-nav-btn:hover {
+  background: rgba(253, 224, 71, 0.1);
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .portal-nav-btn:hover svg {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .portal-nav-btn.active {
+  background: #FDE047;
+  color: #0F172A;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(253, 224, 71, 0.3);
+}
+
+.user-portal-container.dark-theme .portal-nav-btn.active svg {
+  color: #0F172A !important;
+}
+
+.user-portal-container.dark-theme .portal-sidebar-support-card {
+  background: #0E1628;
+  border: 1px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-sidebar-support-icon {
+  background: #FDE047;
+  color: #0F172A;
+  font-weight: 900;
+}
+
+/* Topbar in Dark Mode */
+.user-portal-container.dark-theme .portal-topbar {
+  background: #0B1120;
+  border-bottom: 1.5px solid #1E293B;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.user-portal-container.dark-theme .portal-topbar-breadcrumb strong {
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .portal-topbar-breadcrumb svg {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .portal-topbar-home-btn {
+  background: #0E1628 !important;
+  border: 1px solid #1E293B !important;
+  color: #E2E8F0 !important;
+}
+
+.user-portal-container.dark-theme .portal-topbar-home-btn:hover {
+  border-color: #FDE047 !important;
+  color: #FDE047 !important;
+}
+
+.user-portal-container.dark-theme .portal-topbar-balance-pill {
+  background: #0E1628 !important;
+  border: 1.5px solid #1E293B !important;
+}
+
+.user-portal-container.dark-theme .portal-topbar-balance-pill button {
+  color: #FDE047 !important;
+}
+
+.user-portal-container.dark-theme .portal-topbar-balance-pill svg {
+  color: #FDE047 !important;
+}
+
+.user-portal-container.dark-theme .portal-topbar-profile-btn {
+  background: #0E1628 !important;
+  border: 1.5px solid #1E293B !important;
+}
+
+.user-portal-container.dark-theme .portal-topbar-profile-btn strong {
+  color: #FFFFFF !important;
+}
+
+/* Headings & Text in Dark Mode */
+.user-portal-container.dark-theme h1,
+.user-portal-container.dark-theme h2,
+.user-portal-container.dark-theme h3,
+.user-portal-container.dark-theme h4 {
+  color: #FFFFFF !important;
+}
+
+.user-portal-container.dark-theme p {
+  color: #94A3B8;
+}
+
+/* Metric Cards in Dark Mode */
+.user-portal-container.dark-theme .portal-metric-card {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.user-portal-container.dark-theme .portal-metric-card:hover {
+  border-color: #FDE047;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 16px rgba(253, 224, 71, 0.15);
+}
+
+.user-portal-container.dark-theme .portal-metric-title {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .portal-metric-val {
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .portal-metric-sub.positive {
+  color: #34D399;
+}
+
+.user-portal-container.dark-theme .portal-metric-sub.neutral {
+  color: #94A3B8;
+}
+
+/* Primary CTA in Dark Mode: Red-Orange Gradient from Image */
+.user-portal-container.dark-theme .portal-btn-primary {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35) !important;
+}
+
+.user-portal-container.dark-theme .portal-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FB923C 0%, #F97316 100%) !important;
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+/* Secondary Button in Dark Mode */
+.user-portal-container.dark-theme .portal-btn-secondary {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .portal-btn-secondary:hover {
+  background: #162032;
+  border-color: #FDE047;
+}
+
+/* Tables in Dark Mode */
+.user-portal-container.dark-theme .portal-table-container {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.user-portal-container.dark-theme .portal-table thead tr {
+  background: #111C30;
+  border-bottom: 1.5px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-table thead th {
+  color: #FDE047;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.user-portal-container.dark-theme .portal-table td {
+  background: #0E1628;
+  color: #E2E8F0;
+  border-bottom: 1px solid #162032;
+}
+
+.user-portal-container.dark-theme .portal-table tbody tr:hover td {
+  background: #121D33;
+}
+
+/* Dedicated Explore Lotteries Tickets in Dark Mode */
+.user-portal-container.dark-theme .portal-ticket-card {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.user-portal-container.dark-theme .portal-ticket-card:hover {
+  border-color: #FDE047;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(253, 224, 71, 0.15);
+}
+
+.user-portal-container.dark-theme .portal-ticket-notch-left,
+.user-portal-container.dark-theme .portal-ticket-notch-right {
+  background: #080D1A;
+  border-color: #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-ticket-title {
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .portal-ticket-badge-currency {
+  background: #162032;
+  color: #CBD5E1;
+  border-color: #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-ticket-jackpot-box {
+  background: rgba(253, 224, 71, 0.08);
+  border: 1px solid rgba(253, 224, 71, 0.3);
+}
+
+.user-portal-container.dark-theme .portal-ticket-jackpot-label {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .portal-ticket-jackpot-amount {
+  color: #FDE047;
+  text-shadow: 0 0 12px rgba(253, 224, 71, 0.3);
+}
+
+.user-portal-container.dark-theme .portal-ticket-progress-bar {
+  background: #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-ticket-progress-fill {
+  background: linear-gradient(90deg, #FDE047 0%, #EA580C 100%);
+  box-shadow: 0 0 8px rgba(253, 224, 71, 0.5);
+}
+
+.user-portal-container.dark-theme .portal-ticket-perforation {
+  border-top-color: #1E293B;
+}
+
+.user-portal-container.dark-theme .portal-ticket-bottom {
+  background: #0A0F1D;
+  border-top: 1px solid #162032;
+}
+
+/* Purchased Tickets in Dark Mode */
+.user-portal-container.dark-theme .ticket-item-card {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  border-left: 4px solid #FDE047;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+.user-portal-container.dark-theme .ticket-item-card:hover {
+  border-color: #FDE047;
+}
+
+.user-portal-container.dark-theme .ticket-number-badge {
+  background: rgba(253, 224, 71, 0.1);
+  border: 1.5px solid rgba(253, 224, 71, 0.35);
+}
+
+.user-portal-container.dark-theme .ticket-number-badge .label {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .ticket-number-badge .number {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .ticket-meta-info .draw-title {
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .ticket-meta-info .meta-subtext {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .ticket-price-display {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .tickets-empty-card {
+  background: #0E1628;
+  border: 1.5px dashed #1E293B;
+  color: #FFFFFF;
+}
+
+/* Form, Inputs, and Cards (Profile, Security, Wallet) in Dark Mode */
+.user-portal-container.dark-theme .profile-card-section,
+.user-portal-container.dark-theme .wallet-panel,
+.user-portal-container.dark-theme .portal-card-box {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  color: #F8FAFC;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.user-portal-container.dark-theme .profile-card-section h2,
+.user-portal-container.dark-theme .profile-card-section h3,
+.user-portal-container.dark-theme .wallet-panel h2,
+.user-portal-container.dark-theme .wallet-panel h3,
+.user-portal-container.dark-theme .wallet-panel h4,
+.user-portal-container.dark-theme .portal-card-header h3 {
+  color: #FFFFFF !important;
+}
+
+.user-portal-container.dark-theme .auth-form-group label {
+  color: #FDE047 !important;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.user-portal-container.dark-theme input[type="text"],
+.user-portal-container.dark-theme input[type="password"],
+.user-portal-container.dark-theme input[type="email"],
+.user-portal-container.dark-theme input[type="number"],
+.user-portal-container.dark-theme input[type="tel"],
+.user-portal-container.dark-theme input[inputmode="decimal"],
+.user-portal-container.dark-theme select {
+  background: #080D1A !important;
+  border: 1.5px solid #1E293B !important;
+  color: #FFFFFF !important;
+}
+
+.user-portal-container.dark-theme input:focus,
+.user-portal-container.dark-theme select:focus {
+  border-color: #FDE047 !important;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.15) !important;
+}
+
+.user-portal-container.dark-theme input:disabled {
+  background: #0A0F1D !important;
+  color: #64748B !important;
+  border-color: #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-balances article {
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .wallet-balances strong {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .wallet-panel .wallet-submit-btn,
+.user-portal-container.dark-theme .wallet-form button.wallet-submit-btn,
+.user-portal-container.dark-theme .wallet-panel form button:not(.wallet-secondary-btn) {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35) !important;
+}
+
+.user-portal-container.dark-theme .wallet-panel .wallet-secondary-btn {
+  background: #162032 !important;
+  border: 1.5px solid #1E293B !important;
+  color: #E2E8F0 !important;
+}
+
+.user-portal-container.dark-theme .wallet-panel .wallet-secondary-btn:hover {
+  background: #1E293B !important;
+  border-color: #FDE047 !important;
+  color: #FDE047 !important;
+}
+
+.user-portal-container.dark-theme .wallet-panel .wallet-heading [role="group"],
+.user-portal-container.dark-theme [role="group"] {
+  background: #080D1A !important;
+  border: 1.5px solid #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-panel .wallet-heading [role="group"] button {
+  color: #94A3B8 !important;
+}
+
+.user-portal-container.dark-theme .wallet-panel .wallet-heading [role="group"] button[aria-pressed="true"] {
+  background: #FDE047 !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+/* Wallet sub-tab bar & records in Dark Mode */
+.user-portal-container.dark-theme .wallet-tab-bar {
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .wallet-tab-btn {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .wallet-tab-btn.active {
+  background: #FDE047;
+  color: #0F172A;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(253, 224, 71, 0.25);
+}
+
+.user-portal-container.dark-theme .wallet-record {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .wallet-record:hover {
+  border-color: #FDE047;
+  background: #121D33;
+}
+
+.user-portal-container.dark-theme .wallet-record-amount {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .wallet-record-meta {
+  color: #94A3B8;
+}
+
+.user-portal-container.dark-theme .wallet-record-ref {
+  background: #162032;
+  color: #CBD5E1;
+  border: 1px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .wallet-current-bal-badge {
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .wallet-current-bal-badge strong {
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .quick-amount-btn {
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .quick-amount-btn:hover {
+  border-color: #FDE047;
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .quick-amount-btn.active {
+  background: #FDE047;
+  color: #0F172A;
+  border-color: #FDE047;
+  box-shadow: 0 4px 12px rgba(253, 224, 71, 0.3);
+}
+
+.user-portal-container.dark-theme .wallet-breakdown-card {
+  background: #080D1A;
+  border: 1.5px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .wallet-currency-box {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .wallet-pagination button {
+  background: #0E1628;
+  border: 1.5px solid #1E293B;
+  color: #FFFFFF;
+}
+
+.user-portal-container.dark-theme .wallet-pagination button:hover:not(:disabled) {
+  border-color: #FDE047;
+  color: #FDE047;
+}
+
+
 
 

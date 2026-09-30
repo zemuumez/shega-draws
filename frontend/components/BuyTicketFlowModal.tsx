@@ -78,6 +78,17 @@ export function BuyTicketFlowModal({
     }
   }, [session?.user?.name]);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [isOpen]);
+
   // Reset modal state on open
   useEffect(() => {
     if (isOpen) {
@@ -321,7 +332,7 @@ export function BuyTicketFlowModal({
 
         {/* ── STEP 1: PLAYER DETAILS ── */}
         {step === 1 && (
-          <form onSubmit={handleContinueStep1}>
+          <form onSubmit={handleContinueStep1} className="flow-step-container">
             <div className="flow-modal-body">
               <p className="flow-step-intro">
                 Enter your player details so your winning cash payout can be transferred immediately upon live draw completion:
@@ -393,7 +404,7 @@ export function BuyTicketFlowModal({
 
         {/* ── STEP 2: LUCKY NUMBER SELECTION ── */}
         {step === 2 && (
-          <div>
+          <div className="flow-step-container">
             <div className="flow-modal-body">
               <p className="flow-step-intro">
                 Choose a number from 1 to {draw.capacity.toLocaleString()}. Submitted numbers are disabled.
@@ -533,7 +544,7 @@ export function BuyTicketFlowModal({
 
         {/* ── STEP 3: WALLET CHECKOUT & BALANCE DEDUCTION ── */}
         {step === 3 && (
-          <div>
+          <div className="flow-step-container">
             <div className="flow-modal-body">
               <p className="flow-step-intro">
                 Review your entry ticket details and confirm purchase. The ticket cost will be automatically checked and deducted from your verified wallet balance:
@@ -677,72 +688,74 @@ export function BuyTicketFlowModal({
 
         {/* ── STEP 4: SUCCESS CONFIRMATION ── */}
         {step === 4 && confirmedOrder && (
-          <div className="flow-modal-body">
-            <div className="flow-success-box">
-              <div className="flow-success-icon">
-                <CheckCircle2 size={36} />
-              </div>
-
-              <span className="status-badge-pill verified" style={{ display: "inline-flex", marginBottom: "12px" }}>
-                <Check size={14} /> Confirmed Order
-              </span>
-
-              <h3 style={{ color: "#FFFFFF", fontSize: "1.5rem", margin: "0 0 8px" }}>
-                Ticket Purchased Successfully!
-              </h3>
-              <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "0 0 24px" }}>
-                The entry fee was successfully deducted from your wallet balance. Your ticket is locked in for the live video draw.
-              </p>
-
-              <div className="flow-summary-box" style={{ textAlign: "left", marginBottom: "24px" }}>
-                <div className="flow-summary-row">
-                  <span className="flow-summary-label">Order ID</span>
-                  <code style={{ color: "#FDE047", fontSize: "0.8125rem" }}>{confirmedOrder.id}</code>
+          <div className="flow-step-container">
+            <div className="flow-modal-body">
+              <div className="flow-success-box">
+                <div className="flow-success-icon">
+                  <CheckCircle2 size={36} />
                 </div>
-                <div className="flow-summary-row">
-                  <span className="flow-summary-label">Your Lucky Number</span>
-                  <strong style={{ color: "#FDE047", fontSize: "1.25rem" }}>#{confirmedOrder.number}</strong>
-                </div>
-                <div className="flow-summary-row">
-                  <span className="flow-summary-label">Lottery Draw</span>
-                  <span className="flow-summary-val">{draw.title}</span>
-                </div>
-                <div className="flow-summary-row">
-                  <span className="flow-summary-label">Amount Paid</span>
-                  <span className="flow-summary-val">{money(confirmedOrder.amountMinor, confirmedOrder.currency)}</span>
-                </div>
-                <div className="flow-summary-row">
-                  <span className="flow-summary-label">Payment Method</span>
-                  <span className="flow-summary-val" style={{ color: "#34D399" }}>Wallet Balance</span>
-                </div>
-              </div>
 
-              <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-                <Link
-                  href="/my-tickets"
-                  className="casino-btn-gold"
-                  style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 24px", textDecoration: "none" }}
-                  onClick={onClose}
-                >
-                  <Ticket size={16} />
-                  <span>View in My Tickets</span>
-                </Link>
+                <span className="status-badge-pill verified" style={{ display: "inline-flex", marginBottom: "12px" }}>
+                  <Check size={14} /> Confirmed Order
+                </span>
 
-                <button
-                  type="button"
-                  onClick={onClose}
-                  style={{
-                    padding: "12px 24px",
-                    background: "#1E293B",
-                    border: "1px solid #334155",
-                    borderRadius: "10px",
-                    color: "#FFFFFF",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  Done
-                </button>
+                <h3 style={{ color: "#FFFFFF", fontSize: "1.5rem", margin: "0 0 8px" }}>
+                  Ticket Purchased Successfully!
+                </h3>
+                <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "0 0 24px" }}>
+                  The entry fee was successfully deducted from your wallet balance. Your ticket is locked in for the live video draw.
+                </p>
+
+                <div className="flow-summary-box" style={{ textAlign: "left", marginBottom: "24px" }}>
+                  <div className="flow-summary-row">
+                    <span className="flow-summary-label">Order ID</span>
+                    <code style={{ color: "#FDE047", fontSize: "0.8125rem" }}>{confirmedOrder.id}</code>
+                  </div>
+                  <div className="flow-summary-row">
+                    <span className="flow-summary-label">Your Lucky Number</span>
+                    <strong style={{ color: "#FDE047", fontSize: "1.25rem" }}>#{confirmedOrder.number}</strong>
+                  </div>
+                  <div className="flow-summary-row">
+                    <span className="flow-summary-label">Lottery Draw</span>
+                    <span className="flow-summary-val">{draw.title}</span>
+                  </div>
+                  <div className="flow-summary-row">
+                    <span className="flow-summary-label">Amount Paid</span>
+                    <span className="flow-summary-val">{money(confirmedOrder.amountMinor, confirmedOrder.currency)}</span>
+                  </div>
+                  <div className="flow-summary-row">
+                    <span className="flow-summary-label">Payment Method</span>
+                    <span className="flow-summary-val" style={{ color: "#34D399" }}>Wallet Balance</span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+                  <Link
+                    href="/my-tickets"
+                    className="casino-btn-gold"
+                    style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 24px", textDecoration: "none" }}
+                    onClick={onClose}
+                  >
+                    <Ticket size={16} />
+                    <span>View in My Tickets</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    style={{
+                      padding: "12px 24px",
+                      background: "#1E293B",
+                      border: "1px solid #334155",
+                      borderRadius: "10px",
+                      color: "#FFFFFF",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
             </div>
           </div>

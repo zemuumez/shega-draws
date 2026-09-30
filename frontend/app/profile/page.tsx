@@ -39,6 +39,8 @@ import {
   Eye,
   EyeOff,
   Dice5,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { clearAccountToken, accountAPI } from "@/lib/account-api";
@@ -120,6 +122,32 @@ function UserPortalContent() {
   const [passwordStatus, setPasswordStatus] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  // Theme state: "dark" (default) or "light"
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem("rimna-portal-theme");
+      if (savedTheme === "light" || savedTheme === "dark") {
+        setTheme(savedTheme);
+      } else {
+        setTheme("dark");
+      }
+    } catch {
+      // localStorage may not be accessible in some environments
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    try {
+      localStorage.setItem("rimna-portal-theme", nextTheme);
+    } catch {
+      // ignore
+    }
+  };
 
   // Sync initial name from session
   useEffect(() => {
@@ -454,7 +482,7 @@ function UserPortalContent() {
   };
 
   return (
-    <div className="user-portal-container">
+    <div className={`user-portal-container ${theme === "dark" ? "dark-theme" : "light-theme"}`}>
       {/* ── 1. Modern User Portal Sidebar ──────────────────────────────────── */}
       <aside className="portal-sidebar" aria-label="Portal Navigation">
         {/* Brand Logo Header (Using homepage logo without home button) */}
@@ -637,22 +665,9 @@ function UserPortalContent() {
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Link
               href="/"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "7px 14px",
-                background: "#F1F5F9",
-                border: "1px solid #E2E8F0",
-                borderRadius: 10,
-                color: "#334155",
-                fontSize: "0.8125rem",
-                fontWeight: 700,
-                textDecoration: "none",
-                transition: "all 0.2s ease",
-              }}
+              className="portal-topbar-home-btn"
             >
-              <Home size={15} color="#1B7A53" />
+              <Home size={15} color={theme === "dark" ? "#FDE047" : "#1B7A53"} />
               <span>{text("Home")}</span>
             </Link>
 
@@ -662,19 +677,9 @@ function UserPortalContent() {
             </div>
           </div>
 
-          {/* Right corner of header: Balance with Eye Toggle + Profile Overview */}
+          {/* Right corner of header: Balance with Eye Toggle + Theme Toggle + Profile Overview */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                background: "rgba(27, 122, 83, 0.08)",
-                border: "1.5px solid rgba(27, 122, 83, 0.25)",
-                borderRadius: 10,
-                padding: "3px 8px 3px 12px",
-                gap: 8,
-              }}
-            >
+            <div className="portal-topbar-balance-pill">
               <button
                 type="button"
                 onClick={() => switchTab("wallet")}
@@ -684,7 +689,6 @@ function UserPortalContent() {
                   gap: 6,
                   background: "transparent",
                   border: "none",
-                  color: "#1B7A53",
                   fontSize: "0.8125rem",
                   fontWeight: 800,
                   cursor: "pointer",
@@ -692,7 +696,7 @@ function UserPortalContent() {
                 }}
                 title={text("My Wallet & Balances")}
               >
-                <Wallet size={15} color="#1B7A53" />
+                <Wallet size={15} color={theme === "dark" ? "#FDE047" : "#1B7A53"} />
                 <span>{formatBalance(totalBalanceDisplay, "ETB")}</span>
               </button>
 
@@ -705,13 +709,13 @@ function UserPortalContent() {
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "#1B7A53",
+                  color: theme === "dark" ? "#FDE047" : "#1B7A53",
                   cursor: "pointer",
                   padding: "4px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  opacity: 0.8,
+                  opacity: 0.85,
                   borderRadius: 6,
                   transition: "opacity 0.2s",
                 }}
@@ -722,21 +726,32 @@ function UserPortalContent() {
               </button>
             </div>
 
+            {/* Theme Toggle Button to the left of the user's component */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="portal-theme-toggle-btn"
+              title={theme === "dark" ? text("Switch to Light Mode") : text("Switch to Dark Mode")}
+              aria-label={theme === "dark" ? text("Switch to Light Mode") : text("Switch to Dark Mode")}
+            >
+              {theme === "dark" ? (
+                <>
+                  <Sun size={15} className="theme-toggle-sun" />
+                  <span className="theme-toggle-label">{text("Light")}</span>
+                </>
+              ) : (
+                <>
+                  <Moon size={15} className="theme-toggle-moon" />
+                  <span className="theme-toggle-label">{text("Dark")}</span>
+                </>
+              )}
+            </button>
+
             {/* Profile Overview at the corner in the header */}
             <div
+              className="portal-topbar-profile-btn"
               onClick={() => switchTab("profile")}
               title={text("Profile & Settings")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "4px 12px 4px 6px",
-                background: "#F8FAFC",
-                border: "1px solid #E2E8F0",
-                borderRadius: 9999,
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
             >
               <div
                 style={{
@@ -754,23 +769,23 @@ function UserPortalContent() {
                   flexShrink: 0,
                 }}
               >
-                {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
+                {session?.user?.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <strong style={{ color: "#0F172A", fontSize: "0.8125rem", fontWeight: 800 }}>
-                  {session.user.name || "Lottery Player"}
+                <strong style={{ fontSize: "0.8125rem", fontWeight: 800 }}>
+                  {session?.user?.name || "Lottery Player"}
                 </strong>
                 {isVerified ? (
                   <span
                     style={{
                       fontSize: "0.625rem",
                       fontWeight: 800,
-                      background: "#ECFDF5",
-                      color: "#059669",
+                      background: theme === "dark" ? "rgba(16, 185, 129, 0.2)" : "#ECFDF5",
+                      color: theme === "dark" ? "#34D399" : "#059669",
                       padding: "1px 6px",
                       borderRadius: 9999,
-                      border: "1px solid #A7F3D0",
+                      border: theme === "dark" ? "1px solid rgba(52, 211, 153, 0.4)" : "1px solid #A7F3D0",
                     }}
                   >
                     ✓ {text("Verified")}
@@ -780,11 +795,11 @@ function UserPortalContent() {
                     style={{
                       fontSize: "0.625rem",
                       fontWeight: 800,
-                      background: "#FFFBEB",
-                      color: "#D97706",
+                      background: theme === "dark" ? "rgba(245, 158, 11, 0.2)" : "#FFFBEB",
+                      color: theme === "dark" ? "#FDE047" : "#D97706",
                       padding: "1px 6px",
                       borderRadius: 9999,
-                      border: "1px solid #FDE68A",
+                      border: theme === "dark" ? "1px solid rgba(253, 224, 71, 0.4)" : "1px solid #FDE68A",
                     }}
                   >
                     ! {text("Unverified")}
@@ -892,19 +907,16 @@ function UserPortalContent() {
                 <button
                   type="button"
                   onClick={() => switchTab("lotteries")}
+                  className="portal-btn-secondary"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
                     padding: "8px 16px",
-                    background: "#FFFFFF",
-                    border: "1.5px solid #CBD5E1",
                     borderRadius: 10,
-                    color: "#1B7A53",
                     fontSize: "0.8125rem",
                     fontWeight: 800,
                     cursor: "pointer",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
                   }}
                 >
                   <Ticket size={15} />
@@ -919,20 +931,26 @@ function UserPortalContent() {
               <div className="portal-metric-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <div className="portal-metric-top">
                   <span className="portal-metric-title">{text("Wallet Balances")}</span>
-                  <div className="portal-metric-icon-circle" style={{ background: "#ECFDF5", color: "#1B7A53" }}>
+                  <div
+                    className="portal-metric-icon-circle"
+                    style={{
+                      background: theme === "dark" ? "rgba(253, 224, 71, 0.12)" : "#ECFDF5",
+                      color: theme === "dark" ? "#FDE047" : "#1B7A53",
+                    }}
+                  >
                     <Wallet size={18} />
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6, margin: "6px 0" }}>
                   <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
                     <span style={{ fontSize: "0.8125rem", color: "#64748B", fontWeight: 700 }}>🇪🇹 ETB</span>
-                    <strong style={{ fontSize: "1.2rem", fontWeight: 900, color: "#1B7A53", fontFamily: "var(--font-mono, monospace)" }}>
+                    <strong style={{ fontSize: "1.2rem", fontWeight: 900, color: theme === "dark" ? "#FDE047" : "#1B7A53", fontFamily: "var(--font-mono, monospace)" }}>
                       {formatBalance(etbBalanceDisplay, "ETB")}
                     </strong>
                   </div>
                   <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
                     <span style={{ fontSize: "0.8125rem", color: "#64748B", fontWeight: 700 }}>🇺🇸 USD</span>
-                    <strong style={{ fontSize: "1.05rem", fontWeight: 800, color: "#334155", fontFamily: "var(--font-mono, monospace)" }}>
+                    <strong style={{ fontSize: "1.05rem", fontWeight: 800, color: theme === "dark" ? "#FFFFFF" : "#334155", fontFamily: "var(--font-mono, monospace)" }}>
                       {formatBalance(usdBalanceDisplay, "USD")}
                     </strong>
                   </div>
@@ -941,7 +959,7 @@ function UserPortalContent() {
                   type="button"
                   onClick={() => switchTab("wallet")}
                   className="portal-metric-sub positive"
-                  style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", textAlign: "left", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                  style={{ background: "transparent", border: "none", padding: 0, cursor: "pointer", textAlign: "left", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", color: theme === "dark" ? "#FDE047" : "#15803D" }}
                 >
                   <span>{text("Manage Balances")}</span>
                   <span>&rarr;</span>
@@ -952,7 +970,13 @@ function UserPortalContent() {
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
                   <span className="portal-metric-title">{text("Purchased Tickets")}</span>
-                  <div className="portal-metric-icon-circle" style={{ background: "#EFF6FF", color: "#2563EB" }}>
+                  <div
+                    className="portal-metric-icon-circle"
+                    style={{
+                      background: theme === "dark" ? "rgba(56, 189, 248, 0.12)" : "#EFF6FF",
+                      color: theme === "dark" ? "#38BDF8" : "#2563EB",
+                    }}
+                  >
                     <Ticket size={18} />
                   </div>
                 </div>
@@ -967,7 +991,13 @@ function UserPortalContent() {
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
                   <span className="portal-metric-title">{text("Total Wins")}</span>
-                  <div className="portal-metric-icon-circle" style={{ background: "#FEF9C3", color: "#D97706" }}>
+                  <div
+                    className="portal-metric-icon-circle"
+                    style={{
+                      background: theme === "dark" ? "rgba(253, 224, 71, 0.15)" : "#FEF9C3",
+                      color: theme === "dark" ? "#FDE047" : "#D97706",
+                    }}
+                  >
                     <Trophy size={18} />
                   </div>
                 </div>
@@ -981,7 +1011,13 @@ function UserPortalContent() {
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
                   <span className="portal-metric-title">{text("Total Losses")}</span>
-                  <div className="portal-metric-icon-circle" style={{ background: "#F1F5F9", color: "#64748B" }}>
+                  <div
+                    className="portal-metric-icon-circle"
+                    style={{
+                      background: theme === "dark" ? "rgba(148, 163, 184, 0.12)" : "#F1F5F9",
+                      color: theme === "dark" ? "#94A3B8" : "#64748B",
+                    }}
+                  >
                     <History size={18} />
                   </div>
                 </div>
@@ -992,7 +1028,7 @@ function UserPortalContent() {
               </div>
             </div>
 
-            {/* Waiting for Draw Table Section (Light Mode Emerald Style) */}
+            {/* Waiting for Draw Table Section */}
             <div style={{ marginBottom: 24 }}>
               <div
                 style={{
@@ -1003,8 +1039,8 @@ function UserPortalContent() {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Clock size={20} color="#1B7A53" />
-                  <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#1E293B", margin: 0 }}>
+                  <Clock size={20} color={theme === "dark" ? "#FDE047" : "#1B7A53"} />
+                  <h2 style={{ fontSize: "1.25rem", fontWeight: 800, margin: 0 }}>
                     {text("Waiting for Draw")}
                   </h2>
                 </div>
@@ -1036,15 +1072,15 @@ function UserPortalContent() {
                         return (
                           <tr key={order.id || idx}>
                             <td style={{ fontWeight: 800, color: "#64748B" }}>{idx + 1}</td>
-                            <td style={{ fontWeight: 800, color: "#1E293B" }}>
+                            <td style={{ fontWeight: 800 }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <div
                                   style={{
                                     width: 8,
                                     height: 8,
                                     borderRadius: "50%",
-                                    background: "#1B7A53",
-                                    boxShadow: "0 0 6px rgba(27, 122, 83, 0.4)",
+                                    background: theme === "dark" ? "#FDE047" : "#1B7A53",
+                                    boxShadow: theme === "dark" ? "0 0 8px rgba(253, 224, 71, 0.5)" : "0 0 6px rgba(27, 122, 83, 0.4)",
                                   }}
                                 />
                                 <span>{drawTitle}</span>
@@ -1053,7 +1089,7 @@ function UserPortalContent() {
                             <td style={{ fontFamily: "monospace", color: "#0284C7", fontWeight: 700 }}>
                               {phaseNumber}
                             </td>
-                            <td style={{ fontFamily: "monospace", fontWeight: 900, color: "#1B7A53" }}>
+                            <td style={{ fontFamily: "monospace", fontWeight: 900, color: theme === "dark" ? "#FDE047" : "#1B7A53" }}>
                               {ticketNumber}
                             </td>
                             <td style={{ textAlign: "right" }}>
@@ -1156,9 +1192,7 @@ function UserPortalContent() {
                 style={{
                   display: "inline-flex",
                   padding: "4px",
-                  background: "#F1F5F9",
                   borderRadius: "10px",
-                  border: "1px solid #E2E8F0",
                   gap: "4px",
                 }}
               >
@@ -1181,9 +1215,9 @@ function UserPortalContent() {
                         border: "none",
                         cursor: "pointer",
                         transition: "all 0.15s ease",
-                        background: lotteriesCurrency === curr ? "#1B7A53" : "transparent",
-                        color: lotteriesCurrency === curr ? "#FFFFFF" : "#64748B",
-                        boxShadow: lotteriesCurrency === curr ? "0 2px 6px rgba(27, 122, 83, 0.2)" : "none",
+                        background: lotteriesCurrency === curr ? (theme === "dark" ? "#FDE047" : "#1B7A53") : "transparent",
+                        color: lotteriesCurrency === curr ? (theme === "dark" ? "#0F172A" : "#FFFFFF") : "#94A3B8",
+                        boxShadow: lotteriesCurrency === curr ? (theme === "dark" ? "0 2px 8px rgba(253, 224, 71, 0.3)" : "0 2px 6px rgba(27, 122, 83, 0.2)") : "none",
                       }}
                     >
                       {curr === "ALL" ? text("All Draws") : curr} ({count})
@@ -1206,11 +1240,11 @@ function UserPortalContent() {
               if (filtered.length === 0) {
                 return (
                   <div className="tickets-empty-card">
-                    <Ticket size={48} color="#94A3B8" style={{ margin: "0 auto 16px" }} />
-                    <h3 style={{ color: "#1E293B", fontSize: "1.25rem", margin: "0 0 8px" }}>
+                    <Ticket size={48} color={theme === "dark" ? "#FDE047" : "#1B7A53"} style={{ margin: "0 auto 16px" }} />
+                    <h3 style={{ fontSize: "1.25rem", margin: "0 0 8px" }}>
                       {text("No Active Lotteries in this Category")}
                     </h3>
-                    <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
+                    <p style={{ fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
                       {text("New rounds are scheduled regularly. Switch currency filter or check back shortly.")}
                     </p>
                     <button
@@ -1248,7 +1282,7 @@ function UserPortalContent() {
                                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
                                 {text("LIVE ROUND")}
                               </span>
-                              <span style={{ fontSize: "0.75rem", color: "#64748B", fontWeight: 700 }}>
+                              <span style={{ fontSize: "0.75rem", color: "#94A3B8", fontWeight: 700 }}>
                                 #{d.id.slice(0, 8)}
                               </span>
                             </div>
@@ -1273,15 +1307,15 @@ function UserPortalContent() {
 
                           {/* Ticket Price & Capacity Metrics */}
                           <div className="portal-ticket-info-row">
-                            <span style={{ color: "#64748B", fontWeight: 600 }}>{text("Ticket Price")}:</span>
-                            <strong style={{ color: "#1B7A53", fontSize: "0.9375rem" }}>
+                            <span style={{ color: "#94A3B8", fontWeight: 600 }}>{text("Ticket Price")}:</span>
+                            <strong style={{ color: theme === "dark" ? "#FDE047" : "#1B7A53", fontSize: "0.9375rem" }}>
                               {money(d.priceMinor, d.currency)}
                             </strong>
                           </div>
 
                           <div className="portal-ticket-info-row" style={{ marginBottom: 2 }}>
-                            <span style={{ color: "#64748B", fontWeight: 600 }}>{text("Pool Participation")}:</span>
-                            <span style={{ color: "#0F172A", fontWeight: 700 }}>
+                            <span style={{ color: "#94A3B8", fontWeight: 600 }}>{text("Pool Participation")}:</span>
+                            <span style={{ color: theme === "dark" ? "#FFFFFF" : "#0F172A", fontWeight: 700 }}>
                               {soldCount} / {d.capacity} {text("Tickets")}
                             </span>
                           </div>
@@ -1292,7 +1326,7 @@ function UserPortalContent() {
                           </div>
 
                           {d.deadline && (
-                            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.75rem", color: "#64748B", marginTop: 4 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.75rem", color: "#94A3B8", marginTop: 4 }}>
                               <Clock size={12} />
                               <span>{text("Draw Deadline")}: {new Date(d.deadline).toLocaleDateString()}</span>
                             </div>
@@ -1347,10 +1381,10 @@ function UserPortalContent() {
               }}
             >
               <div>
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0 }}>
                   {text("My Purchased Tickets")}
                 </h1>
-                <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
+                <p style={{ fontSize: "0.875rem", margin: "4px 0 0" }}>
                   {text("All your active and historical lottery tickets with serial codes and draw records.")}
                 </p>
               </div>
@@ -1418,11 +1452,11 @@ function UserPortalContent() {
               </div>
             ) : (
               <div className="tickets-empty-card">
-                <Ticket size={48} color="#1B7A53" style={{ margin: "0 auto 16px" }} />
-                <h3 style={{ color: "#1E293B", fontSize: "1.25rem", margin: "0 0 8px" }}>
+                <Ticket size={48} color={theme === "dark" ? "#FDE047" : "#1B7A53"} style={{ margin: "0 auto 16px" }} />
+                <h3 style={{ fontSize: "1.25rem", margin: "0 0 8px" }}>
                   {text("No tickets purchased yet")}
                 </h3>
-                <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
+                <p style={{ fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
                   {text("Participate in one of our running lotteries for a chance to win the jackpot!")}
                 </p>
                 <button
@@ -1442,10 +1476,10 @@ function UserPortalContent() {
         {activeTab === "wallet" && (
           <div>
             <div style={{ marginBottom: 24 }}>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0 }}>
                 {text("My Wallet & Balances")}
               </h1>
-              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
+              <p style={{ fontSize: "0.875rem", margin: "4px 0 0" }}>
                 {text("Manage your multi-currency player balances, view available funds, and top up your account.")}
               </p>
             </div>
@@ -1461,10 +1495,10 @@ function UserPortalContent() {
             ) : (
               <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
                 <Lock size={36} color="#D97706" style={{ margin: "0 auto 12px" }} />
-                <h3 style={{ color: "#1E293B", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                <h3 style={{ fontSize: "1.2rem", margin: "0 0 8px" }}>
                   {text("Wallet Locked — Email Verification Required")}
                 </h3>
-                <p style={{ color: "#64748B", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                <p style={{ fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
                   {text(
                     "Please verify your email address to unlock your multi-currency wallet, deposit capabilities, and balance tracking."
                   )}
@@ -1492,10 +1526,10 @@ function UserPortalContent() {
         {activeTab === "deposit" && (
           <div>
             <div style={{ marginBottom: 24 }}>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0 }}>
                 {text("Deposit Funds")}
               </h1>
-              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
+              <p style={{ fontSize: "0.875rem", margin: "4px 0 0" }}>
                 {text("Instantly deposit funds into your player wallet via Telebirr, CBE Birr, Awash, and Bank Cards.")}
               </p>
             </div>
@@ -1510,10 +1544,10 @@ function UserPortalContent() {
             ) : (
               <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
                 <Lock size={36} color="#D97706" style={{ margin: "0 auto 12px" }} />
-                <h3 style={{ color: "#1E293B", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                <h3 style={{ fontSize: "1.2rem", margin: "0 0 8px" }}>
                   {text("Deposit Locked — Email Verification Required")}
                 </h3>
-                <p style={{ color: "#64748B", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                <p style={{ fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
                   {text("Please click the verification link sent to your email to enable deposits.")}
                 </p>
               </div>
@@ -1525,10 +1559,10 @@ function UserPortalContent() {
         {activeTab === "history" && (
           <div>
             <div style={{ marginBottom: 24 }}>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, margin: 0 }}>
                 {text("Deposit & Transaction History")}
               </h1>
-              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
+              <p style={{ fontSize: "0.875rem", margin: "4px 0 0" }}>
                 {text("Comprehensive audit log of all your deposits, ticket debit entries, and winning payouts.")}
               </p>
             </div>
@@ -1542,10 +1576,10 @@ function UserPortalContent() {
             ) : (
               <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
                 <Lock size={36} color="#D97706" style={{ margin: "0 auto 12px" }} />
-                <h3 style={{ color: "#1E293B", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                <h3 style={{ fontSize: "1.2rem", margin: "0 0 8px" }}>
                   {text("History Locked — Email Verification Required")}
                 </h3>
-                <p style={{ color: "#64748B", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                <p style={{ fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
                   {text("Please verify your email address to review your transaction ledger.")}
                 </p>
               </div>
@@ -1556,11 +1590,11 @@ function UserPortalContent() {
         {/* ── VIEW 6: PERSONAL PROFILE INFORMATION ───────────────────────────── */}
         {activeTab === "profile" && (
           <div className="profile-card-section">
-            <h2 style={{ color: "#1E293B", display: "flex", alignItems: "center", gap: 10 }}>
-              <User size={20} color="#1B7A53" />
+            <h2 style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <User size={20} color={theme === "dark" ? "#FDE047" : "#1B7A53"} />
               <span>{text("Personal Profile Information")}</span>
             </h2>
-            <p style={{ color: "#64748B", fontSize: "0.875rem", marginBottom: "20px" }}>
+            <p style={{ fontSize: "0.875rem", marginBottom: "20px" }}>
               {text("Manage your display name and view your registered lottery account details.")}
             </p>
 
@@ -1604,13 +1638,13 @@ function UserPortalContent() {
                 <label>{text("Account ID")}</label>
                 <code
                   style={{
-                    background: "#F8FAFC",
+                    background: theme === "dark" ? "#080D1A" : "#F8FAFC",
                     padding: "10px 14px",
                     borderRadius: "10px",
-                    color: "#1B7A53",
+                    color: theme === "dark" ? "#FDE047" : "#1B7A53",
                     fontSize: "0.8125rem",
                     fontWeight: 700,
-                    border: "1.5px solid #E2E8F0",
+                    border: theme === "dark" ? "1.5px solid #1E293B" : "1.5px solid #E2E8F0",
                     display: "block",
                   }}
                 >
@@ -1648,11 +1682,11 @@ function UserPortalContent() {
           <div>
             {/* Two-Factor Authentication Card */}
             <div className="profile-card-section">
-              <h2 style={{ color: "#1E293B", display: "flex", alignItems: "center", gap: 10 }}>
-                <ShieldCheck size={20} color="#1B7A53" />
+              <h2 style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <ShieldCheck size={20} color={theme === "dark" ? "#FDE047" : "#1B7A53"} />
                 <span>{text("Two-Factor Authentication (2FA / TOTP)")}</span>
               </h2>
-              <p style={{ color: "#64748B", fontSize: "0.875rem", marginBottom: "20px" }}>
+              <p style={{ fontSize: "0.875rem", marginBottom: "20px" }}>
                 {text(
                   "Add a time-based authenticator (Google Authenticator, Authy, or Microsoft Authenticator) to protect your lottery wallet, purchases, and winnings."
                 )}
@@ -1733,16 +1767,16 @@ function UserPortalContent() {
                   ) : (
                     <div
                       style={{
-                        background: "#F8FAF9",
-                        border: "1.5px solid #E5EBE7",
+                        background: theme === "dark" ? "#080D1A" : "#F8FAF9",
+                        border: theme === "dark" ? "1.5px solid #1E293B" : "1.5px solid #E5EBE7",
                         borderRadius: "16px",
                         padding: "24px",
                       }}
                     >
-                      <h3 style={{ color: "#1E293B", fontSize: "1.1rem", margin: "0 0 12px" }}>
+                      <h3 style={{ fontSize: "1.1rem", margin: "0 0 12px" }}>
                         {text("1. Scan QR Code in Your Authenticator")}
                       </h3>
-                      <p style={{ color: "#64748B", fontSize: "0.8125rem", marginBottom: "16px" }}>
+                      <p style={{ fontSize: "0.8125rem", marginBottom: "16px" }}>
                         {text("Open Google Authenticator, Authy, or 1Password and scan the QR code below:")}
                       </p>
 
@@ -1766,10 +1800,10 @@ function UserPortalContent() {
                           />
                         </div>
                       ) : (
-                        <p style={{ color: "#64748B" }}>{text("Generating code…")}</p>
+                        <p>{text("Generating code…")}</p>
                       )}
 
-                      <h4 style={{ color: "#1E293B", fontSize: "0.95rem", margin: "0 0 8px" }}>
+                      <h4 style={{ fontSize: "0.95rem", margin: "0 0 8px" }}>
                         {text("Or Enter Secret Key Manually:")}
                       </h4>
                       <div
@@ -1783,14 +1817,14 @@ function UserPortalContent() {
                       >
                         <code
                           style={{
-                            background: "#FFFFFF",
+                            background: theme === "dark" ? "#0E1628" : "#FFFFFF",
                             padding: "8px 14px",
                             borderRadius: "8px",
-                            color: "#1B7A53",
+                            color: theme === "dark" ? "#FDE047" : "#1B7A53",
                             fontSize: "0.95rem",
                             fontWeight: 800,
                             letterSpacing: "1px",
-                            border: "1.5px solid #CBD5E1",
+                            border: theme === "dark" ? "1.5px solid #1E293B" : "1.5px solid #CBD5E1",
                           }}
                         >
                           {getTotpSecret(totpUri)}
@@ -1807,41 +1841,41 @@ function UserPortalContent() {
                             alignItems: "center",
                             gap: "6px",
                             padding: "8px 14px",
-                            background: "#FFFFFF",
-                            border: "1.5px solid #CBD5E1",
+                            background: theme === "dark" ? "#0E1628" : "#FFFFFF",
+                            border: theme === "dark" ? "1.5px solid #1E293B" : "1.5px solid #CBD5E1",
                             borderRadius: "8px",
-                            color: "#1E293B",
+                            color: theme === "dark" ? "#FFFFFF" : "#1E293B",
                             fontSize: "0.8125rem",
                             fontWeight: 700,
                             cursor: "pointer",
                           }}
                         >
-                          {copiedSecret ? <Check size={14} color="#1B7A53" /> : <Copy size={14} />}
+                          {copiedSecret ? <Check size={14} color={theme === "dark" ? "#FDE047" : "#1B7A53"} /> : <Copy size={14} />}
                           <span>{copiedSecret ? text("Copied!") : text("Copy Secret Key")}</span>
                         </button>
                       </div>
 
-                      <h3 style={{ color: "#1E293B", fontSize: "1.1rem", margin: "0 0 12px" }}>
+                      <h3 style={{ fontSize: "1.1rem", margin: "0 0 12px" }}>
                         {text("2. Save Your Recovery Backup Codes")}
                       </h3>
-                      <p style={{ color: "#64748B", fontSize: "0.8125rem", marginBottom: "12px" }}>
+                      <p style={{ fontSize: "0.8125rem", marginBottom: "12px" }}>
                         {text(
                           "Keep these single-use recovery codes in a secure place. If you lose access to your authenticator, they can restore your account:"
                         )}
                       </p>
                       <div
                         style={{
-                          background: "#FFFFFF",
+                          background: theme === "dark" ? "#0E1628" : "#FFFFFF",
                           padding: "14px",
                           borderRadius: "10px",
-                          border: "1.5px solid #E2E8F0",
+                          border: theme === "dark" ? "1.5px solid #1E293B" : "1.5px solid #E2E8F0",
                           marginBottom: "12px",
                         }}
                       >
                         <pre
                           style={{
                             margin: 0,
-                            color: "#0F172A",
+                            color: theme === "dark" ? "#FDE047" : "#0F172A",
                             fontFamily: "monospace",
                             fontSize: "0.8125rem",
                             fontWeight: 700,
@@ -1863,21 +1897,21 @@ function UserPortalContent() {
                           alignItems: "center",
                           gap: "6px",
                           padding: "6px 14px",
-                          background: "#FFFFFF",
-                          border: "1.5px solid #CBD5E1",
+                          background: theme === "dark" ? "#0E1628" : "#FFFFFF",
+                          border: theme === "dark" ? "1.5px solid #1E293B" : "1.5px solid #CBD5E1",
                           borderRadius: "8px",
-                          color: "#1E293B",
+                          color: theme === "dark" ? "#FFFFFF" : "#1E293B",
                           fontSize: "0.75rem",
                           fontWeight: 700,
                           cursor: "pointer",
                           marginBottom: "24px",
                         }}
                       >
-                        {copiedBackups ? <Check size={13} color="#1B7A53" /> : <Copy size={13} />}
+                        {copiedBackups ? <Check size={13} color={theme === "dark" ? "#FDE047" : "#1B7A53"} /> : <Copy size={13} />}
                         <span>{copiedBackups ? text("Copied All Codes!") : text("Copy All Codes")}</span>
                       </button>
 
-                      <h3 style={{ color: "#1E293B", fontSize: "1.1rem", margin: "0 0 12px" }}>
+                      <h3 style={{ fontSize: "1.1rem", margin: "0 0 12px" }}>
                         {text("3. Enter 6-digit Code to Finalize")}
                       </h3>
                       <div
@@ -1900,10 +1934,10 @@ function UserPortalContent() {
                             fontSize: "1.2rem",
                             letterSpacing: "4px",
                             padding: "10px",
-                            background: "#FFFFFF",
-                            border: "2px solid #1B7A53",
+                            background: theme === "dark" ? "#080D1A" : "#FFFFFF",
+                            border: theme === "dark" ? "2px solid #FDE047" : "2px solid #1B7A53",
                             borderRadius: "8px",
-                            color: "#1B7A53",
+                            color: theme === "dark" ? "#FDE047" : "#1B7A53",
                             fontWeight: 800,
                           }}
                         />
@@ -1936,11 +1970,11 @@ function UserPortalContent() {
 
             {/* Change Password Card */}
             <div className="profile-card-section">
-              <h2 style={{ color: "#1E293B", display: "flex", alignItems: "center", gap: 10 }}>
-                <Lock size={20} color="#1B7A53" />
+              <h2 style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Lock size={20} color={theme === "dark" ? "#FDE047" : "#1B7A53"} />
                 <span>{text("Change Account Password")}</span>
               </h2>
-              <p style={{ color: "#64748B", fontSize: "0.875rem", marginBottom: "20px" }}>
+              <p style={{ fontSize: "0.875rem", marginBottom: "20px" }}>
                 {text("Ensure your password is at least 12 characters long and not used on other websites.")}
               </p>
 
