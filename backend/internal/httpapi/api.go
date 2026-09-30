@@ -297,7 +297,11 @@ func (a *API) webhook(w http.ResponseWriter, r *http.Request) {
 		fail(w, domain.ErrInvalid)
 		return
 	}
-	if p == nil || !p.AuthenticateWebhook(body, r.Header.Get("X-Chapa-Signature")) {
+	sig := r.Header.Get("X-Chapa-Signature")
+	if sig == "" {
+		sig = r.Header.Get("Chapa-Signature")
+	}
+	if p == nil || !p.AuthenticateWebhook(body, sig) {
 		reply(w, 401, map[string]string{"error": "Invalid signature"})
 		return
 	}

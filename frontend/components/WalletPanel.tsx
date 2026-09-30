@@ -149,6 +149,10 @@ export function WalletPanel({
         setAttempt(null);
         setAmount("");
         setRevision((v) => v + 1);
+        if (d.checkoutUrl) {
+          window.location.href = d.checkoutUrl;
+          return;
+        }
         setMessage(
           d.status === "initializing"
             ? "Payment setup is being checked. Do not pay again; check your deposit history."

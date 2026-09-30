@@ -42,9 +42,17 @@ func main() {
 		slog.Error("invalid CHAPA_MODE")
 		os.Exit(1)
 	}
-	if key != "" && !strings.HasPrefix(key, "CHAPA_"+strings.ToUpper(mode)+"_") {
-		slog.Error("Chapa key does not match configured mode")
-		os.Exit(1)
+	if key != "" {
+		valid := false
+		if mode == "test" {
+			valid = strings.HasPrefix(key, "CHASECK_TEST-") || strings.HasPrefix(key, "CHAPA_TEST_") || strings.Contains(strings.ToUpper(key), "DEMO") || strings.Contains(strings.ToUpper(key), "MOCK")
+		} else {
+			valid = strings.HasPrefix(key, "CHASECK-") || strings.HasPrefix(key, "CHAPA_LIVE_")
+		}
+		if !valid {
+			slog.Error("Chapa key does not match configured mode (test keys must start with CHASECK_TEST- or contain DEMO)")
+			os.Exit(1)
+		}
 	}
 	if env("APP_ENV", "development") == "production" {
 		for _, s := range []string{origin, issuer, jwks} {
@@ -70,7 +78,7 @@ func main() {
 		slog.Error("database payment environment mismatch or migrations missing")
 		os.Exit(1)
 	}
-	providers := map[string]domain.PaymentProvider{"chapa": chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, strings.Split(env("CHAPA_CURRENCIES", "ETB"), ","))}
+	providers := map[string]domain.PaymentProvider{"chapa": chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, strings.Split(env("CHAPA_CURRENCIES", "ETB"), ","), origin)}
 	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
 	stripeSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if stripeKey != "" && stripeSecret != "" {

@@ -20,13 +20,30 @@ import (
 // Adapter implements Chapa API v2. A timeout during Start is ambiguous: callers
 // must reconcile the merchant reference, never create another charge blindly.
 type Adapter struct {
-	Key, WebhookSecret, Mode, BaseURL string
-	Currencies                        map[string]bool
-	Client                            *http.Client
+	Key, WebhookSecret, Mode, BaseURL, Origin string
+	Currencies                                map[string]bool
+	Client                                    *http.Client
 }
 
-func New(key, secret, mode string, currencies []string) *Adapter {
-	a := &Adapter{Key: key, WebhookSecret: secret, Mode: mode, BaseURL: "https://api.chapa.global/v2", Currencies: map[string]bool{}, Client: &http.Client{Timeout: 15 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}
+func New(key, secret, mode string, currencies []string, origin ...string) *Adapter {
+	orig := "http://localhost:3000"
+	if len(origin) > 0 && origin[0] != "" {
+		orig = strings.TrimRight(origin[0], "/")
+	}
+	a := &Adapter{
+		Key:           key,
+		WebhookSecret: secret,
+		Mode:          mode,
+		BaseURL:       "https://api.chapa.global/v2",
+		Origin:        orig,
+		Currencies:    map[string]bool{},
+		Client: &http.Client{
+			Timeout: 15 * time.Second,
+			CheckRedirect: func(*http.Request, []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		},
+	}
 	for _, c := range currencies {
 		a.Currencies[strings.TrimSpace(c)] = true
 	}
@@ -35,6 +52,10 @@ func New(key, secret, mode string, currencies []string) *Adapter {
 func (a *Adapter) Name() string { return "chapa" }
 func (a *Adapter) Supports(c string) bool {
 	return a.Key != "" && a.WebhookSecret != "" && a.Currencies[c]
+}
+func (a *Adapter) isMock() bool {
+	k := strings.ToUpper(a.Key)
+	return a.Mode == "test" && (k == "DEMO" || strings.HasSuffix(k, "DEMO") || strings.Contains(k, "MOCK"))
 }
 func (a *Adapter) request(ctx context.Context, method, path string, body any, output any) error {
 	if a.Key == "" {
@@ -71,13 +92,35 @@ func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.C
 	if !a.Supports(o.Currency) {
 		return domain.Checkout{}, domain.ErrUnavailable
 	}
+
+	// Local Sandbox Simulator Mode
+	if a.isMock() {
+		ref := fmt.Sprintf("chapa_mock_%s_amt_%d", o.ID, o.AmountMinor)
+		checkoutURL := fmt.Sprintf("%s/chapa-sandbox?id=%s&amount=%d&currency=%s&ref=%s",
+			a.Origin, o.ID, o.AmountMinor, o.Currency, ref)
+		return domain.Checkout{URL: checkoutURL, Reference: ref}, nil
+	}
+
+	// Real Chapa API v2 Hosted Checkout
 	names := strings.Fields(o.Name)
 	first, last := "Player", ""
 	if len(names) > 0 {
 		first = names[0]
 		last = strings.Join(names[1:], " ")
 	}
-	body := map[string]any{"amount": json.Number(fmt.Sprintf("%d.%02d", o.AmountMinor/100, o.AmountMinor%100)), "currency": o.Currency, "merchant_reference": o.ID, "customer": map[string]string{"first_name": first, "last_name": last, "email": o.Email, "phone_number": o.Phone}, "meta": map[string]string{"payment_id": o.ID}}
+	body := map[string]any{
+		"amount":             json.Number(fmt.Sprintf("%d.%02d", o.AmountMinor/100, o.AmountMinor%100)),
+		"currency":           o.Currency,
+		"merchant_reference": o.ID,
+		"customer": map[string]string{
+			"first_name":   first,
+			"last_name":    last,
+			"email":        o.Email,
+			"phone_number": o.Phone,
+		},
+		"meta":       map[string]string{"payment_id": o.ID},
+		"return_url": a.Origin + "/profile#wallet",
+	}
 	var result struct {
 		Status string `json:"status"`
 		Data   struct {
@@ -122,6 +165,23 @@ func DecimalMinor(raw string) (int64, error) {
 	return major*100 + minor, nil
 }
 func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, error) {
+	if a.isMock() && strings.HasPrefix(ref, "chapa_mock_") {
+		parts := strings.Split(strings.TrimPrefix(ref, "chapa_mock_"), "_amt_")
+		merchantID := parts[0]
+		var amt int64
+		if len(parts) > 1 {
+			amt, _ = strconv.ParseInt(parts[1], 10, 64)
+		}
+		return domain.Verification{
+			Reference:         ref,
+			MerchantReference: merchantID,
+			Status:            "success",
+			AmountMinor:       amt,
+			Currency:          "ETB",
+			Mode:              a.Mode,
+		}, nil
+	}
+
 	var result struct {
 		Status string `json:"status"`
 		Data   struct {
@@ -166,12 +226,42 @@ func (a *Adapter) AuthenticateWebhook(body []byte, sig string) bool {
 func (a *Adapter) WebhookReference(body []byte) (domain.Webhook, error) {
 	var event struct {
 		ProviderReference string `json:"chapa_reference"`
-		Type              string `json:"webhook_type"`
-		Mode              string `json:"mode"`
-		Reference         string `json:"merchant_reference"`
+		RefID             string `json:"ref_id"`
+		ReferenceAlt      string `json:"reference"`
+
+		Type  string `json:"webhook_type"`
+		Event string `json:"event"`
+
+		Mode string `json:"mode"`
+
+		Reference string `json:"merchant_reference"`
+		TxRef     string `json:"tx_ref"`
+		TrxRef    string `json:"trx_ref"`
 	}
-	if json.Unmarshal(body, &event) != nil || (event.Type != "payment" && event.Type != "refund") || event.Mode != a.Mode || event.Reference == "" || len(event.Reference) > 128 || event.ProviderReference == "" || len(event.ProviderReference) > 128 {
+	if err := json.Unmarshal(body, &event); err != nil {
 		return domain.Webhook{}, domain.ErrInvalid
 	}
-	return domain.Webhook{MerchantReference: event.Reference, ProviderReference: event.ProviderReference}, nil
+	providerRef := event.ProviderReference
+	if providerRef == "" {
+		providerRef = event.RefID
+	}
+	if providerRef == "" {
+		providerRef = event.ReferenceAlt
+	}
+
+	merchantRef := event.Reference
+	if merchantRef == "" {
+		merchantRef = event.TxRef
+	}
+	if merchantRef == "" {
+		merchantRef = event.TrxRef
+	}
+
+	if event.Mode != "" && event.Mode != a.Mode {
+		return domain.Webhook{}, domain.ErrInvalid
+	}
+	if merchantRef == "" || len(merchantRef) > 128 || providerRef == "" || len(providerRef) > 128 {
+		return domain.Webhook{}, domain.ErrInvalid
+	}
+	return domain.Webhook{MerchantReference: merchantRef, ProviderReference: providerRef}, nil
 }

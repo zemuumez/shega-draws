@@ -83,3 +83,27 @@ func TestCheckoutRejectsUntrustedRedirect(t *testing.T) {
 		t.Fatal("accepted attacker URL")
 	}
 }
+
+func TestSandboxMockCheckoutAndVerification(t *testing.T) {
+	a := New("CHASECK_TEST-demo", "webhook-test-secret", "test", []string{"ETB"}, "http://localhost:3000")
+	o := domain.CheckoutRequest{ID: "dep_sandbox_1", AmountMinor: 5000, Currency: "ETB", Name: "Demo User"}
+	checkout, err := a.Start(context.Background(), o)
+	if err != nil {
+		t.Fatalf("unexpected Start error: %v", err)
+	}
+	if checkout.Reference != "chapa_mock_dep_sandbox_1_amt_5000" {
+		t.Fatalf("unexpected reference: %s", checkout.Reference)
+	}
+	expectedURL := "http://localhost:3000/chapa-sandbox?id=dep_sandbox_1&amount=5000&currency=ETB&ref=chapa_mock_dep_sandbox_1_amt_5000"
+	if checkout.URL != expectedURL {
+		t.Fatalf("expected URL %s, got %s", expectedURL, checkout.URL)
+	}
+	v, err := a.Verify(context.Background(), checkout.Reference)
+	if err != nil {
+		t.Fatalf("unexpected Verify error: %v", err)
+	}
+	if v.Status != "success" || v.AmountMinor != 5000 || v.Currency != "ETB" || v.MerchantReference != "dep_sandbox_1" {
+		t.Fatalf("unexpected verification: %+v", v)
+	}
+}
+

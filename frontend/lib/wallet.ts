@@ -55,6 +55,14 @@ export function checkoutLink(d: Deposit): string | undefined {
   if (d.status !== "pending" || d.creditedAt || !d.checkoutUrl) return;
   try {
     const u = new URL(d.checkoutUrl);
+    // Allow local Chapa sandbox simulator in test/demo mode
+    if (
+      (u.protocol === "http:" || u.protocol === "https:") &&
+      (u.hostname === "localhost" || u.hostname === "127.0.0.1") &&
+      u.pathname.startsWith("/chapa-sandbox")
+    ) {
+      return u.href;
+    }
     if (
       u.protocol === "https:" &&
       !u.username &&
