@@ -36,6 +36,8 @@ import {
   Calendar,
   Layers,
   TrendingUp,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { clearAccountToken, accountAPI } from "@/lib/account-api";
@@ -80,6 +82,7 @@ function UserPortalContent() {
   const [draws, setDraws] = useState<BackendDraw[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
+  const [showBalance, setShowBalance] = useState(true);
 
   // Profile edit state
   const [name, setName] = useState("");
@@ -498,16 +501,6 @@ function UserPortalContent() {
           >
             <Wallet size={18} />
             <span>{text("My Wallet & Balances")}</span>
-            <span
-              style={{
-                marginLeft: "auto",
-                fontSize: "0.6875rem",
-                fontWeight: 800,
-                color: activeTab === "wallet" ? "#1B7A53" : "rgba(255, 255, 255, 0.9)",
-              }}
-            >
-              {(etbBalance / 100).toFixed(0)} ETB
-            </span>
           </button>
 
           <button
@@ -586,45 +579,44 @@ function UserPortalContent() {
               <span>{text("Staff Admin Portal")}</span>
             </Link>
           )}
-
-          {/* Bottom elements: 24/7 Support Card & Sign Out */}
-          <div style={{ marginTop: "auto", paddingTop: 16 }}>
-            {/* 24/7 Support Card matching reference image */}
-            <div className="portal-sidebar-support-card">
-              <div className="portal-sidebar-support-icon">24/7</div>
-              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.25 }}>
-                <strong style={{ fontSize: "0.8125rem", color: "#FFFFFF", fontWeight: 800 }}>
-                  {text("24/7 Support")}
-                </strong>
-                <span style={{ fontSize: "0.6875rem", color: "rgba(255, 255, 255, 0.75)" }}>
-                  {text("Live Player Helpdesk")}
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="portal-nav-btn"
-              style={{
-                color: "#FECACA",
-                background: "rgba(239, 68, 68, 0.15)",
-                marginTop: 8,
-              }}
-              onClick={async () => {
-                await authClient.signOut();
-                clearAccountToken();
-                window.location.href = "/";
-              }}
-            >
-              <LogOut size={16} />
-              <span>{text("Sign Out")}</span>
-            </button>
-          </div>
         </nav>
+
+        {/* Dedicated Fixed Sidebar Footer: Support Card & Sign Out */}
+        <div className="portal-sidebar-footer">
+          {/* 24/7 Support Card matching reference image */}
+          <div className="portal-sidebar-support-card">
+            <div className="portal-sidebar-support-icon">24/7</div>
+            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.25 }}>
+              <strong style={{ fontSize: "0.8125rem", color: "#FFFFFF", fontWeight: 800 }}>
+                {text("24/7 Support")}
+              </strong>
+              <span style={{ fontSize: "0.6875rem", color: "rgba(255, 255, 255, 0.75)" }}>
+                {text("Live Player Helpdesk")}
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="portal-nav-btn"
+            style={{
+              color: "#FECACA",
+              background: "rgba(239, 68, 68, 0.15)",
+            }}
+            onClick={async () => {
+              await authClient.signOut();
+              clearAccountToken();
+              window.location.href = "/";
+            }}
+          >
+            <LogOut size={16} />
+            <span>{text("Sign Out")}</span>
+          </button>
+        </div>
       </aside>
 
       {/* ── 2. Portal Main Content Area ────────────────────────────────────── */}
-      <main className="portal-main-content" style={{ display: "flex", flexDirection: "column", padding: 0 }}>
+      <main className="portal-main-content">
         {/* Sleek Portal Topbar Header */}
         <header className="portal-topbar">
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -645,7 +637,7 @@ function UserPortalContent() {
                 transition: "all 0.2s ease",
               }}
             >
-              <Home size={15} color="#D97706" />
+              <Home size={15} color="#1B7A53" />
               <span>{text("Home")}</span>
             </Link>
 
@@ -655,28 +647,65 @@ function UserPortalContent() {
             </div>
           </div>
 
-          {/* Right corner of header: Balance + Profile Overview */}
+          {/* Right corner of header: Balance with Eye Toggle + Profile Overview */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <button
-              type="button"
-              onClick={() => switchTab("wallet")}
+            <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 6,
-                padding: "7px 14px",
-                background: "rgba(16, 185, 129, 0.1)",
-                border: "1px solid rgba(16, 185, 129, 0.3)",
+                background: "rgba(27, 122, 83, 0.08)",
+                border: "1.5px solid rgba(27, 122, 83, 0.25)",
                 borderRadius: 10,
-                color: "#059669",
-                fontSize: "0.8125rem",
-                fontWeight: 800,
-                cursor: "pointer",
+                padding: "3px 8px 3px 12px",
+                gap: 8,
               }}
             >
-              <Wallet size={15} color="#059669" />
-              <span>{totalBalanceDisplay}</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => switchTab("wallet")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "transparent",
+                  border: "none",
+                  color: "#1B7A53",
+                  fontSize: "0.8125rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  padding: 0,
+                }}
+                title={text("My Wallet & Balances")}
+              >
+                <Wallet size={15} color="#1B7A53" />
+                <span>{showBalance ? totalBalanceDisplay : "** ETB"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowBalance(!showBalance);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#1B7A53",
+                  cursor: "pointer",
+                  padding: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: 0.8,
+                  borderRadius: 6,
+                  transition: "opacity 0.2s",
+                }}
+                title={showBalance ? text("Hide balance") : text("Show balance")}
+                aria-label={showBalance ? text("Hide balance") : text("Show balance")}
+              >
+                {showBalance ? <Eye size={15} /> : <EyeOff size={15} />}
+              </button>
+            </div>
 
             {/* Profile Overview at the corner in the header */}
             <div
@@ -756,7 +785,7 @@ function UserPortalContent() {
           </div>
         </header>
 
-        <div style={{ flex: 1, padding: "clamp(20px, 3vw, 36px) clamp(16px, 3vw, 48px)", overflowY: "auto" }}>
+        <div className="portal-body-scroll">
           {/* Unverified Email Warning Bar if applicable */}
         {!isVerified && (
           <div
@@ -930,146 +959,6 @@ function UserPortalContent() {
                 <div className="portal-metric-val">0.00 ETB</div>
                 <div className="portal-metric-sub neutral">
                   <span>{text("0 Winning Draws Settled")}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* ── 3-Column Middle Section (Matching Reference Image) ── */}
-            <div className="portal-lower-grid">
-              {/* Column 1: Overview */}
-              <div className="portal-card-box">
-                <div className="portal-card-header">
-                  <h3>{text("Overview")}</h3>
-                </div>
-
-                <div className="portal-overview-item highlight">
-                  <span>{text("Active Lottery Pools")}</span>
-                  <span className="badge">
-                    {draws.filter((d) => d.status === "open").length || 3} {text("Active")}
-                  </span>
-                </div>
-
-                <div className="portal-overview-item regular">
-                  <span>{text("Registered Tickets")}</span>
-                  <span className="badge">{orders.length} {text("Tickets")}</span>
-                </div>
-
-                <div className="portal-overview-item regular">
-                  <span>{text("Available Wallet Balance")}</span>
-                  <span className="badge">{totalBalanceDisplay}</span>
-                </div>
-
-                <div className="portal-overview-item regular">
-                  <span>{text("Account Standing")}</span>
-                  <span className="badge">
-                    {isVerified ? text("Verified Player") : text("Pending Verification")}
-                  </span>
-                </div>
-              </div>
-
-              {/* Column 2: Total Sale / Draw Capacity (Circular Gauge Chart) */}
-              <div className="portal-card-box">
-                <div className="portal-card-header">
-                  <h3>{text("Draw Capacity")}</h3>
-                  <Link href="/#available-lotteries" className="portal-view-all-pill">
-                    {text("View All")}
-                  </Link>
-                </div>
-
-                <div className="portal-gauge-container">
-                  <svg width="150" height="150" viewBox="0 0 100 100" className="portal-gauge-svg">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      fill="transparent"
-                      strokeWidth="10"
-                      className="portal-gauge-bg"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      fill="transparent"
-                      strokeWidth="10"
-                      strokeDasharray="251.2"
-                      strokeDashoffset={251.2 * (1 - 0.70)}
-                      className="portal-gauge-bar"
-                    />
-                  </svg>
-                  <div style={{ marginTop: "-95px", marginBottom: "35px", textAlign: "center" }}>
-                    <span style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", display: "block", lineHeight: 1.1 }}>
-                      70%
-                    </span>
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-                      {text("Sold")}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: "0.75rem", color: "#64748B", textAlign: "center", margin: "0 auto", maxWidth: 220, lineHeight: 1.4 }}>
-                    {text("70% capacity reserved across currently open jackpot lottery pools.")}
-                  </p>
-                </div>
-              </div>
-
-              {/* Column 3: Recent Activity (Timeline with colored dots) */}
-              <div className="portal-card-box">
-                <div className="portal-card-header">
-                  <h3>{text("Activity")}</h3>
-                  <button
-                    type="button"
-                    onClick={() => switchTab("history")}
-                    className="portal-view-all-pill"
-                  >
-                    {text("View All")}
-                  </button>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div className="portal-activity-item">
-                    <span className="portal-dot green" />
-                    <div>
-                      <strong style={{ color: "#1E293B", display: "block" }}>{text("Player Wallet Active")}</strong>
-                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                        {text("Multi-currency ETB balance is ready for ticket purchases.")}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="portal-activity-item">
-                    <span className="portal-dot blue" />
-                    <div>
-                      <strong style={{ color: "#1E293B", display: "block" }}>
-                        {deposits.length > 0 ? text("Chapa Deposit Confirmed") : text("Chapa Deposits Ready")}
-                      </strong>
-                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                        {deposits.length > 0 ? `${text("Total credited:")} ${totalDepositDisplay}` : text("Telebirr, CBE Birr & Awash instant checkout.")}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="portal-activity-item">
-                    <span className="portal-dot orange" />
-                    <div>
-                      <strong style={{ color: "#1E293B", display: "block" }}>
-                        {orders.length > 0 ? `${orders.length} ${text("Tickets Registered")}` : text("Jackpot Pools Open")}
-                      </strong>
-                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                        {orders.length > 0 ? text("Your numbers are waiting for the next scheduled draw.") : text("Choose lucky numbers to enter today's jackpot.")}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="portal-activity-item">
-                    <span className="portal-dot gold" />
-                    <div>
-                      <strong style={{ color: "#1E293B", display: "block" }}>
-                        {isVerified ? text("Identity Verified") : text("Email Verification")}
-                      </strong>
-                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                        {isVerified ? text("Account verified and eligible for prize settlements.") : text("Verify email for prompt draw settlement notifications.")}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

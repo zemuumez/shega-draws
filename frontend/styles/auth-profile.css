@@ -685,12 +685,26 @@
 body:has(.user-portal-container) {
   background: #F1F5F3 !important;
   color: #1E293B !important;
+  overflow: hidden !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
 }
 
 body:has(.user-portal-container) .page-content {
   padding: 0 !important;
   margin: 0 !important;
   max-width: none !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+html:has(.user-portal-container),
+body:has(.user-portal-container) {
+  height: 100% !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 body:has(.user-portal-container) .scroll-progress-container {
@@ -698,12 +712,20 @@ body:has(.user-portal-container) .scroll-progress-container {
 }
 
 .user-portal-container {
-  width: 100%;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   background: #F1F5F3;
   color: #1E293B;
   box-sizing: border-box;
+  overflow: hidden;
+  z-index: 100;
 }
 
 /* ── Deep Emerald Sidebar (matching reference image) ───────────────────────── */
@@ -714,13 +736,12 @@ body:has(.user-portal-container) .scroll-progress-container {
   border-right: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 0;
   height: 100vh;
-  overflow-y: auto;
+  max-height: 100vh;
   box-sizing: border-box;
   z-index: 20;
   box-shadow: 4px 0 20px rgba(27, 122, 83, 0.08);
+  overflow: hidden;
 }
 
 .portal-sidebar-brand {
@@ -729,6 +750,7 @@ body:has(.user-portal-container) .scroll-progress-container {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  flex-shrink: 0;
 }
 
 .portal-sidebar-logo-card {
@@ -740,12 +762,41 @@ body:has(.user-portal-container) .scroll-progress-container {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Middle navigation list: only this part scrolls if there are too many links */
 .portal-nav-list {
-  padding: 20px 14px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.portal-nav-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.portal-nav-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.portal-nav-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+/* Bottom fixed area in sidebar */
+.portal-sidebar-footer {
+  flex-shrink: 0;
+  padding: 12px 14px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #1B7A53;
 }
 
 .portal-nav-btn {
@@ -764,6 +815,7 @@ body:has(.user-portal-container) .scroll-progress-container {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .portal-nav-btn:hover {
@@ -778,13 +830,18 @@ body:has(.user-portal-container) .scroll-progress-container {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
+.portal-nav-btn svg {
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
 .portal-nav-btn.active svg {
   color: #1B7A53 !important;
 }
 
 /* 24/7 Support Card at Bottom of Sidebar */
 .portal-sidebar-support-card {
-  margin: 16px 14px 10px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 14px;
@@ -812,6 +869,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 
 /* ── Top Header ───────────────────────────────────────────────────────────── */
 .portal-topbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -821,6 +879,7 @@ body:has(.user-portal-container) .scroll-progress-container {
   border-bottom: 1px solid #E2E8F0;
   box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  z-index: 10;
 }
 
 .portal-topbar-breadcrumb {
@@ -841,9 +900,34 @@ body:has(.user-portal-container) .scroll-progress-container {
 .portal-main-content {
   flex: 1;
   min-width: 0;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   background: #F1F5F3;
+  overflow: hidden;
 }
+
+.portal-body-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: clamp(20px, 3vw, 36px) clamp(16px, 3vw, 48px);
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+
+.portal-body-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.portal-body-scroll::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 6px;
+}
+
 
 /* ── Metric Cards ─────────────────────────────────────────────────────────── */
 .portal-metrics-grid {
@@ -1187,16 +1271,23 @@ body:has(.user-portal-container) .scroll-progress-container {
 .user-portal-container input[type="text"],
 .user-portal-container input[type="password"],
 .user-portal-container input[type="email"],
-.user-portal-container input[type="number"] {
+.user-portal-container input[type="number"],
+.user-portal-container input[type="tel"],
+.user-portal-container input[inputmode="decimal"] {
   background: #FFFFFF !important;
   border: 1.5px solid #CBD5E1 !important;
   color: #1E293B !important;
   border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.9375rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .user-portal-container input:focus {
   border-color: #1B7A53 !important;
   box-shadow: 0 0 0 3px rgba(27, 122, 83, 0.15) !important;
+  outline: none !important;
 }
 
 .user-portal-container input:disabled {
@@ -1219,23 +1310,111 @@ body:has(.user-portal-container) .scroll-progress-container {
   color: #1E293B;
 }
 
-.user-portal-container .wallet-panel button {
-  border: 1px solid #CBD5E1;
-  background: #FFFFFF;
-  color: #334155;
-  border-radius: 8px;
+/* Primary buttons in wallet / portal matching dashboard design */
+.user-portal-container .wallet-panel .wallet-submit-btn,
+.user-portal-container .wallet-form button.wallet-submit-btn,
+.user-portal-container .wallet-panel form button:not(.wallet-secondary-btn) {
+  background: #1B7A53 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+  font-size: 0.875rem !important;
+  padding: 12px 24px !important;
+  box-shadow: 0 4px 14px rgba(27, 122, 83, 0.25) !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.user-portal-container .wallet-panel button:hover {
+.user-portal-container .wallet-panel .wallet-submit-btn:hover:not(:disabled),
+.user-portal-container .wallet-form button.wallet-submit-btn:hover:not(:disabled),
+.user-portal-container .wallet-panel form button:not(.wallet-secondary-btn):hover:not(:disabled) {
+  background: #156645 !important;
+  box-shadow: 0 6px 18px rgba(27, 122, 83, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.user-portal-container .wallet-panel .wallet-submit-btn:disabled,
+.user-portal-container .wallet-form button.wallet-submit-btn:disabled,
+.user-portal-container .wallet-panel form button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary buttons matching dashboard style */
+.user-portal-container .wallet-panel .wallet-secondary-btn {
+  background: #F8FAF9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 10px !important;
+  color: #1E293B !important;
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  padding: 9px 16px !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.user-portal-container .wallet-panel .wallet-secondary-btn:hover {
+  background: #E2E8F0 !important;
+  border-color: #94A3B8 !important;
+}
+
+/* Link-style CTA buttons */
+.user-portal-container .wallet-panel .wallet-link-btn {
+  background: #1B7A53 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 800 !important;
+  padding: 9px 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 12px rgba(27, 122, 83, 0.2) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+}
+
+.user-portal-container .wallet-panel .wallet-link-btn:hover {
+  background: #156645 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(27, 122, 83, 0.3) !important;
+}
+
+/* Currency switcher in wallet header */
+.user-portal-container .wallet-panel .wallet-heading [role="group"] {
+  display: inline-flex;
   background: #F1F5F9;
-  color: #1E293B;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  gap: 4px;
 }
 
-.user-portal-container .wallet-panel button[aria-pressed="true"] {
-  background: #1B7A53;
-  border-color: #1B7A53;
-  color: #FFFFFF;
-  font-weight: 800;
+.user-portal-container .wallet-panel .wallet-heading [role="group"] button {
+  border: none !important;
+  background: transparent !important;
+  color: #64748B !important;
+  font-weight: 700 !important;
+  font-size: 0.8125rem !important;
+  padding: 6px 14px !important;
+  border-radius: 7px !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.user-portal-container .wallet-panel .wallet-heading [role="group"] button[aria-pressed="true"] {
+  background: #1B7A53 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 6px rgba(27, 122, 83, 0.2) !important;
 }
 
 .user-portal-container .wallet-panel table th {

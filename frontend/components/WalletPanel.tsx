@@ -248,7 +248,7 @@ export function WalletPanel({
                 )}{" "}
                 {money(attempt.input.amountMinor, attempt.input.currency)}
               </p>
-              <button disabled={busy}>
+              <button disabled={busy} className="wallet-submit-btn">
                 {text(busy ? "Please wait…" : "Retry same deposit")}
               </button>
             </form>
@@ -283,7 +283,7 @@ export function WalletPanel({
                 {money(data!.depositPolicy.minMinor, currency)} –{" "}
                 {money(data!.depositPolicy.maxMinor, currency)}
               </small>
-              <button disabled={busy}>
+              <button disabled={busy} className="wallet-submit-btn">
                 {text(busy ? "Please wait…" : "Continue to payment")}
               </button>
             </form>
@@ -295,22 +295,17 @@ export function WalletPanel({
           {error && <p role="alert">{text(error)}</p>}
           {message && <p role="status">{text(message)}</p>}
           <div style={{ display: "flex", gap: "10px", marginTop: "16px", flexWrap: "wrap" }}>
-            <button onClick={() => setRevision((v) => v + 1)}>
+            <button onClick={() => setRevision((v) => v + 1)} className="wallet-secondary-btn">
               {text("Refresh wallet")}
             </button>
             {onGoToHistory && (
               <button
                 type="button"
                 onClick={onGoToHistory}
-                style={{
-                  background: "#1F2937",
-                  border: "1px solid rgba(253, 224, 71, 0.4)",
-                  color: "#FDE047",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
+                className="wallet-link-btn"
               >
-                📜 {text("View Deposit & Balance History")} →
+                <span>{text("View Deposit & Balance History")}</span>
+                <span>→</span>
               </button>
             )}
           </div>
@@ -339,11 +334,11 @@ export function WalletPanel({
             </div>
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-            <p style={{ margin: 0, color: "#9CA3AF", fontSize: "0.875rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: 10 }}>
+            <p style={{ margin: 0, color: "#64748B", fontSize: "0.875rem" }}>
               {text("Verified financial ledger records for your deposits and transactions.")}
             </p>
-            <button onClick={() => setRevision((v) => v + 1)} style={{ padding: "6px 12px", fontSize: "0.75rem" }}>
+            <button onClick={() => setRevision((v) => v + 1)} className="wallet-secondary-btn" style={{ padding: "6px 14px", fontSize: "0.75rem" }}>
               {text("Refresh Ledger")}
             </button>
           </div>
@@ -356,18 +351,32 @@ export function WalletPanel({
               {!deposits.items.length && <p>{text("No deposits recorded yet.")}</p>}
               {deposits.items.map((d) => (
                 <article className="wallet-record" key={d.id}>
-                  <strong>
-                    {money(d.amountMinor, d.currency)} · <span style={{ color: d.status === "confirmed" ? "#34D399" : d.status === "review" ? "#F87171" : "#FBBF24" }}>{text(d.status)}</span>
-                  </strong>
-                  <small>
-                    {new Date(d.createdAt).toLocaleString()} · ID: {d.id}
-                  </small>
-                  {d.reviewReason && <p style={{ color: "#F87171", fontSize: "0.8125rem" }}>{text(d.reviewReason)}</p>}
-                  {checkoutLink(d) && (
-                    <a href={checkoutLink(d)} style={{ color: "#FDE047", fontWeight: 700, textDecoration: "underline", display: "inline-block", marginTop: "4px" }}>
-                      {text("Continue payment")} →
-                    </a>
-                  )}
+                  <div>
+                    <div className="wallet-record-amount">
+                      {money(d.amountMinor, d.currency)}
+                    </div>
+                    <div className="wallet-record-meta">
+                      <span>{new Date(d.createdAt).toLocaleString()}</span>
+                      <span>•</span>
+                      <span className="wallet-record-ref">ID: {d.id.slice(0, 14)}...</span>
+                      {d.reviewReason && (
+                        <span style={{ color: "#DC2626", fontWeight: 600 }}>• {text(d.reviewReason)}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <span className={`wallet-record-pill ${d.status}`}>
+                      {d.status === "confirmed" || d.status === "succeeded" ? "✓ " : d.status === "failed" ? "✕ " : "⧗ "}
+                      {text(d.status).toUpperCase()}
+                    </span>
+                    {checkoutLink(d) && (
+                      <a href={checkoutLink(d)} className="wallet-pay-btn">
+                        <span>{text("Continue payment")}</span>
+                        <span>→</span>
+                      </a>
+                    )}
+                  </div>
                 </article>
               ))}
               <div className="wallet-pagination">
@@ -387,7 +396,7 @@ export function WalletPanel({
             </>
           )}
 
-          <h4 style={{ marginTop: "24px" }}>
+          <h4 style={{ marginTop: "28px" }}>
             {text("Balance history")} · {currency}
           </h4>
           {!history ? (
@@ -397,18 +406,24 @@ export function WalletPanel({
               {!history.items.length && <p>{text("No balance entries yet.")}</p>}
               {history.items.map((h) => (
                 <article className="wallet-record" key={h.id}>
-                  <strong>
-                    {text(h.kind.replaceAll("_", " "))} ·{" "}
-                    <span style={{ color: h.amountMinor > 0 ? "#34D399" : "#F87171" }}>
+                  <div>
+                    <div className="wallet-record-amount" style={{ color: h.amountMinor > 0 ? "#059669" : "#DC2626" }}>
                       {h.amountMinor > 0 ? "+" : ""}{money(h.amountMinor, h.currency)}
+                    </div>
+                    <div className="wallet-record-meta">
+                      <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
+                      <span>•</span>
+                      <span>{new Date(h.createdAt).toLocaleString()}</span>
+                      <span>•</span>
+                      <span className="wallet-record-ref">Ref: {h.reference}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                      {text("Balance after")}: <strong style={{ color: "#1E293B" }}>{money(h.balanceAfterMinor, h.currency)}</strong>
                     </span>
-                  </strong>
-                  <small>
-                    {text("Balance after")}:{" "}
-                    <strong>{money(h.balanceAfterMinor, h.currency)}</strong> ·{" "}
-                    {new Date(h.createdAt).toLocaleString()}
-                  </small>
-                  <small style={{ fontFamily: "monospace", opacity: 0.8 }}>Ref: {h.reference}</small>
+                  </div>
                 </article>
               ))}
               <div className="wallet-pagination">
