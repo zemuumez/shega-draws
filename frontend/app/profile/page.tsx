@@ -463,7 +463,7 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "dashboard" ? "active" : ""}`}
             onClick={() => switchTab("dashboard")}
           >
-            <LayoutDashboard size={18} color={activeTab === "dashboard" ? "#FDE047" : "#94A3B8"} />
+            <LayoutDashboard size={18} />
             <span>{text("Dashboard")}</span>
           </button>
 
@@ -472,7 +472,7 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "tickets" ? "active" : ""}`}
             onClick={() => switchTab("tickets")}
           >
-            <Ticket size={18} color={activeTab === "tickets" ? "#FDE047" : "#94A3B8"} />
+            <Ticket size={18} />
             <span>{text("Purchased Tickets")}</span>
             {orders.length > 0 && (
               <span
@@ -480,9 +480,9 @@ function UserPortalContent() {
                   marginLeft: "auto",
                   fontSize: "0.6875rem",
                   fontWeight: 800,
-                  background: "#1F2937",
-                  color: "#FDE047",
-                  padding: "1px 7px",
+                  background: activeTab === "tickets" ? "#1B7A53" : "rgba(255, 255, 255, 0.2)",
+                  color: "#FFFFFF",
+                  padding: "1px 8px",
                   borderRadius: 9999,
                 }}
               >
@@ -496,14 +496,14 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "wallet" ? "active" : ""}`}
             onClick={() => switchTab("wallet")}
           >
-            <Wallet size={18} color={activeTab === "wallet" ? "#34D399" : "#94A3B8"} />
+            <Wallet size={18} />
             <span>{text("My Wallet & Balances")}</span>
             <span
               style={{
                 marginLeft: "auto",
                 fontSize: "0.6875rem",
                 fontWeight: 800,
-                color: "#34D399",
+                color: activeTab === "wallet" ? "#1B7A53" : "rgba(255, 255, 255, 0.9)",
               }}
             >
               {(etbBalance / 100).toFixed(0)} ETB
@@ -515,16 +515,16 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "deposit" ? "active" : ""}`}
             onClick={() => switchTab("deposit")}
           >
-            <CreditCard size={18} color={activeTab === "deposit" ? "#34D399" : "#94A3B8"} />
+            <CreditCard size={18} />
             <span>{text("Deposit Funds")}</span>
             <span
               style={{
                 marginLeft: "auto",
                 fontSize: "0.625rem",
                 fontWeight: 800,
-                background: "rgba(16, 185, 129, 0.2)",
-                color: "#A7F3D0",
-                padding: "1px 6px",
+                background: activeTab === "deposit" ? "#1B7A53" : "rgba(255, 255, 255, 0.2)",
+                color: "#FFFFFF",
+                padding: "1px 7px",
                 borderRadius: 9999,
               }}
             >
@@ -537,7 +537,7 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "history" ? "active" : ""}`}
             onClick={() => switchTab("history")}
           >
-            <History size={18} color={activeTab === "history" ? "#FDE047" : "#94A3B8"} />
+            <History size={18} />
             <span>{text("Deposit & History")}</span>
           </button>
 
@@ -546,7 +546,7 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "profile" ? "active" : ""}`}
             onClick={() => switchTab("profile")}
           >
-            <User size={18} color={activeTab === "profile" ? "#FDE047" : "#94A3B8"} />
+            <User size={18} />
             <span>{text("Profile Information")}</span>
           </button>
 
@@ -555,7 +555,7 @@ function UserPortalContent() {
             className={`portal-nav-btn ${activeTab === "security" ? "active" : ""}`}
             onClick={() => switchTab("security")}
           >
-            <ShieldCheck size={18} color={activeTab === "security" ? "#F59E0B" : "#94A3B8"} />
+            <ShieldCheck size={18} />
             <span>{text("Security & 2FA")}</span>
           </button>
 
@@ -563,11 +563,11 @@ function UserPortalContent() {
           <Link
             href="/#available-lotteries"
             className="portal-nav-btn"
-            style={{ marginTop: 12, borderTop: "1px solid rgba(255, 255, 255, 0.08)" }}
+            style={{ marginTop: 10, borderTop: "1px solid rgba(255, 255, 255, 0.12)" }}
           >
-            <Flame size={18} color="#F97316" />
+            <Flame size={18} />
             <span>{text("Explore Lotteries")}</span>
-            <ExternalLink size={14} style={{ marginLeft: "auto", opacity: 0.6 }} />
+            <ExternalLink size={14} style={{ marginLeft: "auto", opacity: 0.7 }} />
           </Link>
 
           {/* Only render Staff Admin Portal if strictly ADMIN */}
@@ -575,19 +575,41 @@ function UserPortalContent() {
             <Link
               href="/admin"
               className="portal-nav-btn"
-              style={{ color: "#2563EB", background: "rgba(37, 99, 235, 0.08)", border: "1px solid rgba(37, 99, 235, 0.2)" }}
+              style={{
+                marginTop: 4,
+                background: "rgba(255, 255, 255, 0.15)",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
+                color: "#FFFFFF",
+              }}
             >
-              <ShieldAlert size={18} color="#2563EB" />
+              <ShieldAlert size={18} />
               <span>{text("Staff Admin Portal")}</span>
             </Link>
           )}
 
-          {/* Sign Out at bottom of sidebar */}
+          {/* Bottom elements: 24/7 Support Card & Sign Out */}
           <div style={{ marginTop: "auto", paddingTop: 16 }}>
+            {/* 24/7 Support Card matching reference image */}
+            <div className="portal-sidebar-support-card">
+              <div className="portal-sidebar-support-icon">24/7</div>
+              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.25 }}>
+                <strong style={{ fontSize: "0.8125rem", color: "#FFFFFF", fontWeight: 800 }}>
+                  {text("24/7 Support")}
+                </strong>
+                <span style={{ fontSize: "0.6875rem", color: "rgba(255, 255, 255, 0.75)" }}>
+                  {text("Live Player Helpdesk")}
+                </span>
+              </div>
+            </div>
+
             <button
               type="button"
               className="portal-nav-btn"
-              style={{ color: "#FCA5A5", background: "rgba(239, 68, 68, 0.08)" }}
+              style={{
+                color: "#FECACA",
+                background: "rgba(239, 68, 68, 0.15)",
+                marginTop: 8,
+              }}
               onClick={async () => {
                 await authClient.signOut();
                 clearAccountToken();
@@ -809,11 +831,11 @@ function UserPortalContent() {
               }}
             >
               <div>
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#F9FAFB", margin: 0 }}>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
                   {text("Player Dashboard")}
                 </h1>
-                <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "4px 0 0" }}>
-                  {text("Welcome back,")} <strong style={{ color: "#FDE047" }}>{session.user.name}</strong>. {text("Here is your lottery activity and active tickets.")}
+                <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
+                  {text("Welcome back,")} <strong style={{ color: "#1B7A53" }}>{session.user.name}</strong>. {text("Here is your lottery activity and active tickets.")}
                 </p>
               </div>
 
@@ -821,8 +843,8 @@ function UserPortalContent() {
                 <button
                   type="button"
                   onClick={() => switchTab("deposit")}
-                  className="casino-btn-gold"
-                  style={{ padding: "8px 16px", fontSize: "0.8125rem", display: "inline-flex", alignItems: "center", gap: 6 }}
+                  className="portal-btn-primary"
+                  style={{ padding: "8px 16px", fontSize: "0.8125rem" }}
                 >
                   <Plus size={15} strokeWidth={3} />
                   <span>{text("Deposit Funds")}</span>
@@ -835,13 +857,14 @@ function UserPortalContent() {
                     alignItems: "center",
                     gap: 6,
                     padding: "8px 16px",
-                    background: "#1F2937",
-                    border: "1px solid rgba(253, 224, 71, 0.4)",
+                    background: "#FFFFFF",
+                    border: "1.5px solid #CBD5E1",
                     borderRadius: 10,
-                    color: "#FDE047",
+                    color: "#1B7A53",
                     fontSize: "0.8125rem",
                     fontWeight: 800,
                     textDecoration: "none",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
                   }}
                 >
                   <Ticket size={15} />
@@ -850,104 +873,224 @@ function UserPortalContent() {
               </div>
             </div>
 
-            {/* 4 Metric Cards (Matching User's Reference Images 1 & 3) */}
+            {/* 4 Metric Cards (Matching User's Reference Image Top Row) */}
             <div className="portal-metrics-grid">
-              {/* Card 1: Total Balance (Vibrant Cyan Card from Image 1) */}
-              <div className="portal-metric-card cyan-card">
-                <div className="portal-metric-top">
-                  <span className="portal-metric-title">{text("Total Balance")}</span>
-                  <button
-                    type="button"
-                    onClick={() => switchTab("deposit")}
-                    className="portal-metric-btn"
-                  >
-                    <span>+ Deposit</span>
-                  </button>
-                </div>
-                <div className="portal-metric-val">{totalBalanceDisplay}</div>
-                <div className="portal-metric-sub" style={{ color: "#0B192C", fontWeight: 700 }}>
-                  ETB Available Wallet Balance
-                </div>
-                <Wallet className="portal-watermark" style={{ color: "#000000", opacity: 0.12 }} />
-              </div>
-
-              {/* Card 2: Total Wins */}
+              {/* Card 1: Total Balance */}
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
-                  <span className="portal-metric-title">{text("Total Wins")}</span>
-                  <button
-                    type="button"
-                    onClick={() => switchTab("tickets")}
-                    className="portal-metric-btn"
-                  >
-                    <span>{text("View log")}</span>
-                  </button>
+                  <span className="portal-metric-title">{text("Total Balance")}</span>
+                  <div className="portal-metric-icon-circle" style={{ background: "#ECFDF5", color: "#1B7A53" }}>
+                    <TrendingUp size={18} />
+                  </div>
                 </div>
-                <div className="portal-metric-val" style={{ color: "#FDE047" }}>
-                  0.00 ETB
+                <div className="portal-metric-val">{totalBalanceDisplay}</div>
+                <div className="portal-metric-sub positive">
+                  <span>↑</span>
+                  <span>{text("Available ETB in Player Wallet")}</span>
                 </div>
-                <div className="portal-metric-sub">{text("0 winning ticket draws")}</div>
-                <Trophy className="portal-watermark" />
+              </div>
+
+              {/* Card 2: Purchased Tickets */}
+              <div className="portal-metric-card">
+                <div className="portal-metric-top">
+                  <span className="portal-metric-title">{text("Purchased Tickets")}</span>
+                  <div className="portal-metric-icon-circle" style={{ background: "#EFF6FF", color: "#2563EB" }}>
+                    <Ticket size={18} />
+                  </div>
+                </div>
+                <div className="portal-metric-val">{orders.length}</div>
+                <div className="portal-metric-sub positive">
+                  <span>↑</span>
+                  <span>{waitingForDrawTickets.length} {text("Active in Upcoming Draws")}</span>
+                </div>
               </div>
 
               {/* Card 3: Total Deposit */}
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
                   <span className="portal-metric-title">{text("Total Deposit")}</span>
-                  <button
-                    type="button"
-                    onClick={() => switchTab("history")}
-                    className="portal-metric-btn"
-                  >
-                    <span>{text("View log")}</span>
-                  </button>
+                  <div className="portal-metric-icon-circle" style={{ background: "#F0FDF4", color: "#10B981" }}>
+                    <Coins size={18} />
+                  </div>
                 </div>
-                <div className="portal-metric-val" style={{ color: "#34D399" }}>
-                  {totalDepositDisplay}
+                <div className="portal-metric-val">{totalDepositDisplay}</div>
+                <div className="portal-metric-sub neutral">
+                  <span>{deposits.length} {text("Completed via Chapa")}</span>
                 </div>
-                <div className="portal-metric-sub">
-                  {deposits.length} {text("completed deposits")}
-                </div>
-                <Coins className="portal-watermark" />
               </div>
 
-              {/* Card 4: Purchased Tickets */}
+              {/* Card 4: Total Wins */}
               <div className="portal-metric-card">
                 <div className="portal-metric-top">
-                  <span className="portal-metric-title">{text("Purchased Tickets")}</span>
-                  <button
-                    type="button"
-                    onClick={() => switchTab("tickets")}
-                    className="portal-metric-btn"
-                  >
-                    <span>{text("View log")}</span>
-                  </button>
+                  <span className="portal-metric-title">{text("Total Wins")}</span>
+                  <div className="portal-metric-icon-circle" style={{ background: "#FEF9C3", color: "#D97706" }}>
+                    <Trophy size={18} />
+                  </div>
                 </div>
-                <div className="portal-metric-val">{orders.length}</div>
-                <div className="portal-metric-sub">
-                  {waitingForDrawTickets.length} {text("currently active")}
+                <div className="portal-metric-val">0.00 ETB</div>
+                <div className="portal-metric-sub neutral">
+                  <span>{text("0 Winning Draws Settled")}</span>
                 </div>
-                <Ticket className="portal-watermark" />
               </div>
             </div>
 
-            {/* Waiting for Draw Table Section (Matching User's Reference Image 1 & 3) */}
-            <div style={{ marginBottom: 16 }}>
+            {/* ── 3-Column Middle Section (Matching Reference Image) ── */}
+            <div className="portal-lower-grid">
+              {/* Column 1: Overview */}
+              <div className="portal-card-box">
+                <div className="portal-card-header">
+                  <h3>{text("Overview")}</h3>
+                </div>
+
+                <div className="portal-overview-item highlight">
+                  <span>{text("Active Lottery Pools")}</span>
+                  <span className="badge">
+                    {draws.filter((d) => d.status === "open").length || 3} {text("Active")}
+                  </span>
+                </div>
+
+                <div className="portal-overview-item regular">
+                  <span>{text("Registered Tickets")}</span>
+                  <span className="badge">{orders.length} {text("Tickets")}</span>
+                </div>
+
+                <div className="portal-overview-item regular">
+                  <span>{text("Available Wallet Balance")}</span>
+                  <span className="badge">{totalBalanceDisplay}</span>
+                </div>
+
+                <div className="portal-overview-item regular">
+                  <span>{text("Account Standing")}</span>
+                  <span className="badge">
+                    {isVerified ? text("Verified Player") : text("Pending Verification")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Column 2: Total Sale / Draw Capacity (Circular Gauge Chart) */}
+              <div className="portal-card-box">
+                <div className="portal-card-header">
+                  <h3>{text("Draw Capacity")}</h3>
+                  <Link href="/#available-lotteries" className="portal-view-all-pill">
+                    {text("View All")}
+                  </Link>
+                </div>
+
+                <div className="portal-gauge-container">
+                  <svg width="150" height="150" viewBox="0 0 100 100" className="portal-gauge-svg">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="transparent"
+                      strokeWidth="10"
+                      className="portal-gauge-bg"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      fill="transparent"
+                      strokeWidth="10"
+                      strokeDasharray="251.2"
+                      strokeDashoffset={251.2 * (1 - 0.70)}
+                      className="portal-gauge-bar"
+                    />
+                  </svg>
+                  <div style={{ marginTop: "-95px", marginBottom: "35px", textAlign: "center" }}>
+                    <span style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", display: "block", lineHeight: 1.1 }}>
+                      70%
+                    </span>
+                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                      {text("Sold")}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "0.75rem", color: "#64748B", textAlign: "center", margin: "0 auto", maxWidth: 220, lineHeight: 1.4 }}>
+                    {text("70% capacity reserved across currently open jackpot lottery pools.")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Column 3: Recent Activity (Timeline with colored dots) */}
+              <div className="portal-card-box">
+                <div className="portal-card-header">
+                  <h3>{text("Activity")}</h3>
+                  <button
+                    type="button"
+                    onClick={() => switchTab("history")}
+                    className="portal-view-all-pill"
+                  >
+                    {text("View All")}
+                  </button>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div className="portal-activity-item">
+                    <span className="portal-dot green" />
+                    <div>
+                      <strong style={{ color: "#1E293B", display: "block" }}>{text("Player Wallet Active")}</strong>
+                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                        {text("Multi-currency ETB balance is ready for ticket purchases.")}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="portal-activity-item">
+                    <span className="portal-dot blue" />
+                    <div>
+                      <strong style={{ color: "#1E293B", display: "block" }}>
+                        {deposits.length > 0 ? text("Chapa Deposit Confirmed") : text("Chapa Deposits Ready")}
+                      </strong>
+                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                        {deposits.length > 0 ? `${text("Total credited:")} ${totalDepositDisplay}` : text("Telebirr, CBE Birr & Awash instant checkout.")}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="portal-activity-item">
+                    <span className="portal-dot orange" />
+                    <div>
+                      <strong style={{ color: "#1E293B", display: "block" }}>
+                        {orders.length > 0 ? `${orders.length} ${text("Tickets Registered")}` : text("Jackpot Pools Open")}
+                      </strong>
+                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                        {orders.length > 0 ? text("Your numbers are waiting for the next scheduled draw.") : text("Choose lucky numbers to enter today's jackpot.")}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="portal-activity-item">
+                    <span className="portal-dot gold" />
+                    <div>
+                      <strong style={{ color: "#1E293B", display: "block" }}>
+                        {isVerified ? text("Identity Verified") : text("Email Verification")}
+                      </strong>
+                      <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                        {isVerified ? text("Account verified and eligible for prize settlements.") : text("Verify email for prompt draw settlement notifications.")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Waiting for Draw Table Section (Light Mode Emerald Style) */}
+            <div style={{ marginBottom: 24 }}>
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: 12,
+                  marginBottom: 14,
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Clock size={20} color="#00E5FF" />
-                  <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#F9FAFB", margin: 0 }}>
+                  <Clock size={20} color="#1B7A53" />
+                  <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#1E293B", margin: 0 }}>
                     {text("Waiting for Draw")}
                   </h2>
                 </div>
-                <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
+                <span style={{ fontSize: "0.8125rem", color: "#64748B", fontWeight: 600 }}>
                   {waitingForDrawTickets.length} {text("tickets registered")}
                 </span>
               </div>
@@ -974,25 +1117,25 @@ function UserPortalContent() {
 
                         return (
                           <tr key={order.id || idx}>
-                            <td style={{ fontWeight: 800, color: "#94A3B8" }}>{idx + 1}</td>
-                            <td style={{ fontWeight: 800, color: "#F9FAFB" }}>
+                            <td style={{ fontWeight: 800, color: "#64748B" }}>{idx + 1}</td>
+                            <td style={{ fontWeight: 800, color: "#1E293B" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <div
                                   style={{
                                     width: 8,
                                     height: 8,
                                     borderRadius: "50%",
-                                    background: "#10B981",
-                                    boxShadow: "0 0 8px #10B981",
+                                    background: "#1B7A53",
+                                    boxShadow: "0 0 6px rgba(27, 122, 83, 0.4)",
                                   }}
                                 />
                                 <span>{drawTitle}</span>
                               </div>
                             </td>
-                            <td style={{ fontFamily: "monospace", color: "#38BDF8" }}>
+                            <td style={{ fontFamily: "monospace", color: "#0284C7", fontWeight: 700 }}>
                               {phaseNumber}
                             </td>
-                            <td style={{ fontFamily: "monospace", fontWeight: 900, color: "#FDE047" }}>
+                            <td style={{ fontFamily: "monospace", fontWeight: 900, color: "#1B7A53" }}>
                               {ticketNumber}
                             </td>
                             <td style={{ textAlign: "right" }}>
@@ -1010,8 +1153,8 @@ function UserPortalContent() {
                           colSpan={5}
                           style={{
                             textAlign: "center",
-                            padding: "60px 20px",
-                            background: "#0E1626",
+                            padding: "50px 20px",
+                            background: "#FFFFFF",
                           }}
                         >
                           <div
@@ -1024,32 +1167,31 @@ function UserPortalContent() {
                           >
                             <Ticket
                               size={44}
-                              color="#00E5FF"
-                              style={{ opacity: 0.6, animation: "bounce 2s infinite" }}
+                              color="#1B7A53"
+                              style={{ opacity: 0.6 }}
                             />
-                            <div style={{ fontSize: "1.15rem", fontWeight: 800, color: "#E2E8F0" }}>
-                              {text("Data not found")}
+                            <div style={{ fontSize: "1.15rem", fontWeight: 800, color: "#1E293B" }}>
+                              {text("No Tickets in Current Waiting Draw")}
                             </div>
                             <p
                               style={{
-                                color: "#94A3B8",
+                                color: "#64748B",
                                 fontSize: "0.875rem",
                                 margin: 0,
                                 maxWidth: 420,
                               }}
                             >
                               {text(
-                                "You do not have any active tickets waiting for the next draw. Pick a ticket from our open lotteries to participate!"
+                                "You do not have any active tickets waiting for the next draw. Pick a lucky ticket from our open lotteries to participate!"
                               )}
                             </p>
                             <Link
                               href="/#available-lotteries"
-                              className="casino-btn-gold"
+                              className="portal-btn-primary"
                               style={{
-                                marginTop: 12,
+                                marginTop: 8,
                                 padding: "9px 20px",
                                 fontSize: "0.8125rem",
-                                textDecoration: "none",
                               }}
                             >
                               <span>{text("Browse Open Lotteries")}</span>
@@ -1080,17 +1222,17 @@ function UserPortalContent() {
               }}
             >
               <div>
-                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#F9FAFB", margin: 0 }}>
+                <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
                   {text("My Purchased Tickets")}
                 </h1>
-                <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "4px 0 0" }}>
+                <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
                   {text("All your active and historical lottery tickets with serial codes and draw records.")}
                 </p>
               </div>
 
               <Link
                 href="/#available-lotteries"
-                className="casino-btn-gold"
+                className="portal-btn-primary"
                 style={{
                   padding: "8px 18px",
                   fontSize: "0.8125rem",
@@ -1151,16 +1293,16 @@ function UserPortalContent() {
               </div>
             ) : (
               <div className="tickets-empty-card">
-                <Ticket size={48} color="#FDE047" style={{ margin: "0 auto 16px" }} />
-                <h3 style={{ color: "#F9FAFB", fontSize: "1.25rem", margin: "0 0 8px" }}>
+                <Ticket size={48} color="#1B7A53" style={{ margin: "0 auto 16px" }} />
+                <h3 style={{ color: "#1E293B", fontSize: "1.25rem", margin: "0 0 8px" }}>
                   {text("No tickets purchased yet")}
                 </h3>
-                <p style={{ color: "#9CA3AF", fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
+                <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "0 auto 20px", maxWidth: 440 }}>
                   {text("Participate in one of our running lotteries for a chance to win the jackpot!")}
                 </p>
                 <Link
                   href="/#available-lotteries"
-                  className="casino-btn-gold"
+                  className="portal-btn-primary"
                   style={{ padding: "10px 24px", fontSize: "0.875rem", textDecoration: "none" }}
                 >
                   {text("Explore Lotteries")} &rarr;
@@ -1174,10 +1316,10 @@ function UserPortalContent() {
         {activeTab === "wallet" && (
           <div>
             <div style={{ marginBottom: 24 }}>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#F9FAFB", margin: 0 }}>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
                 {text("My Wallet & Balances")}
               </h1>
-              <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "4px 0 0" }}>
+              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
                 {text("Manage your multi-currency player balances, view available funds, and top up your account.")}
               </p>
             </div>
@@ -1191,11 +1333,11 @@ function UserPortalContent() {
               />
             ) : (
               <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
-                <Lock size={36} color="#FBBF24" style={{ margin: "0 auto 12px" }} />
-                <h3 style={{ color: "#F9FAFB", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                <Lock size={36} color="#D97706" style={{ margin: "0 auto 12px" }} />
+                <h3 style={{ color: "#1E293B", fontSize: "1.2rem", margin: "0 0 8px" }}>
                   {text("Wallet Locked — Email Verification Required")}
                 </h3>
-                <p style={{ color: "#9CA3AF", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                <p style={{ color: "#64748B", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
                   {text(
                     "Please verify your email address to unlock your multi-currency wallet, deposit capabilities, and balance tracking."
                   )}
@@ -1209,7 +1351,7 @@ function UserPortalContent() {
                     });
                     alert("Verification email resent!");
                   }}
-                  className="casino-btn-gold"
+                  className="portal-btn-primary"
                   style={{ padding: "8px 18px", fontSize: "0.875rem" }}
                 >
                   {text("Resend verification email")}
@@ -1223,10 +1365,10 @@ function UserPortalContent() {
         {activeTab === "deposit" && (
           <div>
             <div style={{ marginBottom: 24 }}>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#F9FAFB", margin: 0 }}>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
                 {text("Deposit Funds")}
               </h1>
-              <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "4px 0 0" }}>
+              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
                 {text("Instantly deposit funds into your player wallet via Chapa (Telebirr, CBE Birr, Awash, Cards).")}
               </p>
             </div>
@@ -1240,11 +1382,11 @@ function UserPortalContent() {
               />
             ) : (
               <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
-                <Lock size={36} color="#FBBF24" style={{ margin: "0 auto 12px" }} />
-                <h3 style={{ color: "#F9FAFB", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                <Lock size={36} color="#D97706" style={{ margin: "0 auto 12px" }} />
+                <h3 style={{ color: "#1E293B", fontSize: "1.2rem", margin: "0 0 8px" }}>
                   {text("Deposit Locked — Email Verification Required")}
                 </h3>
-                <p style={{ color: "#9CA3AF", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                <p style={{ color: "#64748B", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
                   {text("Please click the verification link sent to your email to enable deposits.")}
                 </p>
               </div>
@@ -1256,10 +1398,10 @@ function UserPortalContent() {
         {activeTab === "history" && (
           <div>
             <div style={{ marginBottom: 24 }}>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#F9FAFB", margin: 0 }}>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#1E293B", margin: 0 }}>
                 {text("Deposit & Transaction History")}
               </h1>
-              <p style={{ color: "#94A3B8", fontSize: "0.875rem", margin: "4px 0 0" }}>
+              <p style={{ color: "#64748B", fontSize: "0.875rem", margin: "4px 0 0" }}>
                 {text("Comprehensive audit log of all your deposits, ticket debit entries, and winning payouts.")}
               </p>
             </div>
@@ -1272,11 +1414,11 @@ function UserPortalContent() {
               />
             ) : (
               <div className="profile-card-section" style={{ textAlign: "center", padding: "40px 20px" }}>
-                <Lock size={36} color="#FBBF24" style={{ margin: "0 auto 12px" }} />
-                <h3 style={{ color: "#F9FAFB", fontSize: "1.2rem", margin: "0 0 8px" }}>
+                <Lock size={36} color="#D97706" style={{ margin: "0 auto 12px" }} />
+                <h3 style={{ color: "#1E293B", fontSize: "1.2rem", margin: "0 0 8px" }}>
                   {text("History Locked — Email Verification Required")}
                 </h3>
-                <p style={{ color: "#9CA3AF", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
+                <p style={{ color: "#64748B", fontSize: "0.875rem", maxWidth: "440px", margin: "0 auto 20px" }}>
                   {text("Please verify your email address to review your transaction ledger.")}
                 </p>
               </div>
@@ -1287,11 +1429,11 @@ function UserPortalContent() {
         {/* ── VIEW 6: PERSONAL PROFILE INFORMATION ───────────────────────────── */}
         {activeTab === "profile" && (
           <div className="profile-card-section">
-            <h2>
-              <User size={20} color="#FDE047" />
+            <h2 style={{ color: "#1E293B", display: "flex", alignItems: "center", gap: 10 }}>
+              <User size={20} color="#1B7A53" />
               <span>{text("Personal Profile Information")}</span>
             </h2>
-            <p style={{ color: "#9CA3AF", fontSize: "0.875rem", marginBottom: "20px" }}>
+            <p style={{ color: "#64748B", fontSize: "0.875rem", marginBottom: "20px" }}>
               {text("Manage your display name and view your registered lottery account details.")}
             </p>
 
@@ -1307,7 +1449,7 @@ function UserPortalContent() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder={text("Full Name")}
                 />
-                <small style={{ color: "#9CA3AF", fontSize: "0.75rem" }}>
+                <small style={{ color: "#64748B", fontSize: "0.75rem" }}>
                   {text("Ensure your name matches your government ID for prize settlement verification.")}
                 </small>
               </div>
@@ -1315,7 +1457,7 @@ function UserPortalContent() {
               <div className="auth-form-group">
                 <label htmlFor="display-email">
                   <span>{text("Email Address")}</span>
-                  <span style={{ fontSize: "0.75rem", color: isVerified ? "#34D399" : "#FBBF24" }}>
+                  <span style={{ fontSize: "0.75rem", color: isVerified ? "#1B7A53" : "#D97706", fontWeight: 700 }}>
                     {isVerified ? text("Verified") : text("Unverified")}
                   </span>
                 </label>
@@ -1324,9 +1466,9 @@ function UserPortalContent() {
                   type="email"
                   disabled
                   value={session.user.email}
-                  style={{ opacity: 0.7, cursor: "not-allowed", background: "#0B111E" }}
+                  style={{ opacity: 0.8, cursor: "not-allowed", background: "#F1F5F9", color: "#64748B" }}
                 />
-                <small style={{ color: "#9CA3AF", fontSize: "0.75rem" }}>
+                <small style={{ color: "#64748B", fontSize: "0.75rem" }}>
                   {text("To change your email address, contact platform security support.")}
                 </small>
               </div>
@@ -1335,12 +1477,13 @@ function UserPortalContent() {
                 <label>{text("Account ID")}</label>
                 <code
                   style={{
-                    background: "#0B111E",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    color: "#FDE047",
+                    background: "#F8FAFC",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
+                    color: "#1B7A53",
                     fontSize: "0.8125rem",
-                    border: "1px solid #374151",
+                    fontWeight: 700,
+                    border: "1.5px solid #E2E8F0",
                     display: "block",
                   }}
                 >
@@ -1351,8 +1494,8 @@ function UserPortalContent() {
               <button
                 type="submit"
                 disabled={isUpdatingName || name === session.user.name}
-                className="casino-btn-gold"
-                style={{ marginTop: "12px", padding: "10px 20px", fontSize: "0.875rem" }}
+                className="portal-btn-primary"
+                style={{ marginTop: "12px" }}
               >
                 {isUpdatingName ? text("Saving…") : text("Save Changes")}
               </button>
@@ -1378,11 +1521,11 @@ function UserPortalContent() {
           <div>
             {/* Two-Factor Authentication Card */}
             <div className="profile-card-section">
-              <h2>
-                <ShieldCheck size={20} color="#FDE047" />
+              <h2 style={{ color: "#1E293B", display: "flex", alignItems: "center", gap: 10 }}>
+                <ShieldCheck size={20} color="#1B7A53" />
                 <span>{text("Two-Factor Authentication (2FA / TOTP)")}</span>
               </h2>
-              <p style={{ color: "#9CA3AF", fontSize: "0.875rem", marginBottom: "20px" }}>
+              <p style={{ color: "#64748B", fontSize: "0.875rem", marginBottom: "20px" }}>
                 {text(
                   "Add a time-based authenticator (Google Authenticator, Authy, or Microsoft Authenticator) to protect your lottery wallet, purchases, and winnings."
                 )}
@@ -1391,8 +1534,8 @@ function UserPortalContent() {
               {is2FaEnabled ? (
                 <div
                   style={{
-                    background: "rgba(16, 185, 129, 0.1)",
-                    border: "1.5px solid #10B981",
+                    background: "rgba(27, 122, 83, 0.08)",
+                    border: "1.5px solid #1B7A53",
                     borderRadius: "14px",
                     padding: "20px",
                   }}
@@ -1405,12 +1548,12 @@ function UserPortalContent() {
                       marginBottom: "12px",
                     }}
                   >
-                    <CheckCircle2 size={24} color="#10B981" />
+                    <CheckCircle2 size={24} color="#1B7A53" />
                     <div>
-                      <strong style={{ color: "#34D399", fontSize: "1rem" }}>
+                      <strong style={{ color: "#1B7A53", fontSize: "1rem" }}>
                         {text("Two-Factor Authentication is Active")}
                       </strong>
-                      <p style={{ color: "#D1D5DB", fontSize: "0.8125rem", margin: "2px 0 0" }}>
+                      <p style={{ color: "#334155", fontSize: "0.8125rem", margin: "2px 0 0" }}>
                         {text(
                           "Your account is secured with a TOTP authenticator app. Sign-ins and sensitive transactions require a 6-digit code."
                         )}
@@ -1423,10 +1566,10 @@ function UserPortalContent() {
                     onClick={handleDisableTwoFa}
                     style={{
                       padding: "8px 16px",
-                      background: "rgba(239, 68, 68, 0.2)",
+                      background: "rgba(239, 68, 68, 0.1)",
                       border: "1px solid #EF4444",
                       borderRadius: "8px",
-                      color: "#FCA5A5",
+                      color: "#DC2626",
                       fontSize: "0.8125rem",
                       fontWeight: 800,
                       cursor: "pointer",
@@ -1439,7 +1582,7 @@ function UserPortalContent() {
                 <div>
                   {!isSettingUp2Fa ? (
                     <div style={{ maxWidth: "480px" }}>
-                      <p style={{ color: "#D1D5DB", fontSize: "0.875rem", marginBottom: "16px" }}>
+                      <p style={{ color: "#334155", fontSize: "0.875rem", marginBottom: "16px" }}>
                         {text("Enter your current account password to begin authenticator setup:")}
                       </p>
                       <div className="auth-form-group">
@@ -1455,8 +1598,7 @@ function UserPortalContent() {
                       <button
                         type="button"
                         onClick={handleInitTwoFa}
-                        className="casino-btn-gold"
-                        style={{ padding: "10px 20px", fontSize: "0.875rem" }}
+                        className="portal-btn-primary"
                       >
                         {text("Set Up Authenticator")}
                       </button>
@@ -1464,16 +1606,16 @@ function UserPortalContent() {
                   ) : (
                     <div
                       style={{
-                        background: "rgba(15, 23, 42, 0.8)",
-                        border: "1.5px solid rgba(253, 224, 71, 0.4)",
+                        background: "#F8FAF9",
+                        border: "1.5px solid #E5EBE7",
                         borderRadius: "16px",
                         padding: "24px",
                       }}
                     >
-                      <h3 style={{ color: "#FDE047", fontSize: "1.1rem", margin: "0 0 12px" }}>
+                      <h3 style={{ color: "#1E293B", fontSize: "1.1rem", margin: "0 0 12px" }}>
                         {text("1. Scan QR Code in Your Authenticator")}
                       </h3>
-                      <p style={{ color: "#D1D5DB", fontSize: "0.8125rem", marginBottom: "16px" }}>
+                      <p style={{ color: "#64748B", fontSize: "0.8125rem", marginBottom: "16px" }}>
                         {text("Open Google Authenticator, Authy, or 1Password and scan the QR code below:")}
                       </p>
 
@@ -1483,7 +1625,8 @@ function UserPortalContent() {
                             display: "inline-block",
                             padding: "10px",
                             background: "#FFFFFF",
-                            borderRadius: "10px",
+                            borderRadius: "12px",
+                            border: "1px solid #E2E8F0",
                             marginBottom: "20px",
                           }}
                         >
@@ -1496,10 +1639,10 @@ function UserPortalContent() {
                           />
                         </div>
                       ) : (
-                        <p style={{ color: "#9CA3AF" }}>{text("Generating code…")}</p>
+                        <p style={{ color: "#64748B" }}>{text("Generating code…")}</p>
                       )}
 
-                      <h4 style={{ color: "#FDE047", fontSize: "0.95rem", margin: "0 0 8px" }}>
+                      <h4 style={{ color: "#1E293B", fontSize: "0.95rem", margin: "0 0 8px" }}>
                         {text("Or Enter Secret Key Manually:")}
                       </h4>
                       <div
@@ -1513,13 +1656,14 @@ function UserPortalContent() {
                       >
                         <code
                           style={{
-                            background: "#0B111E",
+                            background: "#FFFFFF",
                             padding: "8px 14px",
                             borderRadius: "8px",
-                            color: "#FDE047",
+                            color: "#1B7A53",
                             fontSize: "0.95rem",
+                            fontWeight: 800,
                             letterSpacing: "1px",
-                            border: "1px solid rgba(253, 224, 71, 0.3)",
+                            border: "1.5px solid #CBD5E1",
                           }}
                         >
                           {getTotpSecret(totpUri)}
@@ -1535,44 +1679,45 @@ function UserPortalContent() {
                             display: "flex",
                             alignItems: "center",
                             gap: "6px",
-                            padding: "8px 12px",
-                            background: "#1F2937",
-                            border: "1px solid #374151",
+                            padding: "8px 14px",
+                            background: "#FFFFFF",
+                            border: "1.5px solid #CBD5E1",
                             borderRadius: "8px",
-                            color: "#F9FAFB",
+                            color: "#1E293B",
                             fontSize: "0.8125rem",
                             fontWeight: 700,
                             cursor: "pointer",
                           }}
                         >
-                          {copiedSecret ? <Check size={14} color="#10B981" /> : <Copy size={14} />}
+                          {copiedSecret ? <Check size={14} color="#1B7A53" /> : <Copy size={14} />}
                           <span>{copiedSecret ? text("Copied!") : text("Copy Secret Key")}</span>
                         </button>
                       </div>
 
-                      <h3 style={{ color: "#FDE047", fontSize: "1.1rem", margin: "0 0 12px" }}>
+                      <h3 style={{ color: "#1E293B", fontSize: "1.1rem", margin: "0 0 12px" }}>
                         {text("2. Save Your Recovery Backup Codes")}
                       </h3>
-                      <p style={{ color: "#9CA3AF", fontSize: "0.8125rem", marginBottom: "12px" }}>
+                      <p style={{ color: "#64748B", fontSize: "0.8125rem", marginBottom: "12px" }}>
                         {text(
                           "Keep these single-use recovery codes in a secure place. If you lose access to your authenticator, they can restore your account:"
                         )}
                       </p>
                       <div
                         style={{
-                          background: "#0B111E",
-                          padding: "12px",
-                          borderRadius: "8px",
-                          border: "1px solid rgba(255, 255, 255, 0.08)",
-                          marginBottom: "10px",
+                          background: "#FFFFFF",
+                          padding: "14px",
+                          borderRadius: "10px",
+                          border: "1.5px solid #E2E8F0",
+                          marginBottom: "12px",
                         }}
                       >
                         <pre
                           style={{
                             margin: 0,
-                            color: "#93C5FD",
+                            color: "#0F172A",
                             fontFamily: "monospace",
                             fontSize: "0.8125rem",
+                            fontWeight: 700,
                             lineHeight: "1.8",
                           }}
                         >
@@ -1590,22 +1735,22 @@ function UserPortalContent() {
                           display: "flex",
                           alignItems: "center",
                           gap: "6px",
-                          padding: "6px 12px",
-                          background: "#1F2937",
-                          border: "1px solid #374151",
+                          padding: "6px 14px",
+                          background: "#FFFFFF",
+                          border: "1.5px solid #CBD5E1",
                           borderRadius: "8px",
-                          color: "#F9FAFB",
+                          color: "#1E293B",
                           fontSize: "0.75rem",
                           fontWeight: 700,
                           cursor: "pointer",
                           marginBottom: "24px",
                         }}
                       >
-                        {copiedBackups ? <Check size={13} color="#10B981" /> : <Copy size={13} />}
+                        {copiedBackups ? <Check size={13} color="#1B7A53" /> : <Copy size={13} />}
                         <span>{copiedBackups ? text("Copied All Codes!") : text("Copy All Codes")}</span>
                       </button>
 
-                      <h3 style={{ color: "#FDE047", fontSize: "1.1rem", margin: "0 0 12px" }}>
+                      <h3 style={{ color: "#1E293B", fontSize: "1.1rem", margin: "0 0 12px" }}>
                         {text("3. Enter 6-digit Code to Finalize")}
                       </h3>
                       <div
@@ -1628,18 +1773,17 @@ function UserPortalContent() {
                             fontSize: "1.2rem",
                             letterSpacing: "4px",
                             padding: "10px",
-                            background: "#0B111E",
-                            border: "1.5px solid #FDE047",
+                            background: "#FFFFFF",
+                            border: "2px solid #1B7A53",
                             borderRadius: "8px",
-                            color: "#FDE047",
+                            color: "#1B7A53",
                             fontWeight: 800,
                           }}
                         />
                         <button
                           type="button"
                           onClick={handleVerifyTwoFa}
-                          className="casino-btn-gold"
-                          style={{ padding: "10px 20px", fontSize: "0.875rem" }}
+                          className="portal-btn-primary"
                         >
                           {text("Verify and Enable 2FA")}
                         </button>
@@ -1665,11 +1809,11 @@ function UserPortalContent() {
 
             {/* Change Password Card */}
             <div className="profile-card-section">
-              <h2>
-                <Lock size={20} color="#FDE047" />
+              <h2 style={{ color: "#1E293B", display: "flex", alignItems: "center", gap: 10 }}>
+                <Lock size={20} color="#1B7A53" />
                 <span>{text("Change Account Password")}</span>
               </h2>
-              <p style={{ color: "#9CA3AF", fontSize: "0.875rem", marginBottom: "20px" }}>
+              <p style={{ color: "#64748B", fontSize: "0.875rem", marginBottom: "20px" }}>
                 {text("Ensure your password is at least 12 characters long and not used on other websites.")}
               </p>
 
@@ -1717,8 +1861,8 @@ function UserPortalContent() {
                 <button
                   type="submit"
                   disabled={isChangingPassword}
-                  className="casino-btn-gold"
-                  style={{ marginTop: "10px", padding: "10px 20px", fontSize: "0.875rem" }}
+                  className="portal-btn-primary"
+                  style={{ marginTop: "10px" }}
                 >
                   {isChangingPassword ? text("Updating…") : text("Update Password")}
                 </button>
