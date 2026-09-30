@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { accountAPI } from "@/lib/account-api";
 import { money } from "@/lib/admin";
+import { formatDisplayDateTime } from "@/lib/date";
 import { hundredths } from "@/lib/lotteries";
 import {
   checkoutLink,
@@ -728,7 +729,7 @@ export function WalletPanel({
                           {formatBalance(money(d.amountMinor, d.currency), d.currency)}
                         </div>
                         <div className="wallet-record-meta">
-                          <span>{new Date(d.createdAt).toLocaleString()}</span>
+                          <span suppressHydrationWarning>{formatDisplayDateTime(d.createdAt)}</span>
                           <span>•</span>
                           <span className="wallet-record-ref">ID: {d.id.slice(0, 16)}...</span>
                           {d.reviewReason && (
@@ -797,7 +798,7 @@ export function WalletPanel({
                         <div className="wallet-record-meta">
                           <strong style={{ color: "#1E293B" }}>{text(h.kind.replaceAll("_", " "))}</strong>
                           <span>•</span>
-                          <span>{new Date(h.createdAt).toLocaleString()}</span>
+                          <span suppressHydrationWarning>{formatDisplayDateTime(h.createdAt)}</span>
                           <span>•</span>
                           <span className="wallet-record-ref">Ref: {h.reference}</span>
                         </div>

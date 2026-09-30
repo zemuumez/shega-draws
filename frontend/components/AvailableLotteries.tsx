@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { BackendDraw } from "@/lib/backend";
 import { money } from "@/lib/admin";
+import { formatDisplayDate } from "@/lib/date";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { BuyTicketFlowModal } from "./BuyTicketFlowModal";
 
@@ -285,9 +286,12 @@ export function AvailableLotteries({ initialDraws = [] }: AvailableLotteriesProp
                         {d.title}
                       </h3>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.75rem", color: "#94A3B8" }}>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                        <span
+                          suppressHydrationWarning
+                          style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+                        >
                           <Calendar size={13} color="#64748B" />
-                          Draw: {d.deadline ? new Date(d.deadline).toLocaleDateString() : "Live Ongoing"}
+                          Draw: {d.deadline ? formatDisplayDate(d.deadline) : "Live Ongoing"}
                         </span>
                         <span>•</span>
                         <span style={{ color: "#38BDF8", fontWeight: 700 }}>

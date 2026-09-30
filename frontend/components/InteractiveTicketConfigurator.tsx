@@ -1096,6 +1096,7 @@ export function InteractiveTicketConfigurator({
                   fontWeight: 900,
                   color: "#FFFFFF",
                 }}
+                suppressHydrationWarning
               >
                 {selectedDraw?.deadline
                   ? new Date(selectedDraw.deadline).toLocaleDateString(

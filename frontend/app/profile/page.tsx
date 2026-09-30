@@ -49,6 +49,7 @@ import { WalletPanel } from "@/components/WalletPanel";
 import { BuyTicketFlowModal } from "@/components/BuyTicketFlowModal";
 import { type WalletData, type Deposit, type WalletPage } from "@/lib/wallet";
 import { money } from "@/lib/admin";
+import { formatDisplayDate } from "@/lib/date";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { useBalanceVisibility } from "@/lib/balance-visibility";
 
@@ -1328,7 +1329,7 @@ function UserPortalContent() {
                           {d.deadline && (
                             <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.75rem", color: "#94A3B8", marginTop: 4 }}>
                               <Clock size={12} />
-                              <span>{text("Draw Deadline")}: {new Date(d.deadline).toLocaleDateString()}</span>
+                              <span suppressHydrationWarning>{text("Draw Deadline")}: {formatDisplayDate(d.deadline)}</span>
                             </div>
                           )}
                         </div>
@@ -1424,8 +1425,8 @@ function UserPortalContent() {
                       <div className="ticket-meta-info">
                         <div className="draw-title">{title}</div>
                         <div className="meta-subtext">
-                          <span>
-                            {text("Purchased:")} {new Date(o.createdAt).toLocaleDateString()}
+                          <span suppressHydrationWarning>
+                            {text("Purchased:")} {formatDisplayDate(o.createdAt)}
                           </span>
                           <span>•</span>
                           <span>
