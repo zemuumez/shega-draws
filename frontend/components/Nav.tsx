@@ -20,9 +20,14 @@ import {
   UserCheck,
   Plus,
   Wallet,
+  LayoutDashboard,
+  KeyRound,
+  History,
 } from "lucide-react";
 import { useLanguage, LanguageSwitcher } from "@/lib/i18n/LanguageContext";
 import { authClient } from "@/lib/auth-client";
+import { accountAPI } from "@/lib/account-api";
+import type { WalletData } from "@/lib/wallet";
 import { ContactUsModal } from "./ContactUsModal";
 
 import type { CMSSiteSettings } from "@/lib/sanity/queries";
@@ -39,6 +44,8 @@ export function Nav({
   const { data: session } = authClient.useSession();
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [isStaff, setIsStaff] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,6 +61,39 @@ export function Nav({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Fetch live wallet balance and check staff permissions
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setWalletBalance(null);
+      setIsStaff(false);
+      return;
+    }
+    let cancelled = false;
+
+    accountAPI<WalletData>("/wallet?currency=ETB")
+      .then((w) => {
+        if (!cancelled && w?.balances) {
+          const bal = w.balances.find((b) => b.currency === "ETB");
+          setWalletBalance(bal ? bal.availableMinor : 0);
+        }
+      })
+      .catch(() => {});
+
+    accountAPI<{ role: string; userId: string }>("/admin/session")
+      .then((v) => {
+        if (!cancelled && (v.role === "admin" || v.role === "reviewer")) {
+          setIsStaff(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setIsStaff(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user?.id, pathname]);
+
   const contactPhone = siteSettings?.contactPhone || "+251 911 000 000";
   const telegramHandle = siteSettings?.telegramHandle || "@RimnaLotteryOfficial";
   const telegramUrl =
@@ -64,20 +104,22 @@ export function Nav({
 
   if ((pathname?.startsWith("/studio") || pathname === "/admin" || pathname?.startsWith("/admin/"))) return null;
 
-  // Left desktop links
+  // Left desktop links: Home (Home page is home not draws), How It Works, Results
   const leftNavItems = [
-    { href: "/",            label: t.nav.draws,        icon: Home },
+    { href: "/",            label: text("Home"),       icon: Home },
     { href: "/how-it-works", label: t.nav.howItWorks,   icon: Sparkles },
     { href: "/results",     label: t.nav.results,      icon: ShieldCheck },
   ];
 
-  // Right desktop links
+  // Right desktop links: Dashboard (if logged in), My Tickets, Why Rimna
   const myTicketsHref = session
-    ? "/my-tickets"
-    : `/login?redirect=${encodeURIComponent("/my-tickets")}`;
+    ? "/profile?tab=tickets"
+    : `/login?redirect=${encodeURIComponent("/profile?tab=tickets")}`;
 
   const rightNavItems = [
-    { href: "/#choose-ticket", label: "Buy Tickets",    icon: ListChecks },
+    ...(session
+      ? [{ href: "/profile?tab=dashboard", label: text("Dashboard"), icon: LayoutDashboard }]
+      : []),
     { href: myTicketsHref,     label: text("My tickets"), icon: Ticket },
     { href: "/about",          label: t.nav.whyRimna || "Why Rimna", icon: Award },
   ];
@@ -147,13 +189,47 @@ export function Nav({
             </Link>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {/* Show live Balance instead of static deposit button */}
               <Link
-                href="/deposit"
-                className="top-ribbon-deposit-btn"
-                title={text("Deposit funds to your wallet")}
+                href="/profile?tab=wallet"
+                className="top-ribbon-balance-btn"
+                title={text("Available Balance — Click to manage wallet or deposit")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "rgba(16, 185, 129, 0.15)",
+                  border: "1px solid rgba(16, 185, 129, 0.4)",
+                  borderRadius: "9999px",
+                  padding: "4px 10px",
+                  color: "#34D399",
+                  fontWeight: 800,
+                  fontSize: "0.75rem",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                }}
               >
-                <Plus size={12} strokeWidth={3} />
-                <span>{text("Deposit")}</span>
+                <Wallet size={13} color="#34D399" />
+                <span>
+                  {walletBalance !== null ? `${(walletBalance / 100).toFixed(2)} ETB` : text("Balance…")}
+                </span>
+                <span
+                  style={{
+                    backgroundColor: "#10B981",
+                    color: "#064E3B",
+                    borderRadius: "9999px",
+                    width: "16px",
+                    height: "16px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.75rem",
+                    fontWeight: 900,
+                    marginLeft: "2px",
+                  }}
+                >
+                  +
+                </span>
               </Link>
 
               <div style={{ position: "relative" }} ref={profileDropdownRef}>
@@ -192,6 +268,41 @@ export function Nav({
                     </div>
 
                     <Link
+                      href="/profile?tab=dashboard"
+                      className="dropdown-item-link"
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <LayoutDashboard size={15} color="#38BDF8" />
+                      <span style={{ fontWeight: 800, color: "#38BDF8" }}>{text("User Dashboard")}</span>
+                    </Link>
+
+                    <Link
+                      href="/profile?tab=profile"
+                      className="dropdown-item-link"
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <User size={15} color="#FDE047" />
+                      <span>{text("Profile & Settings")}</span>
+                    </Link>
+
+                    <Link
+                      href="/profile?tab=wallet"
+                      className="dropdown-item-link"
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <Wallet size={15} color="#34D399" />
+                      <span>{text("My Wallet & Balances")}</span>
+                      {walletBalance !== null && (
+                        <span style={{ marginLeft: "auto", fontSize: "0.6875rem", color: "#34D399", fontWeight: 800 }}>
+                          {(walletBalance / 100).toFixed(2)} ETB
+                        </span>
+                      )}
+                    </Link>
+
+                    <Link
                       href="/deposit"
                       className="dropdown-item-link deposit-item"
                       role="menuitem"
@@ -203,27 +314,17 @@ export function Nav({
                     </Link>
 
                     <Link
-                      href="/profile"
+                      href="/profile?tab=history"
                       className="dropdown-item-link"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
-                      <User size={15} color="#FDE047" />
-                      <span>{text("Profile & Settings")}</span>
+                      <History size={15} color="#FDE047" />
+                      <span>{text("Deposit & Balance History")}</span>
                     </Link>
 
                     <Link
-                      href="/profile#wallet"
-                      className="dropdown-item-link"
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      <Award size={15} color="#FDE047" />
-                      <span>{text("My Wallet & Balance")}</span>
-                    </Link>
-
-                    <Link
-                      href="/my-tickets"
+                      href="/profile?tab=tickets"
                       className="dropdown-item-link"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
@@ -233,14 +334,27 @@ export function Nav({
                     </Link>
 
                     <Link
-                      href="/admin"
+                      href="/profile?tab=security"
                       className="dropdown-item-link"
                       role="menuitem"
                       onClick={() => setIsProfileOpen(false)}
                     >
-                      <ShieldCheck size={15} color="#60A5FA" />
-                      <span>{text("Staff Portal")}</span>
+                      <KeyRound size={15} color="#F59E0B" />
+                      <span>{text("Security & 2FA")}</span>
                     </Link>
+
+                    {/* Only show Staff Portal if authorized */}
+                    {isStaff && (
+                      <Link
+                        href="/admin"
+                        className="dropdown-item-link"
+                        role="menuitem"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <ShieldCheck size={15} color="#60A5FA" />
+                        <span>{text("Staff Portal")}</span>
+                      </Link>
+                    )}
 
                     <button
                       type="button"

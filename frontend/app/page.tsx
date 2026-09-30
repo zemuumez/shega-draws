@@ -10,7 +10,6 @@ import {
   type CMSAdvertisement,
 } from "@/lib/sanity/queries";
 import { CinematicStadiumHero } from "@/components/CinematicStadiumHero";
-import { PaymentLogosFarm } from "@/components/PaymentLogosFarm";
 import { AdvertisementCarousel } from "@/components/AdvertisementCarousel";
 import { AvailableLotteries } from "@/components/AvailableLotteries";
 import { TestimonialsNewsletter } from "@/components/TestimonialsNewsletter";
@@ -79,11 +78,6 @@ export default async function HomePage() {
             width: "100%",
           }}
         >
-          {/* Top Payment Logos Farm */}
-          <div data-page-reveal style={{ marginBottom: "clamp(36px, 5vw, 56px)" }}>
-            <PaymentLogosFarm />
-          </div>
-
           {/* Advertisement Showcase */}
           <div data-page-reveal><AdvertisementCarousel cmsAds={ads} /></div>
         </section>

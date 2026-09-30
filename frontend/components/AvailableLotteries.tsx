@@ -173,201 +173,258 @@ export function AvailableLotteries({ initialDraws = [] }: AvailableLotteriesProp
             const secondPrizeMinor = Math.round(totalPoolMinor * 0.11);
             const thirdPrizeMinor = Math.round(totalPoolMinor * 0.0825);
 
+            const soldCount = (d as any).purchasedCount ?? Math.min(d.capacity, Math.max(1, Math.round(d.capacity * 0.34)));
+            const soldPercent = Math.min(100, Math.round((soldCount / d.capacity) * 100));
+
             return (
               <div
                 key={d.id}
+                className="lottery-ticket-card"
                 style={{
-                  background: "linear-gradient(180deg, #0F172A 0%, #0A0F1D 100%)",
-                  border: "1.5px solid rgba(253, 224, 71, 0.35)",
-                  borderRadius: "22px",
-                  padding: "clamp(24px, 3.5vw, 32px)",
-                  boxShadow: "0 16px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(253, 224, 71, 0.08)",
+                  background: "linear-gradient(145deg, #111827 0%, #0E1628 50%, #0A101D 100%)",
+                  border: "1.5px solid rgba(253, 224, 71, 0.4)",
+                  borderRadius: "20px",
+                  boxShadow: "0 20px 50px rgba(0, 0, 0, 0.65), 0 0 25px rgba(253, 224, 71, 0.08)",
                   display: "flex",
                   flexDirection: "column",
                   position: "relative",
                   overflow: "hidden",
-                  transition: "transform 0.25s, border-color 0.25s",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
                 }}
               >
-                {/* Top Badges Bar */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      padding: "4px 10px",
-                      background: "rgba(253, 224, 71, 0.15)",
-                      borderRadius: "6px",
-                      color: "#FDE047",
-                      fontSize: "0.725rem",
-                      fontWeight: 800,
-                    }}
-                  >
-                    <span>{d.currency === "USD" ? "DIASPORA USD TICKET" : "ETHIOPIA BIRR TICKET"}</span>
-                    <span>•</span>
-                    <span>#{d.id}</span>
-                  </div>
+                {/* ── Perforation Cutout Punches on Left & Right ── */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    top: "62%",
+                    left: "-13px",
+                    width: "26px",
+                    height: "26px",
+                    borderRadius: "50%",
+                    background: "#080D1A",
+                    border: "1.5px solid rgba(253, 224, 71, 0.4)",
+                    transform: "translateY(-50%)",
+                    zIndex: 4,
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    top: "62%",
+                    right: "-13px",
+                    width: "26px",
+                    height: "26px",
+                    borderRadius: "50%",
+                    background: "#080D1A",
+                    border: "1.5px solid rgba(253, 224, 71, 0.4)",
+                    transform: "translateY(-50%)",
+                    zIndex: 4,
+                  }}
+                />
 
-                  <div style={{ display: "flex", gap: "6px" }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "4px",
-                        padding: "4px 8px",
-                        background: "rgba(16, 185, 129, 0.15)",
-                        border: "1px solid rgba(16, 185, 129, 0.3)",
-                        borderRadius: "6px",
-                        color: "#34D399",
-                        fontSize: "0.6875rem",
-                        fontWeight: 800,
-                      }}
-                    >
-                      <Video size={12} /> 100% Video Draw
-                    </span>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "4px",
-                        padding: "4px 8px",
-                        background: "rgba(56, 189, 248, 0.15)",
-                        border: "1px solid rgba(56, 189, 248, 0.3)",
-                        borderRadius: "6px",
-                        color: "#38BDF8",
-                        fontSize: "0.6875rem",
-                        fontWeight: 800,
-                      }}
-                    >
-                      <Trophy size={12} /> 10 Winners
-                    </span>
-                  </div>
-                </div>
-
-                {/* Draw Title & Price */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "14px" }}>
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-heading, 'Cinzel', Georgia, serif)",
-                      fontSize: "clamp(1.4rem, 2vw, 1.85rem)",
-                      fontWeight: 900,
-                      color: "#FFFFFF",
-                      margin: 0,
-                    }}
-                  >
-                    {d.title}
-                  </h3>
-                  <div style={{ textAlign: "right" }}>
-                    <span style={{ fontSize: "0.75rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 700, display: "block" }}>
-                      Ticket Price
-                    </span>
-                    <strong style={{ fontSize: "1.5rem", color: "#FDE047", fontWeight: 900 }}>
-                      {money(d.priceMinor, d.currency)}
-                    </strong>
-                  </div>
-                </div>
-
-                {/* Jackpot Highlight Banner */}
+                {/* ── Ticket Header Ribbon: Gold Brand & Serial ── */}
                 <div
                   style={{
-                    background: "rgba(8, 13, 26, 0.8)",
-                    border: "1.5px solid rgba(253, 224, 71, 0.3)",
-                    borderRadius: "14px",
-                    padding: "16px 20px",
-                    marginBottom: "20px",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    padding: "10px 18px",
+                    background: "linear-gradient(90deg, rgba(253, 224, 71, 0.15) 0%, rgba(253, 224, 71, 0.03) 100%)",
+                    borderBottom: "1px dashed rgba(253, 224, 71, 0.35)",
+                    fontSize: "0.6875rem",
+                    fontWeight: 900,
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                    color: "#FDE047",
+                    flexWrap: "wrap",
+                    gap: "6px",
                   }}
                 >
-                  <div>
-                    <span style={{ color: "#94A3B8", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.5px" }}>
-                      1st Grand Jackpot
-                    </span>
-                    <strong style={{ display: "block", fontSize: "1.65rem", color: "#F87171", fontWeight: 900, marginTop: "2px" }}>
-                      {money(jackpotMinor, d.currency)}
-                    </strong>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Ticket size={13} color="#FDE047" />
+                    <span>SHEGA DRAWS • OFFICIAL TICKET</span>
                   </div>
-
-                  <div style={{ textAlign: "right" }}>
-                    <span style={{ color: "#94A3B8", fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 800 }}>
-                      Winning Odds
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{
+                      backgroundColor: "rgba(16, 185, 129, 0.2)",
+                      border: "1px solid rgba(16, 185, 129, 0.4)",
+                      color: "#34D399",
+                      padding: "2px 8px",
+                      borderRadius: "9999px",
+                      fontSize: "0.625rem",
+                      fontWeight: 800,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#34D399" }} />
+                      RUNNING
                     </span>
-                    <span style={{ display: "block", color: "#34D399", fontWeight: 800, fontSize: "0.875rem", marginTop: "2px" }}>
-                      1 in 100 (High Odds)
+                    <span style={{ color: "#94A3B8", fontFamily: "monospace", letterSpacing: "1px" }}>
+                      #{d.id.slice(0, 10).toUpperCase()}
                     </span>
-                  </div>
-                </div>
-
-                {/* Pool & Draw Details */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "12px",
-                    marginBottom: "20px",
-                    fontSize: "0.8125rem",
-                  }}
-                >
-                  <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(255, 255, 255, 0.06)" }}>
-                    <span style={{ color: "#64748B", display: "block", fontSize: "0.7rem", textTransform: "uppercase", fontWeight: 700 }}>
-                      Pool Capacity
-                    </span>
-                    <strong style={{ color: "#FFFFFF", fontSize: "0.95rem" }}>
-                      {d.capacity.toLocaleString()} People Max
-                    </strong>
-                  </div>
-
-                  <div style={{ background: "rgba(255, 255, 255, 0.03)", padding: "12px", borderRadius: "10px", border: "1px solid rgba(255, 255, 255, 0.06)" }}>
-                    <span style={{ color: "#64748B", display: "block", fontSize: "0.7rem", textTransform: "uppercase", fontWeight: 700 }}>
-                      Total Prize Pool
-                    </span>
-                    <strong style={{ color: "#FDE047", fontSize: "0.95rem" }}>
-                      {money(totalPoolMinor, d.currency)}
-                    </strong>
                   </div>
                 </div>
 
-                {/* Top 3 Guaranteed Payouts Row */}
-                <div style={{ marginBottom: "24px" }}>
-                  <span style={{ fontSize: "0.725rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 800, display: "block", marginBottom: "8px" }}>
-                    Top 3 Guaranteed Payouts (10 Total Winners)
-                  </span>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
-                    <div style={{ background: "#080D1A", border: "1px solid rgba(253, 224, 71, 0.3)", borderRadius: "8px", padding: "8px 6px", textAlign: "center" }}>
-                      <span style={{ fontSize: "0.65rem", color: "#FDE047", fontWeight: 800, display: "block" }}>#1 Jackpot</span>
-                      <strong style={{ fontSize: "0.8125rem", color: "#F87171" }}>{money(jackpotMinor, d.currency)}</strong>
+                {/* ── Ticket Main Body ── */}
+                <div style={{ padding: "clamp(20px, 3vw, 26px)", display: "flex", flexDirection: "column", flex: 1 }}>
+                  {/* Title & Badge */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                    <div>
+                      <h3
+                        style={{
+                          fontFamily: "var(--font-heading, 'Cinzel', Georgia, serif)",
+                          fontSize: "clamp(1.35rem, 2vw, 1.75rem)",
+                          fontWeight: 900,
+                          color: "#FFFFFF",
+                          margin: "0 0 4px",
+                        }}
+                      >
+                        {d.title}
+                      </h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.75rem", color: "#94A3B8" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                          <Calendar size={13} color="#64748B" />
+                          Draw: {d.deadline ? new Date(d.deadline).toLocaleDateString() : "Live Ongoing"}
+                        </span>
+                        <span>•</span>
+                        <span style={{ color: "#38BDF8", fontWeight: 700 }}>
+                          {d.capacity.toLocaleString()} Max Capacity
+                        </span>
+                      </div>
                     </div>
-                    <div style={{ background: "#080D1A", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "8px", padding: "8px 6px", textAlign: "center" }}>
-                      <span style={{ fontSize: "0.65rem", color: "#38BDF8", fontWeight: 800, display: "block" }}>#2 Luxury</span>
-                      <strong style={{ fontSize: "0.8125rem", color: "#38BDF8" }}>{money(secondPrizeMinor, d.currency)}</strong>
-                    </div>
-                    <div style={{ background: "#080D1A", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "8px", padding: "8px 6px", textAlign: "center" }}>
-                      <span style={{ fontSize: "0.65rem", color: "#34D399", fontWeight: 800, display: "block" }}>#3 Cash</span>
-                      <strong style={{ fontSize: "0.8125rem", color: "#34D399" }}>{money(thirdPrizeMinor, d.currency)}</strong>
+
+                    <div style={{ textAlign: "right" }}>
+                      <span style={{ fontSize: "0.6875rem", color: "#94A3B8", textTransform: "uppercase", fontWeight: 800, display: "block" }}>
+                        Ticket Price
+                      </span>
+                      <strong style={{ fontSize: "1.5rem", color: "#FDE047", fontWeight: 900, letterSpacing: "-0.5px" }}>
+                        {money(d.priceMinor, d.currency)}
+                      </strong>
                     </div>
                   </div>
-                </div>
 
-                {/* Action CTA Button */}
-                <div style={{ marginTop: "auto" }}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveDrawForModal(d)}
-                    className="flow-continue-btn"
+                  {/* Jackpot Prize Golden Box */}
+                  <div
                     style={{
-                      width: "100%",
-                      justifyContent: "center",
-                      padding: "14px 20px",
-                      fontSize: "1rem",
-                      borderRadius: "12px",
+                      background: "rgba(8, 13, 26, 0.85)",
+                      border: "1px solid rgba(253, 224, 71, 0.3)",
+                      borderRadius: "14px",
+                      padding: "14px 18px",
+                      marginBottom: "16px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      boxShadow: "inset 0 2px 10px rgba(0, 0, 0, 0.5)",
                     }}
                   >
-                    <Ticket size={18} />
-                    <span>Choose Lucky Number & Buy — {money(d.priceMinor, d.currency)}</span>
-                    <ChevronRight size={18} />
-                  </button>
+                    <div>
+                      <span style={{ color: "#94A3B8", fontSize: "0.6875rem", textTransform: "uppercase", fontWeight: 800, letterSpacing: "0.5px" }}>
+                        🏆 1st Grand Jackpot
+                      </span>
+                      <strong style={{ display: "block", fontSize: "1.6rem", color: "#F87171", fontWeight: 900, marginTop: "2px" }}>
+                        {money(jackpotMinor, d.currency)}
+                      </strong>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <span style={{ color: "#94A3B8", fontSize: "0.6875rem", textTransform: "uppercase", fontWeight: 800 }}>
+                        Total Pool
+                      </span>
+                      <strong style={{ display: "block", color: "#FDE047", fontSize: "1.1rem", fontWeight: 800, marginTop: "2px" }}>
+                        {money(totalPoolMinor, d.currency)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* % Sold Progress Bar (Matching Reference Image 4) */}
+                  <div style={{ marginBottom: "16px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", fontSize: "0.75rem" }}>
+                      <span style={{ color: "#94A3B8", fontWeight: 700 }}>
+                        {text("Tickets Sold")}
+                      </span>
+                      <span style={{ color: "#38BDF8", fontWeight: 800 }}>
+                        {soldPercent}%
+                      </span>
+                    </div>
+                    <div style={{
+                      width: "100%",
+                      height: "8px",
+                      backgroundColor: "rgba(255, 255, 255, 0.08)",
+                      borderRadius: "9999px",
+                      overflow: "hidden",
+                    }}>
+                      <div
+                        style={{
+                          width: `${soldPercent}%`,
+                          height: "100%",
+                          background: "linear-gradient(90deg, #38BDF8 0%, #10B981 100%)",
+                          borderRadius: "9999px",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Top 3 Guaranteed Payouts */}
+                  <div style={{ marginBottom: "18px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px" }}>
+                      <div style={{ background: "#080D1A", border: "1px solid rgba(253, 224, 71, 0.25)", borderRadius: "8px", padding: "6px", textAlign: "center" }}>
+                        <span style={{ fontSize: "0.625rem", color: "#FDE047", fontWeight: 800, display: "block" }}>#1 Jackpot</span>
+                        <strong style={{ fontSize: "0.75rem", color: "#F87171" }}>{money(jackpotMinor, d.currency)}</strong>
+                      </div>
+                      <div style={{ background: "#080D1A", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "8px", padding: "6px", textAlign: "center" }}>
+                        <span style={{ fontSize: "0.625rem", color: "#38BDF8", fontWeight: 800, display: "block" }}>#2 Luxury</span>
+                        <strong style={{ fontSize: "0.75rem", color: "#38BDF8" }}>{money(secondPrizeMinor, d.currency)}</strong>
+                      </div>
+                      <div style={{ background: "#080D1A", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "8px", padding: "6px", textAlign: "center" }}>
+                        <span style={{ fontSize: "0.625rem", color: "#34D399", fontWeight: 800, display: "block" }}>#3 Cash</span>
+                        <strong style={{ fontSize: "0.75rem", color: "#34D399" }}>{money(thirdPrizeMinor, d.currency)}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Perforated Dashed Tear Line ── */}
+                  <div
+                    style={{
+                      borderTop: "2px dashed rgba(253, 224, 71, 0.35)",
+                      margin: "0 -26px 16px",
+                      position: "relative",
+                    }}
+                  />
+
+                  {/* ── Ticket Stub Footer: Barcode & Buy Button ── */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginTop: "auto", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px", opacity: 0.65 }}>
+                      <span style={{ fontFamily: "monospace", fontSize: "0.95rem", letterSpacing: "1px", color: "#FDE047", lineHeight: 1 }}>
+                        ||| | |||| | ||| || ||||| | ||||
+                      </span>
+                      <span style={{ fontSize: "0.625rem", color: "#64748B", fontFamily: "monospace" }}>
+                        SECURE WALLET ENTRY
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveDrawForModal(d)}
+                      className="casino-btn-gold"
+                      style={{
+                        padding: "12px 20px",
+                        fontSize: "0.875rem",
+                        fontWeight: 900,
+                        borderRadius: "10px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        cursor: "pointer",
+                        marginLeft: "auto",
+                      }}
+                    >
+                      <Ticket size={16} />
+                      <span>{text("Buy Ticket")}</span>
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
