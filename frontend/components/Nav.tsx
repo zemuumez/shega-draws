@@ -81,8 +81,10 @@ export function Nav({
 
     accountAPI<{ role: string; userId: string }>("/admin/session")
       .then((v) => {
-        if (!cancelled && (v.role === "admin" || v.role === "reviewer")) {
+        if (!cancelled && v.role === "admin") {
           setIsStaff(true);
+        } else if (!cancelled) {
+          setIsStaff(false);
         }
       })
       .catch(() => {

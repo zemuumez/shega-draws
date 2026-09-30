@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import QRCode from "qrcode";
 import {
   User,
@@ -77,7 +78,7 @@ function UserPortalContent() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [deposits, setDeposits] = useState<Deposit[]>([]);
   const [draws, setDraws] = useState<BackendDraw[]>([]);
-  const [isStaff, setIsStaff] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   // Profile edit state
@@ -175,19 +176,18 @@ function UserPortalContent() {
         if (!cancelled) setLoadingData(false);
       }
 
-      // Check if user is staff/admin
+      // Check if user is strictly admin
       try {
         const staffRes = await accountAPI<{ role: string; userId: string }>(
           "/admin/session"
         );
-        if (
-          !cancelled &&
-          (staffRes.role === "admin" || staffRes.role === "reviewer")
-        ) {
-          setIsStaff(true);
+        if (!cancelled && staffRes.role === "admin") {
+          setIsAdmin(true);
+        } else if (!cancelled) {
+          setIsAdmin(false);
         }
       } catch {
-        if (!cancelled) setIsStaff(false);
+        if (!cancelled) setIsAdmin(false);
       }
     }
 
@@ -438,124 +438,22 @@ function UserPortalContent() {
     <div className="user-portal-container">
       {/* ── 1. Modern User Portal Sidebar ──────────────────────────────────── */}
       <aside className="portal-sidebar" aria-label="Portal Navigation">
-        {/* Brand Logo & Back to Site Header */}
+        {/* Brand Logo Header (Using homepage logo without home button) */}
         <div className="portal-sidebar-brand">
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div
+          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <Image
+              src="/images/rimna-brand-logo.png"
+              alt="Shega Draws"
+              width={180}
+              height={46}
+              priority
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 10,
-                background: "linear-gradient(135deg, #FDE047 0%, #D97706 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 900,
-                color: "#111827",
-                fontSize: "1.1rem",
-                boxShadow: "0 0 14px rgba(253, 224, 71, 0.4)",
-                flexShrink: 0,
+                height: "38px",
+                width: "auto",
+                objectFit: "contain",
               }}
-            >
-              R
-            </div>
-            <div>
-              <div style={{ fontWeight: 900, color: "#FDE047", fontSize: "0.95rem", letterSpacing: "0.05em", lineHeight: 1.1 }}>
-                SHEGA DRAWS
-              </div>
-              <div style={{ fontSize: "0.625rem", color: "#94A3B8", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                PLAYER PORTAL
-              </div>
-            </div>
+            />
           </Link>
-
-          <Link
-            href="/"
-            title={text("Back to website")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-              padding: "5px 9px",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: 8,
-              color: "#94A3B8",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              textDecoration: "none",
-            }}
-          >
-            <Home size={13} />
-            <span>{text("Home")}</span>
-          </Link>
-        </div>
-
-        {/* User Card in Sidebar */}
-        <div className="portal-sidebar-user">
-          <div className="profile-avatar-large" style={{ width: 44, height: 44, fontSize: "1.15rem" }}>
-            {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <strong
-                style={{
-                  color: "#F9FAFB",
-                  fontSize: "0.9375rem",
-                  fontWeight: 800,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "block",
-                }}
-              >
-                {session.user.name || "Lottery Player"}
-              </strong>
-            </div>
-            <p
-              style={{
-                color: "#94A3B8",
-                fontSize: "0.75rem",
-                margin: "2px 0 6px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {session.user.email}
-            </p>
-            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-              {isVerified ? (
-                <span
-                  style={{
-                    fontSize: "0.625rem",
-                    fontWeight: 800,
-                    background: "rgba(16, 185, 129, 0.15)",
-                    color: "#34D399",
-                    padding: "2px 6px",
-                    borderRadius: 9999,
-                    border: "1px solid rgba(16, 185, 129, 0.3)",
-                  }}
-                >
-                  ✓ {text("Verified")}
-                </span>
-              ) : (
-                <span
-                  style={{
-                    fontSize: "0.625rem",
-                    fontWeight: 800,
-                    background: "rgba(245, 158, 11, 0.15)",
-                    color: "#FBBF24",
-                    padding: "2px 6px",
-                    borderRadius: 9999,
-                    border: "1px solid rgba(245, 158, 11, 0.3)",
-                  }}
-                >
-                  ! {text("Unverified")}
-                </span>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Sidebar Navigation Items */}
@@ -672,14 +570,14 @@ function UserPortalContent() {
             <ExternalLink size={14} style={{ marginLeft: "auto", opacity: 0.6 }} />
           </Link>
 
-          {/* Only render Staff Portal if authorized */}
-          {isStaff && (
+          {/* Only render Staff Admin Portal if strictly ADMIN */}
+          {isAdmin && (
             <Link
               href="/admin"
               className="portal-nav-btn"
-              style={{ color: "#60A5FA", background: "rgba(59, 130, 246, 0.1)" }}
+              style={{ color: "#2563EB", background: "rgba(37, 99, 235, 0.08)", border: "1px solid rgba(37, 99, 235, 0.2)" }}
             >
-              <ShieldAlert size={18} color="#60A5FA" />
+              <ShieldAlert size={18} color="#2563EB" />
               <span>{text("Staff Admin Portal")}</span>
             </Link>
           )}
@@ -707,33 +605,36 @@ function UserPortalContent() {
       <main className="portal-main-content" style={{ display: "flex", flexDirection: "column", padding: 0 }}>
         {/* Sleek Portal Topbar Header */}
         <header className="portal-topbar">
-          <div className="portal-topbar-breadcrumb">
-            <span style={{ color: "#64748B" }}>Portal</span>
-            <ChevronRight size={14} style={{ opacity: 0.5 }} />
-            <strong>{tabNames[activeTab]}</strong>
-          </div>
-
-          <div className="portal-topbar-actions">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Link
               href="/"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                padding: "6px 12px",
-                background: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderRadius: 8,
-                color: "#94A3B8",
-                fontSize: "0.75rem",
+                padding: "7px 14px",
+                background: "#F1F5F9",
+                border: "1px solid #E2E8F0",
+                borderRadius: 10,
+                color: "#334155",
+                fontSize: "0.8125rem",
                 fontWeight: 700,
                 textDecoration: "none",
+                transition: "all 0.2s ease",
               }}
             >
-              <Home size={14} />
-              <span>{text("Public Home")}</span>
+              <Home size={15} color="#D97706" />
+              <span>{text("Home")}</span>
             </Link>
 
+            <div className="portal-topbar-breadcrumb">
+              <ChevronRight size={14} style={{ color: "#94A3B8" }} />
+              <strong>{tabNames[activeTab]}</strong>
+            </div>
+          </div>
+
+          {/* Right corner of header: Balance + Profile Overview */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
               type="button"
               onClick={() => switchTab("wallet")}
@@ -741,19 +642,95 @@ function UserPortalContent() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                padding: "6px 12px",
-                background: "rgba(16, 185, 129, 0.15)",
+                padding: "7px 14px",
+                background: "rgba(16, 185, 129, 0.1)",
                 border: "1px solid rgba(16, 185, 129, 0.3)",
-                borderRadius: 8,
-                color: "#34D399",
-                fontSize: "0.75rem",
+                borderRadius: 10,
+                color: "#059669",
+                fontSize: "0.8125rem",
                 fontWeight: 800,
                 cursor: "pointer",
               }}
             >
-              <Wallet size={14} />
+              <Wallet size={15} color="#059669" />
               <span>{totalBalanceDisplay}</span>
             </button>
+
+            {/* Profile Overview at the corner in the header */}
+            <div
+              onClick={() => switchTab("profile")}
+              title={text("Profile & Settings")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "4px 12px 4px 5px",
+                background: "#F8FAFC",
+                border: "1px solid #E2E8F0",
+                borderRadius: 12,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #FDE047 0%, #D97706 100%)",
+                  color: "#111827",
+                  fontWeight: 900,
+                  fontSize: "0.95rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 6px rgba(234, 179, 8, 0.25)",
+                  flexShrink: 0,
+                }}
+              >
+                {session.user.name ? session.user.name.trim().charAt(0).toUpperCase() : "U"}
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", textAlign: "left", lineHeight: 1.25 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <strong style={{ color: "#0F172A", fontSize: "0.8125rem", fontWeight: 800 }}>
+                    {session.user.name || "Lottery Player"}
+                  </strong>
+                  {isVerified ? (
+                    <span
+                      style={{
+                        fontSize: "0.625rem",
+                        fontWeight: 800,
+                        background: "#ECFDF5",
+                        color: "#059669",
+                        padding: "1px 5px",
+                        borderRadius: 9999,
+                        border: "1px solid #A7F3D0",
+                      }}
+                    >
+                      ✓ {text("Verified")}
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: "0.625rem",
+                        fontWeight: 800,
+                        background: "#FFFBEB",
+                        color: "#D97706",
+                        padding: "1px 5px",
+                        borderRadius: 9999,
+                        border: "1px solid #FDE68A",
+                      }}
+                    >
+                      ! {text("Unverified")}
+                    </span>
+                  )}
+                </div>
+                <span style={{ color: "#64748B", fontSize: "0.6875rem" }}>
+                  {session.user.email}
+                </span>
+              </div>
+            </div>
           </div>
         </header>
 
