@@ -515,23 +515,40 @@
 
 .wallet-quick-amounts {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-  gap: 10px;
-  margin: 10px 0 16px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin: 10px 0 20px;
+}
+
+@media (max-width: 900px) {
+  .wallet-quick-amounts {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-quick-amounts {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .quick-amount-btn {
-  padding: 10px 12px;
+  padding: 13px 10px;
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 10px;
+  border-radius: 12px;
   font-family: var(--font-mono, monospace);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 800;
   color: #1E293B;
   cursor: pointer;
   text-align: center;
   transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .quick-amount-btn:hover {
@@ -606,9 +623,11 @@
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 16px;
-  padding: 24px;
+  padding: 28px 32px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  max-width: 540px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   margin: 16px 0;
 }
 
@@ -735,12 +754,108 @@
   color: #334155;
 }
 
+/* ── Pending Attempt Banner ──────────────────────────────────────────────── */
+.wallet-pending-attempt-box {
+  background: #FFFBEB;
+  border: 1.5px solid #FDE68A;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wallet-pending-attempt-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(217, 119, 6, 0.15);
+  color: #D97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wallet-pending-attempt-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: #92400E;
+  margin-bottom: 4px;
+}
+
+.wallet-pending-attempt-msg {
+  font-size: 0.8125rem;
+  color: #78350F;
+  line-height: 1.45;
+}
+
+.wallet-pending-amount {
+  font-family: var(--font-mono, monospace);
+  font-weight: 900;
+  color: #B45309;
+}
+
+.wallet-pending-attempt-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wallet-discard-btn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  color: #64748B;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wallet-discard-btn:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+  border-color: #94A3B8;
+}
+
 /* ── Bank & Payment Methods Selector ─────────────────────────────────────── */
 .wallet-methods-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin: 10px 0 16px;
+  gap: 12px;
+  width: 100%;
+  margin: 10px 0 20px;
+}
+
+.wallet-methods-grid.methods-count-7 {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.wallet-methods-grid.methods-count-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1240px) {
+  .wallet-methods-grid.methods-count-7 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .wallet-methods-grid.methods-count-7,
+  .wallet-methods-grid.methods-count-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-methods-grid.methods-count-7,
+  .wallet-methods-grid.methods-count-4 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .wallet-method-card {
@@ -754,12 +869,14 @@
   flex-direction: column;
   justify-content: space-between;
   user-select: none;
+  min-height: 86px;
+  box-sizing: border-box;
 }
 
 .wallet-method-card:hover {
   border-color: #1B7A53;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(27, 122, 83, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(27, 122, 83, 0.12);
 }
 
 .wallet-method-card.active {

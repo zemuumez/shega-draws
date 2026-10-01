@@ -186,6 +186,17 @@ export function WalletPanel({
     };
   }, [storageKey]);
 
+  const discardAttempt = () => {
+    try {
+      sessionStorage.removeItem(storageKey);
+    } catch {
+      /* Storage may be disabled. */
+    }
+    setAttempt(null);
+    setError("");
+    setMessage("");
+  };
+
   useEffect(() => {
     const c = new AbortController();
     setData(null);
@@ -238,8 +249,8 @@ export function WalletPanel({
     };
   }, [currency, offset, depositOffset, revision]);
 
-  async function deposit(e: React.FormEvent) {
-    e.preventDefault();
+  async function deposit(e?: React.FormEvent) {
+    if (e) e.preventDefault();
     if (sending.current || !data) return;
     sending.current = true;
     setBusy(true);
@@ -510,33 +521,61 @@ export function WalletPanel({
               </div>
             </div>
 
-            {attempt ? (
-              <form onSubmit={deposit} style={{ display: "grid", gap: "16px" }}>
-                <div
-                  style={{
-                    padding: "14px",
-                    background: "#FFFBEB",
-                    border: "1px solid #FDE68A",
-                    borderRadius: "10px",
-                    fontSize: "0.8125rem",
-                    color: "#92400E",
-                  }}
-                >
-                  <p style={{ margin: 0 }}>
-                    {text("A previous deposit request needs a response. Retrying uses the same payment request:")}{" "}
-                    <strong>{formatBalance(money(attempt.input.amountMinor, attempt.input.currency), attempt.input.currency)}</strong>
-                  </p>
+            {/* Pending Attempt Banner (High-contrast dark mode compatible, with resume and discard buttons) */}
+            {attempt && (
+              <div className="wallet-pending-attempt-box">
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
+                  <div className="wallet-pending-attempt-icon">
+                    <RotateCw size={18} className={busy ? "spin-icon" : ""} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div className="wallet-pending-attempt-title">
+                      {text("Unfinished Deposit in Progress")}
+                    </div>
+                    <div className="wallet-pending-attempt-msg">
+                      {text("You previously started a deposit of")}{" "}
+                      <strong className="wallet-pending-amount">
+                        {formatBalance(money(attempt.input.amountMinor, attempt.input.currency), attempt.input.currency)}
+                      </strong>
+                      . {text("You can resume and complete this payment, or discard it to start a new deposit.")}
+                    </div>
+                  </div>
                 </div>
-                <button
-                  disabled={busy}
-                  className="portal-btn-primary"
-                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: "0.875rem" }}
-                >
-                  {text(busy ? "Please wait…" : "Retry same deposit")}
-                </button>
-              </form>
-            ) : enabled && !balance?.restricted ? (
-              <form onSubmit={deposit} style={{ display: "grid", gap: "18px" }}>
+
+                <div className="wallet-pending-attempt-actions">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => deposit()}
+                    className="portal-btn-primary"
+                    style={{
+                      padding: "10px 20px",
+                      fontSize: "0.875rem",
+                      fontWeight: 800,
+                    }}
+                  >
+                    <ArrowRight size={15} />
+                    <span>
+                      {busy
+                        ? text("Connecting…")
+                        : `${text("Resume Payment")} (${formatBalance(money(attempt.input.amountMinor, attempt.input.currency), attempt.input.currency)})`}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={discardAttempt}
+                    className="wallet-discard-btn"
+                  >
+                    <span>✕ {text("Discard & Start Fresh")}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {enabled && !balance?.restricted ? (
+              <form onSubmit={deposit} style={{ display: "grid", gap: "20px" }}>
                 {/* Clean Amount Input */}
                 <div>
                   <label htmlFor="deposit-amount-input" className="wallet-form-label">
@@ -590,7 +629,7 @@ export function WalletPanel({
                   </div>
                 </div>
 
-                {/* Bank / Payment Method Selector */}
+                {/* Bank / Payment Method Selector (Horizontal layout across full width) */}
                 <div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                     <label className="wallet-form-label" style={{ margin: 0 }}>
@@ -602,7 +641,7 @@ export function WalletPanel({
                       ⚡ {text("Instant Clearance")}
                     </span>
                   </div>
-                  <div className="wallet-methods-grid">
+                  <div className={`wallet-methods-grid methods-count-${(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).length}`}>
                     {(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).map((m) => {
                       const isSelected = selectedMethod === m.id;
                       return (
