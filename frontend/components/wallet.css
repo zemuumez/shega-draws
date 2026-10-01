@@ -735,4 +735,81 @@
   color: #334155;
 }
 
+/* ── Bank & Payment Methods Selector ─────────────────────────────────────── */
+.wallet-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 10px 0 16px;
+}
+
+.wallet-method-card {
+  border: 1.5px solid #CBD5E1;
+  border-radius: 12px;
+  padding: 12px 10px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.wallet-method-card:hover {
+  border-color: #1B7A53;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 122, 83, 0.08);
+}
+
+.wallet-method-card.active {
+  border-color: #1B7A53;
+  background: #F0FDF4;
+  box-shadow: 0 0 0 1px #1B7A53, 0 4px 14px rgba(27, 122, 83, 0.15);
+}
+
+.wallet-method-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.wallet-method-badge {
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.wallet-method-check {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #1B7A53;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(27, 122, 83, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wallet-method-name {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 3px;
+  line-height: 1.25;
+}
+
+.wallet-method-desc {
+  font-size: 0.6875rem;
+  color: #64748B;
+  line-height: 1.3;
+}
+
+
 

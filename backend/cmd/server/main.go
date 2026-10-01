@@ -13,7 +13,7 @@ import (
 	dotenv "rimna/backend/internal/env"
 	"rimna/backend/internal/httpapi"
 	"rimna/backend/internal/payment/chapa"
-	"rimna/backend/internal/payment/stripe"
+	_ "rimna/backend/internal/payment/stripe" // Stripe integration paused at user request in favor of Chapa international money
 	"rimna/backend/internal/service"
 	"rimna/backend/internal/store"
 	"strconv"
@@ -78,13 +78,13 @@ func main() {
 		slog.Error("database payment environment mismatch or migrations missing")
 		os.Exit(1)
 	}
-	providers := map[string]domain.PaymentProvider{"chapa": chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, strings.Split(env("CHAPA_CURRENCIES", "ETB"), ","), origin)}
-	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
-	stripeSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
-	if stripeKey != "" && stripeSecret != "" {
-		stripeProvider := stripe.New(stripeKey, stripeSecret, origin+"/account")
-		providers["stripe"] = stripeProvider
+	// Chapa multi-currency adapter (ETB and international USD)
+	chapaCurrs := strings.Split(env("CHAPA_CURRENCIES", "ETB,USD"), ",")
+	providers := map[string]domain.PaymentProvider{
+		"chapa": chapa.New(key, os.Getenv("CHAPA_WEBHOOK_SECRET"), mode, chapaCurrs, origin),
 	}
+	// Note: Stripe integration is paused at user request in favor of Chapa international multi-currency checkout.
+
 	svc := &service.Service{Store: st, Providers: providers, Mode: mode}
 	enabled := env("DEPOSITS_ENABLED", "false") == "true"
 	min, errMin := strconv.ParseInt(env("DEPOSIT_MIN_MINOR", "0"), 10, 64)
@@ -104,10 +104,20 @@ func main() {
 			slog.Warn("could not auto-unpause deposits on startup", "error", err)
 		}
 	}
+
+	minUSD, errMinUSD := strconv.ParseInt(env("DEPOSIT_MIN_MINOR_USD", "100"), 10, 64)
+	maxDepositUSD, errMaxUSD := strconv.ParseInt(env("DEPOSIT_MAX_MINOR_USD", "1000000"), 10, 64)
+	if errMinUSD != nil || minUSD < 1 {
+		minUSD = 100 // $1.00 minimum
+	}
+	if errMaxUSD != nil || maxDepositUSD < minUSD {
+		maxDepositUSD = 1000000 // $10,000 maximum
+	}
+
 	svc.Deposits = service.DepositPolicy{Enabled: enabled, Currency: "ETB", MinMinor: min, MaxMinor: maxDeposit}
 	svc.DepositPolicies = map[string]service.DepositPolicy{
 		"ETB": {Enabled: enabled, Currency: "ETB", MinMinor: min, MaxMinor: maxDeposit},
-		"USD": {Enabled: enabled && stripeKey != "", Currency: "USD", MinMinor: min, MaxMinor: maxDeposit},
+		"USD": {Enabled: enabled, Currency: "USD", MinMinor: minUSD, MaxMinor: maxDepositUSD},
 	}
 	svc.VerificationPerMinute = quota
 	role := env("PROCESS_ROLE", "all")

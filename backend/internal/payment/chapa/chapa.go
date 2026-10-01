@@ -106,7 +106,7 @@ func (a *Adapter) Start(ctx context.Context, o domain.CheckoutRequest) (domain.C
 
 	// Local Sandbox Simulator Mode
 	if a.isMock() {
-		ref := fmt.Sprintf("chapa_mock_%s_amt_%d", o.ID, o.AmountMinor)
+		ref := fmt.Sprintf("chapa_mock_%s_amt_%d_cur_%s", o.ID, o.AmountMinor, o.Currency)
 		checkoutURL := fmt.Sprintf("%s/chapa-sandbox?id=%s&amount=%d&currency=%s&ref=%s",
 			a.Origin, o.ID, o.AmountMinor, o.Currency, ref)
 		return domain.Checkout{URL: checkoutURL, Reference: ref}, nil
@@ -193,15 +193,20 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 		parts := strings.Split(strings.TrimPrefix(ref, "chapa_mock_"), "_amt_")
 		merchantID := parts[0]
 		var amt int64
+		currency := "ETB"
 		if len(parts) > 1 {
-			amt, _ = strconv.ParseInt(parts[1], 10, 64)
+			amtParts := strings.Split(parts[1], "_cur_")
+			amt, _ = strconv.ParseInt(amtParts[0], 10, 64)
+			if len(amtParts) > 1 && amtParts[1] != "" {
+				currency = strings.ToUpper(amtParts[1])
+			}
 		}
 		return domain.Verification{
 			Reference:         ref,
 			MerchantReference: merchantID,
 			Status:            "success",
 			AmountMinor:       amt,
-			Currency:          "ETB",
+			Currency:          currency,
 			Mode:              a.Mode,
 		}, nil
 	}

@@ -25,6 +25,97 @@ import {
 } from "lucide-react";
 import "./wallet.css";
 
+export interface PaymentMethodOption {
+  id: string;
+  name: string;
+  badge: string;
+  badgeColor: string;
+  desc: string;
+}
+
+export const ETB_PAYMENT_METHODS: PaymentMethodOption[] = [
+  {
+    id: "telebirr",
+    name: "Telebirr",
+    badge: "Mobile Wallet",
+    badgeColor: "#0284C7",
+    desc: "Instant USSD prompt & SMS push to your mobile phone",
+  },
+  {
+    id: "cbe",
+    name: "CBE Birr / CBE",
+    badge: "Commercial Bank",
+    badgeColor: "#7C3AED",
+    desc: "Direct debit from Commercial Bank of Ethiopia accounts",
+  },
+  {
+    id: "boa",
+    name: "Bank of Abyssinia",
+    badge: "Apollo / BoA",
+    badgeColor: "#F59E0B",
+    desc: "Abyssinia digital banking & mobile transfer",
+  },
+  {
+    id: "awash",
+    name: "Awash Birr",
+    badge: "Awash Bank",
+    badgeColor: "#D97706",
+    desc: "Awash Bank instant mobile account debit",
+  },
+  {
+    id: "dashen",
+    name: "Dashen / Amole",
+    badge: "Dashen Bank",
+    badgeColor: "#2563EB",
+    desc: "Dashen Bank Amole payment checkout",
+  },
+  {
+    id: "coop",
+    name: "CoopPay / Coop Bank",
+    badge: "Coop Bank",
+    badgeColor: "#059669",
+    desc: "Cooperative Bank of Oromia digital checkout",
+  },
+  {
+    id: "card_local",
+    name: "EthSwitch ATM Cards",
+    badge: "Debit / ATM",
+    badgeColor: "#DC2626",
+    desc: "Local ATM / Debit cards issued by Ethiopian banks",
+  },
+];
+
+export const USD_PAYMENT_METHODS: PaymentMethodOption[] = [
+  {
+    id: "card_intl",
+    name: "Credit / Debit Card",
+    badge: "Visa • Mastercard • Amex",
+    badgeColor: "#2563EB",
+    desc: "International cards via Chapa Global checkout",
+  },
+  {
+    id: "apple_google_pay",
+    name: "Apple & Google Pay",
+    badge: "One-Touch Mobile",
+    badgeColor: "#10B981",
+    desc: "Fast contactless checkout from your mobile device",
+  },
+  {
+    id: "paypal_express",
+    name: "PayPal / Express",
+    badge: "Diaspora Express",
+    badgeColor: "#0284C7",
+    desc: "International diaspora online wallet checkout",
+  },
+  {
+    id: "wire_transfer",
+    name: "International SWIFT",
+    badge: "Bank Wire",
+    badgeColor: "#7C3AED",
+    desc: "Direct diaspora bank transfer to Chapa clearing",
+  },
+];
+
 type Attempt = {
   key: string;
   input: {
@@ -64,6 +155,19 @@ export function WalletPanel({
 
   // Sub-tab states
   const [historyTab, setHistoryTab] = useState<"deposits" | "ledger">("deposits");
+  const [selectedMethod, setSelectedMethod] = useState("telebirr");
+
+  useEffect(() => {
+    if (currency === "ETB") {
+      setSelectedMethod((prev) =>
+        ETB_PAYMENT_METHODS.some((m) => m.id === prev) ? prev : "telebirr"
+      );
+    } else {
+      setSelectedMethod((prev) =>
+        USD_PAYMENT_METHODS.some((m) => m.id === prev) ? prev : "card_intl"
+      );
+    }
+  }, [currency]);
 
   const sending = useRef(false);
   const alive = useRef(true);
@@ -149,11 +253,13 @@ export function WalletPanel({
         normPhone = "+251" + normPhone;
       } else if (normPhone.startsWith("251")) {
         normPhone = "+" + normPhone;
-      } else if (!normPhone.startsWith("+") && normPhone.length > 0) {
+      } else if (!normPhone.startsWith("+") && normPhone.length > 0 && /^\d+$/.test(normPhone)) {
         normPhone = "+" + normPhone;
       }
       if (!normPhone && currency === "ETB") {
         normPhone = "+251911000000";
+      } else if (!normPhone && currency === "USD") {
+        normPhone = "+12025550123";
       }
 
       const request = attempt || {
@@ -161,7 +267,7 @@ export function WalletPanel({
         input: {
           currency,
           amountMinor: hundredths(amount),
-          provider: data.methods[0],
+          provider: "chapa",
           phone: normPhone,
         },
       };
@@ -188,7 +294,11 @@ export function WalletPanel({
         setAmount("");
         setRevision((v) => v + 1);
         if (d.checkoutUrl) {
-          window.location.href = d.checkoutUrl;
+          let url = d.checkoutUrl;
+          if (url.includes("/chapa-sandbox")) {
+            url += `${url.includes("?") ? "&" : "?"}method=${encodeURIComponent(selectedMethod)}`;
+          }
+          window.location.href = url;
           return;
         }
         setMessage(
@@ -480,28 +590,162 @@ export function WalletPanel({
                   </div>
                 </div>
 
-                {/* Clean Phone Input */}
+                {/* Bank / Payment Method Selector */}
                 <div>
-                  <label htmlFor="deposit-phone-input" className="wallet-form-label">
-                    {text("Mobile Phone Number")}
-                  </label>
-                  <input
-                    id="deposit-phone-input"
-                    aria-label="Deposit phone number"
-                    type="tel"
-                    autoComplete="tel"
-                    required
-                    pattern="\+[1-9][0-9]{7,14}"
-                    placeholder={currency === "USD" ? "+1…" : "+251…"}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    maxLength={16}
-                    className="wallet-phone-input"
-                  />
-                  <small className="wallet-form-hint">
-                    {text("Used to send the instant payment prompt on your phone.")}
-                  </small>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <label className="wallet-form-label" style={{ margin: 0 }}>
+                      {currency === "ETB"
+                        ? text("Select Ethiopian Bank / Payment Channel")
+                        : text("Select Global Payment Option (via Chapa)")}
+                    </label>
+                    <span style={{ fontSize: "0.75rem", color: "#10B981", fontWeight: 700 }}>
+                      ⚡ {text("Instant Clearance")}
+                    </span>
+                  </div>
+                  <div className="wallet-methods-grid">
+                    {(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).map((m) => {
+                      const isSelected = selectedMethod === m.id;
+                      return (
+                        <div
+                          key={m.id}
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={isSelected}
+                          className={`wallet-method-card ${isSelected ? "active" : ""}`}
+                          onClick={() => setSelectedMethod(m.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setSelectedMethod(m.id);
+                            }
+                          }}
+                        >
+                          <div className="wallet-method-card-top">
+                            <span
+                              className="wallet-method-badge"
+                              style={{
+                                color: m.badgeColor,
+                                background: `${m.badgeColor}18`,
+                              }}
+                            >
+                              {m.badge}
+                            </span>
+                            {isSelected && (
+                              <span className="wallet-method-check">✓</span>
+                            )}
+                          </div>
+                          <div>
+                            <div className="wallet-method-name">{m.name}</div>
+                            <div className="wallet-method-desc">{m.desc}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                {/* Dynamic Phone / Contact Input Tailored to Method */}
+                {(() => {
+                  const methodConfig = (() => {
+                    switch (selectedMethod) {
+                      case "telebirr":
+                        return {
+                          label: text("Telebirr Mobile Number"),
+                          placeholder: "+251911000000",
+                          hint: text("You will receive an instant USSD prompt on your phone to approve payment with your PIN."),
+                        };
+                      case "cbe":
+                        return {
+                          label: text("CBE Account / CBE Birr Phone"),
+                          placeholder: "1000... or 09...",
+                          hint: text("Enter your Commercial Bank account number or registered CBE Birr phone."),
+                        };
+                      case "boa":
+                        return {
+                          label: text("Bank of Abyssinia Account / Phone"),
+                          placeholder: "+2519... or BoA Account",
+                          hint: text("Enter your BoA Apollo registered phone number or account number."),
+                        };
+                      case "awash":
+                        return {
+                          label: text("Awash Birr Mobile / Account"),
+                          placeholder: "+251911000000",
+                          hint: text("Enter your Awash Birr registered phone number for instant debit."),
+                        };
+                      case "dashen":
+                        return {
+                          label: text("Dashen / Amole Phone Number"),
+                          placeholder: "+251911000000",
+                          hint: text("Enter your Dashen Bank Amole registered phone number."),
+                        };
+                      case "coop":
+                        return {
+                          label: text("CoopPay Phone / Account Number"),
+                          placeholder: "+251911000000",
+                          hint: text("Enter your Cooperative Bank of Oromia CoopPay mobile or account."),
+                        };
+                      case "card_local":
+                        return {
+                          label: text("Cardholder Phone (for 3D-Secure SMS)"),
+                          placeholder: "+251911000000",
+                          hint: text("Used by EthSwitch to send the 3D-Secure one-time confirmation code (OTP)."),
+                        };
+                      case "card_intl":
+                        return {
+                          label: text("Mobile Phone Number (for 3D-Secure OTP)"),
+                          placeholder: "+1 202 555 0123",
+                          hint: text("International Visa/Mastercard 3D-Secure verification code will be sent to this number."),
+                        };
+                      case "apple_google_pay":
+                        return {
+                          label: text("Mobile Contact / Phone"),
+                          placeholder: "+1 202 555 0123",
+                          hint: text("Used for one-touch Apple Pay / Google Pay receipt and notification."),
+                        };
+                      case "paypal_express":
+                        return {
+                          label: text("Billing Contact Phone"),
+                          placeholder: "+1 202 555 0123",
+                          hint: text("Used to link your diaspora checkout with Chapa Global clearing."),
+                        };
+                      case "wire_transfer":
+                        return {
+                          label: text("Sender Contact Phone Number"),
+                          placeholder: "+1 202 555 0123",
+                          hint: text("Used by Chapa's international clearing desk for SWIFT transfer confirmation."),
+                        };
+                      default:
+                        return {
+                          label: text("Mobile Phone Number"),
+                          placeholder: currency === "USD" ? "+1..." : "+251...",
+                          hint: text("Used to send the instant payment prompt on your phone."),
+                        };
+                    }
+                  })();
+
+                  return (
+                    <div>
+                      <label htmlFor="deposit-phone-input" className="wallet-form-label">
+                        {methodConfig.label}
+                      </label>
+                      <input
+                        id="deposit-phone-input"
+                        aria-label={methodConfig.label}
+                        type="tel"
+                        autoComplete="tel"
+                        required
+                        placeholder={methodConfig.placeholder}
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        maxLength={24}
+                        className="wallet-phone-input"
+                      />
+                      <small className="wallet-form-hint">
+                        {methodConfig.hint}
+                      </small>
+                    </div>
+                  );
+                })()}
 
                 {error && (
                   <div
@@ -555,7 +799,7 @@ export function WalletPanel({
                     {busy
                       ? text("Processing Checkout…")
                       : amount
-                        ? `${text("Deposit")} ${amount} ${currency}`
+                        ? `${text("Deposit")} ${amount} ${currency} via ${(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).find((m) => m.id === selectedMethod)?.name || "Chapa"}`
                         : text("Continue to Payment")}
                   </span>
                   <ArrowRight size={16} />
@@ -563,9 +807,15 @@ export function WalletPanel({
 
                 {/* Subdued Supported Gateways Footer */}
                 <div className="wallet-deposit-footer">
-                  <span className="wallet-deposit-footer-label">{text("Supported Payment Channels:")}</span>
+                  <span className="wallet-deposit-footer-label">
+                    {currency === "ETB"
+                      ? text("Supported Ethiopian Banking Channels:")
+                      : text("Supported Global Payment Rails:")}
+                  </span>
                   <span className="wallet-deposit-footer-channels">
-                    Telebirr • CBE Birr • Awash Birr • Bank Cards
+                    {currency === "ETB"
+                      ? "Telebirr • Commercial Bank of Ethiopia (CBE) • Bank of Abyssinia • Awash Birr • Dashen Amole • Coop Bank • EthSwitch Cards"
+                      : "Visa • Mastercard • American Express • Apple Pay • Google Pay • PayPal • SWIFT Wire (via Chapa Global)"}
                   </span>
                 </div>
               </form>

@@ -2429,6 +2429,37 @@ body:has(.user-portal-container) .scroll-progress-container {
   color: #CBD5E1 !important;
 }
 
+/* ── Bank & Payment Method Selector in Dark Mode ──────────────────────────── */
+.user-portal-container.dark-theme .wallet-method-card {
+  background: #080D1A !important;
+  border: 1.5px solid #1E293B !important;
+}
+
+.user-portal-container.dark-theme .wallet-method-card:hover {
+  border-color: #FDE047 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.user-portal-container.dark-theme .wallet-method-card.active {
+  background: #0F172A !important;
+  border-color: #FDE047 !important;
+  box-shadow: 0 0 0 1px #FDE047, 0 4px 18px rgba(253, 224, 71, 0.2) !important;
+}
+
+.user-portal-container.dark-theme .wallet-method-card .wallet-method-name {
+  color: #FFFFFF !important;
+}
+
+.user-portal-container.dark-theme .wallet-method-card .wallet-method-desc {
+  color: #CBD5E1 !important;
+}
+
+.user-portal-container.dark-theme .wallet-method-card .wallet-method-check {
+  color: #0F172A !important;
+  background: #FDE047 !important;
+}
+
+
 
 
 
