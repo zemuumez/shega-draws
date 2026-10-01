@@ -59,14 +59,14 @@ func (s *Store) CreateDeposit(ctx context.Context, d domain.Deposit) (domain.Dep
 		return d, false, domain.ErrConflict
 	}
 	var pending int
-	if err = tx.QueryRow(ctx, `SELECT count(*) FROM deposits WHERE user_id=$1 AND status IN ('initializing','pending','review')`, d.UserID).Scan(&pending); err != nil {
+	if err = tx.QueryRow(ctx, `SELECT count(*) FROM deposits WHERE user_id=$1 AND status IN ('initializing','pending') AND created_at > now() - interval '15 minutes'`, d.UserID).Scan(&pending); err != nil {
 		return d, false, err
 	}
-	if pending >= 3 {
+	if pending >= 5 {
 		return d, false, domain.ErrRate
 	}
 	d.Status = "initializing"
-	d, err = scanDeposit(tx.QueryRow(ctx, `INSERT INTO deposits(id,user_id,currency,amount_minor,provider,mode,status,idempotency_key,fingerprint,phone,email,name,next_check_at) VALUES($1,$2,$3,$4,$5,$6,'initializing',$7,$8,$9,$10,$11,now()+interval '30 seconds') RETURNING `+depositColumns, d.ID, d.UserID, d.Currency, d.AmountMinor, d.Provider, d.Mode, d.Key, d.Fingerprint, d.Phone, d.Email, d.Name))
+	d, err = scanDeposit(tx.QueryRow(ctx, `INSERT INTO deposits(id,user_id,currency,amount_minor,provider,mode,status,idempotency_key,fingerprint,phone,email,name,next_check_at) VALUES($1,$2,$3,$4,$5,$6,'initializing',$7,$8,$9,$10,$11,now()+interval '3 seconds') RETURNING `+depositColumns, d.ID, d.UserID, d.Currency, d.AmountMinor, d.Provider, d.Mode, d.Key, d.Fingerprint, d.Phone, d.Email, d.Name))
 	if err != nil {
 		return d, false, err
 	}
@@ -166,9 +166,10 @@ type DepositPage struct {
 	HasMore bool             `json:"hasMore"`
 }
 
-func (s *Store) Deposits(ctx context.Context, user string, offset int, admin bool) (DepositPage, error) {
+func (s *Store) Deposits(ctx context.Context, user string, offset int, admin bool, currency string) (DepositPage, error) {
 	out := DepositPage{Items: []domain.Deposit{}}
-	rows, err := s.DB.Query(ctx, `SELECT `+depositColumns+` FROM deposits WHERE ($1 OR user_id=$2) ORDER BY created_at DESC,id LIMIT 51 OFFSET $3`, admin, user, offset)
+	currency = strings.ToUpper(strings.TrimSpace(currency))
+	rows, err := s.DB.Query(ctx, `SELECT `+depositColumns+` FROM deposits WHERE ($1 OR user_id=$2) AND ($4 = '' OR currency=$4) ORDER BY created_at DESC,id LIMIT 51 OFFSET $3`, admin, user, offset, currency)
 	if err != nil {
 		return out, err
 	}
@@ -191,11 +192,14 @@ func (s *Store) DepositWork(ctx context.Context) (domain.Deposit, error) {
 	for i := range cols {
 		cols[i] = "d." + cols[i]
 	}
-	return scanDeposit(s.DB.QueryRow(ctx, `WITH candidate AS(SELECT id FROM deposits WHERE provider_reference<>'' AND status<>'reversed' AND next_check_at<=now() AND (lease_until IS NULL OR lease_until<now()) ORDER BY next_check_at LIMIT 1 FOR UPDATE SKIP LOCKED) UPDATE deposits d SET lease_until=now()+interval '60 seconds',attempts=attempts+1 FROM candidate c WHERE d.id=c.id RETURNING `+strings.Join(cols, ",")))
+	return scanDeposit(s.DB.QueryRow(ctx, `WITH candidate AS(SELECT id FROM deposits WHERE provider_reference<>'' AND status IN ('initializing','pending') AND next_check_at<=now() AND (lease_until IS NULL OR lease_until<now()) ORDER BY next_check_at LIMIT 1 FOR UPDATE SKIP LOCKED) UPDATE deposits d SET lease_until=now()+interval '60 seconds',attempts=attempts+1 FROM candidate c WHERE d.id=c.id RETURNING `+strings.Join(cols, ",")))
 }
 func (s *Store) FinishDepositWork(ctx context.Context, id string, success bool) error {
-	_, err := s.DB.Exec(ctx, `UPDATE deposits SET lease_until=NULL,next_check_at=now()+CASE WHEN status IN ('succeeded','failed','review') OR created_at<now()-interval '1 day' THEN interval '24 hours' ELSE least(interval '1 hour',interval '15 seconds'*power(2,least(attempts,8))) END WHERE id=$1`, id)
+	_, err := s.DB.Exec(ctx, `UPDATE deposits SET lease_until=NULL,next_check_at=now()+CASE WHEN status IN ('succeeded','failed','review') OR created_at<now()-interval '1 day' THEN interval '24 hours' ELSE least(interval '1 hour',interval '5 seconds'*power(2,least(attempts,6))) END WHERE id=$1`, id)
 	return err
+}
+func (s *Store) TouchPendingDeposits(ctx context.Context, userID string) {
+	_, _ = s.DB.Exec(ctx, `UPDATE deposits SET next_check_at=now() WHERE user_id=$1 AND status IN ('initializing','pending') AND (lease_until IS NULL OR lease_until<now())`, userID)
 }
 func (s *Store) SetDepositsPaused(ctx context.Context, actor string, paused bool, reason string) error {
 	if len(strings.TrimSpace(reason)) < 5 || len(reason) > 500 {
@@ -245,8 +249,13 @@ func (s *Store) DepositReference(ctx context.Context, actor, id, reference strin
 	return tx.Commit(ctx)
 }
 
+func (s *Store) FailDeposit(ctx context.Context, id, reason string) error {
+	_, err := s.DB.Exec(ctx, `UPDATE deposits SET status='failed',review_reason=$2 WHERE id=$1 AND status IN ('initializing','pending') AND provider_reference=''`, id, reason)
+	return dbError(err)
+}
+
 func (s *Store) DepositMaintenance(ctx context.Context) error {
-	_, err := s.DB.Exec(ctx, `WITH batch AS(SELECT id FROM deposits WHERE provider_reference='' AND status IN ('initializing','pending') AND created_at<now()-interval '15 minutes' LIMIT 100 FOR UPDATE SKIP LOCKED)
- UPDATE deposits SET status='review',review_reason='Payment reference unavailable. Staff must locate the original payment; do not pay again.' FROM batch WHERE deposits.id=batch.id`)
+	_, err := s.DB.Exec(ctx, `UPDATE deposits SET status='failed',review_reason='Payment session expired without payment confirmation.' WHERE provider_reference='' AND (status IN ('initializing','pending') OR (status='review' AND review_reason LIKE 'Payment reference unavailable%')) AND created_at<now()-interval '2 minutes'`)
 	return err
 }
+

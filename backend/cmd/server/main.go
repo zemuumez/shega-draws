@@ -103,6 +103,7 @@ func main() {
 		if err := st.SetDepositsPaused(ctx, "system-startup", false, "DEPOSITS_ENABLED configured in environment"); err != nil {
 			slog.Warn("could not auto-unpause deposits on startup", "error", err)
 		}
+		_ = st.DepositMaintenance(ctx)
 	}
 
 	minUSD, errMinUSD := strconv.ParseInt(env("DEPOSIT_MIN_MINOR_USD", "100"), 10, 64)

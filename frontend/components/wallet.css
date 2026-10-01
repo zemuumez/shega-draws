@@ -311,10 +311,84 @@
 
 .wallet-record-pill.review,
 .wallet-record-pill.pending,
-.wallet-record-pill.initializing {
+.wallet-record-pill.initializing,
+.wallet-record-pill.processing {
   background: #FFFBEB;
   color: #D97706;
   border: 1px solid #FDE68A;
+}
+
+.wallet-processing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #D97706;
+  display: inline-block;
+  animation: wallet-pulse-dot 1.2s infinite ease-in-out;
+}
+
+@keyframes wallet-pulse-dot {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+.wallet-record-processing-banner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  font-size: 0.8125rem;
+  color: #92400E;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.wallet-record-refresh-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: #D97706;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.wallet-record-refresh-btn:hover {
+  background: #B45309;
+}
+
+.wallet-resume-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #10B981;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.wallet-resume-link:hover {
+  color: #059669;
 }
 
 .wallet-pay-btn {
@@ -534,13 +608,13 @@
 }
 
 .quick-amount-btn {
-  padding: 13px 10px;
+  padding: 11px 12px;
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.9375rem;
-  font-weight: 800;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
   color: #1E293B;
   cursor: pointer;
   text-align: center;
@@ -558,10 +632,10 @@
 }
 
 .quick-amount-btn.active {
-  border-color: #1B7A53;
-  background: #1B7A53;
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(27, 122, 83, 0.25);
+  border-color: #1B7A53 !important;
+  background: #1B7A53 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(27, 122, 83, 0.25);
 }
 
 /* ── Multi-Currency Asset Breakdown Card ───────────────────────────────────── */

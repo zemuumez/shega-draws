@@ -1337,7 +1337,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 /* Primary buttons in wallet / portal matching dashboard design */
 .user-portal-container .wallet-panel .wallet-submit-btn,
 .user-portal-container .wallet-form button.wallet-submit-btn,
-.user-portal-container .wallet-panel form button:not(.wallet-secondary-btn) {
+.user-portal-container .wallet-panel form button.wallet-submit-btn {
   background: #1B7A53 !important;
   color: #FFFFFF !important;
   border: none !important;
@@ -1356,7 +1356,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 
 .user-portal-container .wallet-panel .wallet-submit-btn:hover:not(:disabled),
 .user-portal-container .wallet-form button.wallet-submit-btn:hover:not(:disabled),
-.user-portal-container .wallet-panel form button:not(.wallet-secondary-btn):hover:not(:disabled) {
+.user-portal-container .wallet-panel form button.wallet-submit-btn:hover:not(:disabled) {
   background: #156645 !important;
   box-shadow: 0 6px 18px rgba(27, 122, 83, 0.35) !important;
   transform: translateY(-1px);
@@ -1364,7 +1364,7 @@ body:has(.user-portal-container) .scroll-progress-container {
 
 .user-portal-container .wallet-panel .wallet-submit-btn:disabled,
 .user-portal-container .wallet-form button.wallet-submit-btn:disabled,
-.user-portal-container .wallet-panel form button:disabled {
+.user-portal-container .wallet-panel form button.wallet-submit-btn:disabled {
   opacity: 0.6 !important;
   cursor: not-allowed;
   transform: none;
@@ -2273,6 +2273,54 @@ body:has(.user-portal-container) .scroll-progress-container {
   background: #162032;
   color: #CBD5E1;
   border: 1px solid #1E293B;
+}
+
+.user-portal-container.dark-theme .wallet-record-pill.processing,
+.user-portal-container.dark-theme .wallet-record-pill.pending,
+.user-portal-container.dark-theme .wallet-record-pill.initializing {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.user-portal-container.dark-theme .wallet-record-pill.succeeded,
+.user-portal-container.dark-theme .wallet-record-pill.confirmed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.user-portal-container.dark-theme .wallet-record-pill.failed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.user-portal-container.dark-theme .wallet-processing-dot {
+  background: #FBBF24;
+}
+
+.user-portal-container.dark-theme .wallet-record-processing-banner {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #FDE047;
+}
+
+.user-portal-container.dark-theme .wallet-record-refresh-btn {
+  background: #F59E0B;
+  color: #080D1A;
+}
+
+.user-portal-container.dark-theme .wallet-record-refresh-btn:hover {
+  background: #FBBF24;
+}
+
+.user-portal-container.dark-theme .wallet-resume-link {
+  color: #34D399;
+}
+
+.user-portal-container.dark-theme .wallet-resume-link:hover {
+  color: #6EE7B7;
 }
 
 .user-portal-container.dark-theme .wallet-current-bal-badge {

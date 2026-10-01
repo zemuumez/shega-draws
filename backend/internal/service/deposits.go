@@ -17,6 +17,7 @@ type WalletRepository interface {
 	DepositCheckout(context.Context, string, domain.Checkout) error
 	ApplyDeposit(context.Context, string, domain.Verification, string) error
 	ReviewDeposit(context.Context, string, string) error
+	FailDeposit(context.Context, string, string) error
 	DepositWork(context.Context) (domain.Deposit, error)
 	FinishDepositWork(context.Context, string, bool) error
 	DepositMaintenance(context.Context) error
@@ -87,13 +88,27 @@ func (s *Service) StartDeposit(ctx context.Context, u domain.User, key string, p
 	fingerprint := sha256.Sum256(raw)
 	d := domain.Deposit{ID: "dep_" + ID(), UserID: u.ID, Currency: p.Currency, AmountMinor: p.AmountMinor, Provider: p.Provider, Mode: s.Mode, Key: key, Fingerprint: hex.EncodeToString(fingerprint[:]), Phone: p.Phone, Email: u.Email, Name: u.Name}
 	d, created, err := s.Wallet.CreateDeposit(ctx, d)
-	if err != nil || !created {
+	if err != nil {
 		return d, err
 	}
+	if !created {
+		if d.Status == "succeeded" || d.CreditedAt != nil {
+			return d, nil
+		}
+		if d.Status == "failed" || d.Status == "review" {
+			return d, nil
+		}
+		if d.CheckoutURL != "" {
+			return d, nil
+		}
+	}
 	checkout, err := provider.Start(ctx, d.CheckoutRequest())
-	if err != nil { // Never restart an ambiguous initialization automatically.
-		slog.Warn("deposit checkout outcome uncertain", "deposit", d.ID)
-		return d, nil
+	if err != nil {
+		slog.Warn("deposit checkout start failed", "deposit", d.ID, "error", err)
+		if s.Wallet != nil {
+			_ = s.Wallet.FailDeposit(ctx, d.ID, err.Error())
+		}
+		return d, err
 	}
 	if err = s.Wallet.DepositCheckout(ctx, d.ID, checkout); err != nil {
 		return d, err

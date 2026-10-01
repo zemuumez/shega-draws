@@ -82,6 +82,7 @@ func (a *API) Handler() http.Handler {
 	m.HandleFunc("GET /v1/wallet/history", a.authenticated(a.walletHistory))
 	m.HandleFunc("GET /v1/deposits", a.authenticated(a.deposits))
 	m.HandleFunc("GET /v1/deposits/{id}", a.authenticated(a.deposit))
+	m.HandleFunc("POST /v1/deposits/{id}/check", a.authenticated(a.checkDeposit))
 	m.HandleFunc("POST /v1/deposits", a.authenticated(a.startDeposit))
 	m.HandleFunc("POST /v1/orders", a.authenticated(a.purchase))
 	m.HandleFunc("GET /v1/orders", a.authenticated(a.orders))

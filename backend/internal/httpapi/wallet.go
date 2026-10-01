@@ -58,7 +58,9 @@ func (a *API) deposits(w http.ResponseWriter, r *http.Request, u domain.User) {
 		fail(w, err)
 		return
 	}
-	out, err := a.Store.Deposits(r.Context(), u.ID, offset(r), false)
+	cur := r.URL.Query().Get("currency")
+	a.Store.TouchPendingDeposits(r.Context(), u.ID)
+	out, err := a.Store.Deposits(r.Context(), u.ID, offset(r), false, cur)
 	if err != nil {
 		fail(w, err)
 		return
@@ -78,6 +80,26 @@ func (a *API) deposit(w http.ResponseWriter, r *http.Request, u domain.User) {
 	if d.UserID != u.ID {
 		fail(w, domain.ErrNotFound)
 		return
+	}
+	reply(w, 200, d)
+}
+func (a *API) checkDeposit(w http.ResponseWriter, r *http.Request, u domain.User) {
+	if err := a.Store.Rate(r.Context(), "wallet-check:"+u.ID, 30); err != nil {
+		fail(w, err)
+		return
+	}
+	d, err := a.Store.Deposit(r.Context(), r.PathValue("id"))
+	if err != nil {
+		fail(w, err)
+		return
+	}
+	if d.UserID != u.ID {
+		fail(w, domain.ErrNotFound)
+		return
+	}
+	if d.Status == "pending" && d.ProviderReference != "" {
+		_ = a.Service.ReconcileDeposit(r.Context(), d)
+		d, _ = a.Store.Deposit(r.Context(), d.ID)
 	}
 	reply(w, 200, d)
 }
@@ -106,7 +128,7 @@ type adminDepositPage struct {
 }
 
 func (a *API) adminDepositPage(ctx context.Context, offset int) (adminDepositPage, error) {
-	page, err := a.Store.Deposits(ctx, "", offset, true)
+	page, err := a.Store.Deposits(ctx, "", offset, true, "")
 	out := adminDepositPage{Items: []adminDeposit{}, HasMore: page.HasMore}
 	for _, d := range page.Items {
 		out.Items = append(out.Items, adminDeposit{Deposit: d, AccountID: d.UserID})

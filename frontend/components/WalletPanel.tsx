@@ -118,6 +118,7 @@ export const USD_PAYMENT_METHODS: PaymentMethodOption[] = [
 
 type Attempt = {
   key: string;
+  depositId?: string;
   input: {
     currency: string;
     amountMinor: number;
@@ -152,6 +153,7 @@ export function WalletPanel({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState<Attempt | null>(null);
+  const [checkingId, setCheckingId] = useState<string | null>(null);
 
   // Sub-tab states
   const [historyTab, setHistoryTab] = useState<"deposits" | "ledger">("deposits");
@@ -197,6 +199,48 @@ export function WalletPanel({
     setMessage("");
   };
 
+  async function handleCheckDeposit(depId: string) {
+    if (checkingId) return;
+    setCheckingId(depId);
+    setError("");
+    setMessage("");
+    try {
+      const res = await accountAPI<Deposit>(`/deposits/${depId}/check`, {
+        method: "POST",
+      });
+      setRevision((v) => v + 1);
+      if (res.status === "succeeded" || res.creditedAt) {
+        setMessage(
+          `Deposit of ${money(res.amountMinor, res.currency)} confirmed! Balance updated successfully.`
+        );
+      } else if (res.status === "failed") {
+        setError(res.reviewReason || "Deposit failed or expired.");
+      } else {
+        setMessage("Payment status checked: awaiting confirmation from your bank.");
+      }
+    } catch (err) {
+      setRevision((v) => v + 1);
+      setError((err as Error).message);
+    } finally {
+      setCheckingId(null);
+    }
+  }
+
+  // Auto-dismiss unfinished attempt only if its specific deposit ID has resolved
+  useEffect(() => {
+    if (!attempt || !attempt.depositId || !deposits?.items) return;
+    const matched = deposits.items.find((item) => item.id === attempt.depositId);
+    if (!matched) return;
+    if (matched.status === "succeeded" || matched.creditedAt !== null) {
+      discardAttempt();
+      setMessage(
+        `Previous deposit of ${money(matched.amountMinor, matched.currency)} succeeded and was credited to your balance!`
+      );
+    } else if (matched.status === "failed" || matched.status === "review") {
+      discardAttempt();
+    }
+  }, [deposits, attempt]);
+
   useEffect(() => {
     const c = new AbortController();
     setData(null);
@@ -216,9 +260,10 @@ export function WalletPanel({
             `/wallet/history?currency=${currency}&offset=${offset}`,
             { signal: c.signal },
           ),
-          accountAPI<WalletPage<Deposit>>(`/deposits?offset=${depositOffset}`, {
-            signal: c.signal,
-          }),
+          accountAPI<WalletPage<Deposit>>(
+            `/deposits?currency=${currency}&offset=${depositOffset}`,
+            { signal: c.signal },
+          ),
         ]);
         if (!c.signal.aborted) {
           pending = d.items.some((item) =>
@@ -237,17 +282,89 @@ export function WalletPanel({
     }
 
     void refresh();
-    const timer = setInterval(
-      () => {
-        if (pending && document.visibilityState === "visible") void refresh();
-      },
-      20000 + Math.random() * 5000,
-    );
+
+    // Fast polling if pending deposits exist: 3s interval so status changes immediately
+    const timer = setInterval(() => {
+      if (pending && document.visibilityState === "visible") void refresh();
+    }, 3000);
+
+    // Refresh immediately whenever user comes back to the page/tab
+    const onVisibilityOrFocus = () => {
+      if (document.visibilityState === "visible") {
+        void refresh();
+      }
+    };
+    window.addEventListener("focus", onVisibilityOrFocus);
+    window.addEventListener("visibilitychange", onVisibilityOrFocus);
+    window.addEventListener("pageshow", onVisibilityOrFocus);
+
     return () => {
       c.abort();
       clearInterval(timer);
+      window.removeEventListener("focus", onVisibilityOrFocus);
+      window.removeEventListener("visibilitychange", onVisibilityOrFocus);
+      window.removeEventListener("pageshow", onVisibilityOrFocus);
     };
   }, [currency, offset, depositOffset, revision]);
+
+  async function resumeAttempt() {
+    if (sending.current || !attempt) return;
+    sending.current = true;
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      const d = await accountAPI<Deposit>("/deposits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": attempt.key,
+        },
+        body: JSON.stringify(attempt.input),
+      });
+
+      if (d.status === "succeeded" || d.creditedAt) {
+        discardAttempt();
+        setMessage(
+          `Deposit of ${money(d.amountMinor, d.currency)} has already been completed and credited to your wallet balance.`
+        );
+        setRevision((v) => v + 1);
+        return;
+      }
+
+      if (d.status === "failed" || d.status === "review") {
+        discardAttempt();
+        setMessage(
+          "Previous payment session has expired. You can start a new deposit below."
+        );
+        setRevision((v) => v + 1);
+        return;
+      }
+
+      if (d.checkoutUrl) {
+        sessionStorage.removeItem(storageKey);
+        setAttempt(null);
+        let url = d.checkoutUrl;
+        if (url.includes("/chapa-sandbox")) {
+          url += `${url.includes("?") ? "&" : "?"}method=${encodeURIComponent(selectedMethod)}`;
+        }
+        window.location.href = url;
+        return;
+      }
+
+      setMessage(
+        d.status === "initializing"
+          ? "Payment session initialized. Please wait while the payment gateway connects, or check your Deposit History."
+          : "Payment is currently in process with your bank/gateway. Check Deposit History for live status updates."
+      );
+      setRevision((v) => v + 1);
+    } catch (e) {
+      if (alive.current) setError((e as Error).message);
+    } finally {
+      sending.current = false;
+      if (alive.current) setBusy(false);
+    }
+  }
 
   async function deposit(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -258,53 +375,74 @@ export function WalletPanel({
     setMessage("");
     try {
       let normPhone = phone.trim().replace(/[\s\-()]/g, "");
-      if (normPhone.startsWith("09") || normPhone.startsWith("07")) {
-        normPhone = "+251" + normPhone.slice(1);
-      } else if ((normPhone.startsWith("9") || normPhone.startsWith("7")) && normPhone.length === 9) {
-        normPhone = "+251" + normPhone;
-      } else if (normPhone.startsWith("251")) {
-        normPhone = "+" + normPhone;
-      } else if (!normPhone.startsWith("+") && normPhone.length > 0 && /^\d+$/.test(normPhone)) {
-        normPhone = "+" + normPhone;
-      }
-      if (!normPhone && currency === "ETB") {
-        normPhone = "+251911000000";
-      } else if (!normPhone && currency === "USD") {
-        normPhone = "+12025550123";
+      if (currency === "ETB") {
+        if (normPhone.startsWith("09") || normPhone.startsWith("07")) {
+          normPhone = "+251" + normPhone.slice(1);
+        } else if ((normPhone.startsWith("9") || normPhone.startsWith("7")) && normPhone.length === 9) {
+          normPhone = "+251" + normPhone;
+        } else if (normPhone.startsWith("251") && (normPhone.startsWith("2519") || normPhone.startsWith("2517")) && normPhone.length === 12) {
+          normPhone = "+" + normPhone;
+        } else if (normPhone.startsWith("+251") && (normPhone.startsWith("+2519") || normPhone.startsWith("+2517")) && normPhone.length === 13) {
+          // already in format
+        } else if (!normPhone) {
+          normPhone = "+251911000000";
+        }
+        const etPattern = /^\+251[79]\d{8}$/;
+        if (!etPattern.test(normPhone)) {
+          throw new Error("Please enter a valid Ethiopian mobile phone number starting with 09 or 07 (e.g. 0947859632).");
+        }
+      } else {
+        if (!normPhone) {
+          normPhone = "+12025550123";
+        } else if (!normPhone.startsWith("+")) {
+          normPhone = "+" + normPhone;
+        }
       }
 
-      const request = attempt || {
-        key: crypto.randomUUID(),
-        input: {
-          currency,
-          amountMinor: hundredths(amount),
-          provider: "chapa",
-          phone: normPhone,
-        },
-      };
-      if (!attempt) {
-        if (
-          request.input.amountMinor < data.depositPolicy.minMinor ||
-          request.input.amountMinor > data.depositPolicy.maxMinor
-        )
-          throw new Error("Amount is outside the permitted deposit limits.");
-        sessionStorage.setItem(storageKey, JSON.stringify(request));
-        setAttempt(request);
+      const depositAmountMinor = hundredths(amount);
+      if (
+        depositAmountMinor < data.depositPolicy.minMinor ||
+        depositAmountMinor > data.depositPolicy.maxMinor
+      ) {
+        throw new Error("Amount is outside the permitted deposit limits.");
       }
+
+      const idempotencyKey = attempt?.key || crypto.randomUUID();
+      const payload = {
+        currency,
+        amountMinor: depositAmountMinor,
+        provider: "chapa",
+        phone: normPhone,
+      };
+
       const d = await accountAPI<Deposit>("/deposits", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Idempotency-Key": request.key,
+          "Idempotency-Key": idempotencyKey,
         },
-        body: JSON.stringify(request.input),
+        body: JSON.stringify(payload),
       });
-      sessionStorage.removeItem(storageKey);
+
       if (alive.current) {
-        setAttempt(null);
-        setAmount("");
         setRevision((v) => v + 1);
+
+        if (d.status === "failed" || d.status === "review") {
+          discardAttempt();
+          setError(d.reviewReason || "Payment session could not be established. Please try again.");
+          return;
+        }
+
+        if (d.status === "succeeded" || d.creditedAt) {
+          discardAttempt();
+          setAmount("");
+          setMessage(`Deposit of ${money(d.amountMinor, d.currency)} succeeded and was credited to your balance.`);
+          return;
+        }
+
         if (d.checkoutUrl) {
+          discardAttempt();
+          setAmount("");
           let url = d.checkoutUrl;
           if (url.includes("/chapa-sandbox")) {
             url += `${url.includes("?") ? "&" : "?"}method=${encodeURIComponent(selectedMethod)}`;
@@ -312,11 +450,15 @@ export function WalletPanel({
           window.location.href = url;
           return;
         }
-        setMessage(
-          d.status === "initializing"
-            ? "Payment setup is being checked. Do not pay again; check your deposit history."
-            : "Deposit recorded. Continue payment from your deposit history if it is still pending.",
-        );
+
+        const newAttempt: Attempt = { key: idempotencyKey, depositId: d.id, input: payload };
+        setAttempt(newAttempt);
+        try {
+          sessionStorage.setItem(storageKey, JSON.stringify(newAttempt));
+        } catch {
+          /* Storage may be disabled */
+        }
+        setMessage("Deposit recorded. Processing with bank payment channel.");
       }
     } catch (e) {
       if (alive.current) setError((e as Error).message);
@@ -546,7 +688,7 @@ export function WalletPanel({
                   <button
                     type="button"
                     disabled={busy}
-                    onClick={() => deposit()}
+                    onClick={() => resumeAttempt()}
                     className="portal-btn-primary"
                     style={{
                       padding: "10px 20px",
@@ -592,7 +734,11 @@ export function WalletPanel({
                       required
                       placeholder={currency === "ETB" ? "250.00" : "25.00"}
                       value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      onChange={(e) => {
+                        setAmount(e.target.value);
+                        setMessage("");
+                        setError("");
+                      }}
                       maxLength={12}
                       className="wallet-input-field"
                     />
@@ -620,7 +766,11 @@ export function WalletPanel({
                           key={presetVal}
                           type="button"
                           className={`quick-amount-btn ${isSelected ? "active" : ""}`}
-                          onClick={() => setAmount(String(presetVal))}
+                          onClick={() => {
+                            setAmount(String(presetVal));
+                            setMessage("");
+                            setError("");
+                          }}
                         >
                           {currency === "ETB" ? `ETB ${presetVal}` : `$${presetVal}`}
                         </button>
@@ -651,11 +801,17 @@ export function WalletPanel({
                           tabIndex={0}
                           aria-pressed={isSelected}
                           className={`wallet-method-card ${isSelected ? "active" : ""}`}
-                          onClick={() => setSelectedMethod(m.id)}
+                          onClick={() => {
+                            setSelectedMethod(m.id);
+                            setMessage("");
+                            setError("");
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
                               setSelectedMethod(m.id);
+                              setMessage("");
+                              setError("");
                             }
                           }}
                         >
@@ -821,8 +977,9 @@ export function WalletPanel({
 
                 {/* Primary CTA Submit Button */}
                 <button
+                  type="submit"
                   disabled={busy}
-                  className="portal-btn-primary"
+                  className="portal-btn-primary wallet-submit-btn"
                   style={{
                     width: "100%",
                     justifyContent: "center",
@@ -918,20 +1075,39 @@ export function WalletPanel({
                 ? text("Deposit Records")
                 : text("Balance Ledger History")}
             </h3>
-            <div role="group" aria-label={text("Wallet currency")}>
-              {["ETB", "USD"].map((c) => (
-                <button
-                  key={c}
-                  aria-pressed={currency === c}
-                  onClick={() => {
-                    setCurrency(c);
-                    setOffset(0);
-                    setDepositOffset(0);
-                  }}
-                >
-                  {c}
-                </button>
-              ))}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => setRevision((v) => v + 1)}
+                className="wallet-secondary-btn"
+                style={{
+                  padding: "6px 14px",
+                  fontSize: "0.75rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  height: "36px",
+                }}
+                title={text("Refresh deposit records")}
+              >
+                <RotateCw size={13} className={busy ? "spin-icon" : ""} />
+                <span>{text("Refresh Status")}</span>
+              </button>
+              <div role="group" aria-label={text("Wallet currency")}>
+                {["ETB", "USD"].map((c) => (
+                  <button
+                    key={c}
+                    aria-pressed={currency === c}
+                    onClick={() => {
+                      setCurrency(c);
+                      setOffset(0);
+                      setDepositOffset(0);
+                    }}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -940,62 +1116,163 @@ export function WalletPanel({
             <div>
               {!deposits ? (
                 <p role="status">{text("Loading deposits…")}</p>
-              ) : (
-                <>
-                  {!deposits.items.length && <p>{text("No deposits recorded yet.")}</p>}
-                  {deposits.items.map((d) => (
-                    <article className="wallet-record" key={d.id}>
-                      <div>
-                        <div className="wallet-record-amount">
-                          {formatBalance(money(d.amountMinor, d.currency), d.currency)}
-                        </div>
-                        <div className="wallet-record-meta">
-                          <span suppressHydrationWarning>{formatDisplayDateTime(d.createdAt)}</span>
-                          <span>•</span>
-                          <span className="wallet-record-ref">ID: {d.id.slice(0, 16)}...</span>
-                          {d.reviewReason && (
-                            <span style={{ color: "#DC2626", fontWeight: 600 }}>
-                              • {text(d.reviewReason)}
+              ) : (() => {
+                const filteredDeposits = (deposits.items || []).filter(
+                  (d) => !currency || d.currency === currency,
+                );
+                return (
+                  <>
+                    {!filteredDeposits.length && (
+                      <div
+                        style={{
+                          padding: "36px 16px",
+                          textAlign: "center",
+                          color: "#64748B",
+                          background: "rgba(0,0,0,0.02)",
+                          borderRadius: "12px",
+                          margin: "12px 0",
+                        }}
+                      >
+                        <p style={{ margin: 0, fontWeight: 700, fontSize: "0.9375rem" }}>
+                          {text(`No ${currency} deposits recorded yet.`)}
+                        </p>
+                        <p style={{ margin: "6px 0 0", fontSize: "0.8125rem" }}>
+                          {currency === "USD"
+                            ? text("Global deposits via Chapa USD checkout will appear here.")
+                            : text("Local deposits via Telebirr or Ethiopian banks will appear here.")}
+                        </p>
+                      </div>
+                    )}
+                    {filteredDeposits.map((d) => {
+                      const isProcessing =
+                        d.status === "initializing" || d.status === "pending";
+                      return (
+                        <article className="wallet-record" key={d.id}>
+                          <div style={{ flex: 1 }}>
+                            <div className="wallet-record-amount">
+                              {formatBalance(money(d.amountMinor, d.currency), d.currency)}
+                            </div>
+                            <div className="wallet-record-meta">
+                              <span suppressHydrationWarning>
+                                {formatDisplayDateTime(d.createdAt)}
+                              </span>
+                              <span>•</span>
+                              <span className="wallet-record-ref">
+                                ID: {d.id.slice(0, 16)}...
+                              </span>
+                              {d.reviewReason && (
+                                <span style={{ color: "#DC2626", fontWeight: 600 }}>
+                                  • {text(d.reviewReason)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <span
+                              className={`wallet-record-pill ${isProcessing ? "processing" : d.status}`}
+                            >
+                              {isProcessing ? (
+                                <>
+                                  <span className="wallet-processing-dot" />
+                                  <span>{text("IN PROCESS")}</span>
+                                </>
+                              ) : d.status === "confirmed" || d.status === "succeeded" ? (
+                                <>
+                                  <span>✓</span>
+                                  <span>{text("SUCCEEDED")}</span>
+                                </>
+                              ) : d.status === "failed" ? (
+                                <>
+                                  <span>✕</span>
+                                  <span>{text("FAILED")}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span>⧗</span>
+                                  <span>{text(d.status).toUpperCase()}</span>
+                                </>
+                              )}
                             </span>
+
+                            {checkoutLink(d) && !isProcessing && (
+                              <a href={checkoutLink(d)} className="wallet-pay-btn">
+                                <span>{text("Continue payment")}</span>
+                                <span>→</span>
+                              </a>
+                            )}
+                            {checkoutLink(d) && isProcessing && (
+                              <a
+                                href={checkoutLink(d)}
+                                className="wallet-resume-link"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <span>{text("Re-open payment page")}</span>
+                                <span>→</span>
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Informative in-process notice banner */}
+                          {isProcessing && (
+                            <div className="wallet-record-processing-banner">
+                              <RotateCw
+                                size={14}
+                                className="spin-icon"
+                                style={{ flexShrink: 0, color: "#F59E0B" }}
+                              />
+                              <span>
+                                {text(
+                                  "Payment in process — waiting for bank confirmation. Funds credit automatically upon clearance.",
+                                )}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={checkingId === d.id}
+                                onClick={() => handleCheckDeposit(d.id)}
+                                className="wallet-record-refresh-btn"
+                              >
+                                <RotateCw
+                                  size={12}
+                                  className={checkingId === d.id ? "spin-icon" : ""}
+                                />
+                                <span>
+                                  {checkingId === d.id
+                                    ? text("Verifying…")
+                                    : text("Check Now")}
+                                </span>
+                              </button>
+                            </div>
                           )}
-                        </div>
-                      </div>
+                        </article>
+                      );
+                    })}
 
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                        <span className={`wallet-record-pill ${d.status}`}>
-                          {d.status === "confirmed" || d.status === "succeeded"
-                            ? "✓ "
-                            : d.status === "failed"
-                            ? "✕ "
-                            : "⧗ "}
-                          {text(d.status).toUpperCase()}
-                        </span>
-                        {checkoutLink(d) && (
-                          <a href={checkoutLink(d)} className="wallet-pay-btn">
-                            <span>{text("Continue payment")}</span>
-                            <span>→</span>
-                          </a>
-                        )}
-                      </div>
-                    </article>
-                  ))}
-
-                  <div className="wallet-pagination">
-                    <button
-                      disabled={!depositOffset}
-                      onClick={() => setDepositOffset((v) => Math.max(0, v - 50))}
-                    >
-                      {text("Previous deposits")}
-                    </button>
-                    <button
-                      disabled={!deposits.hasMore}
-                      onClick={() => setDepositOffset((v) => v + 50)}
-                    >
-                      {text("Next deposits")}
-                    </button>
-                  </div>
-                </>
-              )}
+                    <div className="wallet-pagination">
+                      <button
+                        disabled={!depositOffset}
+                        onClick={() => setDepositOffset((v) => Math.max(0, v - 50))}
+                      >
+                        {text("Previous deposits")}
+                      </button>
+                      <button
+                        disabled={!deposits.hasMore}
+                        onClick={() => setDepositOffset((v) => v + 50)}
+                      >
+                        {text("Next deposits")}
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           )}
 

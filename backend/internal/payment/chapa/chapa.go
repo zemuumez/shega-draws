@@ -90,6 +90,26 @@ func (a *Adapter) request(ctx context.Context, method, path string, body any, ou
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		body, _ := io.ReadAll(res.Body)
 		slog.Error("Chapa request returned non-2xx status", "status", res.StatusCode, "body", string(body))
+		var errResp struct {
+			Message any    `json:"message"`
+			Status  string `json:"status"`
+		}
+		_ = json.Unmarshal(body, &errResp)
+		msg := ""
+		if str, ok := errResp.Message.(string); ok && str != "" {
+			msg = str
+		} else if m, ok := errResp.Message.(map[string]any); ok {
+			for k, v := range m {
+				msg = fmt.Sprintf("%s: %v", k, v)
+				break
+			}
+		}
+		if res.StatusCode >= 400 && res.StatusCode < 500 {
+			if msg != "" {
+				return fmt.Errorf("%w: %s", domain.ErrInvalid, msg)
+			}
+			return domain.ErrInvalid
+		}
 		return domain.ErrUnavailable
 	}
 	if err = json.NewDecoder(io.LimitReader(res.Body, 1<<20)).Decode(output); err != nil {
