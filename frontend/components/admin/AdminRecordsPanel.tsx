@@ -501,22 +501,25 @@ export function AdminRecordsPanel({
             <AdminAuditChanges details={r.details} />
           </article>
         ))}
-      {
-        <>
+      <div className="admin-pagination" style={{ marginTop: 20 }}>
+        <span>
+          Showing {rows.length > 0 ? `${offset + 1}–${offset + rows.length}` : "0"} items · Page {Math.floor(offset / 100) + 1}
+        </span>
+        <div style={{ display: "flex", gap: 8 }}>
           <button
             disabled={!offset || busy}
             onClick={() => setOffset((v) => Math.max(0, v - 100))}
           >
-            Previous
+            Previous 100
           </button>
           <button
             disabled={rows.length < 100 || busy}
             onClick={() => setOffset((v) => v + 100)}
           >
-            Next
+            Next 100
           </button>
-        </>
-      }
+        </div>
+      </div>
     </div>
   );
 }

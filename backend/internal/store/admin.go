@@ -44,31 +44,90 @@ func (s *Store) AdminDraws(ctx context.Context, offset int) ([]domain.Draw, erro
 }
 
 type AdminOverview struct {
-	OpenRounds      int               `json:"openRounds"`
-	IssuedTickets   int               `json:"issuedTickets"`
-	PendingPayments int               `json:"pendingPayments"`
-	RefundRequired  int               `json:"refundRequired"`
-	Collections     []AdminCollection `json:"collections"`
-	AsOf            time.Time         `json:"asOf"`
+	OpenRounds          int                 `json:"openRounds"`
+	IssuedTickets       int                 `json:"issuedTickets"`
+	PendingPayments     int                 `json:"pendingPayments"`
+	RefundRequired      int                 `json:"refundRequired"`
+	Collections         []AdminCollection   `json:"collections"`
+	TotalUsers          int                 `json:"totalUsers"`
+	VerifiedUsers       int                 `json:"verifiedUsers"`
+	TotalRounds         int                 `json:"totalRounds"`
+	CompletedRounds     int                 `json:"completedRounds"`
+	TotalRefundedOrders int                 `json:"totalRefundedOrders"`
+	TotalDepositsCount  int                 `json:"totalDepositsCount"`
+	DepositVolume       []AdminDepositTotal `json:"depositVolume"`
+	SalesPaused         bool                `json:"salesPaused"`
+	DepositsPaused      bool                `json:"depositsPaused"`
+	RecoveryLocked      bool                `json:"recoveryLocked"`
+	RecentOrders        []domain.Order      `json:"recentOrders"`
+	RecentAudits        []AdminAuditItem    `json:"recentAudits"`
+	AsOf                time.Time           `json:"asOf"`
 }
 type AdminCollection struct {
 	Currency      string `json:"currency"`
 	PaidMinor     int64  `json:"paidMinor"`
 	RefundedMinor int64  `json:"refundedMinor"`
 }
+type AdminDepositTotal struct {
+	Currency       string `json:"currency"`
+	SucceededMinor int64  `json:"succeededMinor"`
+	PendingMinor   int64  `json:"pendingMinor"`
+}
+type AdminAuditItem struct {
+	ID        int64           `json:"id"`
+	Actor     string          `json:"actor"`
+	Action    string          `json:"action"`
+	Resource  string          `json:"resource"`
+	Details   json.RawMessage `json:"details"`
+	CreatedAt time.Time       `json:"createdAt"`
+}
 
 func (s *Store) AdminOverview(ctx context.Context) (AdminOverview, error) {
-	o := AdminOverview{Collections: []AdminCollection{}}
+	o := AdminOverview{
+		Collections:   []AdminCollection{},
+		DepositVolume: []AdminDepositTotal{},
+		RecentOrders:  []domain.Order{},
+		RecentAudits:  []AdminAuditItem{},
+	}
 	// One statement provides a consistent count snapshot. Expired open draws
 	// are excluded even if their status has not been changed by an operator.
 	err := s.DB.QueryRow(ctx, `SELECT
 	 (SELECT count(*) FROM draws WHERE status='open' AND deadline>now()),
 	 count(*) FILTER(WHERE status='paid' AND NOT refund_recorded),
 	 count(*) FILTER(WHERE status IN ('pending','initializing')),
-	 count(*) FILTER(WHERE status='refund_required' AND NOT refund_recorded),now() FROM orders`).Scan(&o.OpenRounds, &o.IssuedTickets, &o.PendingPayments, &o.RefundRequired, &o.AsOf)
+	 count(*) FILTER(WHERE status='refund_required' AND NOT refund_recorded),
+	 count(*) FILTER(WHERE status='refunded' OR refund_recorded),
+	 (SELECT count(*) FROM draws),
+	 (SELECT count(*) FROM draws WHERE status='completed'),
+	 (SELECT count(*) FROM deposits WHERE status='succeeded'),
+	 now() FROM orders`).Scan(
+		&o.OpenRounds,
+		&o.IssuedTickets,
+		&o.PendingPayments,
+		&o.RefundRequired,
+		&o.TotalRefundedOrders,
+		&o.TotalRounds,
+		&o.CompletedRounds,
+		&o.TotalDepositsCount,
+		&o.AsOf,
+	)
 	if err != nil {
 		return o, err
 	}
+
+	// Operations control status
+	_ = s.DB.QueryRow(ctx, `SELECT sales_paused, deposits_paused, recovery_locked FROM operations_control WHERE id=true`).Scan(
+		&o.SalesPaused, &o.DepositsPaused, &o.RecoveryLocked,
+	)
+
+	// User counts (safe check for auth.user table created by Better-Auth)
+	var hasUserTable bool
+	_ = s.DB.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema='auth' AND table_name='user')`).Scan(&hasUserTable)
+	if hasUserTable {
+		_ = s.DB.QueryRow(ctx, `SELECT count(*), count(*) FILTER(WHERE "emailVerified"=true) FROM auth."user"`).Scan(&o.TotalUsers, &o.VerifiedUsers)
+	}
+
+	// Collections by currency
 	rows, err := s.DB.Query(ctx, `SELECT currency,
 	 COALESCE(sum(amount_minor) FILTER(WHERE kind='payment'),0)::bigint,
 	 COALESCE(sum(abs(amount_minor)) FILTER(WHERE kind='refund'),0)::bigint
@@ -84,7 +143,47 @@ func (s *Store) AdminOverview(ctx context.Context) (AdminOverview, error) {
 		}
 		o.Collections = append(o.Collections, c)
 	}
-	return o, rows.Err()
+
+	// Deposit volume by currency
+	drows, err := s.DB.Query(ctx, `SELECT currency,
+	 COALESCE(sum(amount_minor) FILTER(WHERE status='succeeded'),0)::bigint,
+	 COALESCE(sum(amount_minor) FILTER(WHERE status IN ('pending','initializing')),0)::bigint
+	 FROM deposits GROUP BY currency ORDER BY currency`)
+	if err == nil {
+		defer drows.Close()
+		for drows.Next() {
+			var dt AdminDepositTotal
+			if err = drows.Scan(&dt.Currency, &dt.SucceededMinor, &dt.PendingMinor); err == nil {
+				o.DepositVolume = append(o.DepositVolume, dt)
+			}
+		}
+	}
+
+	// 5 Most recent orders
+	orders, err := s.Orders(ctx, "", 0, true)
+	if err == nil {
+		if len(orders) > 5 {
+			o.RecentOrders = orders[:5]
+		} else {
+			o.RecentOrders = orders
+		}
+	}
+
+	// 5 Most recent audits
+	arows, err := s.DB.Query(ctx, `SELECT id, actor, action, resource, to_jsonb(details), created_at FROM audit_log ORDER BY id DESC LIMIT 5`)
+	if err == nil {
+		defer arows.Close()
+		for arows.Next() {
+			var item AdminAuditItem
+			var details []byte
+			if err = arows.Scan(&item.ID, &item.Actor, &item.Action, &item.Resource, &details, &item.CreatedAt); err == nil {
+				item.Details = json.RawMessage(details)
+				o.RecentAudits = append(o.RecentAudits, item)
+			}
+		}
+	}
+
+	return o, nil
 }
 
 type AdminUser struct {

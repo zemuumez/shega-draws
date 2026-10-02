@@ -398,7 +398,7 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 			}
 			out, err = a.Store.WalletReport(r.Context())
 		} else if kind == "deposits" {
-			out, err = a.adminDepositPage(r.Context(), offset(r))
+			out, err = a.adminDepositPage(r.Context(), offset(r), r.URL.Query().Get("currency"))
 		} else if kind == "templates" {
 			out, err = a.Store.Templates(r.Context(), offset(r))
 		} else if kind == "rounds" {
@@ -451,10 +451,46 @@ func (a *API) admin(w http.ResponseWriter, r *http.Request, u domain.User) {
 	} else if kind == "deposits" {
 		var input struct {
 			Reference string `json:"reference"`
+			Action    string `json:"action"`
+			Reason    string `json:"reason"`
 		}
 		err = decode(r, &input)
 		if err == nil {
-			err = a.Store.DepositReference(r.Context(), u.ID, r.PathValue("id"), input.Reference)
+			if input.Action == "recheck" {
+				err = a.Store.DepositRecheck(r.Context(), u.ID, r.PathValue("id"))
+			} else if input.Action == "resolve_review" {
+				err = a.Store.DepositResolveReview(r.Context(), u.ID, r.PathValue("id"), input.Reason)
+			} else {
+				err = a.Store.DepositReference(r.Context(), u.ID, r.PathValue("id"), input.Reference)
+			}
+		}
+	} else if kind == "refunds" {
+		var input struct {
+			Reference string `json:"reference"`
+			Reason    string `json:"reason"`
+		}
+		err = decode(r, &input)
+		if err == nil {
+			var o domain.Order
+			o, err = a.Store.Order(r.Context(), r.PathValue("id"))
+			if err == nil {
+				ref := strings.TrimSpace(input.Reference)
+				if ref == "" {
+					ref = "admin_refund_" + o.ID
+				}
+				v := domain.Verification{
+					Reference:         ref,
+					MerchantReference: o.ID,
+					Currency:          o.Currency,
+					AmountMinor:       o.AmountMinor,
+					Status:            "fully_refunded",
+					Mode:              "admin",
+				}
+				err = a.Store.ApplyPayment(r.Context(), o.ID, v, "admin")
+				if err == nil {
+					_ = a.Store.Audit(r.Context(), u.ID, "order.refund", o.ID)
+				}
+			}
 		}
 	} else if kind == "payments" {
 		var input struct {

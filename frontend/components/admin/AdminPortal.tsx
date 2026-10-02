@@ -43,6 +43,14 @@ const AdminRecordsPanel = dynamic(
 const AdminWallets = dynamic(() =>
   import("./AdminWallets").then((m) => m.AdminWallets),
 );
+const AdminFinancialReview = dynamic(
+  () => import("./AdminFinancialReview").then((m) => m.AdminFinancialReview),
+  { loading: () => <p role="status">Loading financial review…</p> },
+);
+const AdminReportsAudit = dynamic(
+  () => import("./AdminReportsAudit").then((m) => m.AdminReportsAudit),
+  { loading: () => <p role="status">Loading reports & audit…</p> },
+);
 const OperationsPanel = dynamic(() =>
   import("../OperationsPanel").then((m) => m.OperationsPanel),
 );
@@ -258,6 +266,12 @@ export function AdminPortal() {
               {section.id === "overview" && <AdminOverview />}
               {section.id === "users" && <AdminUsers />}
               {section.id === "wallets" && <AdminWallets />}
+              {section.id === "orders" && (
+                <AdminFinancialReview canWrite={role === "admin"} />
+              )}
+              {section.id === "audit" && (
+                <AdminReportsAudit canWrite={role === "admin"} />
+              )}
               {section.id === "draws" && (
                 <AdminLotteries canWrite={role === "admin"} />
               )}
@@ -283,15 +297,8 @@ export function AdminPortal() {
                   </p>
                 </section>
               )}
-              {recordSection(section.id) && (
+              {section.id !== "orders" && section.id !== "audit" && recordSection(section.id) && (
                 <section className="admin-card">
-                  {section.id === "orders" && (
-                    <p className="admin-notice">
-                      This view shows direct ticket payments. Wallets & deposits
-                      has the separate test funding records. Identity-review
-                      workflows are still pending.
-                    </p>
-                  )}
                   {section.id === "results" && (
                     <p className="admin-notice">
                       Results use the existing publication workflow. Independent

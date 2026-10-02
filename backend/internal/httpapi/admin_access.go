@@ -15,7 +15,7 @@ func adminAllowed(role, method, kind string) bool {
 	}
 	if method == "PUT" && role == "admin" {
 		switch kind {
-		case "deposits", "templates", "rounds", "payments", "legacy", "results", "messages", "advertisers", "operations":
+		case "deposits", "templates", "rounds", "payments", "refunds", "legacy", "results", "messages", "advertisers", "operations":
 			return true
 		}
 	}

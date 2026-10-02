@@ -1,5 +1,6 @@
 export interface Deposit {
   accountId?: string;
+  userId?: string;
   id: string;
   currency: string;
   amountMinor: number;
@@ -9,6 +10,11 @@ export interface Deposit {
   status: string;
   checkoutUrl: string;
   paymentReference: string;
+  phone?: string;
+  email?: string;
+  name?: string;
+  idempotencyKey?: string;
+  fingerprint?: string;
   createdAt: string;
   creditedAt: string | null;
   reversedAt: string | null;

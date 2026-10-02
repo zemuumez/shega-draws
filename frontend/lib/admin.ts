@@ -99,6 +99,38 @@ export interface AdminOverviewData {
   pendingPayments: number;
   refundRequired: number;
   collections: { currency: string; paidMinor: number; refundedMinor: number }[];
+  totalUsers?: number;
+  verifiedUsers?: number;
+  totalRounds?: number;
+  completedRounds?: number;
+  totalRefundedOrders?: number;
+  totalDepositsCount?: number;
+  depositVolume?: { currency: string; succeededMinor: number; pendingMinor: number }[];
+  salesPaused?: boolean;
+  depositsPaused?: boolean;
+  recoveryLocked?: boolean;
+  recentOrders?: {
+    id: string;
+    userId: string;
+    drawId: string;
+    number: number;
+    amountMinor: number;
+    currency: string;
+    provider: string;
+    status: string;
+    name: string;
+    phone: string;
+    paymentReference: string;
+    createdAt: string;
+  }[];
+  recentAudits?: {
+    id: number;
+    actor: string;
+    action: string;
+    resource: string;
+    details?: any;
+    createdAt: string;
+  }[];
   asOf: string;
 }
 export interface AdminUser {

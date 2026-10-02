@@ -262,3 +262,31 @@ func (s *Store) DepositMaintenance(ctx context.Context) error {
 	return err
 }
 
+func (s *Store) DepositRecheck(ctx context.Context, actor, id string) error {
+	tag, err := s.DB.Exec(ctx, `UPDATE deposits SET next_check_at=now(),attempts=0 WHERE id=$1`, id)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	if actor != "" {
+		_ = s.Audit(ctx, actor, "deposit.recheck", id)
+	}
+	return nil
+}
+
+func (s *Store) DepositResolveReview(ctx context.Context, actor, id, reason string) error {
+	tag, err := s.DB.Exec(ctx, `UPDATE deposits SET status='failed',review_reason=$2 WHERE id=$1 AND status='review'`, id, reason)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	if actor != "" {
+		_ = s.Audit(ctx, actor, "deposit.resolve_review", id)
+	}
+	return nil
+}
+

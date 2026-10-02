@@ -35,6 +35,9 @@ export interface Order {
   paymentReference: string;
   expiresAt: string;
   createdAt: string;
+  paidAt?: string | null;
+  idempotencyKey?: string;
+  fingerprint?: string;
 }
 export async function publicAPI<T>(
   path: string,

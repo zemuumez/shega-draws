@@ -110,20 +110,22 @@ export function AdminUsers() {
               {page.items.length
                 ? `${offset + 1}–${offset + page.items.length}`
                 : "0"}{" "}
-              accounts on this page
+              accounts on this page · Page {Math.floor(offset / 50) + 1}
             </span>
-            <button
-              disabled={!offset}
-              onClick={() => setOffset((v) => Math.max(0, v - 50))}
-            >
-              Previous
-            </button>
-            <button
-              disabled={!page.hasMore}
-              onClick={() => setOffset((v) => v + 50)}
-            >
-              Next
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                disabled={!offset}
+                onClick={() => setOffset((v) => Math.max(0, v - 50))}
+              >
+                Previous 50
+              </button>
+              <button
+                disabled={!page.hasMore}
+                onClick={() => setOffset((v) => v + 50)}
+              >
+                Next 50
+              </button>
+            </div>
           </div>
         </>
       )}

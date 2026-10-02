@@ -127,8 +127,8 @@ type adminDepositPage struct {
 	HasMore bool           `json:"hasMore"`
 }
 
-func (a *API) adminDepositPage(ctx context.Context, offset int) (adminDepositPage, error) {
-	page, err := a.Store.Deposits(ctx, "", offset, true, "")
+func (a *API) adminDepositPage(ctx context.Context, offset int, currency string) (adminDepositPage, error) {
+	page, err := a.Store.Deposits(ctx, "", offset, true, currency)
 	out := adminDepositPage{Items: []adminDeposit{}, HasMore: page.HasMore}
 	for _, d := range page.Items {
 		out.Items = append(out.Items, adminDeposit{Deposit: d, AccountID: d.UserID})
