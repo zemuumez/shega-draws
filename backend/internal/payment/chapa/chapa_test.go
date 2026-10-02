@@ -91,10 +91,10 @@ func TestSandboxMockCheckoutAndVerification(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected Start error: %v", err)
 	}
-	if checkout.Reference != "chapa_mock_dep_sandbox_1_amt_5000" {
+	if checkout.Reference != "chapa_mock_dep_sandbox_1_amt_5000_cur_ETB" {
 		t.Fatalf("unexpected reference: %s", checkout.Reference)
 	}
-	expectedURL := "http://localhost:3000/chapa-sandbox?id=dep_sandbox_1&amount=5000&currency=ETB&ref=chapa_mock_dep_sandbox_1_amt_5000"
+	expectedURL := "http://localhost:3000/chapa-sandbox?id=dep_sandbox_1&amount=5000&currency=ETB&ref=chapa_mock_dep_sandbox_1_amt_5000_cur_ETB"
 	if checkout.URL != expectedURL {
 		t.Fatalf("expected URL %s, got %s", expectedURL, checkout.URL)
 	}

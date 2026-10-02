@@ -159,7 +159,15 @@ func main() {
 		os.Exit(1)
 	}
 	a := &httpapi.API{MetricsToken: metricsToken, TrustedProxies: trusted, Store: st, Service: svc, Auth: &auth.Verifier{URL: jwks, Issuer: issuer, Audience: env("AUTH_AUDIENCE", "rimna-api")}, Origin: origin, MediaDir: env("MEDIA_DIR", "./private-media")}
-	srv := &http.Server{Addr: env("LISTEN_ADDR", ":8080"), Handler: a.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 25 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16 << 10}
+	listenAddr := env("LISTEN_ADDR", "")
+	if listenAddr == "" {
+		if p := os.Getenv("PORT"); p != "" {
+			listenAddr = ":" + p
+		} else {
+			listenAddr = ":8080"
+		}
+	}
+	srv := &http.Server{Addr: listenAddr, Handler: a.Handler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 25 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 16 << 10}
 	go func() {
 		<-ctx.Done()
 		c, cancel := context.WithTimeout(context.Background(), 15*time.Second)

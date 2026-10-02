@@ -41,6 +41,10 @@ const AdminRecordsPanel = dynamic(
   () => import("./AdminRecordsPanel").then((m) => m.AdminRecordsPanel),
   { loading: () => <p role="status">Loading workspace…</p> },
 );
+const AdminDrawResults = dynamic(
+  () => import("./AdminDrawResults").then((m) => m.AdminDrawResults),
+  { loading: () => <p role="status">Loading draw management…</p> },
+);
 const AdminWallets = dynamic(() =>
   import("./AdminWallets").then((m) => m.AdminWallets),
 );
@@ -283,6 +287,9 @@ export function AdminPortal() {
               {section.id === "draws" && (
                 <AdminLotteries canWrite={role === "admin"} />
               )}
+              {section.id === "results" && (
+                <AdminDrawResults canWrite={role === "admin"} />
+              )}
               {section.id === "operations" && (
                 <section className="admin-card">
                   <OperationsPanel />
@@ -305,15 +312,8 @@ export function AdminPortal() {
                   </p>
                 </section>
               )}
-              {section.id !== "orders" && section.id !== "audit" && recordSection(section.id) && (
+              {section.id !== "orders" && section.id !== "audit" && section.id !== "results" && recordSection(section.id) && (
                 <section className="admin-card">
-                  {section.id === "results" && (
-                    <p className="admin-notice">
-                      Results use the existing publication workflow. Independent
-                      approval and the external prize-settlement register are
-                      still pending.
-                    </p>
-                  )}
                   <AdminRecordsPanel
                     key={section.id}
                     section={section.id}
