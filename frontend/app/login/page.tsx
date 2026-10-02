@@ -91,6 +91,20 @@ function LoginForm() {
     }
   }, [session, sessionLoading, router, redirectTarget]);
 
+  // Display OAuth redirect errors if present
+  useEffect(() => {
+    const err = searchParams.get("error");
+    if (err) {
+      if (err === "state_not_found") {
+        setErrorMsg("Session expired or domain mismatch during social login. Please try again.");
+      } else if (err === "account_linking_disabled") {
+        setErrorMsg("An account with this email already exists.");
+      } else {
+        setErrorMsg(`Authentication error: ${err}`);
+      }
+    }
+  }, [searchParams]);
+
   // Resend countdown timer
   useEffect(() => {
     if (resendTimer <= 0) return;

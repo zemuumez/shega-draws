@@ -37,7 +37,8 @@ async function handler(request: Request) {
     const response = await getAuth().handler(request);
     response.headers.set("Cache-Control", "no-store");
     return response;
-  } catch {
+  } catch (err) {
+    console.error("Auth Handler Error:", err);
     return Response.json(
       { message: "Account service is temporarily unavailable." },
       { status: 503, headers: { "Cache-Control": "no-store" } },

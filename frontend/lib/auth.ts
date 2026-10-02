@@ -103,6 +103,13 @@ export function authOptions(): BetterAuthOptions {
     appName: "Rimna",
     baseURL,
     secret,
+    database: pool,
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "facebook"],
+      },
+    },
     trustedOrigins: [
       baseURL,
       "https://shega-draws.loca.lt",
@@ -196,5 +203,8 @@ export function authOptions(): BetterAuthOptions {
   };
 }
 export function getAuth() {
+  if (process.env.NODE_ENV !== "production") {
+    return betterAuth(authOptions());
+  }
   return (instance ||= betterAuth(authOptions()));
 }
