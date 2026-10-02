@@ -63,8 +63,8 @@ type Purchase struct {
 type Checkout struct{ URL, Reference string }
 type Webhook struct{ MerchantReference, ProviderReference string }
 type Verification struct {
-	Reference, MerchantReference, Status, Currency, Mode string
-	AmountMinor                                          int64
+	Reference, MerchantReference, Status, Currency, Mode, Method string
+	AmountMinor                                                  int64
 }
 
 // PaymentProvider is the boundary for Chapa, bank payment and future processors.

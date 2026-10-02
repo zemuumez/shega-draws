@@ -240,9 +240,11 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 			Currency  string          `json:"currency"`
 			Reference string          `json:"reference"`
 			ChapaRef  string          `json:"chapa_reference"`
-			TxRef     string          `json:"tx_ref"`
-			Merchant  string          `json:"merchant_reference"`
-			Mode      string          `json:"mode"`
+			TxRef         string          `json:"tx_ref"`
+			Merchant      string          `json:"merchant_reference"`
+			Mode          string          `json:"mode"`
+			PaymentMethod string          `json:"payment_method"`
+			Method        string          `json:"method"`
 		} `json:"data"`
 	}
 	endpoint := "/transaction/verify/" + url.PathEscape(ref)
@@ -280,7 +282,11 @@ func (a *Adapter) Verify(ctx context.Context, ref string) (domain.Verification, 
 	if merchant == "" {
 		merchant = ref
 	}
-	return domain.Verification{Reference: ref, MerchantReference: merchant, Status: status, AmountMinor: amount, Currency: strings.ToUpper(d.Currency), Mode: mode}, nil
+	method := d.PaymentMethod
+	if method == "" {
+		method = d.Method
+	}
+	return domain.Verification{Reference: ref, MerchantReference: merchant, Status: status, AmountMinor: amount, Currency: strings.ToUpper(d.Currency), Mode: mode, Method: method}, nil
 }
 func (a *Adapter) AuthenticateWebhook(body []byte, sig string) bool {
 	if a.WebhookSecret == "" {

@@ -86,7 +86,7 @@ func (s *Service) StartDeposit(ctx context.Context, u domain.User, key string, p
 	}
 	raw, _ := json.Marshal(p)
 	fingerprint := sha256.Sum256(raw)
-	d := domain.Deposit{ID: "dep_" + ID(), UserID: u.ID, Currency: p.Currency, AmountMinor: p.AmountMinor, Provider: p.Provider, Mode: s.Mode, Key: key, Fingerprint: hex.EncodeToString(fingerprint[:]), Phone: p.Phone, Email: u.Email, Name: u.Name}
+	d := domain.Deposit{ID: "dep_" + ID(), UserID: u.ID, Currency: p.Currency, AmountMinor: p.AmountMinor, Provider: p.Provider, PaymentMethod: p.PaymentMethod, Mode: s.Mode, Key: key, Fingerprint: hex.EncodeToString(fingerprint[:]), Phone: p.Phone, Email: u.Email, Name: u.Name}
 	d, created, err := s.Wallet.CreateDeposit(ctx, d)
 	if err != nil {
 		return d, err

@@ -4,6 +4,7 @@ export interface Deposit {
   currency: string;
   amountMinor: number;
   provider: string;
+  paymentMethod?: string;
   mode: string;
   status: string;
   checkoutUrl: string;

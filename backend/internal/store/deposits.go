@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const depositColumns = `id,user_id,currency,amount_minor,provider,mode,status,checkout_url,provider_reference,idempotency_key,fingerprint,phone,email,name,created_at,credited_at,reversed_at,review_reason`
+const depositColumns = `id,user_id,currency,amount_minor,provider,payment_method,mode,status,checkout_url,provider_reference,idempotency_key,fingerprint,phone,email,name,created_at,credited_at,reversed_at,review_reason`
 
 func scanDeposit(row pgx.Row) (domain.Deposit, error) {
 	var d domain.Deposit
-	err := row.Scan(&d.ID, &d.UserID, &d.Currency, &d.AmountMinor, &d.Provider, &d.Mode, &d.Status, &d.CheckoutURL, &d.ProviderReference, &d.Key, &d.Fingerprint, &d.Phone, &d.Email, &d.Name, &d.CreatedAt, &d.CreditedAt, &d.ReversedAt, &d.ReviewReason)
+	err := row.Scan(&d.ID, &d.UserID, &d.Currency, &d.AmountMinor, &d.Provider, &d.PaymentMethod, &d.Mode, &d.Status, &d.CheckoutURL, &d.ProviderReference, &d.Key, &d.Fingerprint, &d.Phone, &d.Email, &d.Name, &d.CreatedAt, &d.CreditedAt, &d.ReversedAt, &d.ReviewReason)
 	return d, dbError(err)
 }
 func (s *Store) Deposit(ctx context.Context, id string) (domain.Deposit, error) {
@@ -66,7 +66,7 @@ func (s *Store) CreateDeposit(ctx context.Context, d domain.Deposit) (domain.Dep
 		return d, false, domain.ErrRate
 	}
 	d.Status = "initializing"
-	d, err = scanDeposit(tx.QueryRow(ctx, `INSERT INTO deposits(id,user_id,currency,amount_minor,provider,mode,status,idempotency_key,fingerprint,phone,email,name,next_check_at) VALUES($1,$2,$3,$4,$5,$6,'initializing',$7,$8,$9,$10,$11,now()+interval '3 seconds') RETURNING `+depositColumns, d.ID, d.UserID, d.Currency, d.AmountMinor, d.Provider, d.Mode, d.Key, d.Fingerprint, d.Phone, d.Email, d.Name))
+	d, err = scanDeposit(tx.QueryRow(ctx, `INSERT INTO deposits(id,user_id,currency,amount_minor,provider,payment_method,mode,status,idempotency_key,fingerprint,phone,email,name,next_check_at) VALUES($1,$2,$3,$4,$5,$6,$7,'initializing',$8,$9,$10,$11,$12,now()+interval '3 seconds') RETURNING `+depositColumns, d.ID, d.UserID, d.Currency, d.AmountMinor, d.Provider, d.PaymentMethod, d.Mode, d.Key, d.Fingerprint, d.Phone, d.Email, d.Name))
 	if err != nil {
 		return d, false, err
 	}
@@ -106,6 +106,9 @@ func (s *Store) ApplyDeposit(ctx context.Context, id string, v domain.Verificati
 		}
 		if _, err = postWallet(ctx, tx, d.UserID, d.Currency, "deposit", d.ID, d.AmountMinor, nil); err != nil {
 			return err
+		}
+		if v.Method != "" {
+			_, _ = tx.Exec(ctx, `UPDATE deposits SET payment_method=$2 WHERE id=$1 AND (payment_method='' OR payment_method IS NULL)`, id, v.Method)
 		}
 		_, err = tx.Exec(ctx, `UPDATE deposits SET status='succeeded',credited_at=now(),review_reason='' WHERE id=$1`, id)
 	case "fully_refunded":

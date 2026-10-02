@@ -9,10 +9,11 @@ type CheckoutRequest struct {
 	Currency, Phone, Email, Name string
 }
 type DepositRequest struct {
-	Currency    string `json:"currency"`
-	AmountMinor int64  `json:"amountMinor"`
-	Provider    string `json:"provider"`
-	Phone       string `json:"phone"`
+	Currency      string `json:"currency"`
+	AmountMinor   int64  `json:"amountMinor"`
+	Provider      string `json:"provider"`
+	Phone         string `json:"phone"`
+	PaymentMethod string `json:"paymentMethod,omitempty"`
 }
 type Deposit struct {
 	ID                                   string     `json:"id"`
@@ -20,6 +21,7 @@ type Deposit struct {
 	Currency                             string     `json:"currency"`
 	AmountMinor                          int64      `json:"amountMinor"`
 	Provider                             string     `json:"provider"`
+	PaymentMethod                        string     `json:"paymentMethod,omitempty"`
 	Mode                                 string     `json:"mode"`
 	Status                               string     `json:"status"`
 	CheckoutURL                          string     `json:"checkoutUrl"`

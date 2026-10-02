@@ -176,6 +176,7 @@ export function AdminWallets() {
                   <tr>
                     <th>Deposit</th>
                     <th>Amount</th>
+                    <th>Method</th>
                     <th>Status</th>
                     <th>Payment reference</th>
                     <th>Review</th>
@@ -195,6 +196,15 @@ export function AdminWallets() {
                         </small>
                       </th>
                       <td>{money(d.amountMinor, d.currency)}</td>
+                      <td>
+                        <span className="admin-method-badge">
+                          {d.paymentMethod
+                            ? d.paymentMethod
+                            : d.currency === "USD"
+                            ? "card / global"
+                            : "telebirr / bank"}
+                        </span>
+                      </td>
                       <td>{d.status}</td>
                       <td>{d.paymentReference || "Not received"}</td>
                       <td>{d.reviewReason || "—"}</td>

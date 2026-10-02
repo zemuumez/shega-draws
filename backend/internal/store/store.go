@@ -546,6 +546,9 @@ func (s *Store) AdminWrite(ctx context.Context, actor, kind, id string, data []b
 // Environment is persistent: test payments can never be promoted to live tickets
 // by changing a key. Production uses a separate, empty operational database.
 func (s *Store) EnsureMode(ctx context.Context, mode string) error {
+	_, _ = s.DB.Exec(ctx, `ALTER TABLE deposits ADD COLUMN IF NOT EXISTS payment_method text NOT NULL DEFAULT ''`)
+	_, _ = s.DB.Exec(ctx, `UPDATE deposits SET payment_method='telebirr' WHERE (payment_method IS NULL OR payment_method='') AND currency='ETB'`)
+	_, _ = s.DB.Exec(ctx, `UPDATE deposits SET payment_method='card' WHERE (payment_method IS NULL OR payment_method='') AND currency='USD'`)
 	_, err := s.DB.Exec(ctx, `INSERT INTO backend_settings(key,value) VALUES('payment_mode',$1) ON CONFLICT DO NOTHING`, mode)
 	if err != nil {
 		return err

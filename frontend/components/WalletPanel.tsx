@@ -23,7 +23,77 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
+import { CountryCodePicker, COUNTRIES, type CountryInfo } from "./CountryCodePicker";
 import "./wallet.css";
+
+export function getMethodLabel(m?: string, currency?: string): string {
+  if (!m || m.trim() === "") {
+    return currency === "USD" ? "💳 Card / Global" : "⚡ Telebirr / Bank";
+  }
+  const clean = m.toLowerCase().replace(/[\s\-_]/g, "");
+  const map: Record<string, string> = {
+    telebirr: "⚡ Telebirr",
+    cbe: "🏦 CBE Birr",
+    cbebirr: "🏦 CBE Birr",
+    commercialbankofethiopia: "🏦 CBE Birr",
+    boa: "🏛️ Bank of Abyssinia",
+    abyssinia: "🏛️ Bank of Abyssinia",
+    bankofabyssinia: "🏛️ Bank of Abyssinia",
+    awash: "💧 Awash Birr",
+    awashbirr: "💧 Awash Birr",
+    awashbank: "💧 Awash Birr",
+    dashen: "🦁 Dashen Amole",
+    amole: "🦁 Dashen Amole",
+    dashenbank: "🦁 Dashen Amole",
+    coop: "🌾 Coop Bank",
+    cooppay: "🌾 Coop Bank",
+    cooperativebankoforomia: "🌾 Coop Bank",
+    cardlocal: "💳 EthSwitch ATM Card",
+    cardintl: "💳 Visa • Mastercard",
+    card: "💳 Card Payment",
+    visamastercard: "💳 Visa • Mastercard",
+    applepay: "📱 Apple Pay",
+    googlepay: "📱 Google Pay",
+    applegooglepay: "📱 Apple / Google Pay",
+    paypal: "🅿️ PayPal",
+    paypalexpress: "🅿️ PayPal",
+    wiretransfer: "🌐 Bank Wire",
+    ebirr: "📱 E-Birr",
+    chapa: "⚡ Chapa Secure",
+  };
+  return map[clean] || (m.charAt(0).toUpperCase() + m.slice(1));
+}
+
+export function parseAndFormatEthiopianPhone(raw: string): {
+  normalized: string;
+  display: string;
+  isValid: boolean;
+  rawDigits: string;
+} {
+  let cleaned = raw.trim().replace(/[\s\-()]/g, "");
+  if (!cleaned) {
+    return { normalized: "", display: "", isValid: false, rawDigits: "" };
+  }
+  if (cleaned.startsWith("+")) cleaned = cleaned.slice(1);
+  if (cleaned.startsWith("00")) cleaned = cleaned.slice(2);
+  if (cleaned.startsWith("251")) cleaned = cleaned.slice(3);
+  if (cleaned.startsWith("0")) cleaned = cleaned.slice(1);
+
+  cleaned = cleaned.replace(/\D/g, "");
+
+  const isValid = /^[79]\d{8}$/.test(cleaned);
+  const normalized = isValid ? `+251${cleaned}` : (cleaned ? `+251${cleaned}` : "");
+
+  let display = "+251";
+  if (cleaned.length > 0) {
+    const p1 = cleaned.slice(0, 2);
+    const p2 = cleaned.slice(2, 5);
+    const p3 = cleaned.slice(5, 9);
+    display = `+251 ${p1}${p2 ? " " + p2 : ""}${p3 ? " " + p3 : ""}`;
+  }
+
+  return { normalized, display, isValid, rawDigits: cleaned };
+}
 
 export interface PaymentMethodOption {
   id: string;
@@ -124,6 +194,7 @@ type Attempt = {
     amountMinor: number;
     provider: string;
     phone: string;
+    paymentMethod?: string;
   };
 };
 
@@ -158,6 +229,7 @@ export function WalletPanel({
   // Sub-tab states
   const [historyTab, setHistoryTab] = useState<"deposits" | "ledger">("deposits");
   const [selectedMethod, setSelectedMethod] = useState("telebirr");
+  const [selectedCountry, setSelectedCountry] = useState<CountryInfo>(COUNTRIES[0]);
 
   useEffect(() => {
     if (currency === "ETB") {
@@ -376,26 +448,23 @@ export function WalletPanel({
     try {
       let normPhone = phone.trim().replace(/[\s\-()]/g, "");
       if (currency === "ETB") {
-        if (normPhone.startsWith("09") || normPhone.startsWith("07")) {
-          normPhone = "+251" + normPhone.slice(1);
-        } else if ((normPhone.startsWith("9") || normPhone.startsWith("7")) && normPhone.length === 9) {
-          normPhone = "+251" + normPhone;
-        } else if (normPhone.startsWith("251") && (normPhone.startsWith("2519") || normPhone.startsWith("2517")) && normPhone.length === 12) {
-          normPhone = "+" + normPhone;
-        } else if (normPhone.startsWith("+251") && (normPhone.startsWith("+2519") || normPhone.startsWith("+2517")) && normPhone.length === 13) {
-          // already in format
-        } else if (!normPhone) {
+        const parsed = parseAndFormatEthiopianPhone(phone);
+        if (!phone.trim()) {
           normPhone = "+251911000000";
-        }
-        const etPattern = /^\+251[79]\d{8}$/;
-        if (!etPattern.test(normPhone)) {
-          throw new Error("Please enter a valid Ethiopian mobile phone number starting with 09 or 07 (e.g. 0947859632).");
+        } else if (!parsed.isValid) {
+          throw new Error("Please enter a valid Ethiopian mobile phone number (e.g. 0912345678, 0712345678, or +251912345678).");
+        } else {
+          normPhone = parsed.normalized;
         }
       } else {
-        if (!normPhone) {
-          normPhone = "+12025550123";
-        } else if (!normPhone.startsWith("+")) {
-          normPhone = "+" + normPhone;
+        if (normPhone.startsWith("+")) {
+          // full international number provided
+        } else if (normPhone.startsWith("0")) {
+          normPhone = selectedCountry.dialCode + normPhone.slice(1);
+        } else if (normPhone) {
+          normPhone = selectedCountry.dialCode + normPhone;
+        } else {
+          normPhone = selectedCountry.dialCode + "2025550123";
         }
       }
 
@@ -413,6 +482,7 @@ export function WalletPanel({
         amountMinor: depositAmountMinor,
         provider: "chapa",
         phone: normPhone,
+        paymentMethod: currency === "ETB" ? "telebirr" : "card",
       };
 
       const d = await accountAPI<Deposit>("/deposits", {
@@ -779,168 +849,156 @@ export function WalletPanel({
                   </div>
                 </div>
 
-                {/* Bank / Payment Method Selector (Horizontal layout across full width) */}
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                    <label className="wallet-form-label" style={{ margin: 0 }}>
+                {/* Streamlined Supported Payment Methods Strip */}
+                <div className="wallet-trust-section">
+                  <div className="wallet-trust-header">
+                    <span className="wallet-trust-title">
                       {currency === "ETB"
-                        ? text("Select Ethiopian Bank / Payment Channel")
-                        : text("Select Global Payment Option (via Chapa)")}
-                    </label>
-                    <span style={{ fontSize: "0.75rem", color: "#10B981", fontWeight: 700 }}>
+                        ? text("Supported Ethiopian Payment Methods")
+                        : text("Supported Global Payment Methods")}
+                    </span>
+                    <span className="wallet-trust-instant">
                       ⚡ {text("Instant Clearance")}
                     </span>
                   </div>
-                  <div className={`wallet-methods-grid methods-count-${(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).length}`}>
-                    {(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).map((m) => {
-                      const isSelected = selectedMethod === m.id;
+                  <div className="wallet-trust-strip">
+                    {currency === "ETB" ? (
+                      <>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#0284C7" }} />
+                          <strong>Telebirr</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#7C3AED" }} />
+                          <strong>CBE Birr</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#F59E0B" }} />
+                          <strong>Bank of Abyssinia</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#D97706" }} />
+                          <strong>Awash Birr</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#2563EB" }} />
+                          <strong>Dashen Amole</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#059669" }} />
+                          <strong>Coop Bank</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#DC2626" }} />
+                          <strong>EthSwitch ATM Cards</strong>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#2563EB" }} />
+                          <strong>Visa • Mastercard</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#0284C7" }} />
+                          <strong>American Express</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#10B981" }} />
+                          <strong>Apple Pay</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#EA4335" }} />
+                          <strong>Google Pay</strong>
+                        </span>
+                        <span className="trust-badge">
+                          <span className="trust-badge-dot" style={{ background: "#0079C1" }} />
+                          <strong>PayPal</strong>
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <p className="wallet-trust-caption">
+                    {currency === "ETB"
+                      ? text("Select your bank once on Chapa's official checkout screen, authorize with your PIN, and your wallet balance is credited immediately.")
+                      : text("Select your card or digital wallet on Chapa Global checkout, approve 3D-Secure, and your wallet balance is credited immediately.")}
+                  </p>
+                </div>
+
+                {/* Auto-adapting Phone Number Input */}
+                <div>
+                  <label htmlFor="deposit-phone-input" className="wallet-form-label">
+                    {currency === "ETB"
+                      ? text("Mobile Phone Number (for Chapa Payment Prompt)")
+                      : text("Mobile Contact / Phone (for 3D-Secure OTP)")}
+                  </label>
+                  {currency === "ETB" ? (
+                    (() => {
+                      const etbParsed = parseAndFormatEthiopianPhone(phone);
                       return (
-                        <div
-                          key={m.id}
-                          role="button"
-                          tabIndex={0}
-                          aria-pressed={isSelected}
-                          className={`wallet-method-card ${isSelected ? "active" : ""}`}
-                          onClick={() => {
-                            setSelectedMethod(m.id);
-                            setMessage("");
-                            setError("");
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              setSelectedMethod(m.id);
-                              setMessage("");
-                              setError("");
-                            }
-                          }}
-                        >
-                          <div className="wallet-method-card-top">
-                            <span
-                              className="wallet-method-badge"
-                              style={{
-                                color: m.badgeColor,
-                                background: `${m.badgeColor}18`,
-                              }}
-                            >
-                              {m.badge}
-                            </span>
-                            {isSelected && (
-                              <span className="wallet-method-check">✓</span>
-                            )}
+                        <div>
+                          <div className="wallet-phone-combined-row">
+                            <div className="etb-fixed-badge">
+                              <span style={{ fontSize: "1.1rem" }}>🇪🇹</span>
+                              <span>+251</span>
+                            </div>
+                            <input
+                              id="deposit-phone-input"
+                              aria-label={text("Ethiopian mobile phone number")}
+                              type="tel"
+                              autoComplete="tel"
+                              required
+                              placeholder="09... or 07... (or 9...)"
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value)}
+                              className="wallet-phone-input"
+                              style={{ flex: 1 }}
+                            />
                           </div>
-                          <div>
-                            <div className="wallet-method-name">{m.name}</div>
-                            <div className="wallet-method-desc">{m.desc}</div>
+                          <div className={`wallet-phone-feedback ${etbParsed.isValid ? "valid" : phone.trim() ? "typing" : ""}`}>
+                            {phone.trim() ? (
+                              etbParsed.isValid ? (
+                                <span>✓ {text("Prompt will be sent to:")} <strong>{etbParsed.display}</strong></span>
+                              ) : (
+                                <span>📱 {text("Auto-adapting:")} <strong>{etbParsed.display}</strong> {text("(enter 9 or 10 digits)")}</span>
+                              )
+                            ) : (
+                              <span className="wallet-form-hint">
+                                {text("Auto-adapts seamlessly whether you start with 09, 07, 9, or +251.")}
+                              </span>
+                            )}
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </div>
-
-                {/* Dynamic Phone / Contact Input Tailored to Method */}
-                {(() => {
-                  const methodConfig = (() => {
-                    switch (selectedMethod) {
-                      case "telebirr":
-                        return {
-                          label: text("Telebirr Mobile Number"),
-                          placeholder: "+251911000000",
-                          hint: text("You will receive an instant USSD prompt on your phone to approve payment with your PIN."),
-                        };
-                      case "cbe":
-                        return {
-                          label: text("CBE Account / CBE Birr Phone"),
-                          placeholder: "1000... or 09...",
-                          hint: text("Enter your Commercial Bank account number or registered CBE Birr phone."),
-                        };
-                      case "boa":
-                        return {
-                          label: text("Bank of Abyssinia Account / Phone"),
-                          placeholder: "+2519... or BoA Account",
-                          hint: text("Enter your BoA Apollo registered phone number or account number."),
-                        };
-                      case "awash":
-                        return {
-                          label: text("Awash Birr Mobile / Account"),
-                          placeholder: "+251911000000",
-                          hint: text("Enter your Awash Birr registered phone number for instant debit."),
-                        };
-                      case "dashen":
-                        return {
-                          label: text("Dashen / Amole Phone Number"),
-                          placeholder: "+251911000000",
-                          hint: text("Enter your Dashen Bank Amole registered phone number."),
-                        };
-                      case "coop":
-                        return {
-                          label: text("CoopPay Phone / Account Number"),
-                          placeholder: "+251911000000",
-                          hint: text("Enter your Cooperative Bank of Oromia CoopPay mobile or account."),
-                        };
-                      case "card_local":
-                        return {
-                          label: text("Cardholder Phone (for 3D-Secure SMS)"),
-                          placeholder: "+251911000000",
-                          hint: text("Used by EthSwitch to send the 3D-Secure one-time confirmation code (OTP)."),
-                        };
-                      case "card_intl":
-                        return {
-                          label: text("Mobile Phone Number (for 3D-Secure OTP)"),
-                          placeholder: "+1 202 555 0123",
-                          hint: text("International Visa/Mastercard 3D-Secure verification code will be sent to this number."),
-                        };
-                      case "apple_google_pay":
-                        return {
-                          label: text("Mobile Contact / Phone"),
-                          placeholder: "+1 202 555 0123",
-                          hint: text("Used for one-touch Apple Pay / Google Pay receipt and notification."),
-                        };
-                      case "paypal_express":
-                        return {
-                          label: text("Billing Contact Phone"),
-                          placeholder: "+1 202 555 0123",
-                          hint: text("Used to link your diaspora checkout with Chapa Global clearing."),
-                        };
-                      case "wire_transfer":
-                        return {
-                          label: text("Sender Contact Phone Number"),
-                          placeholder: "+1 202 555 0123",
-                          hint: text("Used by Chapa's international clearing desk for SWIFT transfer confirmation."),
-                        };
-                      default:
-                        return {
-                          label: text("Mobile Phone Number"),
-                          placeholder: currency === "USD" ? "+1..." : "+251...",
-                          hint: text("Used to send the instant payment prompt on your phone."),
-                        };
-                    }
-                  })();
-
-                  return (
+                    })()
+                  ) : (
                     <div>
-                      <label htmlFor="deposit-phone-input" className="wallet-form-label">
-                        {methodConfig.label}
-                      </label>
-                      <input
-                        id="deposit-phone-input"
-                        aria-label={methodConfig.label}
-                        type="tel"
-                        autoComplete="tel"
-                        required
-                        placeholder={methodConfig.placeholder}
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        maxLength={24}
-                        className="wallet-phone-input"
-                      />
+                      <div className="wallet-phone-combined-row">
+                        <CountryCodePicker
+                          selectedDialCode={selectedCountry.dialCode}
+                          onSelect={(c) => setSelectedCountry(c)}
+                          disabled={busy}
+                        />
+                        <input
+                          id="deposit-phone-input"
+                          aria-label={text("International phone number")}
+                          type="tel"
+                          autoComplete="tel"
+                          required
+                          placeholder="202 555 0123"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          maxLength={18}
+                          className="wallet-phone-input"
+                          style={{ flex: 1 }}
+                        />
+                      </div>
                       <small className="wallet-form-hint">
-                        {methodConfig.hint}
+                        {text("International Visa/Mastercard 3D-Secure verification code will be sent to this number.")}
                       </small>
                     </div>
-                  );
-                })()}
+                  )}
+                </div>
 
                 {error && (
                   <div
@@ -983,35 +1041,27 @@ export function WalletPanel({
                   style={{
                     width: "100%",
                     justifyContent: "center",
-                    padding: "14px 20px",
+                    padding: "15px 22px",
                     fontSize: "0.9375rem",
                     fontWeight: 800,
                     cursor: busy ? "not-allowed" : "pointer",
                     opacity: busy ? 0.7 : 1,
                   }}
                 >
-                  <CreditCard size={18} />
+                  <ShieldCheck size={18} />
                   <span>
                     {busy
-                      ? text("Processing Checkout…")
+                      ? text("Connecting to Chapa Checkout…")
                       : amount
-                        ? `${text("Deposit")} ${amount} ${currency} via ${(currency === "ETB" ? ETB_PAYMENT_METHODS : USD_PAYMENT_METHODS).find((m) => m.id === selectedMethod)?.name || "Chapa"}`
-                        : text("Continue to Payment")}
+                        ? `${text("Deposit")} ${amount} ${currency} ${text("via Chapa Secure Checkout")} →`
+                        : text("Continue to Chapa Secure Checkout →")}
                   </span>
-                  <ArrowRight size={16} />
                 </button>
 
-                {/* Subdued Supported Gateways Footer */}
-                <div className="wallet-deposit-footer">
-                  <span className="wallet-deposit-footer-label">
-                    {currency === "ETB"
-                      ? text("Supported Ethiopian Banking Channels:")
-                      : text("Supported Global Payment Rails:")}
-                  </span>
-                  <span className="wallet-deposit-footer-channels">
-                    {currency === "ETB"
-                      ? "Telebirr • Commercial Bank of Ethiopia (CBE) • Bank of Abyssinia • Awash Birr • Dashen Amole • Coop Bank • EthSwitch Cards"
-                      : "Visa • Mastercard • American Express • Apple Pay • Google Pay • PayPal • SWIFT Wire (via Chapa Global)"}
+                <div className="wallet-secure-guarantee">
+                  <ShieldCheck size={14} style={{ color: "#10B981" }} />
+                  <span>
+                    {text("Licensed by National Bank of Ethiopia • 256-bit SSL encrypted • Instant wallet credit")}
                   </span>
                 </div>
               </form>
@@ -1151,6 +1201,9 @@ export function WalletPanel({
                           <div style={{ flex: 1 }}>
                             <div className="wallet-record-amount">
                               {formatBalance(money(d.amountMinor, d.currency), d.currency)}
+                              <span className="wallet-method-pill">
+                                {getMethodLabel(d.paymentMethod, d.currency)}
+                              </span>
                             </div>
                             <div className="wallet-record-meta">
                               <span suppressHydrationWarning>
