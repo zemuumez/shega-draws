@@ -61,21 +61,11 @@ function LoginForm() {
   const [phoneOtp, setPhoneOtp] = useState("");
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
   const [resendTimer, setResendTimer] = useState(0);
-  const [adblockDetected, setAdblockDetected] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Detect if Google reCAPTCHA is blocked by client adblocker
-  useEffect(() => {
-    if (mounted && authMethod === "phone") {
-      fetch("https://www.google.com/recaptcha/api.js", { method: "HEAD", mode: "no-cors" })
-        .then(() => setAdblockDetected(false))
-        .catch(() => setAdblockDetected(true));
-    }
-  }, [mounted, authMethod]);
 
   // General State
   const [busy, setBusy] = useState(false);
@@ -622,19 +612,6 @@ function LoginForm() {
           {/* ── FORM 2: PHONE (SMS OTP) AUTH ───────────────────────────────── */}
           {authMethod === "phone" && (
             <div>
-              {mounted && adblockDetected && (
-                <div className="auth-alert-message error" style={{ marginBottom: "16px" }}>
-                  <AlertCircle size={16} style={{ flexShrink: 0, marginTop: "2px" }} />
-                  <div>
-                    <p style={{ margin: "0 0 3px 0", fontWeight: 700 }}>
-                      {text("AdBlock Extension Active")}
-                    </p>
-                    <p style={{ margin: 0, fontSize: "0.75rem", lineHeight: 1.4 }}>
-                      {text("Your browser extension is blocking Google reCAPTCHA. Click your AdBlock icon in the Chrome toolbar, select 'Pause on this site', and refresh to receive SMS.")}
-                    </p>
-                  </div>
-                </div>
-              )}
 
               {phoneStep === "enter-phone" ? (
                 <form onSubmit={handleSendRealPhoneOtp}>

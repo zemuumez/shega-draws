@@ -58,6 +58,8 @@ export function getClientFirebaseAuth(): Auth | null {
   return firebaseAuth;
 }
 
+let activeVerifier: RecaptchaVerifier | null = null;
+
 /**
  * Creates and renders a fresh reCAPTCHA verifier for Phone Auth.
  */
@@ -69,12 +71,22 @@ export function setupRecaptcha(
   if (!auth) return null;
 
   try {
-    const container = document.getElementById(containerId);
-    if (container) {
-      container.innerHTML = "";
+    if (activeVerifier) {
+      try {
+        activeVerifier.clear();
+      } catch (_) {}
+      activeVerifier = null;
     }
 
-    const verifier = new RecaptchaVerifier(auth, containerId, {
+    const container = document.getElementById(containerId);
+    if (container && container.parentNode) {
+      // Replace the DOM container with a completely fresh node to clear any internal Google reCAPTCHA widget bindings
+      const freshContainer = document.createElement("div");
+      freshContainer.id = containerId;
+      container.parentNode.replaceChild(freshContainer, container);
+    }
+
+    activeVerifier = new RecaptchaVerifier(auth, containerId, {
       size: "invisible",
       callback: () => {
         if (onSolved) onSolved();
@@ -84,8 +96,8 @@ export function setupRecaptcha(
       },
     });
 
-    return verifier;
-  } catch (err) {
+    return activeVerifier;
+  } catch (err: any) {
     console.error("Failed to setup RecaptchaVerifier:", err);
     return null;
   }
@@ -113,8 +125,11 @@ export function parseFirebasePhoneError(err: any): string {
   const code = err?.code || "";
   const msg = err?.message || "";
 
+  if (msg.includes("region enabled") || msg.includes("region") || (code === "auth/operation-not-allowed" && msg.includes("region"))) {
+    return "SMS to Ethiopia (+251) is blocked by Firebase SMS Region Policy. In Firebase Console: go to Authentication > Settings tab > 'SMS region policy', and add Ethiopia (+251) or choose 'Allow all regions'. Alternatively, add this number under 'Phone numbers for testing' for instant verification.";
+  }
   if (code === "auth/internal-error" || msg.includes("auth/internal-error")) {
-    return "reCAPTCHA verification was blocked by your browser (e.g. AdBlock, uBlock, or Brave Shield), or Phone Provider is still provisioning in Firebase Console. Please disable AdBlock on localhost or try in an Incognito window.";
+    return "reCAPTCHA verification was blocked by your browser or Phone Provider is still provisioning. Please disable browser extensions on localhost or try in an Incognito window.";
   }
   if (code === "auth/invalid-phone-number" || msg.includes("auth/invalid-phone-number")) {
     return "Invalid mobile number format. Please ensure you selected the correct country code and entered a valid phone number.";
@@ -125,8 +140,8 @@ export function parseFirebasePhoneError(err: any): string {
   if (code === "auth/quota-exceeded" || msg.includes("auth/quota-exceeded")) {
     return "Daily SMS quota has been exceeded for this Firebase project.";
   }
-  if (code === "auth/captcha-check-failed" || msg.includes("auth/captcha-check-failed")) {
-    return "Security verification failed. Please disable browser extensions that block Google reCAPTCHA and try again.";
+  if (code === "auth/captcha-check-failed" || msg.includes("auth/captcha-check-failed") || msg.includes("already been rendered")) {
+    return "Security verification reloaded. Please click 'Send SMS Verification Code' again.";
   }
   if (code === "auth/network-request-failed" || msg.includes("auth/network-request-failed")) {
     return "Network connection failed. Please verify your internet connection and try again.";
