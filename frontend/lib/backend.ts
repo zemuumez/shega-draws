@@ -10,6 +10,13 @@ export interface BackendDraw {
   status: "open" | "closed" | "completed";
   deadline: string;
   liveVideoUrl: string;
+  rules?: {
+    deductions?: { label: string; bps: number }[];
+    prizeBps?: number[];
+  } | null;
+  purchasedCount?: number;
+  soldCount?: number;
+  occupiedCount?: number;
 }
 export interface Order {
   id: string;
@@ -49,5 +56,8 @@ export function compatibleDraw(d: BackendDraw) {
     drawId: d.id,
     ticketPrice: d.priceMinor / 100,
     poolCapacity: d.capacity,
+    purchasedCount: d.soldCount ?? d.purchasedCount ?? 0,
+    soldCount: d.soldCount ?? d.purchasedCount ?? 0,
+    occupiedCount: d.occupiedCount ?? d.soldCount ?? 0,
   };
 }

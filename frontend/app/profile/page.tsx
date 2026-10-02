@@ -1245,9 +1245,18 @@ function UserPortalContent() {
                 <div className="portal-lotteries-grid">
                   {filtered.map((d) => {
                     const totalPoolMinor = d.priceMinor * d.capacity;
-                    const jackpotMinor = Math.round(totalPoolMinor * 0.1925);
-                    const soldCount = (d as any).purchasedCount ?? Math.min(d.capacity, Math.max(1, Math.round(d.capacity * 0.35)));
-                    const soldPercent = Math.min(100, Math.round((soldCount / d.capacity) * 100));
+                    let deductionBps = 4500;
+                    if (d.rules?.deductions && d.rules.deductions.length > 0) {
+                      deductionBps = d.rules.deductions.reduce((s, x) => s + (x.bps || 0), 0);
+                    }
+                    const netPoolMinor = Math.max(0, Math.round((totalPoolMinor * (10000 - deductionBps)) / 10000));
+                    let jackpotShare = 0.35;
+                    if (d.rules?.prizeBps && d.rules.prizeBps.length > 0) {
+                      jackpotShare = d.rules.prizeBps[0] / 10000;
+                    }
+                    const jackpotMinor = Math.round(netPoolMinor * jackpotShare);
+                    const soldCount = d.soldCount ?? d.purchasedCount ?? 0;
+                    const soldPercent = d.capacity > 0 ? Number(((soldCount / d.capacity) * 100).toFixed(1)) : 0;
 
                     return (
                       <div key={d.id} className="portal-ticket-card">
@@ -1260,6 +1269,29 @@ function UserPortalContent() {
                           {/* Ribbon: ID + Live Status + Currency */}
                           <div className="portal-ticket-ribbon">
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              {d.liveVideoUrl && (
+                                <a
+                                  href={d.liveVideoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    backgroundColor: "rgba(239, 68, 68, 0.2)",
+                                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                                    color: "#F87171",
+                                    padding: "2px 8px",
+                                    borderRadius: "9999px",
+                                    fontSize: "0.625rem",
+                                    fontWeight: 800,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                    textDecoration: "none",
+                                  }}
+                                >
+                                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#EF4444" }} />
+                                  LIVE
+                                </a>
+                              )}
                               <span className="portal-ticket-badge-live">
                                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10B981" }} />
                                 {text("LIVE ROUND")}
@@ -1298,13 +1330,13 @@ function UserPortalContent() {
                           <div className="portal-ticket-info-row" style={{ marginBottom: 2 }}>
                             <span style={{ color: "#94A3B8", fontWeight: 600 }}>{text("Pool Participation")}:</span>
                             <span style={{ color: theme === "dark" ? "#FFFFFF" : "#0F172A", fontWeight: 700 }}>
-                              {soldCount} / {d.capacity} {text("Tickets")}
+                              {soldCount.toLocaleString()} / {d.capacity.toLocaleString()} {text("Tickets")} ({soldPercent}%)
                             </span>
                           </div>
 
                           {/* Progress bar */}
                           <div className="portal-ticket-progress-bar">
-                            <div className="portal-ticket-progress-fill" style={{ width: `${soldPercent}%` }} />
+                            <div className="portal-ticket-progress-fill" style={{ width: `${Math.min(100, soldPercent)}%` }} />
                           </div>
 
                           {d.deadline && (

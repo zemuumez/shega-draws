@@ -57,11 +57,40 @@ func scanOrder(r pgx.Row) (domain.Order, error) {
 }
 func (s *Store) Draw(ctx context.Context, id string) (domain.Draw, error) {
 	var d domain.Draw
-	err := s.DB.QueryRow(ctx, `SELECT id,title,currency,price_minor,capacity,status,deadline,live_video_url FROM draws WHERE id=$1`, id).Scan(&d.ID, &d.Title, &d.Currency, &d.PriceMinor, &d.Capacity, &d.Status, &d.Deadline, &d.LiveVideoURL)
-	return d, dbError(err)
+	var rawRules []byte
+	err := s.DB.QueryRow(ctx, `SELECT d.id, d.title, d.currency, d.price_minor, d.capacity, d.status, d.deadline, COALESCE(d.live_video_url,''), d.rules,
+		COALESCE(o.sold, 0), COALESCE(o.occupied, 0)
+		FROM draws d
+		LEFT JOIN LATERAL (
+			SELECT
+				count(*) FILTER(WHERE status IN ('paid','legacy_pending')) AS sold,
+				count(*) FILTER(WHERE status IN ('paid','legacy_pending') OR (status IN ('initializing','pending') AND expires_at>now())) AS occupied
+			FROM orders WHERE draw_id=d.id
+		) o ON true
+		WHERE d.id=$1`, id).Scan(&d.ID, &d.Title, &d.Currency, &d.PriceMinor, &d.Capacity, &d.Status, &d.Deadline, &d.LiveVideoURL, &rawRules, &d.SoldCount, &d.OccupiedCount)
+	if err != nil {
+		return d, dbError(err)
+	}
+	d.PurchasedCount = d.SoldCount
+	if len(rawRules) > 0 {
+		var rules domain.LotteryRules
+		if err := json.Unmarshal(rawRules, &rules); err == nil {
+			d.Rules = &rules
+		}
+	}
+	return d, nil
 }
 func (s *Store) Draws(ctx context.Context) ([]domain.Draw, error) {
-	rows, err := s.DB.Query(ctx, `SELECT id,title,currency,price_minor,capacity,status,deadline,live_video_url FROM draws ORDER BY created_at DESC LIMIT 500`)
+	rows, err := s.DB.Query(ctx, `SELECT d.id, d.title, d.currency, d.price_minor, d.capacity, d.status, d.deadline, COALESCE(d.live_video_url,''), d.rules,
+		COALESCE(o.sold, 0), COALESCE(o.occupied, 0)
+		FROM draws d
+		LEFT JOIN LATERAL (
+			SELECT
+				count(*) FILTER(WHERE status IN ('paid','legacy_pending')) AS sold,
+				count(*) FILTER(WHERE status IN ('paid','legacy_pending') OR (status IN ('initializing','pending') AND expires_at>now())) AS occupied
+			FROM orders WHERE draw_id=d.id
+		) o ON true
+		ORDER BY d.created_at DESC LIMIT 500`)
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +98,16 @@ func (s *Store) Draws(ctx context.Context) ([]domain.Draw, error) {
 	out := []domain.Draw{}
 	for rows.Next() {
 		var d domain.Draw
-		if err = rows.Scan(&d.ID, &d.Title, &d.Currency, &d.PriceMinor, &d.Capacity, &d.Status, &d.Deadline, &d.LiveVideoURL); err != nil {
+		var rawRules []byte
+		if err = rows.Scan(&d.ID, &d.Title, &d.Currency, &d.PriceMinor, &d.Capacity, &d.Status, &d.Deadline, &d.LiveVideoURL, &rawRules, &d.SoldCount, &d.OccupiedCount); err != nil {
 			return nil, err
+		}
+		d.PurchasedCount = d.SoldCount
+		if len(rawRules) > 0 {
+			var rules domain.LotteryRules
+			if err := json.Unmarshal(rawRules, &rules); err == nil {
+				d.Rules = &rules
+			}
 		}
 		out = append(out, d)
 	}

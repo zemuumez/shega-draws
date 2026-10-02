@@ -23,14 +23,18 @@ type User struct {
 	SessionID       string
 }
 type Draw struct {
-	ID           string    `json:"id"`
-	Title        string    `json:"title"`
-	Currency     string    `json:"currency"`
-	PriceMinor   int64     `json:"priceMinor"`
-	Capacity     int       `json:"capacity"`
-	Status       string    `json:"status"`
-	Deadline     time.Time `json:"deadline"`
-	LiveVideoURL string    `json:"liveVideoUrl"`
+	ID             string        `json:"id"`
+	Title          string        `json:"title"`
+	Currency       string        `json:"currency"`
+	PriceMinor     int64         `json:"priceMinor"`
+	Capacity       int           `json:"capacity"`
+	Status         string        `json:"status"`
+	Deadline       time.Time     `json:"deadline"`
+	LiveVideoURL   string        `json:"liveVideoUrl"`
+	Rules          *LotteryRules `json:"rules,omitempty"`
+	PurchasedCount int           `json:"purchasedCount"`
+	SoldCount      int           `json:"soldCount"`
+	OccupiedCount  int           `json:"occupiedCount"`
 }
 type Order struct {
 	ID                string    `json:"id"`

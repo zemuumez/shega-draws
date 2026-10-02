@@ -192,32 +192,51 @@ export function AvailableLotteries({ initialDraws = [] }: AvailableLotteriesProp
       ) : (() => {
         const d = currentDraw;
         const totalPoolMinor = d.priceMinor * d.capacity;
-        // 45% deductions, 55% net prize pool
-        const netPoolMinor = totalPoolMinor * 0.55;
 
-        // 10 Guaranteed Prize Tiers
-        const allTenPrizes = [
-          { rank: 1, title: text("Grand Jackpot"), share: 0.35, pctDisplay: "35%", icon: "🏆", color: "#F87171" },
-          { rank: 2, title: text("Luxury Reward"), share: 0.20, pctDisplay: "20%", icon: "🚗", color: "#38BDF8" },
-          { rank: 3, title: text("High Cash"), share: 0.15, pctDisplay: "15%", icon: "💰", color: "#34D399" },
-          { rank: 4, title: text("4th Cash Prize"), share: 0.10, pctDisplay: "10%", icon: "💵", color: "#FDE047" },
-          { rank: 5, title: text("5th Cash Prize"), share: 0.07, pctDisplay: "7%", icon: "✨", color: "#E2E8F0" },
-          { rank: 6, title: text("6th Cash Prize"), share: 0.05, pctDisplay: "5%", icon: "✨", color: "#E2E8F0" },
-          { rank: 7, title: text("7th Cash Prize"), share: 0.04, pctDisplay: "4%", icon: "✨", color: "#E2E8F0" },
-          { rank: 8, title: text("8th Cash Prize"), share: 0.03, pctDisplay: "3%", icon: "✨", color: "#94A3B8" },
-          { rank: 9, title: text("9th Cash Prize"), share: 0.03, pctDisplay: "3%", icon: "✨", color: "#94A3B8" },
-          { rank: 10, title: text("10th Cash Prize"), share: 0.03, pctDisplay: "3%", icon: "✨", color: "#94A3B8" },
-        ].map((pz) => ({
-          ...pz,
-          amountMinor: Math.round(netPoolMinor * pz.share),
-        }));
+        // Exact deductions configured by admin (or default 45% if unconfigured)
+        let deductionBps = 4500;
+        if (d.rules?.deductions && d.rules.deductions.length > 0) {
+          deductionBps = d.rules.deductions.reduce((sum, item) => sum + (item.bps || 0), 0);
+        }
+        const netPoolMinor = Math.max(0, Math.round((totalPoolMinor * (10000 - deductionBps)) / 10000));
+
+        // 10 Guaranteed Prize Tiers configured by admin (or standard tiers)
+        const defaultBps = [3500, 2000, 1200, 800, 600, 500, 400, 400, 300, 300];
+        const activePrizeBps = (d.rules?.prizeBps && d.rules.prizeBps.length === 10)
+          ? d.rules.prizeBps
+          : defaultBps;
+
+        const prizeMeta = [
+          { rank: 1, title: text("Grand Jackpot"), icon: "🏆", color: "#F87171" },
+          { rank: 2, title: text("Luxury Reward"), icon: "🚗", color: "#38BDF8" },
+          { rank: 3, title: text("High Cash"), icon: "💰", color: "#34D399" },
+          { rank: 4, title: text("4th Cash Prize"), icon: "💵", color: "#FDE047" },
+          { rank: 5, title: text("5th Cash Prize"), icon: "✨", color: "#E2E8F0" },
+          { rank: 6, title: text("6th Cash Prize"), icon: "✨", color: "#E2E8F0" },
+          { rank: 7, title: text("7th Cash Prize"), icon: "✨", color: "#E2E8F0" },
+          { rank: 8, title: text("8th Cash Prize"), icon: "✨", color: "#94A3B8" },
+          { rank: 9, title: text("9th Cash Prize"), icon: "✨", color: "#94A3B8" },
+          { rank: 10, title: text("10th Cash Prize"), icon: "✨", color: "#94A3B8" },
+        ];
+
+        const allTenPrizes = prizeMeta.map((pm, idx) => {
+          const bps = activePrizeBps[idx] ?? 300;
+          const share = bps / 10000;
+          const pct = bps / 100;
+          return {
+            ...pm,
+            share,
+            pctDisplay: `${pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1)}%`,
+            amountMinor: Math.round((netPoolMinor * bps) / 10000),
+          };
+        });
 
         const jackpotMinor = allTenPrizes[0].amountMinor;
         const secondPrizeMinor = allTenPrizes[1].amountMinor;
         const thirdPrizeMinor = allTenPrizes[2].amountMinor;
 
-        const soldCount = (d as any).purchasedCount ?? Math.min(d.capacity, Math.max(1, Math.round(d.capacity * 0.34)));
-        const soldPercent = Math.min(100, Math.round((soldCount / d.capacity) * 100));
+        const soldCount = d.soldCount ?? d.purchasedCount ?? 0;
+        const soldPercent = d.capacity > 0 ? Number(((soldCount / d.capacity) * 100).toFixed(1)) : 0;
 
         return (
           <div style={{ maxWidth: "800px", margin: "0 auto", position: "relative" }}>
@@ -387,6 +406,29 @@ export function AvailableLotteries({ initialDraws = [] }: AvailableLotteriesProp
                   <span>SHEGA DRAWS • OFFICIAL TICKET</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  {d.liveVideoUrl && (
+                    <a
+                      href={d.liveVideoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        backgroundColor: "rgba(239, 68, 68, 0.2)",
+                        border: "1px solid rgba(239, 68, 68, 0.4)",
+                        color: "#F87171",
+                        padding: "2px 8px",
+                        borderRadius: "9999px",
+                        fontSize: "0.625rem",
+                        fontWeight: 800,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#EF4444" }} />
+                      LIVE STREAM
+                    </a>
+                  )}
                   <span style={{
                     backgroundColor: "rgba(16, 185, 129, 0.2)",
                     border: "1px solid rgba(16, 185, 129, 0.4)",
@@ -483,12 +525,12 @@ export function AvailableLotteries({ initialDraws = [] }: AvailableLotteriesProp
 
                 {/* % Sold Progress Bar */}
                 <div style={{ marginBottom: "16px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", fontSize: "0.75rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", fontSize: "0.75rem", flexWrap: "wrap", gap: "4px" }}>
                     <span style={{ color: "#94A3B8", fontWeight: 700 }}>
                       {text("Tickets Sold")}
                     </span>
                     <span style={{ color: "#38BDF8", fontWeight: 800 }}>
-                      {soldPercent}%
+                      {soldCount.toLocaleString()} / {d.capacity.toLocaleString()} {text("Tickets")} ({soldPercent}%)
                     </span>
                   </div>
                   <div style={{
@@ -500,10 +542,11 @@ export function AvailableLotteries({ initialDraws = [] }: AvailableLotteriesProp
                   }}>
                     <div
                       style={{
-                        width: `${soldPercent}%`,
+                        width: `${Math.min(100, soldPercent)}%`,
                         height: "100%",
                         background: "linear-gradient(90deg, #38BDF8 0%, #10B981 100%)",
                         borderRadius: "9999px",
+                        transition: "width 0.3s ease",
                       }}
                     />
                   </div>
