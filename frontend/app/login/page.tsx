@@ -217,6 +217,19 @@ function LoginForm() {
     }
   }
 
+  function formatE164Phone(code: string, raw: string): string {
+    let cleaned = raw.trim().replace(/[\s\-\(\)\.]/g, "");
+    if (cleaned.startsWith("+")) {
+      return cleaned;
+    }
+    const numericCode = code.replace("+", "");
+    if (cleaned.startsWith(numericCode)) {
+      cleaned = cleaned.slice(numericCode.length);
+    }
+    cleaned = cleaned.replace(/^0+/, "");
+    return `${code}${cleaned}`;
+  }
+
   // Handle Real Phone SMS Dispatch via Firebase
   async function handleSendRealPhoneOtp(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -224,14 +237,13 @@ function LoginForm() {
     setErrorMsg("");
     setSuccessMsg("");
 
-    const cleanLocal = localPhone.trim().replace(/^0+/, "");
-    if (!cleanLocal || cleanLocal.length < 7) {
-      setErrorMsg("Please enter a valid mobile number.");
+    const fullPhoneNumber = formatE164Phone(countryCode, localPhone);
+    const nationalNumber = fullPhoneNumber.replace(countryCode, "");
+    if (!nationalNumber || nationalNumber.length < 7 || nationalNumber.length > 12) {
+      setErrorMsg("Please enter a valid mobile number (e.g. 911 234 567).");
       setBusy(false);
       return;
     }
-
-    const fullPhoneNumber = `${countryCode}${cleanLocal}`;
 
     // Verify Firebase credentials are set in .env.local
     if (!isFirebaseConfigured()) {
@@ -284,8 +296,7 @@ function LoginForm() {
       return;
     }
 
-    const cleanLocal = localPhone.trim().replace(/^0+/, "");
-    const fullPhoneNumber = `${countryCode}${cleanLocal}`;
+    const fullPhoneNumber = formatE164Phone(countryCode, localPhone);
 
     try {
       if (!confirmationResult) {

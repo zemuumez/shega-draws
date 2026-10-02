@@ -128,8 +128,14 @@ export function parseFirebasePhoneError(err: any): string {
   if (msg.includes("region enabled") || msg.includes("region") || (code === "auth/operation-not-allowed" && msg.includes("region"))) {
     return "SMS to Ethiopia (+251) is blocked by Firebase SMS Region Policy. In Firebase Console: go to Authentication > Settings tab > 'SMS region policy', and add Ethiopia (+251) or choose 'Allow all regions'. Alternatively, add this number under 'Phone numbers for testing' for instant verification.";
   }
+  if (code === "auth/billing-not-enabled" || msg.includes("billing-not-enabled")) {
+    return "Firebase requires a Blaze (pay-as-you-go) plan to send real SMS via carrier networks. For free testing without billing, add your number in Firebase Console under Authentication > Sign-in method > Phone > 'Phone numbers for testing' (e.g. your number with code 123456).";
+  }
   if (code === "auth/internal-error" || msg.includes("auth/internal-error")) {
     return "reCAPTCHA verification was blocked by your browser or Phone Provider is still provisioning. Please disable browser extensions on localhost or try in an Incognito window.";
+  }
+  if (msg.includes("TOO_LONG")) {
+    return "The phone number has too many digits. Please enter only your 9-digit mobile number (e.g. 911 234 567) without repeating the country code or adding extra digits.";
   }
   if (code === "auth/invalid-phone-number" || msg.includes("auth/invalid-phone-number")) {
     return "Invalid mobile number format. Please ensure you selected the correct country code and entered a valid phone number.";
