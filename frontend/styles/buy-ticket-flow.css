@@ -531,3 +531,188 @@
   justify-content: center;
   margin: 0 auto 16px;
 }
+
+/* ── Calendar-like Page Picker ── */
+.flow-page-calendar-trigger {
+  padding: 8px 14px;
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #FDE047;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.flow-page-calendar-trigger:hover,
+.flow-page-calendar-trigger.active {
+  border-color: #FDE047;
+  background: #253347;
+  box-shadow: 0 0 12px rgba(253, 224, 71, 0.2);
+}
+
+.flow-calendar-dropdown-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: min(92vw, 360px);
+  background: #0D1527;
+  border: 1.5px solid #FDE047;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 20px rgba(253, 224, 71, 0.15);
+  z-index: 100;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: flowFadeSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes flowFadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flow-calendar-popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.flow-calendar-popover-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #FDE047;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-calendar-thousands-bar {
+  display: flex;
+  overflow-x: auto;
+  gap: 6px;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.flow-calendar-thousand-chip {
+  padding: 5px 9px;
+  background: #1A263D;
+  border: 1px solid #2A3B5C;
+  border-radius: 6px;
+  color: #94A3B8;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.flow-calendar-thousand-chip:hover {
+  color: #FDE047;
+  border-color: #FDE047;
+}
+
+.flow-calendar-thousand-chip.active {
+  background: #FDE047;
+  border-color: #FDE047;
+  color: #0F172A;
+}
+
+.flow-calendar-pages-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.flow-calendar-page-cell {
+  padding: 8px 10px;
+  background: #141E33;
+  border: 1px solid #23314F;
+  border-radius: 8px;
+  color: #E2E8F0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.flow-calendar-page-cell:hover {
+  background: #1E2D4A;
+  border-color: #38BDF8;
+  color: #38BDF8;
+}
+
+.flow-calendar-page-cell.selected {
+  background: rgba(253, 224, 71, 0.15);
+  border-color: #FDE047;
+  color: #FDE047;
+  font-weight: 900;
+  box-shadow: 0 0 8px rgba(253, 224, 71, 0.25);
+}
+
+.flow-calendar-jump-box {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.flow-calendar-jump-input {
+  flex: 1;
+  padding: 7px 10px;
+  background: #141E33;
+  border: 1px solid #2A3B5C;
+  border-radius: 6px;
+  color: #FDE047;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.flow-calendar-jump-input:focus {
+  outline: none;
+  border-color: #FDE047;
+}
+
+.flow-calendar-jump-btn {
+  padding: 7px 14px;
+  background: #FDE047;
+  border: none;
+  border-radius: 6px;
+  color: #0F172A;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.flow-calendar-jump-btn:hover {
+  background: #FEF08A;
+}
+

@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Calendar,
   Dice5,
   Search,
   CheckCircle2,
@@ -56,6 +58,23 @@ export function BuyTicketFlowModal({
   const [page, setPage] = useState(0);
   const [takenNumbers, setTakenNumbers] = useState<number[]>([]);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [showPagePicker, setShowPagePicker] = useState(false);
+  const [activeThousandIndex, setActiveThousandIndex] = useState(0);
+  const [quickJumpInput, setQuickJumpInput] = useState("");
+  const pagePickerRef = useRef<HTMLDivElement>(null);
+
+  // Close calendar page picker on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (pagePickerRef.current && !pagePickerRef.current.contains(e.target as Node)) {
+        setShowPagePicker(false);
+      }
+    }
+    if (showPagePicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showPagePicker]);
 
   // Step 3: Wallet Checkout
   const [walletBalance, setWalletBalance] = useState<{ availableMinor: number; balanceMinor: number; restricted: boolean } | null>(null);
@@ -462,27 +481,179 @@ export function BuyTicketFlowModal({
                 </div>
 
                 {!searchQuery && (
-                  <>
-                    <button
-                      type="button"
-                      className="flow-page-nav-btn"
-                      disabled={page === 0}
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                    <span style={{ fontSize: "0.8125rem", fontWeight: 800, color: "#FDE047", minWidth: "85px", textAlign: "center" }}>
-                      #{page * PAGE_SIZE + 1} – #{Math.min(draw.capacity, (page + 1) * PAGE_SIZE)}
-                    </span>
-                    <button
-                      type="button"
-                      className="flow-page-nav-btn"
-                      disabled={page >= totalPages - 1}
-                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                    >
-                      <ChevronRight size={16} />
-                    </button>
-                  </>
+                  <div style={{ position: "relative" }} ref={pagePickerRef}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <button
+                        type="button"
+                        className="flow-page-nav-btn"
+                        disabled={page === 0}
+                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        title={text("Previous 100 numbers")}
+                        aria-label="Previous page"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`flow-page-calendar-trigger ${showPagePicker ? "active" : ""}`}
+                        onClick={() => {
+                          setActiveThousandIndex(Math.floor(page / 10));
+                          setShowPagePicker((prev) => !prev);
+                        }}
+                        title={text("Click to choose numbers page like a calendar")}
+                        aria-label="Choose numbers page"
+                      >
+                        <Calendar size={14} color="#FDE047" />
+                        <span>
+                          #{page * PAGE_SIZE + 1} – #{Math.min(draw.capacity, (page + 1) * PAGE_SIZE)}
+                        </span>
+                        <ChevronDown
+                          size={14}
+                          style={{
+                            transform: showPagePicker ? "rotate(180deg)" : "none",
+                            transition: "transform 0.2s ease",
+                          }}
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        className="flow-page-nav-btn"
+                        disabled={page >= totalPages - 1}
+                        onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                        title={text("Next 100 numbers")}
+                        aria-label="Next page"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+
+                    {/* Calendar-style Page Picker Popover */}
+                    {showPagePicker && (
+                      <div className="flow-calendar-dropdown-popover">
+                        <div className="flow-calendar-popover-header">
+                          <span className="flow-calendar-popover-title">
+                            <Calendar size={13} color="#FDE047" />
+                            <span>{text("Choose Number Range")}</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowPagePicker(false)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#94A3B8",
+                              cursor: "pointer",
+                              padding: "2px",
+                              display: "flex",
+                            }}
+                            aria-label="Close"
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+
+                        {/* Thousands Selector (Decade/Thousands row) */}
+                        {Math.ceil(draw.capacity / 1000) > 1 && (
+                          <div>
+                            <div style={{ color: "#94A3B8", fontSize: "0.6875rem", fontWeight: 700, marginBottom: "4px" }}>
+                              {text("THOUSANDS POOL")}
+                            </div>
+                            <div className="flow-calendar-thousands-bar">
+                              {Array.from({ length: Math.ceil(draw.capacity / 1000) }, (_, idx) => {
+                                const tStart = idx * 1000 + 1;
+                                const tEnd = Math.min(draw.capacity, (idx + 1) * 1000);
+                                const isCurrent = activeThousandIndex === idx;
+                                return (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    className={`flow-calendar-thousand-chip ${isCurrent ? "active" : ""}`}
+                                    onClick={() => setActiveThousandIndex(idx)}
+                                  >
+                                    #{tStart.toLocaleString()} – #{tEnd.toLocaleString()}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 100-Numbers Pages Grid */}
+                        <div>
+                          <div style={{ color: "#94A3B8", fontSize: "0.6875rem", fontWeight: 700, marginBottom: "4px" }}>
+                            {text("PAGES (100 NUMBERS EACH)")}
+                          </div>
+                          <div className="flow-calendar-pages-grid">
+                            {Array.from({ length: 10 }, (_, pIdx) => {
+                              const pNumber = activeThousandIndex * 10 + pIdx;
+                              if (pNumber >= totalPages) return null;
+                              const pStart = pNumber * PAGE_SIZE + 1;
+                              const pEnd = Math.min(draw.capacity, (pNumber + 1) * PAGE_SIZE);
+                              const isSelected = page === pNumber;
+                              return (
+                                <button
+                                  key={pNumber}
+                                  type="button"
+                                  className={`flow-calendar-page-cell ${isSelected ? "selected" : ""}`}
+                                  onClick={() => {
+                                    setPage(pNumber);
+                                    setShowPagePicker(false);
+                                  }}
+                                >
+                                  {isSelected && <Check size={13} color="#FDE047" />}
+                                  <span>#{pStart} – #{pEnd}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Direct Jump to Number Input */}
+                        <div className="flow-calendar-jump-box">
+                          <input
+                            type="number"
+                            min={1}
+                            max={draw.capacity}
+                            placeholder={`Jump directly to # (1 - ${draw.capacity})`}
+                            className="flow-calendar-jump-input"
+                            value={quickJumpInput}
+                            onChange={(e) => setQuickJumpInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                const val = parseInt(quickJumpInput.trim(), 10);
+                                if (!isNaN(val) && val >= 1 && val <= draw.capacity) {
+                                  const targetPage = Math.floor((val - 1) / PAGE_SIZE);
+                                  setPage(targetPage);
+                                  setSelectedNumber(val);
+                                  setShowPagePicker(false);
+                                  setQuickJumpInput("");
+                                }
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="flow-calendar-jump-btn"
+                            onClick={() => {
+                              const val = parseInt(quickJumpInput.trim(), 10);
+                              if (!isNaN(val) && val >= 1 && val <= draw.capacity) {
+                                const targetPage = Math.floor((val - 1) / PAGE_SIZE);
+                                setPage(targetPage);
+                                setSelectedNumber(val);
+                                setShowPagePicker(false);
+                                setQuickJumpInput("");
+                              }
+                            }}
+                          >
+                            {text("Go")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
