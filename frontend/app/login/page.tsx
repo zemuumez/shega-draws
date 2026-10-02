@@ -38,11 +38,13 @@ function LoginForm() {
 
   const { data: session, isPending: sessionLoading } = authClient.useSession();
 
-  // Top-level Auth Method: email | phone | telegram
+  // Mode: "signin" | "signup" | "forgot" | "two-factor"
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot" | "two-factor">("signin");
+
+  // Auth Method: "email" | "phone" | "telegram"
   const [authMethod, setAuthMethod] = useState<"email" | "phone" | "telegram">("email");
 
-  // Email Mode State: signin | signup | forgot | two-factor
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot" | "two-factor">("signin");
+  // Email form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -50,7 +52,7 @@ function LoginForm() {
   const [isRecoveryCode, setIsRecoveryCode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Phone (Firebase SMS) Mode State
+  // Phone (Firebase SMS) form state
   const [countryCode, setCountryCode] = useState("+251");
   const [localPhone, setLocalPhone] = useState("");
   const [phoneName, setPhoneName] = useState("");
@@ -58,7 +60,6 @@ function LoginForm() {
   const [phoneOtp, setPhoneOtp] = useState("");
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
   const [resendTimer, setResendTimer] = useState(0);
-  const [isDevPhoneSimulation, setIsDevPhoneSimulation] = useState(false);
 
   // General State
   const [busy, setBusy] = useState(false);
@@ -74,7 +75,7 @@ function LoginForm() {
     }
   }, [session, sessionLoading, router, redirectTarget]);
 
-  // Resend countdown timer effect
+  // Resend countdown timer
   useEffect(() => {
     if (resendTimer <= 0) return;
     const interval = setInterval(() => {
@@ -83,11 +84,12 @@ function LoginForm() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
-  // Handle Social Sign In (Google / Facebook)
+  // Handle Social Sign-In (Google / Facebook)
   async function handleSocialSignIn(provider: "google" | "facebook") {
     setBusy(true);
     setErrorMsg("");
     setSuccessMsg("");
+
     try {
       const res: any = await authClient.signIn.social({
         provider,
@@ -95,15 +97,22 @@ function LoginForm() {
       });
 
       if (res?.error) {
-        throw new Error(
-          res.error.message ||
-            `${provider.toUpperCase()} sign-in requires credentials configured in .env.local.`
-        );
+        if (
+          res.error.message?.toLowerCase().includes("provider not found") ||
+          res.error.status === 400 ||
+          res.error.status === 404
+        ) {
+          throw new Error(
+            `${provider === "google" ? "Google" : "Facebook"} Sign-In is not activated yet. Please configure ${provider === "google" ? "GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET" : "FACEBOOK_CLIENT_ID & FACEBOOK_CLIENT_SECRET"} in frontend/.env.local.`
+          );
+        }
+        throw new Error(res.error.message || `Failed to sign in with ${provider}.`);
       }
     } catch (err: any) {
       setErrorMsg(
-        err.message ||
-          `${provider.toUpperCase()} provider is currently unavailable. Please check configuration.`
+        err.message?.includes("provider not found")
+          ? `${provider === "google" ? "Google" : "Facebook"} Sign-In requires API credentials in frontend/.env.local.`
+          : err.message || `Could not sign in with ${provider}.`
       );
     } finally {
       setBusy(false);
@@ -188,8 +197,8 @@ function LoginForm() {
     }
   }
 
-  // Handle Sending Phone SMS OTP
-  async function handleSendPhoneOtp(e?: React.FormEvent, isSimulation = false) {
+  // Handle Real Phone SMS Dispatch via Firebase
+  async function handleSendRealPhoneOtp(e?: React.FormEvent) {
     if (e) e.preventDefault();
     setBusy(true);
     setErrorMsg("");
@@ -204,19 +213,16 @@ function LoginForm() {
 
     const fullPhoneNumber = `${countryCode}${cleanLocal}`;
 
-    try {
-      if (isSimulation || !isFirebaseConfigured()) {
-        // Dev Simulation Mode
-        setIsDevPhoneSimulation(true);
-        setPhoneStep("verify-otp");
-        setResendTimer(60);
-        setSuccessMsg(
-          `Demo SMS sent to ${fullPhoneNumber}! (In Dev Mode, use test verification code: 123456)`
-        );
-        return;
-      }
+    // Verify Firebase credentials are set in .env.local
+    if (!isFirebaseConfigured()) {
+      setErrorMsg(
+        "Firebase is not configured yet in frontend/.env.local! To dispatch real SMS to phones, set NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_PROJECT_ID."
+      );
+      setBusy(false);
+      return;
+    }
 
-      // Live Firebase Phone Auth Flow
+    try {
       let verifier = recaptchaVerifierRef.current;
       if (!verifier) {
         verifier = setupRecaptcha("recaptcha-container");
@@ -224,31 +230,25 @@ function LoginForm() {
       }
 
       if (!verifier) {
-        throw new Error("Could not initialize security verification. Please refresh.");
+        throw new Error("Could not initialize security verification. Please refresh the page.");
       }
 
       const confirmation = await sendFirebasePhoneOtp(fullPhoneNumber, verifier);
       setConfirmationResult(confirmation);
-      setIsDevPhoneSimulation(false);
       setPhoneStep("verify-otp");
       setResendTimer(60);
-      setSuccessMsg(`Verification SMS dispatched to ${fullPhoneNumber}.`);
+      setSuccessMsg(`Verification code sent via SMS to ${fullPhoneNumber}.`);
     } catch (err: any) {
-      console.error("Phone Auth Error:", err);
-      // If Firebase failed or origin is not whitelisted, offer simulation in dev
-      if (process.env.NODE_ENV !== "production") {
-        setErrorMsg(
-          `Firebase SMS delivery note: ${err.message || "Unknown error"}. You can use the Dev Simulation button below to test.`
-        );
-      } else {
-        setErrorMsg(err.message || "Failed to send SMS code. Please try again.");
-      }
+      console.error("Firebase Phone SMS Error:", err);
+      setErrorMsg(
+        err.message || "Failed to dispatch SMS. Please ensure your Firebase credentials and authorized domain are configured."
+      );
     } finally {
       setBusy(false);
     }
   }
 
-  // Handle Verifying Phone SMS OTP & Better Auth Session Creation
+  // Handle Real Phone SMS OTP Verification
   async function handleVerifyPhoneOtp(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -257,7 +257,7 @@ function LoginForm() {
 
     const cleanCode = phoneOtp.trim();
     if (cleanCode.length !== 6) {
-      setErrorMsg("Please enter the 6-digit verification code.");
+      setErrorMsg("Please enter the 6-digit verification code received on your phone.");
       setBusy(false);
       return;
     }
@@ -266,18 +266,15 @@ function LoginForm() {
     const fullPhoneNumber = `${countryCode}${cleanLocal}`;
 
     try {
-      let idToken = "dev-bypass";
-
-      if (!isDevPhoneSimulation && confirmationResult) {
-        const userCredential = await confirmationResult.confirm(cleanCode);
-        idToken = await userCredential.user.getIdToken();
-      } else {
-        if (cleanCode !== "123456") {
-          throw new Error("Invalid demo verification code. Please enter 123456.");
-        }
+      if (!confirmationResult) {
+        throw new Error("No active SMS session. Please request a new verification code.");
       }
 
-      // Exchange with Better Auth plugin
+      // Verify code with Firebase
+      const userCredential = await confirmationResult.confirm(cleanCode);
+      const idToken = await userCredential.user.getIdToken();
+
+      // Exchange with Better Auth plugin to create session cookie
       const res = await fetch("/api/auth/phone/verify-and-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -315,171 +312,136 @@ function LoginForm() {
 
   return (
     <div className="auth-page-container">
-      <div className="auth-card">
-        {/* Hidden reCAPTCHA container for Firebase Phone Auth */}
-        <div id="recaptcha-container" style={{ display: "none" }}></div>
+      {/* Invisible reCAPTCHA container for Firebase Phone Auth */}
+      <div
+        id="recaptcha-container"
+        style={{
+          position: "fixed",
+          bottom: 0,
+          right: 0,
+          opacity: 0.01,
+          pointerEvents: "none",
+          zIndex: 9999,
+        }}
+      />
 
-        {/* Header / Brand */}
-        <div className="auth-header">
-          <Link href="/" style={{ display: "inline-block", marginBottom: "12px" }}>
+      {/* Dual-Panel Card (Reference Style) */}
+      <div className="auth-split-wrapper">
+        {/* Left Side: Welcome Hero Banner with Toggle Button */}
+        <div className="auth-hero-panel">
+          <Link href="/" style={{ marginBottom: "8px" }}>
             <Image
               src="/images/rimna-brand-logo.png"
               alt="Rimna Digital Lottery"
-              width={180}
-              height={42}
+              width={160}
+              height={38}
               priority
-              style={{ height: "38px", width: "auto", objectFit: "contain" }}
+              style={{ height: "34px", width: "auto", objectFit: "contain" }}
             />
           </Link>
-          <h1>
-            {authMethod === "email" && mode === "signin" && (t.nav.signIn || text("Sign In"))}
-            {authMethod === "email" && mode === "signup" && text("Create Account")}
-            {authMethod === "email" && mode === "forgot" && text("Reset Password")}
-            {authMethod === "email" && mode === "two-factor" && text("2-Step Verification")}
-            {authMethod === "phone" && text("Phone Sign In / Sign Up")}
-            {authMethod === "telegram" && text("Telegram One-Click Sign In")}
-          </h1>
-          <p>
-            {authMethod === "email" && mode === "signin" && text("Access your tickets, wallet balances, and settlements.")}
-            {authMethod === "email" && mode === "signup" && text("Join thousands of players in transparent live lottery draws.")}
-            {authMethod === "email" && mode === "forgot" && text("Enter your email to receive a password reset link.")}
-            {authMethod === "email" && mode === "two-factor" && text("Enter the 6-digit code from your Authenticator app.")}
-            {authMethod === "phone" && text("Instant SMS verification code. No email required to play.")}
-            {authMethod === "telegram" && text("Zero SMS fees and instant authentication via your Telegram app.")}
-          </p>
+
+          {mode === "signin" ? (
+            <>
+              <h2>{text("Hello, Friend!")}</h2>
+              <p>
+                {text("Enter your personal details and start your journey with Rimna Digital Lottery.")}
+              </p>
+              <button
+                type="button"
+                className="auth-hero-toggle-btn"
+                onClick={() => {
+                  setMode("signup");
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+              >
+                {text("Sign Up")}
+              </button>
+            </>
+          ) : (
+            <>
+              <h2>{text("Welcome Back!")}</h2>
+              <p>
+                {text("To keep connected with us please login with your personal account info.")}
+              </p>
+              <button
+                type="button"
+                className="auth-hero-toggle-btn"
+                onClick={() => {
+                  setMode("signin");
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+              >
+                {text("Sign In")}
+              </button>
+            </>
+          )}
         </div>
 
-        {/* 1. Quick Social Sign-In Buttons */}
-        <div className="social-auth-grid">
-          <button
-            type="button"
-            className="social-auth-btn google"
-            onClick={() => handleSocialSignIn("google")}
-            disabled={busy}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <path
-                fill="#EA4335"
-                d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
-              />
-              <path
-                fill="#4285F4"
-                d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.1s.7 5.4 1.9 7.8l3.7-2.9z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
-              />
-            </svg>
-            <span>Google</span>
-          </button>
+        {/* Right Side: Active Form Panel */}
+        <div className="auth-form-panel">
+          <div className="auth-form-header">
+            <h1>
+              {mode === "signin" && (t.nav.signIn || text("Sign In"))}
+              {mode === "signup" && text("Create Account")}
+              {mode === "forgot" && text("Reset Password")}
+              {mode === "two-factor" && text("2-Step Verification")}
+            </h1>
+            <p>
+              {mode === "signin" && text("Sign in with email, verified phone SMS, or Telegram.")}
+              {mode === "signup" && text("Create your official Rimna account to play and win.")}
+              {mode === "forgot" && text("Enter your email address to receive a secure reset link.")}
+              {mode === "two-factor" && text("Enter the 6-digit code from your Authenticator app.")}
+            </p>
+          </div>
 
-          <button
-            type="button"
-            className="social-auth-btn facebook"
-            onClick={() => handleSocialSignIn("facebook")}
-            disabled={busy}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-            <span>Facebook</span>
-          </button>
-        </div>
+          {/* Primary Method Selector Tabs: Email | Phone (SMS) | Telegram */}
+          {mode !== "two-factor" && mode !== "forgot" && (
+            <div className="auth-method-selector" role="tablist">
+              <button
+                type="button"
+                className={`auth-method-btn ${authMethod === "email" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthMethod("email");
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+              >
+                <Mail size={15} />
+                <span>{text("Email")}</span>
+              </button>
 
-        {/* Divider */}
-        <div className="auth-divider">
-          <span>{text("or choose sign-in method")}</span>
-        </div>
+              <button
+                type="button"
+                className={`auth-method-btn ${authMethod === "phone" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthMethod("phone");
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+              >
+                <Phone size={15} />
+                <span>{text("Phone (SMS)")}</span>
+              </button>
 
-        {/* 2. Primary Method Selector Tabs: Email | Phone | Telegram */}
-        <div className="auth-method-selector" role="tablist">
-          <button
-            type="button"
-            className={`auth-method-btn ${authMethod === "email" ? "active" : ""}`}
-            onClick={() => {
-              setAuthMethod("email");
-              setErrorMsg("");
-              setSuccessMsg("");
-            }}
-          >
-            <Mail size={15} />
-            <span>{text("Email")}</span>
-          </button>
+              <button
+                type="button"
+                className={`auth-method-btn ${authMethod === "telegram" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthMethod("telegram");
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+              >
+                <Send size={15} />
+                <span>{text("Telegram")}</span>
+              </button>
+            </div>
+          )}
 
-          <button
-            type="button"
-            className={`auth-method-btn ${authMethod === "phone" ? "active" : ""}`}
-            onClick={() => {
-              setAuthMethod("phone");
-              setErrorMsg("");
-              setSuccessMsg("");
-            }}
-          >
-            <Phone size={15} />
-            <span>{text("Phone (SMS)")}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`auth-method-btn ${authMethod === "telegram" ? "active" : ""}`}
-            onClick={() => {
-              setAuthMethod("telegram");
-              setErrorMsg("");
-              setSuccessMsg("");
-            }}
-          >
-            <Send size={15} />
-            <span>{text("Telegram")}</span>
-          </button>
-        </div>
-
-        {/* ── METHOD 1: EMAIL AUTH ─────────────────────────────────────────── */}
-        {authMethod === "email" && (
-          <div>
-            {/* Sub-tabs: Sign In / Sign Up / Forgot */}
-            {mode !== "two-factor" && (
-              <div className="auth-tabs" role="tablist">
-                <button
-                  type="button"
-                  className={`auth-tab-btn ${mode === "signin" ? "active" : ""}`}
-                  onClick={() => {
-                    setMode("signin");
-                    setErrorMsg("");
-                    setSuccessMsg("");
-                  }}
-                >
-                  {text("Sign In")}
-                </button>
-                <button
-                  type="button"
-                  className={`auth-tab-btn ${mode === "signup" ? "active" : ""}`}
-                  onClick={() => {
-                    setMode("signup");
-                    setErrorMsg("");
-                    setSuccessMsg("");
-                  }}
-                >
-                  {text("Sign Up")}
-                </button>
-                <button
-                  type="button"
-                  className={`auth-tab-btn ${mode === "forgot" ? "active" : ""}`}
-                  onClick={() => {
-                    setMode("forgot");
-                    setErrorMsg("");
-                    setSuccessMsg("");
-                  }}
-                >
-                  {text("Forgot?")}
-                </button>
-              </div>
-            )}
-
+          {/* ── FORM 1: EMAIL SIGN IN / SIGN UP ────────────────────────────── */}
+          {authMethod === "email" && (
             <form onSubmit={handleEmailSubmit} noValidate>
               {mode === "signup" && (
                 <div className="auth-form-group">
@@ -528,26 +490,6 @@ function LoginForm() {
                 <div className="auth-form-group">
                   <label htmlFor="auth-password">
                     <span>{text("Password")}</span>
-                    {mode === "signin" && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMode("forgot");
-                          setErrorMsg("");
-                          setSuccessMsg("");
-                        }}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "#FDE047",
-                          fontSize: "0.75rem",
-                          cursor: "pointer",
-                          padding: 0,
-                        }}
-                      >
-                        {text("Forgot password?")}
-                      </button>
-                    )}
                   </label>
                   <div style={{ position: "relative" }}>
                     <input
@@ -581,14 +523,27 @@ function LoginForm() {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                  {mode === "signup" && (
-                    <small style={{ color: "#9CA3AF", fontSize: "0.75rem", marginTop: "2px" }}>
-                      {text("Must be at least 12 characters long.")}
-                    </small>
-                  )}
                 </div>
               )}
 
+              {/* Dedicated "Forgot Password" link directly below password in Sign In mode */}
+              {mode === "signin" && (
+                <div className="auth-forgot-link-wrapper">
+                  <button
+                    type="button"
+                    className="auth-forgot-link"
+                    onClick={() => {
+                      setMode("forgot");
+                      setErrorMsg("");
+                      setSuccessMsg("");
+                    }}
+                  >
+                    {text("Forgot your password?")}
+                  </button>
+                </div>
+              )}
+
+              {/* 2-Step TOTP Verification */}
               {mode === "two-factor" && (
                 <div className="auth-form-group">
                   <label htmlFor="auth-totp">
@@ -634,14 +589,14 @@ function LoginForm() {
                 </div>
               )}
 
-              <button type="submit" disabled={busy} className="auth-submit-btn">
+              <button type="submit" disabled={busy} className="auth-primary-btn">
                 {busy ? (
                   <span>{text("Please wait…")}</span>
                 ) : (
                   <>
                     <span>
                       {mode === "signin" && (t.nav.signIn || text("Sign In"))}
-                      {mode === "signup" && text("Create Free Account")}
+                      {mode === "signup" && text("Sign Up")}
                       {mode === "forgot" && text("Send Reset Link")}
                       {mode === "two-factor" && text("Verify & Proceed")}
                     </span>
@@ -650,246 +605,300 @@ function LoginForm() {
                 )}
               </button>
             </form>
-          </div>
-        )}
+          )}
 
-        {/* ── METHOD 2: PHONE (SMS OTP) AUTH ───────────────────────────────── */}
-        {authMethod === "phone" && (
-          <div>
-            {phoneStep === "enter-phone" ? (
-              <form onSubmit={(e) => handleSendPhoneOtp(e, false)}>
-                <div className="auth-form-group">
-                  <label htmlFor="phone-name">
-                    <span>{text("Your Name (Optional)")}</span>
-                  </label>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      id="phone-name"
-                      type="text"
-                      maxLength={100}
-                      placeholder={text("e.g. Almaz Bekele")}
-                      value={phoneName}
-                      onChange={(e) => setPhoneName(e.target.value)}
-                      style={{ paddingLeft: "38px" }}
-                    />
-                    <User size={16} color="#9CA3AF" style={{ position: "absolute", left: "12px", top: "14px" }} />
-                  </div>
-                </div>
-
-                <div className="auth-form-group">
-                  <label htmlFor="phone-input">
-                    <span>{text("Mobile Phone Number")}</span>
-                  </label>
-                  <div className="phone-input-row">
-                    <select
-                      className="country-code-select"
-                      value={countryCode}
-                      onChange={(e) => setCountryCode(e.target.value)}
-                      aria-label="Country Calling Code"
-                    >
-                      <option value="+251">🇪🇹 +251 (ET)</option>
-                      <option value="+1">🇺🇸 +1 (US/CA)</option>
-                      <option value="+44">🇬🇧 +44 (UK)</option>
-                      <option value="+971">🇦🇪 +971 (UAE)</option>
-                      <option value="+254">🇰🇪 +254 (KE)</option>
-                      <option value="+234">🇳🇬 +234 (NG)</option>
-                      <option value="+27">🇿🇦 +27 (ZA)</option>
-                      <option value="+49">🇩🇪 +49 (DE)</option>
-                    </select>
-
-                    <div style={{ position: "relative", flex: 1 }}>
+          {/* ── FORM 2: PHONE (SMS OTP) AUTH ───────────────────────────────── */}
+          {authMethod === "phone" && (
+            <div>
+              {phoneStep === "enter-phone" ? (
+                <form onSubmit={handleSendRealPhoneOtp}>
+                  <div className="auth-form-group">
+                    <label htmlFor="phone-name">
+                      <span>{text("Your Name (Optional)")}</span>
+                    </label>
+                    <div style={{ position: "relative" }}>
                       <input
-                        id="phone-input"
-                        type="tel"
-                        required
-                        placeholder="911 234 567"
-                        value={localPhone}
-                        onChange={(e) => setLocalPhone(e.target.value)}
-                        autoComplete="tel-national"
+                        id="phone-name"
+                        type="text"
+                        maxLength={100}
+                        placeholder={text("e.g. Almaz Bekele")}
+                        value={phoneName}
+                        onChange={(e) => setPhoneName(e.target.value)}
                         style={{ paddingLeft: "38px" }}
                       />
-                      <Smartphone
-                        size={16}
-                        color="#9CA3AF"
-                        style={{ position: "absolute", left: "12px", top: "14px" }}
+                      <User size={16} color="#9CA3AF" style={{ position: "absolute", left: "12px", top: "14px" }} />
+                    </div>
+                  </div>
+
+                  <div className="auth-form-group">
+                    <label htmlFor="phone-input">
+                      <span>{text("Mobile Phone Number")}</span>
+                    </label>
+                    <div className="phone-input-row">
+                      <select
+                        className="country-code-select"
+                        value={countryCode}
+                        onChange={(e) => setCountryCode(e.target.value)}
+                        aria-label="Country Calling Code"
+                      >
+                        <option value="+251">🇪🇹 +251 (ET)</option>
+                        <option value="+1">🇺🇸 +1 (US/CA)</option>
+                        <option value="+44">🇬🇧 +44 (UK)</option>
+                        <option value="+971">🇦🇪 +971 (UAE)</option>
+                        <option value="+254">🇰🇪 +254 (KE)</option>
+                        <option value="+234">🇳🇬 +234 (NG)</option>
+                        <option value="+27">🇿🇦 +27 (ZA)</option>
+                        <option value="+49">🇩🇪 +49 (DE)</option>
+                      </select>
+
+                      <div style={{ position: "relative", flex: 1 }}>
+                        <input
+                          id="phone-input"
+                          type="tel"
+                          required
+                          placeholder="911 234 567"
+                          value={localPhone}
+                          onChange={(e) => setLocalPhone(e.target.value)}
+                          autoComplete="tel-national"
+                          style={{ paddingLeft: "38px" }}
+                        />
+                        <Smartphone
+                          size={16}
+                          color="#9CA3AF"
+                          style={{ position: "absolute", left: "12px", top: "14px" }}
+                        />
+                      </div>
+                    </div>
+                    <small style={{ color: "#9CA3AF", fontSize: "0.75rem", marginTop: "4px" }}>
+                      {text("We will send a 6-digit SMS verification code to your device.")}
+                    </small>
+                  </div>
+
+                  <button type="submit" disabled={busy} className="auth-primary-btn" style={{ marginTop: "12px" }}>
+                    {busy ? (
+                      <span>{text("Dispatching SMS code…")}</span>
+                    ) : (
+                      <>
+                        <span>{text("Send SMS Verification Code")}</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyPhoneOtp}>
+                  <div className="auth-form-group">
+                    <label htmlFor="otp-input">
+                      <span>
+                        {text("Enter 6-Digit SMS Code sent to")} {countryCode} {localPhone}
+                      </span>
+                    </label>
+                    <div className="otp-box-container">
+                      <input
+                        id="otp-input"
+                        type="text"
+                        required
+                        maxLength={6}
+                        autoFocus
+                        placeholder="••••••"
+                        className="otp-digit-input"
+                        value={phoneOtp}
+                        onChange={(e) => setPhoneOtp(e.target.value.replace(/[^0-9]/g, ""))}
+                        autoComplete="one-time-code"
                       />
                     </div>
-                  </div>
-                  <small style={{ color: "#9CA3AF", fontSize: "0.75rem", marginTop: "4px" }}>
-                    {text("We will send a 6-digit SMS verification code.")}
-                  </small>
-                </div>
 
-                <button type="submit" disabled={busy} className="auth-submit-btn">
-                  {busy ? (
-                    <span>{text("Sending SMS code…")}</span>
-                  ) : (
-                    <>
-                      <span>{text("Send SMS Verification Code")}</span>
-                      <ArrowRight size={16} />
-                    </>
-                  )}
-                </button>
+                    <div className="phone-action-links">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPhoneStep("enter-phone");
+                          setPhoneOtp("");
+                          setErrorMsg("");
+                        }}
+                      >
+                        ← {text("Change number")}
+                      </button>
 
-                {/* Dev Simulation Option */}
-                {process.env.NODE_ENV !== "production" && (
-                  <div className="dev-mode-banner">
-                    <div>
-                      <strong>🛠️ Developer Mode:</strong> Test phone auth instantly without live SMS charges or before adding Firebase API keys.
+                      <button
+                        type="button"
+                        disabled={resendTimer > 0 || busy}
+                        onClick={handleSendRealPhoneOtp}
+                      >
+                        {resendTimer > 0 ? (
+                          <span>{text("Resend code in")} {resendTimer}s</span>
+                        ) : (
+                          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                            <RefreshCw size={12} /> {text("Resend Code")}
+                          </span>
+                        )}
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleSendPhoneOtp(undefined, true)}
-                      disabled={busy}
-                    >
-                      Use Dev Simulation (Mock Code: 123456)
-                    </button>
-                  </div>
-                )}
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyPhoneOtp}>
-                <div className="auth-form-group">
-                  <label htmlFor="otp-input">
-                    <span>
-                      {text("Enter 6-Digit SMS Code sent to")} {countryCode} {localPhone}
-                    </span>
-                  </label>
-                  <div className="otp-box-container">
-                    <input
-                      id="otp-input"
-                      type="text"
-                      required
-                      maxLength={6}
-                      autoFocus
-                      placeholder="••••••"
-                      className="otp-digit-input"
-                      value={phoneOtp}
-                      onChange={(e) => setPhoneOtp(e.target.value.replace(/[^0-9]/g, ""))}
-                      autoComplete="one-time-code"
-                    />
                   </div>
 
-                  <div className="phone-action-links">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPhoneStep("enter-phone");
-                        setPhoneOtp("");
-                        setErrorMsg("");
-                      }}
-                    >
-                      ← {text("Change number")}
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={resendTimer > 0 || busy}
-                      onClick={() => handleSendPhoneOtp(undefined, isDevPhoneSimulation)}
-                    >
-                      {resendTimer > 0 ? (
-                        <span>{text("Resend code in")} {resendTimer}s</span>
-                      ) : (
-                        <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                          <RefreshCw size={12} /> {text("Resend Code")}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <button type="submit" disabled={busy || phoneOtp.length !== 6} className="auth-submit-btn">
-                  {busy ? (
-                    <span>{text("Verifying code…")}</span>
-                  ) : (
-                    <>
-                      <span>{text("Verify & Sign In")}</span>
-                      <ArrowRight size={16} />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-          </div>
-        )}
-
-        {/* ── METHOD 3: TELEGRAM AUTH ──────────────────────────────────────── */}
-        {authMethod === "telegram" && (
-          <TelegramAuth
-            onSuccess={() => router.replace(redirectTarget)}
-            onError={(msg) => setErrorMsg(msg)}
-          />
-        )}
-
-        {/* Alerts / Feedback */}
-        {errorMsg && (
-          <div className="auth-alert-message error" role="alert" style={{ marginTop: "20px" }}>
-            <AlertCircle size={16} style={{ flexShrink: 0, marginTop: "2px" }} />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {successMsg && (
-          <div className="auth-alert-message success" role="status" style={{ marginTop: "20px" }}>
-            <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: "2px" }} />
-            <div>
-              <p style={{ margin: 0 }}>{successMsg}</p>
-              {authMethod === "email" && mode === "signup" && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await authClient.sendVerificationEmail({
-                        email: email.trim().toLowerCase(),
-                        callbackURL: redirectTarget,
-                      });
-                      setSuccessMsg("Verification email resent! Please check your inbox.");
-                    } catch {
-                      setErrorMsg("Could not resend email. Please try again shortly.");
-                    }
-                  }}
-                  style={{
-                    marginTop: "8px",
-                    padding: "4px 10px",
-                    background: "rgba(16, 185, 129, 0.2)",
-                    border: "1px solid #10B981",
-                    borderRadius: "6px",
-                    color: "#A7F3D0",
-                    fontSize: "0.75rem",
-                    cursor: "pointer",
-                    fontWeight: 700,
-                  }}
-                >
-                  {text("Resend verification email")}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={busy || phoneOtp.length !== 6}
+                    className="auth-primary-btn"
+                    style={{ marginTop: "12px" }}
+                  >
+                    {busy ? (
+                      <span>{text("Verifying code…")}</span>
+                    ) : (
+                      <>
+                        <span>{text("Verify & Sign In")}</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </form>
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Footer links for Email Forgot mode */}
-        {authMethod === "email" && mode === "forgot" && (
-          <div style={{ textAlign: "center", marginTop: "20px" }}>
-            <button
-              type="button"
-              onClick={() => {
-                setMode("signin");
-                setErrorMsg("");
-                setSuccessMsg("");
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#FDE047",
-                fontSize: "0.8125rem",
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-            >
-              ← {text("Back to Sign In")}
-            </button>
-          </div>
-        )}
+          {/* ── FORM 3: TELEGRAM AUTH ──────────────────────────────────────── */}
+          {authMethod === "telegram" && (
+            <TelegramAuth
+              onSuccess={() => router.replace(redirectTarget)}
+              onError={(msg) => setErrorMsg(msg)}
+            />
+          )}
+
+          {/* Alerts / Feedback Messages */}
+          {errorMsg && (
+            <div className="auth-alert-message error" role="alert" style={{ marginTop: "18px" }}>
+              <AlertCircle size={16} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="auth-alert-message success" role="status" style={{ marginTop: "18px" }}>
+              <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <div>
+                <p style={{ margin: 0 }}>{successMsg}</p>
+                {authMethod === "email" && mode === "signup" && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await authClient.sendVerificationEmail({
+                          email: email.trim().toLowerCase(),
+                          callbackURL: redirectTarget,
+                        });
+                        setSuccessMsg("Verification email resent! Please check your inbox.");
+                      } catch {
+                        setErrorMsg("Could not resend email. Please try again shortly.");
+                      }
+                    }}
+                    style={{
+                      marginTop: "8px",
+                      padding: "4px 10px",
+                      background: "rgba(16, 185, 129, 0.2)",
+                      border: "1px solid #10B981",
+                      borderRadius: "6px",
+                      color: "#A7F3D0",
+                      fontSize: "0.75rem",
+                      cursor: "pointer",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {text("Resend verification email")}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Back to Sign In button for Forgot Password mode */}
+          {mode === "forgot" && (
+            <div style={{ textAlign: "center", marginTop: "16px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("signin");
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#FDE047",
+                  fontSize: "0.8125rem",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                ← {text("Back to Sign In")}
+              </button>
+            </div>
+          )}
+
+          {/* ── AT THE BOTTOM: SOCIAL PLATFORMS SECTION (Reference Style) ─── */}
+          {mode !== "two-factor" && mode !== "forgot" && (
+            <div className="auth-social-bottom">
+              <div className="auth-social-bottom-text">
+                {text("or login with social platforms")}
+              </div>
+              <div className="social-circle-row">
+                {/* Google Circular Button */}
+                <button
+                  type="button"
+                  className="social-circle-btn"
+                  title="Sign in with Google"
+                  onClick={() => handleSocialSignIn("google")}
+                  disabled={busy}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path
+                      fill="#EA4335"
+                      d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
+                    />
+                    <path
+                      fill="#4285F4"
+                      d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.1s.7 5.4 1.9 7.8l3.7-2.9z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16.5C3.7 20.2 7.5 23.5 12 23.5z"
+                    />
+                  </svg>
+                </button>
+
+                {/* Facebook Circular Button */}
+                <button
+                  type="button"
+                  className="social-circle-btn"
+                  title="Sign in with Facebook"
+                  onClick={() => handleSocialSignIn("facebook")}
+                  disabled={busy}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </button>
+
+                {/* Telegram Circular Button */}
+                <button
+                  type="button"
+                  className="social-circle-btn"
+                  title="Sign in with Telegram"
+                  onClick={() => {
+                    setAuthMethod("telegram");
+                    setErrorMsg("");
+                  }}
+                  disabled={busy}
+                >
+                  <Send size={18} color="#0088cc" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
