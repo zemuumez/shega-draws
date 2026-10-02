@@ -103,8 +103,11 @@ export function authOptions(): BetterAuthOptions {
     appName: "Rimna",
     baseURL,
     secret,
-    database: pool,
-    trustedOrigins: [baseURL, "https://shega-draws.loca.lt"].filter(Boolean) as string[],
+    trustedOrigins: [
+      baseURL,
+      "https://shega-draws.loca.lt",
+      "https://calm-puma-52.loca.lt",
+    ].filter(Boolean) as string[],
     socialProviders: {
       ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
         ? {

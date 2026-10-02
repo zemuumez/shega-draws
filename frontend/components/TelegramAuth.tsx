@@ -14,7 +14,7 @@ export function TelegramAuth({ onSuccess, onError }: TelegramAuthProps) {
   const [loading, setLoading] = useState(false);
   const [demoActive, setDemoActive] = useState(false);
 
-  const botName = process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || "";
+  const botName = process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || "ZemuAdminBot";
   const isDev = process.env.NODE_ENV !== "production";
 
   useEffect(() => {
