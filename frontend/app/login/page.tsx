@@ -28,6 +28,7 @@ import {
   isFirebaseConfigured,
   setupRecaptcha,
   sendFirebasePhoneOtp,
+  parseFirebasePhoneError,
 } from "@/lib/firebase";
 
 function LoginForm() {
@@ -223,15 +224,19 @@ function LoginForm() {
     }
 
     try {
-      let verifier = recaptchaVerifierRef.current;
-      if (!verifier) {
-        verifier = setupRecaptcha("recaptcha-container");
-        recaptchaVerifierRef.current = verifier;
+      // Clear any prior verifier instance to prevent stale or failed reCAPTCHA state
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (_) {}
+        recaptchaVerifierRef.current = null;
       }
 
+      const verifier = setupRecaptcha("recaptcha-container");
       if (!verifier) {
         throw new Error("Could not initialize security verification. Please refresh the page.");
       }
+      recaptchaVerifierRef.current = verifier;
 
       const confirmation = await sendFirebasePhoneOtp(fullPhoneNumber, verifier);
       setConfirmationResult(confirmation);
@@ -240,9 +245,7 @@ function LoginForm() {
       setSuccessMsg(`Verification code sent via SMS to ${fullPhoneNumber}.`);
     } catch (err: any) {
       console.error("Firebase Phone SMS Error:", err);
-      setErrorMsg(
-        err.message || "Failed to dispatch SMS. Please ensure your Firebase credentials and authorized domain are configured."
-      );
+      setErrorMsg(parseFirebasePhoneError(err));
     } finally {
       setBusy(false);
     }
@@ -293,7 +296,7 @@ function LoginForm() {
       clearAccountToken();
       router.replace(redirectTarget);
     } catch (err: any) {
-      setErrorMsg(err.message || "Invalid or expired verification code.");
+      setErrorMsg(parseFirebasePhoneError(err));
     } finally {
       setBusy(false);
     }
@@ -313,17 +316,7 @@ function LoginForm() {
   return (
     <div className="auth-page-container">
       {/* Invisible reCAPTCHA container for Firebase Phone Auth */}
-      <div
-        id="recaptcha-container"
-        style={{
-          position: "fixed",
-          bottom: 0,
-          right: 0,
-          opacity: 0.01,
-          pointerEvents: "none",
-          zIndex: 9999,
-        }}
-      />
+      <div id="recaptcha-container"></div>
 
       {/* Dual-Panel Card (Reference Style) */}
       <div className="auth-split-wrapper">

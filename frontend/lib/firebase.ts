@@ -59,7 +59,7 @@ export function getClientFirebaseAuth(): Auth | null {
 }
 
 /**
- * Creates and renders a reCAPTCHA verifier for Phone Auth.
+ * Creates and renders a fresh reCAPTCHA verifier for Phone Auth.
  */
 export function setupRecaptcha(
   containerId: string,
@@ -69,6 +69,11 @@ export function setupRecaptcha(
   if (!auth) return null;
 
   try {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = "";
+    }
+
     const verifier = new RecaptchaVerifier(auth, containerId, {
       size: "invisible",
       callback: () => {
@@ -95,8 +100,46 @@ export async function sendFirebasePhoneOtp(
 ): Promise<ConfirmationResult> {
   const auth = getClientFirebaseAuth();
   if (!auth) {
-    throw new Error("Firebase Authentication is not initialized or configured.");
+    throw new Error("Firebase Authentication is not initialized. Please verify configuration.");
   }
 
   return await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+}
+
+/**
+ * Translates Firebase error codes into actionable, user-friendly messages.
+ */
+export function parseFirebasePhoneError(err: any): string {
+  const code = err?.code || "";
+  const msg = err?.message || "";
+
+  if (code === "auth/internal-error" || msg.includes("auth/internal-error")) {
+    return "reCAPTCHA verification was blocked by your browser (e.g. AdBlock, uBlock, or Brave Shield), or Phone Provider is still provisioning in Firebase Console. Please disable AdBlock on localhost or try in an Incognito window.";
+  }
+  if (code === "auth/invalid-phone-number" || msg.includes("auth/invalid-phone-number")) {
+    return "Invalid mobile number format. Please ensure you selected the correct country code and entered a valid phone number.";
+  }
+  if (code === "auth/too-many-requests" || msg.includes("auth/too-many-requests")) {
+    return "Too many SMS requests sent to this number. Please wait a few minutes before trying again.";
+  }
+  if (code === "auth/quota-exceeded" || msg.includes("auth/quota-exceeded")) {
+    return "Daily SMS quota has been exceeded for this Firebase project.";
+  }
+  if (code === "auth/captcha-check-failed" || msg.includes("auth/captcha-check-failed")) {
+    return "Security verification failed. Please disable browser extensions that block Google reCAPTCHA and try again.";
+  }
+  if (code === "auth/network-request-failed" || msg.includes("auth/network-request-failed")) {
+    return "Network connection failed. Please verify your internet connection and try again.";
+  }
+  if (code === "auth/invalid-verification-code" || msg.includes("auth/invalid-verification-code")) {
+    return "The 6-digit SMS code you entered is incorrect. Please check your SMS and try again.";
+  }
+  if (code === "auth/code-expired" || msg.includes("auth/code-expired")) {
+    return "The SMS code has expired. Please click 'Resend Code' to request a new one.";
+  }
+  if (code === "auth/operation-not-allowed" || msg.includes("auth/operation-not-allowed")) {
+    return "Phone Authentication is not enabled in Firebase Console. Go to Authentication > Sign-in method > Phone, and switch it to Enable.";
+  }
+
+  return msg || "Failed to process phone verification. Please try again.";
 }
