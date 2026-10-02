@@ -389,6 +389,315 @@
   color: #6EE7B7;
 }
 
+/* ── Social Login Buttons ──────────────────────────────────────────────── */
+.social-auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.social-auth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #1F2937;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #F3F4F6;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.social-auth-btn:hover:not(:disabled) {
+  background: #374151;
+  border-color: rgba(253, 224, 71, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.social-auth-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.social-auth-btn.google:hover:not(:disabled) {
+  border-color: rgba(234, 67, 53, 0.5);
+}
+
+.social-auth-btn.facebook:hover:not(:disabled) {
+  border-color: rgba(24, 119, 242, 0.5);
+}
+
+/* ── Auth Divider ──────────────────────────────────────────────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #6B7280;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-divider span {
+  padding: 0 12px;
+}
+
+/* ── Primary Auth Method Selector (Email vs Phone vs Telegram) ──────────── */
+.auth-method-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #0B111E;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+  gap: 4px;
+}
+
+.auth-method-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: #9CA3AF;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-method-btn.active {
+  background: #1F2937;
+  color: #FDE047;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Phone Number & OTP Inputs ─────────────────────────────────────────── */
+.phone-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.country-code-select {
+  width: 120px;
+  flex-shrink: 0;
+  padding: 12px 10px;
+  background: #0B111E;
+  border: 1.5px solid #374151;
+  border-radius: 10px;
+  color: #F9FAFB;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.country-code-select:focus {
+  outline: none;
+  border-color: #FDE047;
+}
+
+.otp-box-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.otp-digit-input {
+  width: 100%;
+  padding: 14px;
+  background: #0B111E;
+  border: 1.5px solid #374151;
+  border-radius: 10px;
+  color: #FDE047;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 12px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.otp-digit-input:focus {
+  outline: none;
+  border-color: #FDE047;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.2);
+}
+
+.phone-action-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 0.75rem;
+}
+
+.phone-action-links button {
+  background: none;
+  border: none;
+  color: #FDE047;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.phone-action-links button:disabled {
+  color: #6B7280;
+  cursor: not-allowed;
+}
+
+/* ── Telegram Auth Styles ──────────────────────────────────────────────── */
+.telegram-auth-box {
+  background: rgba(11, 17, 30, 0.8);
+  border: 1px solid rgba(0, 136, 204, 0.25);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.telegram-icon-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(0, 136, 204, 0.15);
+  border: 1.5px solid rgba(0, 136, 204, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.telegram-auth-box h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.125rem;
+  color: #F9FAFB;
+  font-weight: 800;
+}
+
+.telegram-auth-box p {
+  margin: 0 0 16px 0;
+  font-size: 0.8125rem;
+  color: #9CA3AF;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.telegram-widget-wrapper {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.telegram-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0088cc;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.telegram-notice-box {
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px dashed rgba(234, 179, 8, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.telegram-notice-text {
+  font-size: 0.75rem !important;
+  color: #FDE047 !important;
+  margin: 0 !important;
+  text-align: left;
+}
+
+.telegram-notice-text code {
+  background: #111827;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.7rem;
+}
+
+.telegram-demo-btn {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(0, 136, 204, 0.15);
+  border: 1px solid rgba(0, 136, 204, 0.4);
+  color: #38bdf8;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.telegram-demo-btn:hover:not(:disabled) {
+  background: rgba(0, 136, 204, 0.25);
+  border-color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+/* ── Dev Test Code Banner ──────────────────────────────────────────────── */
+.dev-mode-banner {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px dashed rgba(59, 130, 246, 0.4);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: #93C5FD;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dev-mode-banner button {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3B82F6;
+  border-radius: 6px;
+  color: #BFDBFE;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.dev-mode-banner button:hover {
+  background: rgba(59, 130, 246, 0.35);
+}
+
 /* ── Profile Hub Page ───────────────────────────────────────────────────── */
 .profile-page-wrapper {
   max-width: 1100px;

@@ -3,6 +3,7 @@ import { jwt, twoFactor } from "better-auth/plugins";
 import { Pool } from "pg";
 import nodemailer from "nodemailer";
 import { smtpOptions } from "./auth-mail";
+import { phoneAndTelegramAuthPlugin } from "./auth-extensions";
 
 let instance: ReturnType<typeof betterAuth> | undefined;
 let pool: Pool | undefined;
@@ -104,6 +105,24 @@ export function authOptions(): BetterAuthOptions {
     secret,
     database: pool,
     trustedOrigins: [baseURL],
+    socialProviders: {
+      ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+              clientId: process.env.GOOGLE_CLIENT_ID,
+              clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            },
+          }
+        : {}),
+      ...(process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET
+        ? {
+            facebook: {
+              clientId: process.env.FACEBOOK_CLIENT_ID,
+              clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+            },
+          }
+        : {}),
+    },
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 12,
@@ -146,10 +165,13 @@ export function authOptions(): BetterAuthOptions {
         "/send-verification-email": { window: 60, max: 3 },
         "/reset-password": { window: 60, max: 5 },
         "/two-factor/*": { window: 60, max: 5 },
+        "/phone/*": { window: 60, max: 10 },
+        "/telegram/*": { window: 60, max: 10 },
       },
     },
     plugins: [
       twoFactor({ issuer: "Rimna" }),
+      phoneAndTelegramAuthPlugin(),
       jwt({
         jwks: {
           keyPairConfig: { alg: "EdDSA" as const, crv: "Ed25519" as const },
