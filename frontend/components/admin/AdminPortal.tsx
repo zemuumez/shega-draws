@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import {
   LayoutDashboard,
@@ -181,7 +182,14 @@ export function AdminPortal() {
       </a>
       <aside className="admin-sidebar">
         <Link href="/admin" className="admin-brand">
-          <span>R</span>
+          <Image
+            src="/images/rimna-brand-logo.png"
+            alt="Rimna"
+            width={36}
+            height={36}
+            className="admin-brand-logo"
+            style={{ borderRadius: 8, objectFit: "contain" }}
+          />
           <div>
             Rimna<small>Operations center</small>
           </div>

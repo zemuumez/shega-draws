@@ -638,7 +638,7 @@ export function AdminFinancialReview({ canWrite }: { canWrite: boolean }) {
                 e.preventDefault();
                 void handleRecheck(manualOrderId.trim(), manualReference.trim());
               }}
-              style={{ maxWidth: 640 }}
+              style={{ width: "100%" }}
             >
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <label style={{ display: "block" }}>
@@ -814,7 +814,7 @@ export function AdminFinancialReview({ canWrite }: { canWrite: boolean }) {
 
           <div style={{ marginTop: 16 }}>
             <h3>Ledger Integrity Assurance</h3>
-            <p className="admin-muted" style={{ fontSize: 13, maxWidth: 700 }}>
+            <p className="admin-muted" style={{ fontSize: 13 }}>
               The payment ledger enforces unique transaction references and single-order debit/credit immutability.
               All payment records are signed with transaction timestamps and verified against external Chapa webhook digests.
             </p>

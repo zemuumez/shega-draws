@@ -374,7 +374,7 @@ export function AdminWallets() {
                 `Deposit availability updated to ${!paused ? "Paused" : "Allowed"} and recorded in audit history.`
               );
             }}
-            style={{ maxWidth: 640 }}
+            style={{ width: "100%" }}
           >
             <label style={{ display: "block", marginBottom: 14 }}>
               <span style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>
